@@ -17,3 +17,6 @@
 obj/
 [Rr]elease*/
 _ReSharper*/
+
+_work/*
+!_work/*.txt
