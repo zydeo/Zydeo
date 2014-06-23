@@ -1,4 +1,4 @@
-#Ignore files build by Visual Studio
+# Ignore files build by Visual Studio
 *.user
 *.aps
 *.pch
@@ -18,5 +18,9 @@ obj/
 [Rr]elease*/
 _ReSharper*/
 
+# Work folder: include only character and strokes data
 _work/*
 !_work/*.txt
+
+# Bin folder: ignore altogether
+_bin/*
