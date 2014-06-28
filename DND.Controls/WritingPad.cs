@@ -91,7 +91,8 @@ namespace DND.Controls
                 g.DrawLine(p, new PointF(0, ((float)ClientSize.Height) / 2.0F), new PointF(ClientSize.Width, ((float)ClientSize.Height) / 2.0F));
             }
             // All strokes collectd so far, plus current points
-            using (Pen p = new Pen(Color.Black, 3.0F))
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            using (Pen p = new Pen(Color.Black, 5.0F))
             {
                 // Previous strokes
                 foreach (Stroke stroke in strokes)
