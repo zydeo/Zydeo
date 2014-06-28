@@ -94,6 +94,8 @@ namespace DND.Controls
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             using (Pen p = new Pen(Color.Black, 5.0F))
             {
+                p.StartCap = System.Drawing.Drawing2D.LineCap.Round;
+                p.EndCap = System.Drawing.Drawing2D.LineCap.Round;
                 // Previous strokes
                 foreach (Stroke stroke in strokes)
                 {
