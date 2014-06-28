@@ -28,6 +28,7 @@ namespace Sandbox
             writingPad.StrokesChanged += writingPad_StrokesChanged;
 
             this.strokesDataSource = strokesDataSource;
+
         }
 
         private void btnClose_Click(object sender, EventArgs e)
