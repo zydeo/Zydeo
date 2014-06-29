@@ -30,15 +30,14 @@ namespace DND.Controls
             DoubleBuffered = false;
             FormBorderStyle = FormBorderStyle.None;
 
-            Size = new Size(600, 240);
+            Size = new Size(800, 300);
             contentPanel = new Panel();
-            contentPanel.BackColor = SystemColors.Control;
+            contentPanel.BackColor = ZenParams.PaddingBackColor;
             contentPanel.BorderStyle = BorderStyle.None;
             contentPanel.Location = new Point((int)ZenParams.InnerPadding, (int)ZenParams.HeaderHeight);
             contentPanel.Size = new Size(
                 Width - 2 * (int)ZenParams.InnerPadding,
                 Height - (int)ZenParams.InnerPadding - (int)ZenParams.HeaderHeight);
-            contentPanel.Anchor = AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom | AnchorStyles.Left;
             Controls.Add(contentPanel);
             AutoScaleDimensions = new SizeF(6.0F, 13.0F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -47,11 +46,6 @@ namespace DND.Controls
 
             headerHeight = (int)(ZenParams.HeaderHeight * scale);
             innerPadding = (int)(ZenParams.InnerPadding * scale);
-
-            contentPanel.Location = new Point(innerPadding, headerHeight);
-            contentPanel.Size = new Size(
-                Width - 2 * innerPadding,
-                Height - innerPadding - headerHeight);
 
             doCreateControls();
         }
@@ -82,6 +76,14 @@ namespace DND.Controls
             ctrl.Owner = this;
         }
 
+        public void SetControl(Control c)
+        {
+            c.Dock = DockStyle.Fill;
+            c.Location = new Point(0, 0);
+            c.Size = contentPanel.ClientSize;
+            contentPanel.Controls.Add(c);
+        }
+
         private void doCreateControls()
         {
             ctrlClose = new ZenCloseControl(scale);
@@ -96,6 +98,13 @@ namespace DND.Controls
         private void arrangeControls()
         {
             if (!controlsCreated) return;
+            
+            contentPanel.Location = new Point(innerPadding, headerHeight);
+            contentPanel.Size = new Size(
+                Width - 2 * innerPadding,
+                Height - innerPadding - headerHeight);
+
+
             ctrlClose.Location = new Point(Width - ctrlClose.Size.Width - innerPadding, 0);
         }
 
