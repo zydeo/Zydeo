@@ -12,13 +12,16 @@ using System.Runtime.InteropServices;
 
 namespace DND.Controls
 {
-    public class ZenTabbedForm : Form
+    public class ZenTabbedForm : Form, IZenControlOwner
     {
         private readonly int headerHeight;
         private readonly int innerPadding;
         private readonly float scale;
         private Bitmap dbuffer = null;
         private Panel contentPanel;
+        private readonly List<ZenControl> controls = new List<ZenControl>();
+        private ZenCloseControl ctrlClose;
+        private bool controlsCreated = false;
 
         public ZenTabbedForm()
         {
@@ -49,6 +52,8 @@ namespace DND.Controls
             contentPanel.Size = new Size(
                 Width - 2 * innerPadding,
                 Height - innerPadding - headerHeight);
+
+            doCreateControls();
         }
 
         protected override CreateParams CreateParams
@@ -71,6 +76,34 @@ namespace DND.Controls
             }
         }
 
+        private void addControl(ZenControl ctrl)
+        {
+            controls.Add(ctrl);
+            ctrl.Owner = this;
+        }
+
+        private void doCreateControls()
+        {
+            ctrlClose = new ZenCloseControl(scale);
+            ctrlClose.LogicalSize = new Size(40, 20);
+            ctrlClose.Location = new Point(Width - ctrlClose.Size.Width - innerPadding, 0);
+            ctrlClose.MouseClick += ctrlClose_MouseClick;
+            addControl(ctrlClose);
+
+            controlsCreated = true;
+        }
+
+        private void arrangeControls()
+        {
+            if (!controlsCreated) return;
+            ctrlClose.Location = new Point(Width - ctrlClose.Size.Width - innerPadding, 0);
+        }
+
+        void ctrlClose_MouseClick(ZenControl sender)
+        {
+            Close();
+        }
+
         protected override void OnSizeChanged(EventArgs e)
         {
             if (dbuffer != null)
@@ -79,6 +112,7 @@ namespace DND.Controls
                 dbuffer = null;
             }
             base.OnSizeChanged(e);
+            arrangeControls();
             Invalidate();
         }
 
@@ -106,6 +140,12 @@ namespace DND.Controls
             }
         }
 
+        public void Invalidate(ZenControl ctrl)
+        {
+            // TO-DO: optimize: trigger paint that only paints affected control
+            Invalidate();
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             Graphics gg = e.Graphics;
@@ -115,6 +155,7 @@ namespace DND.Controls
             using (Graphics g = Graphics.FromImage(dbuffer))
             {
                 doPaintMyBackground(g);
+                foreach (ZenControl ctrl in controls) ctrl.DoPaint(g);
             }
             e.Graphics.DrawImageUnscaled(dbuffer, 0, 0);
         }
@@ -196,7 +237,14 @@ namespace DND.Controls
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            base.OnMouseDown(e);
+            // Over any control? Not our job to handle.
+            ZenControl ctrl = getControl(e.Location);
+            if (ctrl != null)
+            {
+                ctrl.DoMouseDown(translateToControl(ctrl, e.Location), e.Button);
+                return;
+            }
+
             var area = getDragArea(e.Location);
             if (area == DragMode.Move)
             {
@@ -215,7 +263,6 @@ namespace DND.Controls
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            base.OnMouseMove(e);
             Point loc = PointToScreen(e.Location);
             if (dragMode == DragMode.Move)
             {
@@ -282,6 +329,16 @@ namespace DND.Controls
                 Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y);
                 return;
             }
+
+            // Over any controls? Not our job to handle.
+            ZenControl ctrl = getControl(e.Location);
+            if (ctrl != null)
+            {
+                Cursor = Cursors.Arrow;
+                ctrl.DoMouseMove(translateToControl(ctrl, e.Location), e.Button);
+                return;
+            }
+
             var area = getDragArea(e.Location);
             if (area == DragMode.ResizeW || area == DragMode.ResizeE)
                 Cursor = Cursors.SizeWE;
@@ -296,7 +353,6 @@ namespace DND.Controls
 
         protected override void OnMouseLeave(EventArgs e)
         {
-            base.OnMouseLeave(e);
             if (dragMode == DragMode.None || dragMode == DragMode.Move)
             {
                 Cursor = Cursors.Arrow;
@@ -305,8 +361,30 @@ namespace DND.Controls
 
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            base.OnMouseUp(e);
             dragMode = DragMode.None;
+
+            ZenControl ctrl = getControl(e.Location);
+            if (ctrl != null) ctrl.DoMouseUp(translateToControl(ctrl, e.Location), e.Button);
+        }
+
+        private ZenControl getControl(Point p)
+        {
+            foreach (ZenControl ctrl in controls)
+                if (ctrl.Contains(p)) return ctrl;
+            return null;
+        }
+
+        private Point translateToControl(ZenControl ctrl, Point p)
+        {
+            int x = p.X - ctrl.Location.X;
+            int y = p.Y - ctrl.Location.Y;
+            return new Point(x, y);
+        }
+
+        protected override void OnMouseClick(MouseEventArgs e)
+        {
+            ZenControl ctrl = getControl(e.Location);
+            if (ctrl != null) ctrl.DoMouseClick(translateToControl(ctrl, e.Location), e.Button);
         }
     }
 }
