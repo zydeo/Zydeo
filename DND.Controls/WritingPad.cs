@@ -41,6 +41,7 @@ namespace DND.Controls
         }
 
         private readonly List<Stroke> strokes = new List<Stroke>();
+        private Bitmap dbuffer;
 
         public IEnumerable<Stroke> Strokes
         {
@@ -63,15 +64,29 @@ namespace DND.Controls
             InitializeComponent();
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if (disposing)
+            {
+                if (components != null) components.Dispose();
+                if (dbuffer != null) { dbuffer.Dispose(); dbuffer = null; }
+            }
+        }
+        
         protected override void OnSizeChanged(EventArgs e)
         {
+            if (dbuffer != null)
+            {
+                dbuffer.Dispose();
+                dbuffer = null;
+            }
             base.OnSizeChanged(e);
             Invalidate();
         }
 
-        protected override void OnPaint(PaintEventArgs pe)
+        private void doPaint(Graphics g)
         {
-            Graphics g = pe.Graphics;
             // Background
             using (Brush b = new SolidBrush(SystemColors.Window))
             {
@@ -131,6 +146,23 @@ namespace DND.Controls
                     }
                 }
             }
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs pevent)
+        {
+            //base.OnPaintBackground(pevent);
+        }
+
+        protected override void OnPaint(PaintEventArgs pe)
+        {
+            // Do all the remaining drawing through my own hand-made double-buffering for speed
+            if (dbuffer == null)
+                dbuffer = new Bitmap(Width, Height);
+            using (Graphics g = Graphics.FromImage(dbuffer))
+            {
+                doPaint(g);
+            }
+            pe.Graphics.DrawImageUnscaled(dbuffer, 0, 0);
         }
 
         private PointF normToReal(PointF pp)
