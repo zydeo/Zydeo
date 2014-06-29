@@ -48,35 +48,10 @@
     <Compile Include="WritingPad.Designer.cs">
       <DependentUpon>WritingPad.cs</DependentUpon>
     </Compile>
-    <Compile Include="ZenContentPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="ZenContentPanel.Designer.cs">
-      <DependentUpon>ZenContentPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ZenFormHeader.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="ZenFormHeader.Designer.cs">
-      <DependentUpon>ZenFormHeader.cs</DependentUpon>
-    </Compile>
+    <Compile Include="ZenParams.cs" />
     <Compile Include="ZenTabbedForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ZenTabbedForm.Designer.cs">
-      <DependentUpon>ZenTabbedForm.cs</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="ZenContentPanel.resx">
-      <DependentUpon>ZenContentPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ZenFormHeader.resx">
-      <DependentUpon>ZenFormHeader.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ZenTabbedForm.resx">
-      <DependentUpon>ZenTabbedForm.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

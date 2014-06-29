@@ -2,148 +2,128 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace DND.Controls
 {
-    public partial class ZenTabbedForm : Form
+    public class ZenTabbedForm : Form
     {
-        private float scaleFactor;
-        private ZenContentPanel pnlZenFrame;
-        private ZenFormHeader headerCtrl;
+        private readonly int headerHeight;
+        private readonly int innerPadding;
+        private readonly int outerShadow;
+        private readonly float scale;
+        private Bitmap dbuffer = null;
+        private Panel contentPanel;
 
         public ZenTabbedForm()
         {
-            InitializeComponent();
-            Text = "ZenTabbedForm";
-            scaleFactor = AutoScaleDimensions.Height / 13.0F;
+            SuspendLayout();
+
+            DoubleBuffered = false;
+            FormBorderStyle = FormBorderStyle.None;
+            this.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            BackColor = Color.Transparent;
+
+            Size = new Size(600, 240);
+            contentPanel = new Panel();
+            contentPanel.BackColor = ZenParams.PaddingBackColor;
+            contentPanel.BorderStyle = BorderStyle.FixedSingle;
+            contentPanel.Location = new Point(
+                (int)(ZenParams.OuterShadow + ZenParams.InnerPadding),
+                (int)(ZenParams.HeaderHeight + ZenParams.OuterShadow));
+            contentPanel.Size = new Size(
+                Width - 2 * (int)(ZenParams.OuterShadow + ZenParams.InnerPadding),
+                Height - 2 * (int)ZenParams.OuterShadow - (int)ZenParams.InnerPadding - (int)ZenParams.HeaderHeight);
+            contentPanel.Anchor = AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom | AnchorStyles.Left;
+            Controls.Add(contentPanel);
+            AutoScaleDimensions = new SizeF(6.0F, 13.0F);
+            AutoScaleMode = AutoScaleMode.Font;
+            scale = CurrentAutoScaleDimensions.Height / 13.0F;
+            ResumeLayout();
+
+            headerHeight = (int)(ZenParams.HeaderHeight * scale);
+            innerPadding = (int)(ZenParams.InnerPadding * scale);
+            outerShadow = (int)(ZenParams.OuterShadow * scale);
+
+            contentPanel.Location = new Point(
+                outerShadow + innerPadding,
+                headerHeight + outerShadow);
+            contentPanel.Size = new Size(
+                Width - 2 * (outerShadow + innerPadding),
+                Height - 2 * outerShadow - innerPadding - headerHeight);
         }
 
-        public override string Text
+        protected override void Dispose(bool disposing)
         {
-            get
+            base.Dispose(disposing);
+            if (disposing)
             {
-                if (headerCtrl == null) return "ZenTabbedForm";
-                return headerCtrl.HeaderText;
+                if (dbuffer != null) { dbuffer.Dispose(); dbuffer = null; }
             }
-            set { headerCtrl.HeaderText = value; }
         }
 
-        public new FormBorderStyle FormBorderStyle
+        protected override void OnSizeChanged(EventArgs e)
         {
-            get { return base.FormBorderStyle; }
-            set { base.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None; }
+            if (dbuffer != null)
+            {
+                dbuffer.Dispose();
+                dbuffer = null;
+            }
+            base.OnSizeChanged(e);
+            Invalidate();
         }
 
-        protected override void OnFontChanged(EventArgs e)
+        protected override void OnPaintBackground(PaintEventArgs e)
         {
-            base.OnFontChanged(e);
+            //base.OnPaintBackground(e);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            base.OnPaint(e);
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            pnlZenFrame.MouseMove += pnlZenFrame_MouseMove;
-            pnlZenFrame.MouseLeave += pnlZenFrame_MouseLeave;
-            pnlZenFrame.MouseDown += pnlZenFrame_MouseDown;
-            pnlZenFrame.MouseUp += pnlZenFrame_MouseUp;
-            base.OnLoad(e);
-        }
-
-        enum ResizeModes
-        {
-            WE,
-            NWSE,
-            NS
-        }
-        bool captureResize = false;
-        ResizeModes captureMode;
-        Point captureStartPoint;
-        Size captureSizeBefore;
-
-        void pnlZenFrame_MouseUp(object sender, MouseEventArgs e)
-        {
-            captureResize = false;
-        }
-
-        void pnlZenFrame_MouseDown(object sender, MouseEventArgs e)
-        {
-            int th = (int)(4.0F * scaleFactor);
-            Rectangle rR = new Rectangle(pnlZenFrame.Width - th, 0, th, pnlZenFrame.Height - th);
-            Rectangle rBR = new Rectangle(pnlZenFrame.Width - th, pnlZenFrame.Height - th, th, th);
-            Rectangle rB = new Rectangle(0, pnlZenFrame.Height - th, pnlZenFrame.Width - th, th);
-            if (rR.Contains(e.Location))
+            Graphics gg = e.Graphics;
+            // Draw border outside: cannot double-buffer that
+            // (Must draw directly onto graphics, which shows whatever is on screen behind)
+            for (int i = 0; i != outerShadow; ++i)
             {
-                captureResize = true;
-                captureStartPoint = e.Location;
-                captureMode = ResizeModes.WE;
-                captureSizeBefore = Size;
-            }
-            else if (rBR.Contains(e.Location))
-            {
-                captureResize = true;
-                captureStartPoint = e.Location;
-                captureMode = ResizeModes.NWSE;
-                captureSizeBefore = Size;
-            }
-            else if (rB.Contains(e.Location))
-            {
-                captureResize = true;
-                captureStartPoint = e.Location;
-                captureMode = ResizeModes.NS;
-                captureSizeBefore = Size;
-            }
-        }
-
-        void pnlZenFrame_MouseLeave(object sender, EventArgs e)
-        {
-            if (!captureResize) Cursor = Cursors.Arrow;
-        }
-
-        void pnlZenFrame_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (captureResize)
-            {
-                if (captureMode == ResizeModes.WE)
+                float alpha = ZenParams.ShadowAlphaStart;
+                float alphaStep = alpha / (float)outerShadow;
+                alpha = alpha - (float)i * alphaStep;
+                using (Pen p = new Pen(Color.FromArgb((int)alpha, Color.Black)))
                 {
-                    int dx = e.X - captureStartPoint.X;
-                    Size = new Size(captureSizeBefore.Width + dx, captureSizeBefore.Height);
-                }
-                else if (captureMode == ResizeModes.NWSE)
-                {
-                    int dx = e.X - captureStartPoint.X;
-                    int dy = e.Y - captureStartPoint.Y;
-                    Size = new Size(captureSizeBefore.Width + dx, captureSizeBefore.Height + dy);
-                }
-                else if (captureMode == ResizeModes.NS)
-                {
-                    int dy = e.Y - captureStartPoint.Y;
-                    Size = new Size(captureSizeBefore.Width, captureSizeBefore.Height + dy);
+                    p.Width = 1;
+                    // North
+                    gg.DrawLine(p, outerShadow, outerShadow - i - 1, Width - outerShadow - 1, outerShadow - i - 1);
+                    // South
+                    gg.DrawLine(p, outerShadow, Height - outerShadow - 1 + i, Width - outerShadow - 1, Height - outerShadow - 1 + i);
+                    // East
+                    gg.DrawLine(p, outerShadow - 1 - i, outerShadow, outerShadow - 1 - i, Height - outerShadow - 1);
+                    // West
+                    gg.DrawLine(p, Width - outerShadow - 1 + i, outerShadow, Width - outerShadow - 1 + i, Height - outerShadow - 1);
                 }
             }
-            else
+            // Do all the remaining drawing through my own hand-made double-buffering for speed
+            if (dbuffer == null)
+                dbuffer = new Bitmap(Width - 2 * outerShadow, Height - 2 * outerShadow);
+            using (Graphics g = Graphics.FromImage(dbuffer))
             {
-                int th = (int)(4.0F * scaleFactor);
-                Rectangle rR = new Rectangle(pnlZenFrame.Width - th, 0, th, pnlZenFrame.Height - th);
-                Rectangle rBR = new Rectangle(pnlZenFrame.Width - th, pnlZenFrame.Height - th, th, th);
-                Rectangle rB = new Rectangle(0, pnlZenFrame.Height - th, pnlZenFrame.Width - th, th);
-                if (rR.Contains(e.Location))
-                    Cursor = Cursors.SizeWE;
-                else if (rBR.Contains(e.Location))
-                    Cursor = Cursors.SizeNWSE;
-                else if (rB.Contains(e.Location))
-                    Cursor = Cursors.SizeNS;
-                else
+                int width = Width - 2 * outerShadow;
+                int height = Height - 2 * outerShadow;
+                using (Brush b = new SolidBrush(ZenParams.HeaderBackColor))
                 {
-                    Cursor = Cursors.Arrow;
+                    g.FillRectangle(b, 0, 0, width, headerHeight);
+                }
+                using (Brush b = new SolidBrush(ZenParams.PaddingBackColor))
+                {
+                    g.FillRectangle(b, 0, headerHeight, innerPadding, height - headerHeight);
+                    g.FillRectangle(b, width - innerPadding, headerHeight, innerPadding, height - headerHeight);
+                    g.FillRectangle(b, innerPadding, height - innerPadding, width - 2 * innerPadding, innerPadding);
                 }
             }
+            e.Graphics.DrawImageUnscaled(dbuffer, outerShadow, outerShadow);
         }
     }
 }
