@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
+
 
 namespace DND.Controls
 {
@@ -14,7 +16,6 @@ namespace DND.Controls
     {
         private readonly int headerHeight;
         private readonly int innerPadding;
-        private readonly int outerShadow;
         private readonly float scale;
         private Bitmap dbuffer = null;
         private Panel contentPanel;
@@ -25,19 +26,15 @@ namespace DND.Controls
 
             DoubleBuffered = false;
             FormBorderStyle = FormBorderStyle.None;
-            this.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            BackColor = Color.Transparent;
 
             Size = new Size(600, 240);
             contentPanel = new Panel();
-            contentPanel.BackColor = ZenParams.PaddingBackColor;
-            contentPanel.BorderStyle = BorderStyle.FixedSingle;
-            contentPanel.Location = new Point(
-                (int)(ZenParams.OuterShadow + ZenParams.InnerPadding),
-                (int)(ZenParams.HeaderHeight + ZenParams.OuterShadow));
+            contentPanel.BackColor = SystemColors.Control;
+            contentPanel.BorderStyle = BorderStyle.None;
+            contentPanel.Location = new Point((int)ZenParams.InnerPadding, (int)ZenParams.HeaderHeight);
             contentPanel.Size = new Size(
-                Width - 2 * (int)(ZenParams.OuterShadow + ZenParams.InnerPadding),
-                Height - 2 * (int)ZenParams.OuterShadow - (int)ZenParams.InnerPadding - (int)ZenParams.HeaderHeight);
+                Width - 2 * (int)ZenParams.InnerPadding,
+                Height - (int)ZenParams.InnerPadding - (int)ZenParams.HeaderHeight);
             contentPanel.Anchor = AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom | AnchorStyles.Left;
             Controls.Add(contentPanel);
             AutoScaleDimensions = new SizeF(6.0F, 13.0F);
@@ -47,14 +44,22 @@ namespace DND.Controls
 
             headerHeight = (int)(ZenParams.HeaderHeight * scale);
             innerPadding = (int)(ZenParams.InnerPadding * scale);
-            outerShadow = (int)(ZenParams.OuterShadow * scale);
 
-            contentPanel.Location = new Point(
-                outerShadow + innerPadding,
-                headerHeight + outerShadow);
+            contentPanel.Location = new Point(innerPadding, headerHeight);
             contentPanel.Size = new Size(
-                Width - 2 * (outerShadow + innerPadding),
-                Height - 2 * outerShadow - innerPadding - headerHeight);
+                Width - 2 * innerPadding,
+                Height - innerPadding - headerHeight);
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                const int CS_DROPSHADOW = 0x20000;
+                CreateParams cp = base.CreateParams;
+                cp.ClassStyle |= CS_DROPSHADOW;
+                return cp;
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -79,51 +84,229 @@ namespace DND.Controls
 
         protected override void OnPaintBackground(PaintEventArgs e)
         {
-            //base.OnPaintBackground(e);
+            // NOP!
+        }
+
+        private void doPaintMyBackground(Graphics g)
+        {
+            using (Brush b = new SolidBrush(ZenParams.HeaderBackColor))
+            {
+                g.FillRectangle(b, 0, 0, Width, headerHeight);
+            }
+            using (Brush b = new SolidBrush(ZenParams.PaddingBackColor))
+            {
+                g.FillRectangle(b, 0, headerHeight, innerPadding, Height - headerHeight);
+                g.FillRectangle(b, Width - innerPadding, headerHeight, innerPadding, Height - headerHeight);
+                g.FillRectangle(b, innerPadding, Height - innerPadding, Width - 2 * innerPadding, innerPadding);
+            }
+            using (Pen p = new Pen(ZenParams.BorderColor))
+            {
+                p.Width = 1;
+                g.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
+            }
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             Graphics gg = e.Graphics;
-            // Draw border outside: cannot double-buffer that
-            // (Must draw directly onto graphics, which shows whatever is on screen behind)
-            for (int i = 0; i != outerShadow; ++i)
-            {
-                float alpha = ZenParams.ShadowAlphaStart;
-                float alphaStep = alpha / (float)outerShadow;
-                alpha = alpha - (float)i * alphaStep;
-                using (Pen p = new Pen(Color.FromArgb((int)alpha, Color.Black)))
-                {
-                    p.Width = 1;
-                    // North
-                    gg.DrawLine(p, outerShadow, outerShadow - i - 1, Width - outerShadow - 1, outerShadow - i - 1);
-                    // South
-                    gg.DrawLine(p, outerShadow, Height - outerShadow - 1 + i, Width - outerShadow - 1, Height - outerShadow - 1 + i);
-                    // East
-                    gg.DrawLine(p, outerShadow - 1 - i, outerShadow, outerShadow - 1 - i, Height - outerShadow - 1);
-                    // West
-                    gg.DrawLine(p, Width - outerShadow - 1 + i, outerShadow, Width - outerShadow - 1 + i, Height - outerShadow - 1);
-                }
-            }
             // Do all the remaining drawing through my own hand-made double-buffering for speed
             if (dbuffer == null)
-                dbuffer = new Bitmap(Width - 2 * outerShadow, Height - 2 * outerShadow);
+                dbuffer = new Bitmap(Width, Height);
             using (Graphics g = Graphics.FromImage(dbuffer))
             {
-                int width = Width - 2 * outerShadow;
-                int height = Height - 2 * outerShadow;
-                using (Brush b = new SolidBrush(ZenParams.HeaderBackColor))
-                {
-                    g.FillRectangle(b, 0, 0, width, headerHeight);
-                }
-                using (Brush b = new SolidBrush(ZenParams.PaddingBackColor))
-                {
-                    g.FillRectangle(b, 0, headerHeight, innerPadding, height - headerHeight);
-                    g.FillRectangle(b, width - innerPadding, headerHeight, innerPadding, height - headerHeight);
-                    g.FillRectangle(b, innerPadding, height - innerPadding, width - 2 * innerPadding, innerPadding);
-                }
+                doPaintMyBackground(g);
             }
-            e.Graphics.DrawImageUnscaled(dbuffer, outerShadow, outerShadow);
+            e.Graphics.DrawImageUnscaled(dbuffer, 0, 0);
+        }
+
+        private enum DragMode
+        {
+            None,
+            ResizeW,
+            ResizeE,
+            ResizeN,
+            ResizeS,
+            ResizeNW,
+            ResizeSE,
+            ResizeNE,
+            ResizeSW,
+            Move
+        }
+
+        private DragMode dragMode = DragMode.None;
+        private Point dragStart;
+        private Point formBeforeDragLocation;
+        private Size formBeforeDragSize;
+
+        private DragMode getDragArea(Point p)
+        {
+            Rectangle rHeader = new Rectangle(
+                innerPadding,
+                innerPadding,
+                Width - 2 * innerPadding,
+                headerHeight - innerPadding);
+            if (rHeader.Contains(p))
+                return DragMode.Move;
+            Rectangle rEast = new Rectangle(
+                Width - innerPadding,
+                0,
+                innerPadding,
+                Height);
+            if (rEast.Contains(p))
+            {
+                if (p.Y < 2 * innerPadding) return DragMode.ResizeNE;
+                if (p.Y > Height - 2 * innerPadding) return DragMode.ResizeSE;
+                return DragMode.ResizeE;
+            }
+            Rectangle rWest = new Rectangle(
+                0,
+                0,
+                innerPadding,
+                Height);
+            if (rWest.Contains(p))
+            {
+                if (p.Y < 2 * innerPadding) return DragMode.ResizeNW;
+                if (p.Y > Height - 2 * innerPadding) return DragMode.ResizeSW;
+                return DragMode.ResizeW;
+            }
+            Rectangle rNorth = new Rectangle(
+                0,
+                0,
+                Width,
+                innerPadding);
+            if (rNorth.Contains(p))
+            {
+                if (p.X < 2 * innerPadding) return DragMode.ResizeNW;
+                if (p.X > Width - 2 * innerPadding) return DragMode.ResizeNE;
+                return DragMode.ResizeN;
+            }
+            Rectangle rSouth = new Rectangle(
+                0,
+                Height - innerPadding,
+                Width,
+                innerPadding);
+            if (rSouth.Contains(p))
+            {
+                if (p.X < 2 * innerPadding) return DragMode.ResizeSW;
+                if (p.X > Width - 2 * innerPadding) return DragMode.ResizeSE;
+                return DragMode.ResizeS;
+            }
+            return DragMode.None;
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            var area = getDragArea(e.Location);
+            if (area == DragMode.Move)
+            {
+                dragMode = DragMode.Move;
+                dragStart = PointToScreen(e.Location);
+                formBeforeDragLocation = Location;
+            }
+            else if (area != DragMode.None && area != DragMode.Move)
+            {
+                dragMode = area;
+                dragStart = PointToScreen(e.Location);
+                formBeforeDragSize = Size;
+                formBeforeDragLocation = Location;
+            }
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            Point loc = PointToScreen(e.Location);
+            if (dragMode == DragMode.Move)
+            {
+                int dx = loc.X - dragStart.X;
+                int dy = loc.Y - dragStart.Y;
+                Point newLocation = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y + dy);
+                ((Form)TopLevelControl).Location = newLocation;
+                return;
+            }
+            else if (dragMode == DragMode.ResizeE)
+            {
+                int dx = loc.X - dragStart.X;
+                Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height);
+                return;
+            }
+            else if (dragMode == DragMode.ResizeW)
+            {
+                int dx = loc.X - dragStart.X;
+                Left = formBeforeDragLocation.X + dx;
+                Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height);
+                return;
+            }
+            else if (dragMode == DragMode.ResizeN)
+            {
+                int dy = loc.Y - dragStart.Y;
+                Top = formBeforeDragLocation.Y + dy;
+                Size = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height - dy);
+                return;
+            }
+            else if (dragMode == DragMode.ResizeS)
+            {
+                int dy = loc.Y - dragStart.Y;
+                Size = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height + dy);
+                return;
+            }
+            else if (dragMode == DragMode.ResizeNW)
+            {
+                int dx = loc.X - dragStart.X;
+                int dy = loc.Y - dragStart.Y;
+                Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height - dy);
+                Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y + dy);
+                return;
+            }
+            else if (dragMode == DragMode.ResizeSE)
+            {
+                int dx = loc.X - dragStart.X;
+                int dy = loc.Y - dragStart.Y;
+                Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height + dy);
+                return;
+            }
+            else if (dragMode == DragMode.ResizeNE)
+            {
+                int dx = loc.X - dragStart.X;
+                int dy = loc.Y - dragStart.Y;
+                Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height - dy);
+                Location = new Point(formBeforeDragLocation.X, formBeforeDragLocation.Y + dy);
+                return;
+            }
+            else if (dragMode == DragMode.ResizeSW)
+            {
+                int dx = loc.X - dragStart.X;
+                int dy = loc.Y - dragStart.Y;
+                Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height + dy);
+                Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y);
+                return;
+            }
+            var area = getDragArea(e.Location);
+            if (area == DragMode.ResizeW || area == DragMode.ResizeE)
+                Cursor = Cursors.SizeWE;
+            else if (area == DragMode.ResizeN || area == DragMode.ResizeS)
+                Cursor = Cursors.SizeNS;
+            else if (area == DragMode.ResizeNW || area == DragMode.ResizeSE)
+                Cursor = Cursors.SizeNWSE;
+            else if (area == DragMode.ResizeNE || area == DragMode.ResizeSW)
+                Cursor = Cursors.SizeNESW;
+            else Cursor = Cursors.Arrow;
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            if (dragMode == DragMode.None || dragMode == DragMode.Move)
+            {
+                Cursor = Cursors.Arrow;
+            }
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            dragMode = DragMode.None;
         }
     }
 }
