@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace DND.Controls
 {
-    internal interface IZenControlOwner
+    internal interface IZenTabsChangedListener
     {
-        void Invalidate(ZenControl ctrl);
+        void ZenTabsChanged();
     }
 }

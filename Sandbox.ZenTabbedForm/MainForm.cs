@@ -15,13 +15,17 @@ namespace Sandbox
     public partial class MainForm : ZenTabbedForm
     {
         private LookupControl lc;
+        private SettingsControl stgs;
 
         public MainForm()
         {
-            InitializeComponent();
+            LogicalSize = new Size(800, 500);
+            Header = "Zydeo Chinese-English dictionary";
             lc = new LookupControl();
-            SetControl(lc);
-            
+            stgs = new SettingsControl();
+            MainTab = stgs;
+            MainTabHeader = "Zydeo";
+            Tabs.Add(new ZenTab(lc, "Lookup"));
         }
     }
 }
