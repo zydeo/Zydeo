@@ -257,6 +257,8 @@ namespace DND.Controls
                 tabs[idx].Ctrl.Visible = true;
                 activeTabIdx = idx;
             }
+            // Newly active contol still has old size if window was resized
+            arrangeControls();
             // Refresh
             Invalidate();
         }

@@ -88,7 +88,7 @@ namespace DND.Controls
         private void doPaint(Graphics g)
         {
             // Background
-            using (Brush b = new SolidBrush(SystemColors.Window))
+            using (Brush b = new SolidBrush(Color.White))
             {
                 g.FillRectangle(b, ClientRectangle);
             }
@@ -98,6 +98,14 @@ namespace DND.Controls
                 p.DashStyle = System.Drawing.Drawing2D.DashStyle.Solid;
                 g.DrawLine(p, new PointF(0, 0), new PointF(ClientSize.Width, ClientSize.Height));
                 g.DrawLine(p, new PointF(ClientSize.Width, 0), new Point(0, ClientSize.Height));
+            }
+            // Border
+            using (Pen p = new Pen(SystemColors.ControlDarkDark))
+            {
+                g.DrawLine(p, 0, 0, Width, 0);
+                g.DrawLine(p, Width - 1, 0, Width - 1, Height);
+                g.DrawLine(p, Width - 1, Height - 1, 0, Height - 1);
+                g.DrawLine(p, 0, Height - 1, 0, 0);
             }
             using (Pen p = new Pen(Color.DarkGray, 0.5F))
             {
