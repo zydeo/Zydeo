@@ -10,5 +10,10 @@ namespace DND.Common
         public readonly CedictEntry Entry;
 
         // TO-DO: highlights
+
+        public CedictResult(CedictEntry entry)
+        {
+            Entry = entry;
+        }
     }
 }

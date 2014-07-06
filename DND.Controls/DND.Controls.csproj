@@ -63,6 +63,7 @@
     <Compile Include="ZenCloseControl.cs" />
     <Compile Include="ZenControl.cs" />
     <Compile Include="ZenParams.cs" />
+    <Compile Include="ZenScrollbarCtrl.cs" />
     <Compile Include="ZenTab.cs" />
     <Compile Include="ZenTabbedForm.cs">
       <SubType>Form</SubType>

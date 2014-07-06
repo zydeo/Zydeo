@@ -158,6 +158,7 @@ namespace DND.Controls
             if (tabs.Count == 1)
             {
                 tabs[0].Ctrl.Visible = true;
+                tabs[0].Ctrl.Focus();
                 contentTabControls[0].Selected = true;
             }
             // Redraw
@@ -245,6 +246,7 @@ namespace DND.Controls
                 mainTabCtrl.Selected = true;
                 tabs[activeTabIdx].Ctrl.Visible = false;
                 mainTab.Visible = true;
+                mainTab.Focus();
                 activeTabIdx = -1;
             }
             // Switching away to a content tab
@@ -254,6 +256,7 @@ namespace DND.Controls
                 contentTabControls[idx].Selected = true;
                 mainTab.Visible = false;
                 tabs[idx].Ctrl.Visible = true;
+                tabs[idx].Ctrl.Focus();
                 activeTabIdx = idx;
             }
             // Newly active contol still has old size if window was resized

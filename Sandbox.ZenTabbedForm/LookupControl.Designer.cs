@@ -60,7 +60,7 @@
             this.writingPad1.Margin = new System.Windows.Forms.Padding(0);
             this.writingPad1.Name = "writingPad1";
             this.writingPad1.Size = new System.Drawing.Size(204, 196);
-            this.writingPad1.TabIndex = 0;
+            this.writingPad1.TabIndex = 1;
             this.writingPad1.Text = "writingPad1";
             // 
             // pnlLookup
@@ -77,7 +77,7 @@
             this.pnlLookup.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.pnlLookup.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.pnlLookup.Size = new System.Drawing.Size(368, 196);
-            this.pnlLookup.TabIndex = 1;
+            this.pnlLookup.TabIndex = 0;
             // 
             // siCtrl
             // 
