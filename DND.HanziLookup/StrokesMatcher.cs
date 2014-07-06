@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DND.HanziLookup
 {
@@ -331,7 +330,6 @@ namespace DND.HanziLookup
 
                         // Result score is the maximum of skipping a substroke, or comparing the two.
                         newScore = Math.Max(previousScore + matchScore, skipScore);
-                        int yyy = 0;
                     }
 
                     // Set the score for comparing the two substrokes.

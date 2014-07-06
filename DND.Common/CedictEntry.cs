@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DND.Common
 {
@@ -23,8 +23,8 @@ namespace DND.Common
         }
 
         public CedictEntry(string chSimpl, string chTrad,
-            IReadOnlyList<string> pinyin,
-            IReadOnlyList<CedictMeaning> meanings)
+            ReadOnlyCollection<string> pinyin,
+            ReadOnlyCollection<CedictMeaning> meanings)
         {
             ChSimpl = chSimpl;
             ChTrad = chTrad;
