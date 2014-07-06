@@ -8,10 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using DND.Common;
+
 namespace DND.Controls
 {
     public partial class ResultsControl : Control
     {
+        private IReadOnlyCollection<CedictResult> results;
+        private int pageSize;
+
         public ResultsControl()
         {
         }
@@ -23,6 +28,12 @@ namespace DND.Controls
                 // ...
             }
             base.Dispose(disposing);
+        }
+
+        public void SetResults(IReadOnlyCollection<CedictResult> results, int pageSize)
+        {
+            this.results = results;
+            this.pageSize = pageSize;
         }
 
         protected override void OnPaintBackground(PaintEventArgs pevent)

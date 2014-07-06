@@ -92,6 +92,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DND.Common\DND.Common.csproj">
+      <Project>{d151811c-2cf7-4ea9-8a09-052cc5c2f695}</Project>
+      <Name>DND.Common</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\DND.Controls\DND.Controls.csproj">
       <Project>{e08421c2-073f-4e52-a4cc-1ab4baf1eee3}</Project>
       <Name>DND.Controls</Name>
