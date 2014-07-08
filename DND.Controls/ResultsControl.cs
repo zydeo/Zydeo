@@ -13,14 +13,14 @@ using DND.Common;
 
 namespace DND.Controls
 {
-    public partial class ResultsControl : Control, IMessageFilter
+    public partial class ResultsControl : Control, IMessageFilter, IZenControlOwner
     {
-        // TEMP
-        private VScrollBar sb;
+        private float scale = 0;
 
-        private bool handleCreated = false;
-        private ReadOnlyCollection<CedictResult> results;
-        private int pageSize;
+        // TEMP standard scroll bar
+        private VScrollBar sb;
+        private Size contentRectSize;
+        private List<OneResultControl> resCtrls = new List<OneResultControl>();
 
         public ResultsControl()
         {
@@ -41,16 +41,21 @@ namespace DND.Controls
             sb.ValueChanged += sb_ValueChanged;
 
             contentRectSize = new Size(Width - 2 - sb.Width, Height - 2);
+        }
 
-            renderThread = new Thread(renderThreadFun);
-            renderThread.Start();
-
-            HandleCreated += onHandleCreated;
-            HandleDestroyed += onHandleDestroyed;
+        public void SetScale(float scale)
+        {
+            this.scale = scale;
         }
 
         void sb_ValueChanged(object sender, EventArgs e)
         {
+            int y = 1 - sb.Value;
+            foreach (OneResultControl orc in resCtrls)
+            {
+                orc.Top = y;
+                y += orc.Height;
+            }
             Invalidate();
         }
 
@@ -78,7 +83,7 @@ namespace DND.Controls
 
         private void onMouseWheel(MouseEventArgs e)
         {
-            float diff = ((float)sb.SmallChange) * ((float)e.Delta) / 120.0F;
+            float diff = ((float)sb.LargeChange) * ((float)e.Delta) / 240.0F;
             int idiff = -(int)diff;
             int newval = sb.Value + idiff;
             if (newval < 0) newval = 0;
@@ -86,185 +91,48 @@ namespace DND.Controls
             sb.Value = newval;
         }
 
-        private void onHandleDestroyed(object sender, EventArgs e)
-        {
-            renderKill = true;
-            renderEvent.Set();
-        }
-
-        void onHandleCreated(object sender, EventArgs e)
-        {
-            handleCreated = true;
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                // ...
+                foreach (OneResultControl orc in resCtrls) orc.Dispose();
             }
             base.Dispose(disposing);
         }
 
         protected override void OnSizeChanged(EventArgs e)
         {
+            contentRectSize = new Size(Width - 2 - sb.Width, Height - 2);
             sb.Height = Height - 2;
             sb.Top = 1;
             sb.Left = Width - 1 - sb.Width;
-            contentRectSize = new Size(Width - 2 - sb.Width, Height - 2);
-            if (results != null)
-                renderInBackground();
+            sb.LargeChange = contentRectSize.Height;
         }
 
         public void SetResults(ReadOnlyCollection<CedictResult> results, int pageSize)
         {
-            this.results = results;
-            this.pageSize = pageSize;
-            renderInBackground();
-        }
-
-        private Thread renderThread;
-        private AutoResetEvent renderEvent = new AutoResetEvent(false);
-        private bool renderStop = false;
-        private bool renderKill = false;
-        private bool isRendering = false;
-        private int renderRequests = 0;
-        private Size contentRectSize;
-        private Bitmap contentBmp;
-        private List<CedictResult> resultsToRender;
-        private int pageSizeToRender;
-
-        private void renderInBackground()
-        {
-            lock (renderThread)
+            if (scale == 0) throw new InvalidOperationException("Scale must be set before setting results to show.");
+            // Dispose old results controls
+            foreach (OneResultControl orc in resCtrls) orc.Dispose();
+            resCtrls.Clear();
+            // Create new result controls
+            int y = 0;
+            using (Graphics g = Graphics.FromHwnd(this.Handle))
             {
-                sb.Enabled = false;
-                ++renderRequests;
-                renderStop = true;
-                if (results != null)
-                    resultsToRender = new List<CedictResult>(results);
-                else
-                    resultsToRender = new List<CedictResult>();
-                pageSizeToRender = pageSize;
-                renderEvent.Set();
-            }
-        }
-
-        private void renderThreadFun()
-        {
-            while (true)
-            {
-                renderEvent.WaitOne();
-                if (renderKill) break;
-                Size canvasSize;
-                List<CedictResult> copiedResults;
-                int copiedPageSize;
-                lock (renderThread)
+                foreach (CedictResult cr in results)
                 {
-                    --renderRequests;
-                    if (renderRequests > 0) continue;
-                    canvasSize = contentRectSize;
-                    renderStop = false;
-                    isRendering = true;
-                    copiedResults = resultsToRender;
-                    copiedPageSize = pageSizeToRender;
-                }
-                bool completed = doRender(canvasSize, copiedResults, copiedPageSize);
-                if (renderKill) break;
-                if (completed)
-                {
-                    lock (renderThread)
-                    {
-                        isRendering = false;
-                    }
-
-                    if (handleCreated)
-                    {
-                        Invoke((MethodInvoker)delegate
-                        {
-                            sb.Maximum = contentBmp.Height;
-                            sb.LargeChange = Height - 2;
-                            sb.SmallChange = sb.Maximum / (copiedResults.Count + 1);
-                            sb.Value = 0;
-                            sb.Enabled = true;
-                            Invalidate();
-                        });
-                    }
+                    OneResultControl orc = new OneResultControl(scale, this, cr);
+                    orc.Analyze(g, contentRectSize.Width);
+                    orc.Location = new Point(1, y + 1);
+                    y += orc.Height;
+                    resCtrls.Add(orc);
                 }
             }
-        }
-
-        private void doRenderOne(Graphics g, int w, int h, CedictResult cr)
-        {
-            for (int i = 0; i != h; ++i)
-            {
-                using (Pen p = new Pen(Color.FromArgb(i,i,i)))
-                {
-                    g.DrawLine(p, 0, i, w, i);
-                }
-                using (Brush b = new SolidBrush(Color.White))
-                using (Font f = new Font("SimSun", 12.0F))
-                {
-                    g.DrawString(cr.Entry.ChSimpl, f, b, 5.0F, 5.0F);
-                }
-            }
-        }
-
-        private bool doRender(Size canvasSize, List<CedictResult> cRes, int cPageSize)
-        {
-            Bitmap bmpTest = new Bitmap(1, 1);
-            List<Bitmap> entryBmps = new List<Bitmap>();
-
-            int top = 0;
-            foreach (CedictResult cr in cRes)
-            {
-                Bitmap resBmp = new Bitmap(canvasSize.Width, 47);
-                using (Graphics g = Graphics.FromImage(resBmp))
-                {
-                    doRenderOne(g, canvasSize.Width, resBmp.Height, cr);
-                }
-                entryBmps.Add(resBmp);
-                top += resBmp.Height;
-                if (renderStop || renderKill) break;
-            }
-
-            if (entryBmps.Count != cRes.Count)
-            {
-                foreach (var x in entryBmps) if (x != null) x.Dispose();
-                bmpTest.Dispose();
-                return false;
-            }
-
-            int h = 0;
-            foreach (Bitmap b in entryBmps) h += b.Height;
-            Bitmap bmp = null;
-            if (h > 0)
-            {
-                bmp = new Bitmap(canvasSize.Width, h);
-                using (Graphics g = Graphics.FromImage(bmp))
-                {
-                    int y = 0;
-                    for (int i = 0; i != entryBmps.Count; ++i)
-                    {
-                        Bitmap thisBmp = entryBmps[i];
-                        g.DrawImageUnscaled(thisBmp, 0, y);
-                        y += thisBmp.Height;
-                        thisBmp.Dispose();
-                        entryBmps[i] = null;
-                    }
-                }
-            }
-            lock (renderThread)
-            {
-                if (contentBmp != null)
-                {
-                    contentBmp.Dispose();
-                    contentBmp = null;
-                }
-                contentBmp = bmp;
-            }
-            bmpTest.Dispose();
-            return true;
+            sb.Maximum = y;
+            sb.LargeChange = contentRectSize.Height;
+            sb.Value = 0;
+            sb.Enabled = true;
+            Invalidate();
         }
 
         protected override void OnPaintBackground(PaintEventArgs pevent)
@@ -274,6 +142,8 @@ namespace DND.Controls
 
         protected override void OnPaint(PaintEventArgs pe)
         {
+            if (scale == 0) throw new InvalidOperationException("Scale must be set before control is first painted.");
+
             Graphics g = pe.Graphics;
             // Background
             using (Brush b = new SolidBrush(Color.White))
@@ -288,16 +158,21 @@ namespace DND.Controls
                 g.DrawLine(p, Width - 1, Height - 1, 0, Height - 1);
                 g.DrawLine(p, 0, Height - 1, 0, 0);
             }
-            // Show canvas
-            lock (renderThread)
+            // Results
+            g.Clip = new Region(new Rectangle(1, 1, contentRectSize.Width, contentRectSize.Height));
+            foreach (OneResultControl orc in resCtrls)
             {
-                if (isRendering || contentBmp == null) return;
-                if (contentBmp.Width != contentRectSize.Width) return;
-                // Render part of bitmap
-                g.DrawImage(contentBmp, new Rectangle(1, 1, contentRectSize.Width, contentRectSize.Height),
-                    new Rectangle(0, sb.Value, contentRectSize.Width, contentRectSize.Height),
-                    GraphicsUnit.Pixel);
+                if ((orc.Bottom < contentRectSize.Height && orc.Bottom >= 0) ||
+                    (orc.Top < contentRectSize.Height || orc.Top >= 0))
+                {
+                    orc.DoPaint(g);
+                }
             }
+        }
+
+        void IZenControlOwner.Invalidate(ZenControl ctrl)
+        {
+            Invalidate();
         }
     }
 }

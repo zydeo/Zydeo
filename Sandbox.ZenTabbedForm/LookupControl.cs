@@ -17,7 +17,7 @@ namespace Sandbox
         public LookupControl()
         {
             InitializeComponent();
-
+            resultsCtrl.SetScale(AutoScaleDimensions.Height / 13.0F);
             siCtrl.StartSearch += siCtrl_StartSearch;
         }
 
@@ -28,7 +28,8 @@ namespace Sandbox
             {
                 string[] xs = new string[0];
                 CedictMeaning[] xm = new CedictMeaning[0];
-                CedictEntry ce = new CedictEntry(i.ToString(), "爱情", new ReadOnlyCollection<string>(xs), new ReadOnlyCollection<CedictMeaning>(xm));
+                CedictEntry ce = new CedictEntry("爱情" + (i + 1).ToString(),
+                    "爱情" + (i + 1).ToString(), new ReadOnlyCollection<string>(xs), new ReadOnlyCollection<CedictMeaning>(xm));
                 CedictResult cr = new CedictResult(ce);
                 rs.Add(cr);
             }

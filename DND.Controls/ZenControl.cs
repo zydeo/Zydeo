@@ -113,6 +113,12 @@ namespace DND.Controls
             }
         }
 
+        protected void SetSizeNoInvalidate(Size sz)
+        {
+            size = sz;
+            calcRect();
+        }
+
         protected void AddDisposable(IDisposable d)
         {
             disposables.Add(d);
