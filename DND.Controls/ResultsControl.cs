@@ -21,6 +21,8 @@ namespace DND.Controls
         private VScrollBar sb;
         private Size contentRectSize;
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
+        private bool childRedrawSuspended = false;
+        private readonly System.Timers.Timer timer;
 
         public ResultsControl()
         {
@@ -41,6 +43,11 @@ namespace DND.Controls
             sb.ValueChanged += sb_ValueChanged;
 
             contentRectSize = new Size(Width - 2 - sb.Width, Height - 2);
+
+            timer = new System.Timers.Timer(40);
+            timer.AutoReset = true;
+            timer.Start();
+            timer.Elapsed += onScrollTimerEvent;
         }
 
         public void SetScale(float scale)
@@ -83,12 +90,56 @@ namespace DND.Controls
 
         private void onMouseWheel(MouseEventArgs e)
         {
-            float diff = ((float)sb.LargeChange) * ((float)e.Delta) / 240.0F;
-            int idiff = -(int)diff;
-            int newval = sb.Value + idiff;
-            if (newval < 0) newval = 0;
-            else if (newval > sb.Maximum - sb.LargeChange) newval = sb.Maximum - sb.LargeChange;
-            sb.Value = newval;
+            subscribeOrAddScrollTimer(((float)e.Delta));
+
+            //float diff = ((float)sb.LargeChange) * ((float)e.Delta) / 240.0F;
+            //int idiff = -(int)diff;
+            //int newval = sb.Value + idiff;
+            //if (newval < 0) newval = 0;
+            //else if (newval > sb.Maximum - sb.LargeChange) newval = sb.Maximum - sb.LargeChange;
+            //sb.Value = newval;
+        }
+
+        private float scrollSpeed;
+        private bool scrollTimerSubscribed = false;
+        private object scrollTimerLO = new object();
+
+        private void subscribeOrAddScrollTimer(float diffMomentum)
+        {
+            lock (scrollTimerLO)
+            {
+                scrollSpeed += diffMomentum;
+            }
+        }
+
+        private void onScrollTimerEvent(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            float speed = 0;
+            lock (scrollTimerLO)
+            {
+                speed = scrollSpeed;
+                scrollSpeed *= 0.9F;
+                scrollSpeed -= 3.0F;
+                if (scrollSpeed < 1.0F) scrollSpeed = 0;
+            }
+            if (speed == 0) return;
+            bool edgeHit = false;
+            Invoke((MethodInvoker)delegate
+            {
+                int scrollVal = sb.Value;
+                scrollVal += (int)speed;
+                if (scrollVal < 0)
+                {
+                    edgeHit = true;
+                    scrollVal = 0;
+                }
+                else if (scrollVal > sb.Maximum - contentRectSize.Height)
+                {
+                    edgeHit = true;
+                    scrollVal = sb.Maximum - contentRectSize.Height;
+                }
+                sb.Value = scrollVal;
+            });
         }
 
         protected override void Dispose(bool disposing)
@@ -96,6 +147,7 @@ namespace DND.Controls
             if (disposing)
             {
                 foreach (OneResultControl orc in resCtrls) orc.Dispose();
+                timer.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -107,6 +159,10 @@ namespace DND.Controls
             sb.Top = 1;
             sb.Left = Width - 1 - sb.Width;
             sb.LargeChange = contentRectSize.Height;
+            childRedrawSuspended = true;
+            foreach (OneResultControl orc in resCtrls) orc.Width = contentRectSize.Width;
+            childRedrawSuspended = false;
+            Invalidate();
         }
 
         public void SetResults(ReadOnlyCollection<CedictResult> results, int pageSize)
@@ -172,7 +228,7 @@ namespace DND.Controls
 
         void IZenControlOwner.Invalidate(ZenControl ctrl)
         {
-            Invalidate();
+            if (!childRedrawSuspended) Invalidate();
         }
     }
 }

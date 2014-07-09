@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GraphicsExtension.cs" />
     <Compile Include="IZenControlOwner.cs" />
     <Compile Include="IZenTabsChangedListener.cs" />
     <Compile Include="OneResultControl.cs" />
