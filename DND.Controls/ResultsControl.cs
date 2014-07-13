@@ -90,7 +90,7 @@ namespace DND.Controls
 
         private void onMouseWheel(MouseEventArgs e)
         {
-            subscribeOrAddScrollTimer(((float)e.Delta));
+            subscribeOrAddScrollTimer(-((float)e.Delta) * ((float)sb.LargeChange) / 1500.0F);
 
             //float diff = ((float)sb.LargeChange) * ((float)e.Delta) / 240.0F;
             //int idiff = -(int)diff;
@@ -101,7 +101,6 @@ namespace DND.Controls
         }
 
         private float scrollSpeed;
-        private bool scrollTimerSubscribed = false;
         private object scrollTimerLO = new object();
 
         private void subscribeOrAddScrollTimer(float diffMomentum)
@@ -119,8 +118,9 @@ namespace DND.Controls
             {
                 speed = scrollSpeed;
                 scrollSpeed *= 0.9F;
-                scrollSpeed -= 3.0F;
-                if (scrollSpeed < 1.0F) scrollSpeed = 0;
+                if (scrollSpeed > 3.0F) scrollSpeed -= 3.0F;
+                else if (scrollSpeed < -3.0F) scrollSpeed += 3.0F;
+                if (Math.Abs(scrollSpeed) < 1.0F) scrollSpeed = 0;
             }
             if (speed == 0) return;
             bool edgeHit = false;
