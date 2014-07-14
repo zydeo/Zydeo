@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
 namespace DND.Controls
 {
-    public partial class WritingPad : Control
+    public partial class WritingPad : ZenControl
     {
-        public delegate void StrokesChangedDelegate(Control sender, IEnumerable<Stroke> strokes);
+        public delegate void StrokesChangedDelegate(object sender, IEnumerable<Stroke> strokes);
         public event StrokesChangedDelegate StrokesChanged;
 
         public class Stroke
@@ -58,45 +59,45 @@ namespace DND.Controls
             Invalidate();
         }
 
-        public WritingPad()
+        public WritingPad(float scale, IZenControlOwner owner)
+            : base(scale, owner)
         {
-            InitializeComponent();
         }
 
-        protected override void Dispose(bool disposing)
+        public override void Dispose()
         {
-            base.Dispose(disposing);
-            if (disposing)
-            {
-                if (components != null) components.Dispose();
-                if (dbuffer != null) { dbuffer.Dispose(); dbuffer = null; }
-            }
+            if (dbuffer != null) { dbuffer.Dispose(); dbuffer = null; }
+            base.Dispose();
         }
         
-        protected override void OnSizeChanged(EventArgs e)
+        protected override void OnSizeChanged()
         {
             if (dbuffer != null)
             {
                 dbuffer.Dispose();
                 dbuffer = null;
             }
-            base.OnSizeChanged(e);
             Invalidate();
         }
 
-        private void doPaint(Graphics g)
+        public override void DoPaint(Graphics g)
         {
+            Region oldClip = g.Clip;
+            Matrix oldTransform = g.Transform;
+            Rectangle rect = AbsRect;
+            g.Clip = new Region(new Rectangle(AbsLeft, AbsTop, Width, Height));
+            g.TranslateTransform(rect.X, rect.Y);
             // Background
             using (Brush b = new SolidBrush(Color.White))
             {
-                g.FillRectangle(b, ClientRectangle);
+                g.FillRectangle(b, 0, 0, rect.Width, rect.Height);
             }
             // Lines to structure character space
             using (Pen p = new Pen(Color.LightGray, 0.5F))
             {
                 p.DashStyle = System.Drawing.Drawing2D.DashStyle.Solid;
-                g.DrawLine(p, new PointF(0, 0), new PointF(ClientSize.Width, ClientSize.Height));
-                g.DrawLine(p, new PointF(ClientSize.Width, 0), new Point(0, ClientSize.Height));
+                g.DrawLine(p, new PointF(0, 0), new PointF(Size.Width, Size.Height));
+                g.DrawLine(p, new PointF(Size.Width, 0), new Point(0, Size.Height));
             }
             // Border
             using (Pen p = new Pen(SystemColors.ControlDarkDark))
@@ -109,8 +110,8 @@ namespace DND.Controls
             using (Pen p = new Pen(Color.DarkGray, 0.5F))
             {
                 p.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
-                g.DrawLine(p, new PointF(((float)ClientSize.Width) / 2.0F, 0), new PointF(((float)ClientSize.Width) / 2.0F, ClientSize.Height));
-                g.DrawLine(p, new PointF(0, ((float)ClientSize.Height) / 2.0F), new PointF(ClientSize.Width, ((float)ClientSize.Height) / 2.0F));
+                g.DrawLine(p, new PointF(((float)Size.Width) / 2.0F, 0), new PointF(((float)Size.Width) / 2.0F, Size.Height));
+                g.DrawLine(p, new PointF(0, ((float)Size.Height) / 2.0F), new PointF(Size.Width, ((float)Size.Height) / 2.0F));
             }
             // All strokes collectd so far, plus current points
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
@@ -153,53 +154,38 @@ namespace DND.Controls
                     }
                 }
             }
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs pevent)
-        {
-            //base.OnPaintBackground(pevent);
-        }
-
-        protected override void OnPaint(PaintEventArgs pe)
-        {
-            // Do all the remaining drawing through my own hand-made double-buffering for speed
-            if (dbuffer == null)
-                dbuffer = new Bitmap(Width, Height);
-            using (Graphics g = Graphics.FromImage(dbuffer))
-            {
-                doPaint(g);
-            }
-            pe.Graphics.DrawImageUnscaled(dbuffer, 0, 0);
+            g.Transform = oldTransform;
+            g.Clip = oldClip;
         }
 
         private PointF normToReal(PointF pp)
         {
-            return new PointF(pp.X * ((float)ClientSize.Width) / scale, pp.Y * ((float)ClientSize.Height) / scale);
+            return new PointF(pp.X * ((float)Size.Width) / canvasScale, pp.Y * ((float)Size.Height) / canvasScale);
         }
 
         private readonly List<PointF> currentPoints = new List<PointF>();
 
-        const float scale = 250.0F;
+        const float canvasScale = 250.0F;
 
-        protected override void OnMouseDown(MouseEventArgs e)
+        public override bool DoMouseDown(Point p, MouseButtons button)
         {
-            base.OnMouseDown(e);
-            double x = ((double)e.X) * scale / ((double)ClientSize.Width);
-            double y = ((double)e.Y) * scale / ((double)ClientSize.Height);
+            double x = ((double)p.X) * canvasScale / ((double)Size.Width);
+            double y = ((double)p.Y) * canvasScale / ((double)Size.Height);
             currentPoints.Add(new PointF((float)x, (float)y));
             Invalidate();
+            return true;
         }
 
-        protected override void OnMouseMove(MouseEventArgs e)
+        public override bool DoMouseMove(Point p, MouseButtons button)
         {
-            base.OnMouseMove(e);
-            if (currentPoints.Count == 0) return;
-            double x = ((double)e.X) * scale / ((double)ClientSize.Width);
-            double y = ((double)e.Y) * scale / ((double)ClientSize.Height);
+            if (currentPoints.Count == 0) return true;
+            double x = ((double)p.X) * canvasScale / ((double)Size.Width);
+            double y = ((double)p.Y) * canvasScale / ((double)Size.Height);
             PointF newPoint = new PointF((float)x, (float)y);
             if (currentPoints.Count == 0) currentPoints.Add(newPoint);
             else if (currentPoints[currentPoints.Count - 1] != newPoint) currentPoints.Add(newPoint);
             Invalidate();
+            return true;
         }
 
         private static float dist(PointF a, PointF b)
@@ -209,9 +195,8 @@ namespace DND.Controls
             return (float)Math.Sqrt(dx * dx + dy * dy);
         }
 
-        protected override void OnMouseUp(MouseEventArgs e)
+        public override bool DoMouseUp(Point p, MouseButtons button)
         {
-            base.OnMouseUp(e);
             if (currentPoints.Count > 1)
             {
                 List<PointF> strokePoints = new List<PointF>();
@@ -229,6 +214,7 @@ namespace DND.Controls
             currentPoints.Clear();
             Invalidate();
             if (StrokesChanged != null) StrokesChanged(this, Strokes);
+            return true;
         }
     }
 }

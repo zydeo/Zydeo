@@ -60,7 +60,7 @@ namespace DND.Controls
             int y = 1 - sb.Value;
             foreach (OneResultControl orc in resCtrls)
             {
-                orc.Top = y;
+                orc.AbsTop = y;
                 y += orc.Height;
             }
             Invalidate();
@@ -179,7 +179,7 @@ namespace DND.Controls
                 {
                     OneResultControl orc = new OneResultControl(scale, this, cr);
                     orc.Analyze(g, contentRectSize.Width);
-                    orc.Location = new Point(1, y + 1);
+                    orc.AbsLocation = new Point(1, y + 1);
                     y += orc.Height;
                     resCtrls.Add(orc);
                 }
@@ -218,8 +218,8 @@ namespace DND.Controls
             g.Clip = new Region(new Rectangle(1, 1, contentRectSize.Width, contentRectSize.Height));
             foreach (OneResultControl orc in resCtrls)
             {
-                if ((orc.Bottom < contentRectSize.Height && orc.Bottom >= 0) ||
-                    (orc.Top < contentRectSize.Height || orc.Top >= 0))
+                if ((orc.AbsBottom < contentRectSize.Height && orc.AbsBottom >= 0) ||
+                    (orc.AbsTop < contentRectSize.Height || orc.AbsTop >= 0))
                 {
                     orc.DoPaint(g);
                 }
@@ -229,6 +229,20 @@ namespace DND.Controls
         void IZenControlOwner.Invalidate(ZenControl ctrl)
         {
             if (!childRedrawSuspended) Invalidate();
+        }
+
+        void IZenControlOwner.ControlAdded(ZenControl ctrl)
+        {
+            // NOP
+        }
+
+        public Rectangle AbsRect
+        {
+            get
+            {
+                // TO-DO
+                return new Rectangle(0, 0, 0, 0);
+            }
         }
     }
 }

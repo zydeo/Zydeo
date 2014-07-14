@@ -21,28 +21,28 @@ namespace DND.Controls
             if (isHover) clr = ZenParams.CloseColorHover;
             using (Brush b = new SolidBrush(clr))
             {
-                g.FillRectangle(b, Location.X, Location.Y, Size.Width, Size.Height);
+                g.FillRectangle(b, AbsLocation.X, AbsLocation.Y, Size.Width, Size.Height);
             }
             using (Pen p = new Pen(Color.DarkGray))
             {
-                g.DrawLine(p, Location.X, Location.Y, Location.X, Location.Y + Height - 1);
-                g.DrawLine(p, Location.X + Width - 1, Location.Y, Location.X + Width - 1, Location.Y + Height - 1);
-                g.DrawLine(p, Location.X, Location.Y + Height - 1, Location.X + Width - 1, Location.Y + Height - 1);
+                g.DrawLine(p, AbsLocation.X, AbsLocation.Y, AbsLocation.X, AbsLocation.Y + Height - 1);
+                g.DrawLine(p, AbsLocation.X + Width - 1, AbsLocation.Y, AbsLocation.X + Width - 1, AbsLocation.Y + Height - 1);
+                g.DrawLine(p, AbsLocation.X, AbsLocation.Y + Height - 1, AbsLocation.X + Width - 1, AbsLocation.Y + Height - 1);
             }
         }
 
-        public override void DoMouseEnter()
+        public override bool DoMouseEnter()
         {
-            base.DoMouseEnter();
             isHover = true;
             Invalidate();
+            return true;
         }
 
-        public override void DoMouseLeave()
+        public override bool DoMouseLeave()
         {
-            base.DoMouseEnter();
             isHover = false;
             Invalidate();
+            return true;
         }
     }
 }

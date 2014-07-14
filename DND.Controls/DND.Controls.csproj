@@ -43,8 +43,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GraphicsExtension.cs" />
-    <Compile Include="IZenControlOwner.cs" />
-    <Compile Include="IZenTabsChangedListener.cs" />
+    <Compile Include="LookupControl.cs" />
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SettingsControl.cs" />
+    <Compile Include="Zen\IZenControlOwner.cs" />
+    <Compile Include="Zen\IZenTabsChangedListener.cs" />
     <Compile Include="OneResultControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResultsControl.cs">
@@ -56,22 +61,20 @@
     <Compile Include="SearchInputControl.Designer.cs">
       <DependentUpon>SearchInputControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="WritingPad.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="WritingPad.cs" />
     <Compile Include="WritingPad.Designer.cs">
       <DependentUpon>WritingPad.cs</DependentUpon>
     </Compile>
-    <Compile Include="ZenCloseControl.cs" />
-    <Compile Include="ZenControl.cs" />
-    <Compile Include="ZenParams.cs" />
-    <Compile Include="ZenScrollbarCtrl.cs" />
-    <Compile Include="ZenTab.cs" />
-    <Compile Include="ZenTabbedForm.cs">
+    <Compile Include="Zen\ZenCloseControl.cs" />
+    <Compile Include="Zen\ZenControl.cs" />
+    <Compile Include="Zen\ZenParams.cs" />
+    <Compile Include="Zen\ZenScrollbarCtrl.cs" />
+    <Compile Include="Zen\ZenTab.cs" />
+    <Compile Include="Zen\ZenTabbedForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ZenTabCollection.cs" />
-    <Compile Include="ZenTabControl.cs" />
+    <Compile Include="Zen\ZenTabCollection.cs" />
+    <Compile Include="Zen\ZenTabControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SearchInputControl.resx">
@@ -85,6 +88,7 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

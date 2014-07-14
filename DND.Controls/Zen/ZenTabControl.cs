@@ -65,18 +65,18 @@ namespace DND.Controls
             }
         }
 
-        public override void DoMouseEnter()
+        public override bool DoMouseEnter()
         {
-            base.DoMouseEnter();
             isHover = true;
             Invalidate();
+            return true;
         }
 
-        public override void DoMouseLeave()
+        public override bool DoMouseLeave()
         {
-            base.DoMouseLeave();
             isHover = false;
             Invalidate();
+            return true;
         }
 
         public override void DoPaint(Graphics g)
@@ -116,17 +116,17 @@ namespace DND.Controls
             }
             using (Brush b = new SolidBrush(fillColor))
             {
-                g.FillRectangle(b, Location.X, Location.Y, Size.Width, Size.Height);
+                g.FillRectangle(b, AbsLocation.X, AbsLocation.Y, Size.Width, Size.Height);
             }
             using (Pen p = new Pen(borderColor))
             {
-                g.DrawLine(p, Location.X, Location.Y, Location.X + Width, Location.Y);
-                g.DrawLine(p, Location.X + Width - 1, Location.Y, Location.X + Width - 1, Location.Y + Height - 1);
+                g.DrawLine(p, AbsLocation.X, AbsLocation.Y, AbsLocation.X + Width, AbsLocation.Y);
+                g.DrawLine(p, AbsLocation.X + Width - 1, AbsLocation.Y, AbsLocation.X + Width - 1, AbsLocation.Y + Height - 1);
             }
             using (Brush b = new SolidBrush(textColor))
             {
-                float x = Location.X + ZenParams.HeaderTabPadding* scale;
-                float y = Location.Y + (((float)Height) - textHeight) / 2.0F;
+                float x = AbsLocation.X + ZenParams.HeaderTabPadding* scale;
+                float y = AbsLocation.Y + (((float)Height) - textHeight) / 2.0F;
                 g.DrawString(text, font, b, new PointF(x, y));
             }
         }

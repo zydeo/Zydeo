@@ -20,18 +20,18 @@ namespace DND.Controls
 
         }
 
-        public override void DoMouseEnter()
+        public override bool DoMouseEnter()
         {
-            base.DoMouseEnter();
             isHover = true;
             Invalidate();
+            return true;
         }
 
-        public override void DoMouseLeave()
+        public override bool DoMouseLeave()
         {
-            base.DoMouseEnter();
             isHover = false;
             Invalidate();
+            return true;
         }
     }
 }

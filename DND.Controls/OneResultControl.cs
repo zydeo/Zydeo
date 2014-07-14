@@ -76,18 +76,18 @@ namespace DND.Controls
             {
                 using (Pen p = new Pen(Color.White))
                 {
-                    g.DrawLine(p, Left, Top + i, Left + Width, Top + i);
+                    g.DrawLine(p, AbsLeft, AbsTop + i, AbsLeft + Width, AbsTop + i);
                 }
             }
             using (Brush b = new SolidBrush(Color.Black))
             {
-                g.DrawString(Res.Entry.ChSimpl, fntZho, b, simpLeft + (float)Left, simpTop + (float)Top);
-                g.DrawString(Res.Entry.ChTrad, fntZho, b, tradLeft + (float)Left, tradTop + (float)Top);
-                float rx = (float)Left + zhoWidth + (float)padMid;
-                g.DrawString(strPinyin, fntPinyin, b, rx, padTop + (float)Top);
+                g.DrawString(Res.Entry.ChSimpl, fntZho, b, simpLeft + (float)AbsLeft, simpTop + (float)AbsTop);
+                g.DrawString(Res.Entry.ChTrad, fntZho, b, tradLeft + (float)AbsLeft, tradTop + (float)AbsTop);
+                float rx = (float)AbsLeft + zhoWidth + (float)padMid;
+                g.DrawString(strPinyin, fntPinyin, b, rx, padTop + (float)AbsTop);
                 foreach (MeasuredBlock mb in lemmaBlocks)
                 {
-                    g.DrawString(mb.Str, fntLemma, b, mb.Loc.X + (float)Left, mb.Loc.Y + (float)Top);
+                    g.DrawString(mb.Str, fntLemma, b, mb.Loc.X + (float)AbsLeft, mb.Loc.Y + (float)AbsTop);
                 }
             }
         }

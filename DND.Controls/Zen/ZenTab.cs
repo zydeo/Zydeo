@@ -8,10 +8,10 @@ namespace DND.Controls
         internal delegate void TabHeaderChangedDelegate();
         internal TabHeaderChangedDelegate TabHeaderChanged;
 
-        private readonly Control ctrl;
+        private readonly ZenControl ctrl;
         private string header;
 
-        public ZenTab(Control ctrl, string header)
+        public ZenTab(ZenControl ctrl, string header)
         {
             if (ctrl == null) throw new ArgumentNullException("ctrl");
             if (header == null) throw new ArgumentNullException("header");
@@ -19,7 +19,7 @@ namespace DND.Controls
             this.header = header;
         }
 
-        public Control Ctrl
+        public ZenControl Ctrl
         {
             get { return ctrl; }
         }

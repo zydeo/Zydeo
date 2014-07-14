@@ -7,11 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using DND.Controls;
-
-namespace Sandbox
+namespace DND.Controls
 {
-    public partial class MainForm : ZenTabbedForm
+    public class MainForm : ZenTabbedForm
     {
         private LookupControl lc;
         private SettingsControl stgs;
@@ -20,10 +18,10 @@ namespace Sandbox
         {
             LogicalSize = new Size(800, 500);
             Header = "Zydeo Chinese-English dictionary";
-            lc = new LookupControl();
-            stgs = new SettingsControl();
-            MainTab = stgs;
-            MainTabHeader = "Zydeo";
+            lc = new LookupControl(Scale, this);
+            stgs = new SettingsControl(Scale, this);
+            MainTab = new ZenTab(stgs, "Zydeo");
+            //MainTabHeader = "Zydeo";
             Tabs.Add(new ZenTab(lc, "Lookup"));
         }
     }
