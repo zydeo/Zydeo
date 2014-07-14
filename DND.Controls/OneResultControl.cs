@@ -80,6 +80,7 @@ namespace DND.Controls
                     g.DrawLine(p, AbsLeft, AbsTop + i, AbsLeft + Width, AbsTop + i);
                 }
             }
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
             using (Brush b = new SolidBrush(Color.Black))
             {
                 g.DrawString(Res.Entry.ChSimpl, fntZho, b, simpLeft + (float)AbsLeft, simpTop + (float)AbsTop);
