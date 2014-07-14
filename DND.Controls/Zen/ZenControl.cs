@@ -23,7 +23,7 @@ namespace DND.Controls
         public Size Size
         {
             get { return absRect.Size; }
-            set { absRect.Size = value; OnSizeChanged(); Invalidate(); }
+            set { absRect.Size = value; OnSizeChanged(); MakeMePaint(true, RenderMode.Invalidate); }
         }
 
         public Rectangle AbsRect
@@ -49,7 +49,7 @@ namespace DND.Controls
                 int diff = value - absRect.X;
                 absRect.Location = new Point(value, absRect.Location.Y);
                 foreach (ZenControl ctrl in zenChildren) ctrl.AbsLeft += diff;
-                Invalidate();
+                MakeMePaint(true, RenderMode.Invalidate);
             }
         }
 
@@ -66,7 +66,7 @@ namespace DND.Controls
                 int diff = value - absRect.Y;
                 absRect.Location = new Point(absRect.X, value);
                 foreach (ZenControl ctrl in zenChildren) ctrl.AbsTop += diff;
-                Invalidate();
+                MakeMePaint(true, RenderMode.Invalidate);
             }
         }
 
@@ -78,13 +78,23 @@ namespace DND.Controls
         public int Width
         {
             get { return absRect.Width; }
-            set { absRect.Size = new Size(value, absRect.Height); OnSizeChanged(); Invalidate(); }
+            set
+            {
+                absRect.Size = new Size(value, absRect.Height);
+                OnSizeChanged();
+                MakeMePaint(true, RenderMode.Invalidate);
+            }
         }
 
         public int Height
         {
             get { return absRect.Height; }
-            set { absRect.Size = new Size(absRect.Width, value); OnSizeChanged(); Invalidate(); }
+            set
+            {
+                absRect.Size = new Size(absRect.Width, value);
+                OnSizeChanged();
+                MakeMePaint(true, RenderMode.Invalidate);
+            }
         }
 
         public Size LogicalSize
@@ -96,7 +106,7 @@ namespace DND.Controls
                 Size newSize = new Size((int)w, (int)h);
                 absRect.Size = newSize;
                 OnSizeChanged();
-                Invalidate();
+                MakeMePaint(true, RenderMode.Invalidate);
             }
             get { return new Size((int)(absRect.Width / scale), (int)(absRect.Height / scale)); }
         }
@@ -115,7 +125,7 @@ namespace DND.Controls
                     Point childNewLoc = new Point(ctrl.AbsLocation.X + diffX, ctrl.AbsLocation.Y + diffY);
                     ctrl.AbsLocation = childNewLoc;
                 }
-                Invalidate();
+                MakeMePaint(true, RenderMode.Invalidate);
             }
         }
 
@@ -133,7 +143,7 @@ namespace DND.Controls
                     Point childNewLoc = new Point(ctrl.AbsLocation.X + diffX, ctrl.AbsLocation.Y + diffY);
                     ctrl.AbsLocation = childNewLoc;
                 }
-                Invalidate();
+                MakeMePaint(true, RenderMode.Invalidate);
             }
         }
 
@@ -169,6 +179,16 @@ namespace DND.Controls
         public virtual void Dispose()
         {
             foreach (IDisposable d in disposables) d.Dispose();
+        }
+
+        protected void MakeMePaint(bool needBackground, RenderMode rm)
+        {
+            owner.MakeCtrlPaint(this, needBackground, rm);
+        }
+
+        public void MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
+        {
+            owner.MakeCtrlPaint(ctrl, needBackground, rm);
         }
 
         protected void DoPaintChildren(Graphics g)
@@ -319,16 +339,6 @@ namespace DND.Controls
         public bool Contains(Point pParent)
         {
             return RelRect.Contains(pParent);
-        }
-
-        public void Invalidate()
-        {
-            if (owner != null) owner.Invalidate(this);
-        }
-
-        public void Invalidate(ZenControl ctrl)
-        {
-            if (owner != null) owner.Invalidate(this);
         }
 
         public void ControlAdded(ZenControl ctrl)

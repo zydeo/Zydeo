@@ -41,7 +41,6 @@ namespace DND.Controls
         }
 
         private readonly List<Stroke> strokes = new List<Stroke>();
-        private Bitmap dbuffer;
 
         public IEnumerable<Stroke> Strokes
         {
@@ -56,7 +55,7 @@ namespace DND.Controls
         public void Clear()
         {
             strokes.Clear();
-            Invalidate();
+            MakeMePaint(false, RenderMode.Invalidate);
         }
 
         public WritingPad(float scale, IZenControlOwner owner)
@@ -66,18 +65,12 @@ namespace DND.Controls
 
         public override void Dispose()
         {
-            if (dbuffer != null) { dbuffer.Dispose(); dbuffer = null; }
             base.Dispose();
         }
         
         protected override void OnSizeChanged()
         {
-            if (dbuffer != null)
-            {
-                dbuffer.Dispose();
-                dbuffer = null;
-            }
-            Invalidate();
+            MakeMePaint(true, RenderMode.Invalidate);
         }
 
         public override void DoPaint(Graphics g)
@@ -172,7 +165,7 @@ namespace DND.Controls
             double x = ((double)p.X) * canvasScale / ((double)Size.Width);
             double y = ((double)p.Y) * canvasScale / ((double)Size.Height);
             currentPoints.Add(new PointF((float)x, (float)y));
-            Invalidate();
+            MakeMePaint(false, RenderMode.Invalidate);
             return true;
         }
 
@@ -184,7 +177,7 @@ namespace DND.Controls
             PointF newPoint = new PointF((float)x, (float)y);
             if (currentPoints.Count == 0) currentPoints.Add(newPoint);
             else if (currentPoints[currentPoints.Count - 1] != newPoint) currentPoints.Add(newPoint);
-            Invalidate();
+            MakeMePaint(false, RenderMode.Invalidate);
             return true;
         }
 
@@ -212,7 +205,7 @@ namespace DND.Controls
                 strokes.Add(newStroke);
             }
             currentPoints.Clear();
-            Invalidate();
+            MakeMePaint(false, RenderMode.Invalidate);
             if (StrokesChanged != null) StrokesChanged(this, Strokes);
             return true;
         }

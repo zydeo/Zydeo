@@ -23,14 +23,14 @@ namespace DND.Controls
         public override bool DoMouseEnter()
         {
             isHover = true;
-            Invalidate();
+            MakeMePaint(false, RenderMode.Invalidate);
             return true;
         }
 
         public override bool DoMouseLeave()
         {
             isHover = false;
-            Invalidate();
+            MakeMePaint(false, RenderMode.Invalidate);
             return true;
         }
     }

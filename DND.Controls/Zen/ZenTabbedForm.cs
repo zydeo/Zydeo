@@ -16,6 +16,7 @@ namespace DND.Controls
         private readonly int headerHeight;
         private readonly int innerPadding;
         private readonly float scale;
+        private readonly object bufferLockObj = new object();
         private Bitmap dbuffer = null;
         private string header;
         private readonly List<ZenControl> zenControls = new List<ZenControl>();
@@ -204,8 +205,11 @@ namespace DND.Controls
             base.Dispose(disposing);
             if (disposing)
             {
-                if (dbuffer != null) { dbuffer.Dispose(); dbuffer = null; }
                 foreach (ZenControl zc in zenControls) zc.Dispose();
+                lock (bufferLockObj)
+                {
+                    if (dbuffer != null) { dbuffer.Dispose(); dbuffer = null; }
+                }
             }
         }
 
@@ -294,19 +298,55 @@ namespace DND.Controls
 
         protected override void OnSizeChanged(EventArgs e)
         {
-            if (dbuffer != null)
+            lock (bufferLockObj)
             {
-                dbuffer.Dispose();
-                dbuffer = null;
+                if (dbuffer != null)
+                {
+                    dbuffer.Dispose();
+                    dbuffer = null;
+                }
             }
             base.OnSizeChanged(e);
             arrangeControls();
             Invalidate();
         }
 
+        void IZenControlOwner.ControlAdded(ZenControl ctrl)
+        {
+            // We do nothing here: main form creates its own controls and keeps track of them
+            // explicitly (so we can pretend content controls are not there)
+        }
+
         protected override void OnPaintBackground(PaintEventArgs e)
         {
             // NOP!
+        }
+
+        void IZenControlOwner.MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
+        {
+            lock (bufferLockObj)
+            {
+                if (dbuffer == null) return;
+                using (Graphics g = Graphics.FromImage(dbuffer))
+                {
+                    if (needBackground) doPaint(g);
+                    else ctrl.DoPaint(g);
+                }
+            }
+            if (rm == RenderMode.None) return;
+            if (InvokeRequired)
+            {
+                Invoke((MethodInvoker)delegate
+                {
+                    if (rm == RenderMode.Invalidate) Invalidate();
+                    else Refresh();
+                });
+            }
+            else
+            {
+                if (rm == RenderMode.Invalidate) Invalidate();
+                else Refresh();
+            }
         }
 
         private void doPaintMyBackground(Graphics g)
@@ -332,43 +372,40 @@ namespace DND.Controls
             }
         }
 
-        void IZenControlOwner.Invalidate(ZenControl ctrl)
+        private void doPaint(Graphics g)
         {
-            // TO-DO: optimize: trigger paint that only paints affected control
-            Invalidate();
-        }
-
-        void IZenControlOwner.ControlAdded(ZenControl ctrl)
-        {
-            // We do nothing here: main form creates its own controls and keeps track of them
-            // explicitly (so we can pretend content controls are not there)
+            doPaintMyBackground(g);
+            float x = contentTabControls[contentTabControls.Count - 1].AbsRight;
+            x += ZenParams.HeaderTabPadding * 3.0F;
+            float y = 7.0F * scale;
+            RectangleF rect = new RectangleF(x, y, ctrlClose.AbsLeft - x, headerHeight - y);
+            using (Brush b = new SolidBrush(Color.Black))
+            using (Font f = new Font(new FontFamily(ZenParams.HeaderFontFamily), ZenParams.HeaderFontSize))
+            {
+                StringFormat sf = StringFormat.GenericDefault;
+                sf.Trimming = StringTrimming.Word;
+                sf.FormatFlags |= StringFormatFlags.NoWrap;
+                g.DrawString(header, f, b, rect, sf);
+            }
+            // Draw my zen controls
+            foreach (ZenControl ctrl in zenControls) ctrl.DoPaint(g);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            Graphics gg = e.Graphics;
-            // Do all the remaining drawing through my own hand-made double-buffering for speed
-            if (dbuffer == null)
-                dbuffer = new Bitmap(Width, Height);
-            using (Graphics g = Graphics.FromImage(dbuffer))
+            lock (bufferLockObj)
             {
-                doPaintMyBackground(g);
-                float x = contentTabControls[contentTabControls.Count - 1].AbsRight;
-                x += ZenParams.HeaderTabPadding * 3.0F;
-                float y = 7.0F * scale;
-                RectangleF rect = new RectangleF(x, y, ctrlClose.AbsLeft - x, headerHeight - y);
-                using (Brush b = new SolidBrush(Color.Black))
-                using (Font f = new Font(new FontFamily(ZenParams.HeaderFontFamily), ZenParams.HeaderFontSize))
+                // Do all the remaining drawing through my own hand-made double-buffering for speed
+                if (dbuffer == null)
                 {
-                    StringFormat sf = StringFormat.GenericDefault;
-                    sf.Trimming = StringTrimming.Word;
-                    sf.FormatFlags |= StringFormatFlags.NoWrap;
-                    g.DrawString(header, f, b, rect, sf);
+                    dbuffer = new Bitmap(Width, Height);
+                    using (Graphics g = Graphics.FromImage(dbuffer))
+                    {
+                        doPaint(g);
+                    }
                 }
-                // Draw my zen controls
-                foreach (ZenControl ctrl in zenControls) ctrl.DoPaint(g);
+                e.Graphics.DrawImageUnscaled(dbuffer, 0, 0);
             }
-            e.Graphics.DrawImageUnscaled(dbuffer, 0, 0);
         }
 
         private enum DragMode

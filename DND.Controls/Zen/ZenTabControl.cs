@@ -35,7 +35,7 @@ namespace DND.Controls
                 SizeF size = MeasureText(text, font, StringFormat.GenericDefault);
                 textWidth = (int)size.Width;
                 textHeight = (int)size.Height;
-                Invalidate();
+                MakeMePaint(false, RenderMode.Invalidate);
             }
         }
 
@@ -47,7 +47,7 @@ namespace DND.Controls
                 if (isSelected != value)
                 {
                     isSelected = value;
-                    Invalidate();
+                    MakeMePaint(false, RenderMode.Invalidate);
                 }
             }
         }
@@ -68,14 +68,14 @@ namespace DND.Controls
         public override bool DoMouseEnter()
         {
             isHover = true;
-            Invalidate();
+            MakeMePaint(false, RenderMode.Invalidate);
             return true;
         }
 
         public override bool DoMouseLeave()
         {
             isHover = false;
-            Invalidate();
+            MakeMePaint(false, RenderMode.Invalidate);
             return true;
         }
 

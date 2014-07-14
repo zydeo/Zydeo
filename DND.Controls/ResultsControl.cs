@@ -123,19 +123,16 @@ namespace DND.Controls
                 if (Math.Abs(scrollSpeed) < 1.0F) scrollSpeed = 0;
             }
             if (speed == 0) return;
-            bool edgeHit = false;
             Invoke((MethodInvoker)delegate
             {
                 int scrollVal = sb.Value;
                 scrollVal += (int)speed;
                 if (scrollVal < 0)
                 {
-                    edgeHit = true;
                     scrollVal = 0;
                 }
                 else if (scrollVal > sb.Maximum - contentRectSize.Height)
                 {
-                    edgeHit = true;
                     scrollVal = sb.Maximum - contentRectSize.Height;
                 }
                 sb.Value = scrollVal;
@@ -226,7 +223,7 @@ namespace DND.Controls
             }
         }
 
-        void IZenControlOwner.Invalidate(ZenControl ctrl)
+        void IZenControlOwner.MakeCtrlPaint(ZenControl ctrl, bool b, RenderMode rm)
         {
             if (!childRedrawSuspended) Invalidate();
         }

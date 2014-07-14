@@ -43,7 +43,7 @@ namespace DND.Controls
         private float tradLeft;
         private string strPinyin;
         private SizeF pinyinSize;
-        private PointF pinyinLoc;
+        //private PointF pinyinLoc;
         private float lemmaTop;
         private List<MeasuredBlock> lemmaBlocks;
 
