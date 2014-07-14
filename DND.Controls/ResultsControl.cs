@@ -14,7 +14,7 @@ using DND.Common;
 
 namespace DND.Controls
 {
-    public partial class ResultsControl : ZenControl, IMessageFilter
+    public class ResultsControl : ZenControl, IMessageFilter
     {
         // TEMP standard scroll bar
         private VScrollBar sb;
