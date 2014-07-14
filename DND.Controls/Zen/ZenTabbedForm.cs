@@ -317,6 +317,16 @@ namespace DND.Controls
             // explicitly (so we can pretend content controls are not there)
         }
 
+        void IZenControlOwner.AddWinFormsControlToForm(Control c)
+        {
+            Controls.Add(c);
+        }
+
+        void IZenControlOwner.InvokeOnForm(Delegate method)
+        {
+            Invoke(method);
+        }
+
         protected override void OnPaintBackground(PaintEventArgs e)
         {
             // NOP!

@@ -62,11 +62,6 @@ namespace DND.Controls
             : base(scale, owner)
         {
         }
-
-        public override void Dispose()
-        {
-            base.Dispose();
-        }
         
         protected override void OnSizeChanged()
         {
@@ -80,6 +75,7 @@ namespace DND.Controls
             Rectangle rect = AbsRect;
             g.Clip = new Region(new Rectangle(AbsLeft, AbsTop, Width, Height));
             g.TranslateTransform(rect.X, rect.Y);
+
             // Background
             using (Brush b = new SolidBrush(Color.White))
             {
@@ -147,6 +143,7 @@ namespace DND.Controls
                     }
                 }
             }
+
             g.Transform = oldTransform;
             g.Clip = oldClip;
         }

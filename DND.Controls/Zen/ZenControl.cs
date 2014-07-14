@@ -13,12 +13,12 @@ namespace DND.Controls
         public delegate void ClickDelegate(ZenControl sender);
         public event ClickDelegate MouseClick;
 
-        private readonly List<IDisposable> disposables = new List<IDisposable>();
         protected readonly float scale;
         protected readonly IZenControlOwner owner;
         private Rectangle absRect = new Rectangle(0, 0, 0, 0);
         private List<ZenControl> zenChildren = new List<ZenControl>();
         private ZenControl zenCtrlWithMouse = null;
+        private bool paintSuspended = false;
 
         public Size Size
         {
@@ -176,19 +176,42 @@ namespace DND.Controls
             owner.ControlAdded(this);
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
-            foreach (IDisposable d in disposables) d.Dispose();
+            DoDispose();
+        }
+
+        protected void AddWinFormsControl(Control c)
+        {
+            owner.AddWinFormsControlToForm(c);
+        }
+
+        void IZenControlOwner.AddWinFormsControlToForm(Control c)
+        {
+            owner.AddWinFormsControlToForm(c);
         }
 
         protected void MakeMePaint(bool needBackground, RenderMode rm)
         {
+            if (paintSuspended) return;
             owner.MakeCtrlPaint(this, needBackground, rm);
         }
 
         public void MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
         {
+            if (paintSuspended) return;
             owner.MakeCtrlPaint(ctrl, needBackground, rm);
+        }
+
+        protected void SuspendPaint()
+        {
+            paintSuspended = true;
+        }
+
+        protected void ResumePaint(bool needBackground, RenderMode rm)
+        {
+            paintSuspended = false;
+            MakeMePaint(needBackground, rm);
         }
 
         protected void DoPaintChildren(Graphics g)
@@ -221,9 +244,18 @@ namespace DND.Controls
             absRect.Size = sz;
         }
 
-        protected void AddDisposable(IDisposable d)
+        protected virtual void DoDispose()
         {
-            disposables.Add(d);
+        }
+
+        protected void Invoke(Delegate method)
+        {
+            owner.InvokeOnForm(method);
+        }
+
+        void IZenControlOwner.InvokeOnForm(Delegate method)
+        {
+            owner.InvokeOnForm(method);
         }
 
         protected SizeF MeasureText(string text, Font font, StringFormat fmt)
@@ -250,7 +282,8 @@ namespace DND.Controls
 
         public virtual bool DoMouseClick(Point p, MouseButtons button)
         {
-            foreach (ZenControl ctrl in zenChildren)
+            ZenControl ctrl = getControl(p);
+            if (ctrl != null)
             {
                 if (ctrl.DoMouseClick(translateToControl(ctrl, p), button))
                     return true;

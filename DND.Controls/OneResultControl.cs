@@ -55,6 +55,7 @@ namespace DND.Controls
             padBottom = (int)(10.0F * scale);
             padMid = (int)(10.0F * scale);
             padRight = (int)(5.0F * scale);
+            SuspendPaint();
         }
 
         // Graphics resource: static, singleton, never disposed

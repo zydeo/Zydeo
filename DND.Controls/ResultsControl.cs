@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -13,28 +14,21 @@ using DND.Common;
 
 namespace DND.Controls
 {
-    public partial class ResultsControl : Control, IMessageFilter, IZenControlOwner
+    public partial class ResultsControl : ZenControl, IMessageFilter
     {
-        private float scale = 0;
-
         // TEMP standard scroll bar
         private VScrollBar sb;
         private Size contentRectSize;
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
-        private bool childRedrawSuspended = false;
         private readonly System.Timers.Timer timer;
 
-        public ResultsControl()
+        public ResultsControl(float scale, IZenControlOwner owner)
+            : base(scale, owner)
         {
             Application.AddMessageFilter(this);
 
-            this.DoubleBuffered = false;
-            this.SetStyle(ControlStyles.UserPaint, true);
-            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-            this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-
             sb = new VScrollBar();
-            Controls.Add(sb);
+            AddWinFormsControl(sb);
             sb.Height = Height - 2;
             sb.Top = 1;
             sb.Left = Width - 1 - sb.Width;
@@ -50,25 +44,21 @@ namespace DND.Controls
             timer.Elapsed += onScrollTimerEvent;
         }
 
-        public void SetScale(float scale)
-        {
-            this.scale = scale;
-        }
-
         void sb_ValueChanged(object sender, EventArgs e)
         {
             int y = 1 - sb.Value;
+            SuspendPaint();
             foreach (OneResultControl orc in resCtrls)
             {
                 orc.AbsTop = y;
                 y += orc.Height;
             }
-            Invalidate();
+            ResumePaint(false, RenderMode.Invalidate);
         }
 
         void sb_Scroll(object sender, ScrollEventArgs e)
         {
-            Invalidate();
+            MakeMePaint(false, RenderMode.Invalidate);
         }
 
         public static ushort HIWORD(IntPtr l) { return (ushort)((l.ToInt64() >> 16) & 0xFFFF); }
@@ -139,27 +129,22 @@ namespace DND.Controls
             });
         }
 
-        protected override void Dispose(bool disposing)
+        protected override void DoDispose()
         {
-            if (disposing)
-            {
-                foreach (OneResultControl orc in resCtrls) orc.Dispose();
-                timer.Dispose();
-            }
-            base.Dispose(disposing);
+            foreach (OneResultControl orc in resCtrls) orc.Dispose();
+            timer.Dispose();
         }
 
-        protected override void OnSizeChanged(EventArgs e)
+        protected override void OnSizeChanged()
         {
             contentRectSize = new Size(Width - 2 - sb.Width, Height - 2);
             sb.Height = Height - 2;
-            sb.Top = 1;
-            sb.Left = Width - 1 - sb.Width;
+            sb.Top = AbsTop + 1;
+            sb.Left = AbsLeft + Width - 1 - sb.Width;
             sb.LargeChange = contentRectSize.Height;
-            childRedrawSuspended = true;
+            SuspendPaint();
             foreach (OneResultControl orc in resCtrls) orc.Width = contentRectSize.Width;
-            childRedrawSuspended = false;
-            Invalidate();
+            ResumePaint(true, RenderMode.Invalidate);
         }
 
         public void SetResults(ReadOnlyCollection<CedictResult> results, int pageSize)
@@ -169,8 +154,10 @@ namespace DND.Controls
             foreach (OneResultControl orc in resCtrls) orc.Dispose();
             resCtrls.Clear();
             // Create new result controls
+            SuspendPaint();
             int y = 0;
-            using (Graphics g = Graphics.FromHwnd(this.Handle))
+            using (Bitmap bmp = new Bitmap(1, 1))
+            using (Graphics g = Graphics.FromImage(bmp))
             {
                 foreach (CedictResult cr in results)
                 {
@@ -185,23 +172,21 @@ namespace DND.Controls
             sb.LargeChange = contentRectSize.Height;
             sb.Value = 0;
             sb.Enabled = true;
-            Invalidate();
+            ResumePaint(false, RenderMode.Invalidate);
         }
 
-        protected override void OnPaintBackground(PaintEventArgs pevent)
+        public override void DoPaint(Graphics g)
         {
-            // NOP
-        }
+            Region oldClip = g.Clip;
+            Matrix oldTransform = g.Transform;
+            Rectangle rect = AbsRect;
+            g.Clip = new Region(new Rectangle(AbsLeft, AbsTop, Width, Height));
+            g.TranslateTransform(rect.X, rect.Y);
 
-        protected override void OnPaint(PaintEventArgs pe)
-        {
-            if (scale == 0) throw new InvalidOperationException("Scale must be set before control is first painted.");
-
-            Graphics g = pe.Graphics;
             // Background
             using (Brush b = new SolidBrush(Color.White))
             {
-                g.FillRectangle(b, ClientRectangle);
+                g.FillRectangle(b, new Rectangle(0, 0, Width, Height));
             }
             // Border
             using (Pen p = new Pen(SystemColors.ControlDarkDark))
@@ -216,37 +201,15 @@ namespace DND.Controls
             foreach (OneResultControl orc in resCtrls)
             {
                 if ((orc.AbsBottom < contentRectSize.Height && orc.AbsBottom >= 0) ||
-                    (orc.AbsTop < contentRectSize.Height || orc.AbsTop >= 0))
+                    (orc.AbsTop < contentRectSize.Height && orc.AbsTop >= 0))
                 {
                     orc.DoPaint(g);
                 }
             }
+
+            g.Transform = oldTransform;
+            g.Clip = oldClip;
         }
 
-        void IZenControlOwner.MakeCtrlPaint(ZenControl ctrl, bool b, RenderMode rm)
-        {
-            if (!childRedrawSuspended) Invalidate();
-        }
-
-        void IZenControlOwner.ControlAdded(ZenControl ctrl)
-        {
-            // NOP
-        }
-
-        public Rectangle AbsRect
-        {
-            get
-            {
-                // TO-DO
-                return new Rectangle(0, 0, 0, 0);
-            }
-        }
-
-
-        public Point MousePositionAbs
-        {
-            // TO-DO
-            get { return new Point(0, 0); }
-        }
     }
 }
