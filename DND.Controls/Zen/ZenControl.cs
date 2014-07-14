@@ -18,6 +18,7 @@ namespace DND.Controls
         protected readonly IZenControlOwner owner;
         private Rectangle absRect = new Rectangle(0, 0, 0, 0);
         private List<ZenControl> zenChildren = new List<ZenControl>();
+        private ZenControl zenCtrlWithMouse = null;
 
         public Size Size
         {
@@ -28,6 +29,11 @@ namespace DND.Controls
         public Rectangle AbsRect
         {
             get { return absRect; }
+        }
+
+        public Point MousePositionAbs
+        {
+            get { return owner.MousePositionAbs; }
         }
 
         public Rectangle RelRect
@@ -242,8 +248,19 @@ namespace DND.Controls
             ZenControl ctrl = getControl(p);
             if (ctrl != null)
             {
+                if (zenCtrlWithMouse != ctrl)
+                {
+                    if (zenCtrlWithMouse != null) zenCtrlWithMouse.DoMouseLeave();
+                    ctrl.DoMouseEnter();
+                    zenCtrlWithMouse = ctrl;
+                }
                 if (ctrl.DoMouseMove(translateToControl(ctrl, p), button))
                     return true;
+            }
+            else if (zenCtrlWithMouse != null)
+            {
+                zenCtrlWithMouse.DoMouseLeave();
+                zenCtrlWithMouse = null;
             }
             return false;
         }
@@ -272,14 +289,31 @@ namespace DND.Controls
 
         public virtual bool DoMouseEnter()
         {
-            // TO-DO: children
-            return false;
+            bool res = false;
+            Point pAbs = owner.MousePositionAbs;
+            Point pRel = new Point(pAbs.X - AbsLeft, pAbs.Y - AbsTop);
+            ZenControl ctrl = getControl(pRel);
+            if (ctrl != null)
+            {
+                if (zenCtrlWithMouse != ctrl)
+                {
+                    if (zenCtrlWithMouse != null) zenCtrlWithMouse.DoMouseLeave();
+                    res = ctrl.DoMouseEnter();
+                    zenCtrlWithMouse = ctrl;
+                }
+            }
+            return res;
         }
 
         public virtual bool DoMouseLeave()
         {
-            // TO-DO: children
-            return false;
+            bool res = false;
+            if (zenCtrlWithMouse != null)
+            {
+                res = zenCtrlWithMouse.DoMouseLeave();
+                zenCtrlWithMouse = null;
+            }
+            return res;
         }
 
         public bool Contains(Point pParent)

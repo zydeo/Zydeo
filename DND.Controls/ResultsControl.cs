@@ -244,5 +244,12 @@ namespace DND.Controls
                 return new Rectangle(0, 0, 0, 0);
             }
         }
+
+
+        public Point MousePositionAbs
+        {
+            // TO-DO
+            get { return new Point(0, 0); }
+        }
     }
 }

@@ -11,5 +11,6 @@ namespace DND.Controls
         void Invalidate(ZenControl ctrl);
         void ControlAdded(ZenControl ctrl);
         Rectangle AbsRect { get; }
+        Point MousePositionAbs { get; }
     }
 }

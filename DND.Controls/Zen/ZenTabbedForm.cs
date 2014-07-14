@@ -128,6 +128,11 @@ namespace DND.Controls
             }
         }
 
+        public Point MousePositionAbs
+        {
+            get { return PointToClient(MousePosition); }
+        }
+
         public Rectangle AbsRect
         {
             get { return new Rectangle(0, 0, Width, Height); }
@@ -558,6 +563,11 @@ namespace DND.Controls
                 }
                 ctrl.DoMouseMove(translateToControl(ctrl, e.Location), e.Button);
                 return;
+            }
+            else if (zenCtrlWithMouse != null)
+            {
+                zenCtrlWithMouse.DoMouseLeave();
+                zenCtrlWithMouse = null;
             }
 
             var area = getDragArea(e.Location);
