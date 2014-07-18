@@ -11,13 +11,12 @@ using System.Runtime.InteropServices;
 
 namespace DND.Controls
 {
-    public class ZenTabbedForm : Form, IZenControlOwner, IZenTabsChangedListener
+    public class ZenTabbedForm : IDisposable, IZenControlOwner, IZenTabsChangedListener
     {
+        private readonly ZenWinForm form;
+
         private readonly int headerHeight;
         private readonly int innerPadding;
-        private readonly float scale;
-        private readonly object bufferLockObj = new object();
-        private Bitmap dbuffer = null;
         private string header;
         private readonly List<ZenControl> zenControls = new List<ZenControl>();
         private ZenCloseControl ctrlClose;
@@ -30,35 +29,32 @@ namespace DND.Controls
 
         public ZenTabbedForm()
         {
-            SuspendLayout();
+            form = new ZenWinForm(doRender);
 
-            DoubleBuffered = false;
-            FormBorderStyle = FormBorderStyle.None;
-
-            Size = new Size(800, 300);
-            //contentPanel = new Panel();
-            //contentPanel.BackColor = ZenParams.PaddingBackColor;
-            //contentPanel.BorderStyle = BorderStyle.None;
-            //contentPanel.Location = new Point((int)ZenParams.InnerPadding, (int)(ZenParams.HeaderHeight + ZenParams.InnerPadding));
-            //contentPanel.Size = new Size(
-            //    Width - 2 * (int)ZenParams.InnerPadding,
-            //    Height - (int)ZenParams.InnerPadding - (int)ZenParams.HeaderHeight);
-            //Controls.Add(contentPanel);
-            AutoScaleDimensions = new SizeF(6.0F, 13.0F);
-            AutoScaleMode = AutoScaleMode.Font;
-            scale = CurrentAutoScaleDimensions.Height / 13.0F;
-            ResumeLayout();
-
-            headerHeight = (int)(ZenParams.HeaderHeight * scale);
-            innerPadding = (int)(ZenParams.InnerPadding * scale);
+            headerHeight = (int)(ZenParams.HeaderHeight * Scale);
+            innerPadding = (int)(ZenParams.InnerPadding * Scale);
 
             createZenControls();
             tabs = new ZenTabCollection(this);
+
+            form.SizeChanged += onFormSizeChanged;
+            form.MouseDown += onFormMouseDown;
+            form.MouseMove += onFormMouseMove;
+            form.MouseUp += onFormMouseUp;
+            form.MouseClick += onFormMouseClick;
+            form.MouseEnter += onFormMouseEnter;
+            form.MouseLeave += onFormMouseLeave;
+            form.FormClosed += onFormClosed;
         }
 
-        protected new float Scale
+        public Form WinForm
         {
-            get { return scale; }
+            get { return form; }
+        }
+
+        protected float Scale
+        {
+            get { return form.Scale; }
         }
 
         private Size ContentSize
@@ -66,8 +62,8 @@ namespace DND.Controls
             get
             {
                 return new Size(
-                    Width - 2 * (int)ZenParams.InnerPadding,
-                    Height - (int)ZenParams.InnerPadding - (int)ZenParams.HeaderHeight);
+                    form.Width - 2 * (int)ZenParams.InnerPadding,
+                    form.Height - (int)ZenParams.InnerPadding - (int)ZenParams.HeaderHeight);
             }
         }
 
@@ -84,18 +80,10 @@ namespace DND.Controls
             get { return mainTab; }
             set
             {
-                if (mainTab != null)
-                {
-                    //Controls.Remove(mainTab);
-                    mainTab = null;
-                }
                 mainTab = value;
-                //mainTab.Dock = DockStyle.Fill;
                 mainTab.Ctrl.AbsLocation = ContentLocation;
                 mainTab.Ctrl.Size = ContentSize;
-                //mainTab.Visible = false;
-                //mainTab.BackColor = Color.White;
-                //contentPanel.Controls.Add(mainTab);
+                mainTabCtrl.Text = mainTab.Header;
             }
         }
 
@@ -107,7 +95,7 @@ namespace DND.Controls
         protected string Header
         {
             get { return header; }
-            set { header = value; Invalidate(); }
+            set { header = value; form.Invalidate(); }
         }
 
         /// <summary>
@@ -124,19 +112,19 @@ namespace DND.Controls
             {
                 float w = value.Width;
                 float h = value.Height;
-                Size s = new Size((int)(w * scale), (int)(h * scale));
-                Size = s;
+                Size s = new Size((int)(w * Scale), (int)(h * Scale));
+                form.Size = s;
             }
         }
 
         public Point MousePositionAbs
         {
-            get { return PointToClient(MousePosition); }
+            get { return form.PointToClient(form.MousePosition); }
         }
 
         public Rectangle AbsRect
         {
-            get { return new Rectangle(0, 0, Width, Height); }
+            get { return new Rectangle(0, 0, form.Width, form.Height); }
         }
 
         void IZenTabsChangedListener.ZenTabsChanged()
@@ -159,7 +147,7 @@ namespace DND.Controls
             int posx = mainTabCtrl.AbsLocation.X + mainTabCtrl.Width;
             for (int i = 0; i != tabs.Count; ++i)
             {
-                ZenTabControl tc = new ZenTabControl(scale, this, false);
+                ZenTabControl tc = new ZenTabControl(Scale, this, false);
                 tc.Text = tabs[i].Header;
                 tc.LogicalSize = new Size(80, 30);
                 tc.Size = new Size(tc.PreferredWidth, tc.Height);
@@ -179,49 +167,29 @@ namespace DND.Controls
             // gets sized and placed
             arrangeControls();
             // Redraw
-            Invalidate();
+            form.Invalidate();
         }
 
-        protected override void OnLoad(EventArgs e)
+        private void onFormClosed(object sender, FormClosedEventArgs e)
         {
-            base.OnLoad(e);
-            if (tabs.Count == 0 || mainTab == null)
-                throw new InvalidOperationException("ZenTabbedForm must have main tab and at least one content tab set by the time it's loaded.");
+            Dispose();
         }
 
-        protected override CreateParams CreateParams
+        public void Dispose()
         {
-            get
-            {
-                const int CS_DROPSHADOW = 0x20000;
-                CreateParams cp = base.CreateParams;
-                cp.ClassStyle |= CS_DROPSHADOW;
-                return cp;
-            }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            if (disposing)
-            {
-                foreach (ZenControl zc in zenControls) zc.Dispose();
-                lock (bufferLockObj)
-                {
-                    if (dbuffer != null) { dbuffer.Dispose(); dbuffer = null; }
-                }
-            }
+            foreach (ZenControl zc in zenControls) zc.Dispose();
+            form.Dispose();
         }
 
         private void createZenControls()
         {
-            ctrlClose = new ZenCloseControl(scale, this);
+            ctrlClose = new ZenCloseControl(Scale, this);
             ctrlClose.LogicalSize = new Size(40, 20);
-            ctrlClose.AbsLocation = new Point(Width - ctrlClose.Width - innerPadding, 1);
+            ctrlClose.AbsLocation = new Point(form.Width - ctrlClose.Width - innerPadding, 1);
             ctrlClose.MouseClick += ctrlClose_MouseClick;
             zenControls.Add(ctrlClose);
 
-            mainTabCtrl = new ZenTabControl(scale, this, true);
+            mainTabCtrl = new ZenTabControl(Scale, this, true);
             mainTabCtrl.Text = "Main";
             mainTabCtrl.LogicalSize = new Size(80, 30);
             mainTabCtrl.Size = new Size(mainTabCtrl.PreferredWidth, mainTabCtrl.Height);
@@ -239,29 +207,29 @@ namespace DND.Controls
             // Resize and place active content tab, if any
             foreach (ZenTab zt in tabs)
             {
-                if (!this.Created || zenControls.Contains(zt.Ctrl))
+                if (!form.Created || zenControls.Contains(zt.Ctrl))
                 {
                     zt.Ctrl.AbsLocation = new Point(innerPadding, headerHeight + innerPadding);
                     zt.Ctrl.Size = new Size(
-                        Width - 2 * innerPadding,
-                        Height - 2 * innerPadding - headerHeight);
+                        form.Width - 2 * innerPadding,
+                        form.Height - 2 * innerPadding - headerHeight);
                 }
             }
             // Resize main tab, if active
-            if (mainTab != null && (!this.Created || zenControls.Contains(mainTab.Ctrl)))
+            if (mainTab != null && (!form.Created || zenControls.Contains(mainTab.Ctrl)))
             {
                 mainTab.Ctrl.AbsLocation = new Point(innerPadding, headerHeight + innerPadding);
                 mainTab.Ctrl.Size = new Size(
-                    Width - 2 * innerPadding,
-                    Height - 2 * innerPadding - headerHeight);
+                    form.Width - 2 * innerPadding,
+                    form.Height - 2 * innerPadding - headerHeight);
             }
 
-            ctrlClose.AbsLocation = new Point(Width - ctrlClose.Size.Width - innerPadding, 1);
+            ctrlClose.AbsLocation = new Point(form.Width - ctrlClose.Size.Width - innerPadding, 1);
         }
 
         private void ctrlClose_MouseClick(ZenControl sender)
         {
-            Close();
+            form.Close();
         }
 
 
@@ -293,22 +261,14 @@ namespace DND.Controls
             // Newly active contol still has old size if window was resized
             arrangeControls();
             // Refresh
-            Invalidate();
+            form.Invalidate();
         }
 
-        protected override void OnSizeChanged(EventArgs e)
+
+        private void onFormSizeChanged(object sender, EventArgs e)
         {
-            lock (bufferLockObj)
-            {
-                if (dbuffer != null)
-                {
-                    dbuffer.Dispose();
-                    dbuffer = null;
-                }
-            }
-            base.OnSizeChanged(e);
             arrangeControls();
-            Invalidate();
+            form.Invalidate();
         }
 
         void IZenControlOwner.ControlAdded(ZenControl ctrl)
@@ -319,75 +279,74 @@ namespace DND.Controls
 
         void IZenControlOwner.AddWinFormsControlToForm(Control c)
         {
-            Controls.Add(c);
+            form.Controls.Add(c);
         }
 
         void IZenControlOwner.InvokeOnForm(Delegate method)
         {
-            Invoke(method);
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs e)
-        {
-            // NOP!
+            form.Invoke(method);
         }
 
         void IZenControlOwner.MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
         {
-            lock (bufferLockObj)
+            ZenWinForm.BitmapRenderer br = null;
+            try
             {
-                if (dbuffer == null) return;
-                using (Graphics g = Graphics.FromImage(dbuffer))
-                {
-                    if (needBackground) doPaint(g);
-                    else ctrl.DoPaint(g);
-                }
+                br = form.GetBitmapRenderer();
+                if (br == null) return;
+                Graphics g = br.Graphics;
+                if (needBackground) doRender(g);
+                else ctrl.DoPaint(g);
+            }
+            finally
+            {
+                if (br != null) br.Dispose();
             }
             if (rm == RenderMode.None) return;
-            if (InvokeRequired)
+            if (form.InvokeRequired)
             {
-                Invoke((MethodInvoker)delegate
+                form.Invoke((MethodInvoker)delegate
                 {
-                    if (rm == RenderMode.Invalidate) Invalidate();
-                    else Refresh();
+                    if (rm == RenderMode.Invalidate) form.Invalidate();
+                    else form.Refresh();
                 });
             }
             else
             {
-                if (rm == RenderMode.Invalidate) Invalidate();
-                else Refresh();
+                if (rm == RenderMode.Invalidate) form.Invalidate();
+                else form.Refresh();
             }
         }
 
-        private void doPaintMyBackground(Graphics g)
+        private void doRenderMyBackground(Graphics g)
         {
             using (Brush b = new SolidBrush(ZenParams.HeaderBackColor))
             {
-                g.FillRectangle(b, 0, 0, Width, headerHeight);
+                g.FillRectangle(b, 0, 0, form.Width, headerHeight);
             }
             // For content tab and main tab, pad with different color
             Color colPad = ZenParams.PaddingBackColor;
             if (activeTabIdx == -1) colPad = Color.White;
             using (Brush b = new SolidBrush(colPad))
             {
-                g.FillRectangle(b, innerPadding, headerHeight, Width - 2 * innerPadding, innerPadding);
-                g.FillRectangle(b, 0, headerHeight, innerPadding, Height - headerHeight);
-                g.FillRectangle(b, Width - innerPadding, headerHeight, innerPadding, Height - headerHeight);
-                g.FillRectangle(b, innerPadding, Height - innerPadding - 1, Width - 2 * innerPadding, innerPadding);
+                g.FillRectangle(b, innerPadding, headerHeight, form.Width - 2 * innerPadding, innerPadding);
+                g.FillRectangle(b, 0, headerHeight, innerPadding, form.Height - headerHeight);
+                g.FillRectangle(b, form.Width - innerPadding, headerHeight, innerPadding, form.Height - headerHeight);
+                g.FillRectangle(b, innerPadding, form.Height - innerPadding - 1, form.Width - 2 * innerPadding, innerPadding);
             }
             using (Pen p = new Pen(ZenParams.BorderColor))
             {
                 p.Width = 1;
-                g.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
+                g.DrawRectangle(p, 0, 0, form.Width - 1, form.Height - 1);
             }
         }
 
-        private void doPaint(Graphics g)
+        private void doRender(Graphics g)
         {
-            doPaintMyBackground(g);
+            doRenderMyBackground(g);
             float x = contentTabControls[contentTabControls.Count - 1].AbsRight;
             x += ZenParams.HeaderTabPadding * 3.0F;
-            float y = 7.0F * scale;
+            float y = 7.0F * Scale;
             RectangleF rect = new RectangleF(x, y, ctrlClose.AbsLeft - x, headerHeight - y);
             using (Brush b = new SolidBrush(Color.Black))
             using (Font f = new Font(new FontFamily(ZenParams.HeaderFontFamily), ZenParams.HeaderFontSize))
@@ -399,23 +358,6 @@ namespace DND.Controls
             }
             // Draw my zen controls
             foreach (ZenControl ctrl in zenControls) ctrl.DoPaint(g);
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            lock (bufferLockObj)
-            {
-                // Do all the remaining drawing through my own hand-made double-buffering for speed
-                if (dbuffer == null)
-                {
-                    dbuffer = new Bitmap(Width, Height);
-                    using (Graphics g = Graphics.FromImage(dbuffer))
-                    {
-                        doPaint(g);
-                    }
-                }
-                e.Graphics.DrawImageUnscaled(dbuffer, 0, 0);
-            }
         }
 
         private enum DragMode
@@ -443,58 +385,106 @@ namespace DND.Controls
             Rectangle rHeader = new Rectangle(
                 innerPadding,
                 innerPadding,
-                Width - 2 * innerPadding,
+                form.Width - 2 * innerPadding,
                 headerHeight - innerPadding);
             if (rHeader.Contains(p))
                 return DragMode.Move;
             Rectangle rEast = new Rectangle(
-                Width - innerPadding,
+                form.Width - innerPadding,
                 0,
                 innerPadding,
-                Height);
+                form.Height);
             if (rEast.Contains(p))
             {
                 if (p.Y < 2 * innerPadding) return DragMode.ResizeNE;
-                if (p.Y > Height - 2 * innerPadding) return DragMode.ResizeSE;
+                if (p.Y > form.Height - 2 * innerPadding) return DragMode.ResizeSE;
                 return DragMode.ResizeE;
             }
             Rectangle rWest = new Rectangle(
                 0,
                 0,
                 innerPadding,
-                Height);
+                form.Height);
             if (rWest.Contains(p))
             {
                 if (p.Y < 2 * innerPadding) return DragMode.ResizeNW;
-                if (p.Y > Height - 2 * innerPadding) return DragMode.ResizeSW;
+                if (p.Y > form.Height - 2 * innerPadding) return DragMode.ResizeSW;
                 return DragMode.ResizeW;
             }
             Rectangle rNorth = new Rectangle(
                 0,
                 0,
-                Width,
+                form.Width,
                 innerPadding);
             if (rNorth.Contains(p))
             {
                 if (p.X < 2 * innerPadding) return DragMode.ResizeNW;
-                if (p.X > Width - 2 * innerPadding) return DragMode.ResizeNE;
+                if (p.X > form.Width - 2 * innerPadding) return DragMode.ResizeNE;
                 return DragMode.ResizeN;
             }
             Rectangle rSouth = new Rectangle(
                 0,
-                Height - innerPadding,
-                Width,
+                form.Height - innerPadding,
+                form.Width,
                 innerPadding);
             if (rSouth.Contains(p))
             {
                 if (p.X < 2 * innerPadding) return DragMode.ResizeSW;
-                if (p.X > Width - 2 * innerPadding) return DragMode.ResizeSE;
+                if (p.X > form.Width - 2 * innerPadding) return DragMode.ResizeSE;
                 return DragMode.ResizeS;
             }
             return DragMode.None;
         }
 
-        protected override void OnMouseDown(MouseEventArgs e)
+        private ZenControl getControl(Point p)
+        {
+            foreach (ZenControl ctrl in zenControls)
+                if (ctrl.Contains(p)) return ctrl;
+            return null;
+        }
+
+        private Point translateToControl(ZenControl ctrl, Point p)
+        {
+            int x = p.X - ctrl.AbsLocation.X;
+            int y = p.Y - ctrl.AbsLocation.Y;
+            return new Point(x, y);
+        }
+
+        private void onFormMouseLeave(object sender, EventArgs e)
+        {
+            if (zenCtrlWithMouse != null)
+            {
+                zenCtrlWithMouse.DoMouseLeave();
+                zenCtrlWithMouse = null;
+            }
+            if (dragMode == DragMode.None || dragMode == DragMode.Move)
+            {
+                form.Cursor = Cursors.Arrow;
+            }
+        }
+
+        private void onFormMouseEnter(object sender, EventArgs e)
+        {
+            Point loc = form.PointToClient(form.MousePosition);
+            ZenControl ctrl = getControl(loc);
+            if (ctrl != null)
+            {
+                if (zenCtrlWithMouse != ctrl)
+                {
+                    if (zenCtrlWithMouse != null) zenCtrlWithMouse.DoMouseLeave();
+                    ctrl.DoMouseEnter();
+                    zenCtrlWithMouse = ctrl;
+                }
+            }
+        }
+
+        private void onFormMouseClick(object sender, MouseEventArgs e)
+        {
+            ZenControl ctrl = getControl(e.Location);
+            if (ctrl != null) ctrl.DoMouseClick(translateToControl(ctrl, e.Location), e.Button);
+        }
+
+        private void onFormMouseDown(object sender, MouseEventArgs e)
         {
             // Over any control? Not our job to handle.
             ZenControl ctrl = getControl(e.Location);
@@ -508,92 +498,100 @@ namespace DND.Controls
             if (area == DragMode.Move)
             {
                 dragMode = DragMode.Move;
-                dragStart = PointToScreen(e.Location);
-                formBeforeDragLocation = Location;
+                dragStart = form.PointToScreen(e.Location);
+                formBeforeDragLocation = form.Location;
             }
             else if (area != DragMode.None && area != DragMode.Move)
             {
                 dragMode = area;
-                dragStart = PointToScreen(e.Location);
-                formBeforeDragSize = Size;
-                formBeforeDragLocation = Location;
+                dragStart = form.PointToScreen(e.Location);
+                formBeforeDragSize = form.Size;
+                formBeforeDragLocation = form.Location;
             }
         }
 
-        protected override void OnMouseMove(MouseEventArgs e)
+        private void onFormMouseUp(object sender, MouseEventArgs e)
         {
-            Point loc = PointToScreen(e.Location);
+            dragMode = DragMode.None;
+
+            ZenControl ctrl = getControl(e.Location);
+            if (ctrl != null) ctrl.DoMouseUp(translateToControl(ctrl, e.Location), e.Button);
+        }
+
+        private void onFormMouseMove(object sender, MouseEventArgs e)
+        {
+            Point loc = form.PointToScreen(e.Location);
             if (dragMode == DragMode.Move)
             {
                 int dx = loc.X - dragStart.X;
                 int dy = loc.Y - dragStart.Y;
                 Point newLocation = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y + dy);
-                ((Form)TopLevelControl).Location = newLocation;
+                ((Form)form.TopLevelControl).Location = newLocation;
                 return;
             }
             else if (dragMode == DragMode.ResizeE)
             {
                 int dx = loc.X - dragStart.X;
-                Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height);
-                Refresh();
+                form.Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height);
+                form.Refresh();
                 return;
             }
             else if (dragMode == DragMode.ResizeW)
             {
                 int dx = loc.X - dragStart.X;
-                Left = formBeforeDragLocation.X + dx;
-                Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height);
-                Refresh();
+                form.Left = formBeforeDragLocation.X + dx;
+                form.Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height);
+                form.Refresh();
                 return;
             }
             else if (dragMode == DragMode.ResizeN)
             {
                 int dy = loc.Y - dragStart.Y;
-                Top = formBeforeDragLocation.Y + dy;
-                Size = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height - dy);
-                Refresh();
+                form.Top = formBeforeDragLocation.Y + dy;
+                form.Size = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height - dy);
+                form.Refresh();
                 return;
             }
             else if (dragMode == DragMode.ResizeS)
             {
                 int dy = loc.Y - dragStart.Y;
-                Size = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height + dy);
-                Refresh();
+                form.Size = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height + dy);
+                form.Refresh();
                 return;
             }
             else if (dragMode == DragMode.ResizeNW)
             {
                 int dx = loc.X - dragStart.X;
                 int dy = loc.Y - dragStart.Y;
-                Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height - dy);
-                Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y + dy);
-                Refresh();
+                form.Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height - dy);
+                form.Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y + dy);
+                form.Refresh();
                 return;
             }
             else if (dragMode == DragMode.ResizeSE)
             {
                 int dx = loc.X - dragStart.X;
                 int dy = loc.Y - dragStart.Y;
-                Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height + dy);
-                Refresh();
+                form.Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height + dy);
+                form.Refresh();
                 return;
             }
             else if (dragMode == DragMode.ResizeNE)
             {
                 int dx = loc.X - dragStart.X;
                 int dy = loc.Y - dragStart.Y;
-                Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height - dy);
-                Location = new Point(formBeforeDragLocation.X, formBeforeDragLocation.Y + dy);
-                Refresh();
+                form.Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height - dy);
+                form.Location = new Point(formBeforeDragLocation.X, formBeforeDragLocation.Y + dy);
+                form.Refresh();
                 return;
             }
             else if (dragMode == DragMode.ResizeSW)
             {
                 int dx = loc.X - dragStart.X;
                 int dy = loc.Y - dragStart.Y;
-                Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height + dy);
-                Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y);
-                Refresh();
+                form.Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height + dy);
+                form.Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y);
+                form.Refresh();
                 return;
             }
 
@@ -601,7 +599,7 @@ namespace DND.Controls
             ZenControl ctrl = getControl(e.Location);
             if (ctrl != null)
             {
-                Cursor = Cursors.Arrow;
+                form.Cursor = Cursors.Arrow;
                 if (zenCtrlWithMouse != ctrl)
                 {
                     if (zenCtrlWithMouse != null) zenCtrlWithMouse.DoMouseLeave();
@@ -619,70 +617,14 @@ namespace DND.Controls
 
             var area = getDragArea(e.Location);
             if (area == DragMode.ResizeW || area == DragMode.ResizeE)
-                Cursor = Cursors.SizeWE;
+                form.Cursor = Cursors.SizeWE;
             else if (area == DragMode.ResizeN || area == DragMode.ResizeS)
-                Cursor = Cursors.SizeNS;
+                form.Cursor = Cursors.SizeNS;
             else if (area == DragMode.ResizeNW || area == DragMode.ResizeSE)
-                Cursor = Cursors.SizeNWSE;
+                form.Cursor = Cursors.SizeNWSE;
             else if (area == DragMode.ResizeNE || area == DragMode.ResizeSW)
-                Cursor = Cursors.SizeNESW;
-            else Cursor = Cursors.Arrow;
-        }
-
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            dragMode = DragMode.None;
-
-            ZenControl ctrl = getControl(e.Location);
-            if (ctrl != null) ctrl.DoMouseUp(translateToControl(ctrl, e.Location), e.Button);
-        }
-
-        private ZenControl getControl(Point p)
-        {
-            foreach (ZenControl ctrl in zenControls)
-                if (ctrl.Contains(p)) return ctrl;
-            return null;
-        }
-
-        private Point translateToControl(ZenControl ctrl, Point p)
-        {
-            int x = p.X - ctrl.AbsLocation.X;
-            int y = p.Y - ctrl.AbsLocation.Y;
-            return new Point(x, y);
-        }
-
-        protected override void OnMouseClick(MouseEventArgs e)
-        {
-            ZenControl ctrl = getControl(e.Location);
-            if (ctrl != null) ctrl.DoMouseClick(translateToControl(ctrl, e.Location), e.Button);
-        }
-
-        protected override void OnMouseEnter(EventArgs e)
-        {
-            Point loc = PointToClient(MousePosition);
-            ZenControl ctrl = getControl(loc);
-            if (ctrl != null)
-            {
-                if (zenCtrlWithMouse != ctrl)
-                {
-                    if (zenCtrlWithMouse != null) zenCtrlWithMouse.DoMouseLeave();
-                    ctrl.DoMouseEnter();
-                    zenCtrlWithMouse = ctrl;
-                }
-            }
-        }
-
-        protected override void OnMouseLeave(EventArgs e)
-        {
-            if (zenCtrlWithMouse != null)
-            {
-                zenCtrlWithMouse.DoMouseLeave();
-                zenCtrlWithMouse = null;
-            }
-            if (dragMode == DragMode.None || dragMode == DragMode.Move)
-            {
-                Cursor = Cursors.Arrow;
-            }
+                form.Cursor = Cursors.SizeNESW;
+            else form.Cursor = Cursors.Arrow;
         }
     }
 }

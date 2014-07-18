@@ -22,8 +22,8 @@ namespace Sandbox
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Form f = new MainForm();
-            Application.Run(f);
+            var mf = new MainForm();
+            Application.Run(mf.WinForm);
         }
     }
 }

@@ -44,9 +44,7 @@
   <ItemGroup>
     <Compile Include="GraphicsExtension.cs" />
     <Compile Include="LookupControl.cs" />
-    <Compile Include="MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="MainForm.cs" />
     <Compile Include="ResultsControl.cs" />
     <Compile Include="SettingsControl.cs" />
     <Compile Include="Zen\IZenControlOwner.cs" />
@@ -68,11 +66,12 @@
     <Compile Include="Zen\ZenParams.cs" />
     <Compile Include="Zen\ZenScrollbarCtrl.cs" />
     <Compile Include="Zen\ZenTab.cs" />
-    <Compile Include="Zen\ZenTabbedForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Zen\ZenTabbedForm.cs" />
     <Compile Include="Zen\ZenTabCollection.cs" />
     <Compile Include="Zen\ZenTabControl.cs" />
+    <Compile Include="Zen\ZenWinForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SearchInputControl.resx">
