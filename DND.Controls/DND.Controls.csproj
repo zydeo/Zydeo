@@ -47,7 +47,7 @@
     <Compile Include="MainForm.cs" />
     <Compile Include="ResultsControl.cs" />
     <Compile Include="SettingsControl.cs" />
-    <Compile Include="Zen\IZenControlOwner.cs" />
+    <Compile Include="Zen\ZenControlBase.cs" />
     <Compile Include="Zen\IZenTabsChangedListener.cs" />
     <Compile Include="OneResultControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

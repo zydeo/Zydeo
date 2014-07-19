@@ -58,7 +58,7 @@ namespace DND.Controls
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
-        public WritingPad(float scale, IZenControlOwner owner)
+        public WritingPad(float scale, ZenControl owner)
             : base(scale, owner)
         {
         }

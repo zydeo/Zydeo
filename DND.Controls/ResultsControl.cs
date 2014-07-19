@@ -22,7 +22,7 @@ namespace DND.Controls
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
         private readonly System.Timers.Timer timer;
 
-        public ResultsControl(float scale, IZenControlOwner owner)
+        public ResultsControl(float scale, ZenControl owner)
             : base(scale, owner)
         {
             Application.AddMessageFilter(this);

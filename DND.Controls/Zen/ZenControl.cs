@@ -8,13 +8,13 @@ using System.Drawing.Drawing2D;
 
 namespace DND.Controls
 {
-    public class ZenControl : IDisposable, IZenControlOwner
+    public class ZenControl : ZenControlBase, IDisposable
     {
         public delegate void ClickDelegate(ZenControl sender);
         public event ClickDelegate MouseClick;
 
         protected readonly float scale;
-        protected readonly IZenControlOwner owner;
+        protected readonly ZenControlBase parent;
         private Rectangle absRect = new Rectangle(0, 0, 0, 0);
         private List<ZenControl> zenChildren = new List<ZenControl>();
         private ZenControl zenCtrlWithMouse = null;
@@ -26,19 +26,19 @@ namespace DND.Controls
             set { absRect.Size = value; OnSizeChanged(); MakeMePaint(true, RenderMode.Invalidate); }
         }
 
-        public Rectangle AbsRect
+        public override sealed Rectangle AbsRect
         {
             get { return absRect; }
         }
 
-        public Point MousePositionAbs
+        internal override sealed Point MousePositionAbs
         {
-            get { return owner.MousePositionAbs; }
+            get { return parent.MousePositionAbs; }
         }
 
         public Rectangle RelRect
         {
-            get { return new Rectangle(absRect.X - owner.AbsRect.X, absRect.Y - owner.AbsRect.Y, absRect.Width, absRect.Height); }
+            get { return new Rectangle(absRect.X - parent.AbsRect.X, absRect.Y - parent.AbsRect.Y, absRect.Width, absRect.Height); }
         }
 
         public int AbsLeft
@@ -169,11 +169,11 @@ namespace DND.Controls
             get { return new Point((int)(RelRect.X / scale), (int)(RelRect.Y / scale)); }
         }
 
-        public ZenControl(float scale, IZenControlOwner owner)
+        public ZenControl(float scale, ZenControlBase parent)
         {
             this.scale = scale;
-            this.owner = owner;
-            owner.ControlAdded(this);
+            this.parent = parent;
+            parent.ControlAdded(this);
         }
 
         public void Dispose()
@@ -183,24 +183,24 @@ namespace DND.Controls
 
         protected void AddWinFormsControl(Control c)
         {
-            owner.AddWinFormsControlToForm(c);
+            parent.AddWinFormsControlToForm(c);
         }
 
-        void IZenControlOwner.AddWinFormsControlToForm(Control c)
+        internal override sealed void AddWinFormsControlToForm(Control c)
         {
-            owner.AddWinFormsControlToForm(c);
+            parent.AddWinFormsControlToForm(c);
         }
 
         protected void MakeMePaint(bool needBackground, RenderMode rm)
         {
             if (paintSuspended) return;
-            owner.MakeCtrlPaint(this, needBackground, rm);
+            parent.MakeCtrlPaint(this, needBackground, rm);
         }
 
-        public void MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
+        internal override sealed void MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
         {
             if (paintSuspended) return;
-            owner.MakeCtrlPaint(ctrl, needBackground, rm);
+            parent.MakeCtrlPaint(ctrl, needBackground, rm);
         }
 
         protected void SuspendPaint()
@@ -250,12 +250,12 @@ namespace DND.Controls
 
         protected void Invoke(Delegate method)
         {
-            owner.InvokeOnForm(method);
+            parent.InvokeOnForm(method);
         }
 
-        void IZenControlOwner.InvokeOnForm(Delegate method)
+        internal override sealed void InvokeOnForm(Delegate method)
         {
-            owner.InvokeOnForm(method);
+            parent.InvokeOnForm(method);
         }
 
         protected SizeF MeasureText(string text, Font font, StringFormat fmt)
@@ -343,7 +343,7 @@ namespace DND.Controls
         public virtual bool DoMouseEnter()
         {
             bool res = false;
-            Point pAbs = owner.MousePositionAbs;
+            Point pAbs = parent.MousePositionAbs;
             Point pRel = new Point(pAbs.X - AbsLeft, pAbs.Y - AbsTop);
             ZenControl ctrl = getControl(pRel);
             if (ctrl != null)
@@ -374,7 +374,7 @@ namespace DND.Controls
             return RelRect.Contains(pParent);
         }
 
-        public void ControlAdded(ZenControl ctrl)
+        internal override sealed void ControlAdded(ZenControl ctrl)
         {
             zenChildren.Add(ctrl);
         }

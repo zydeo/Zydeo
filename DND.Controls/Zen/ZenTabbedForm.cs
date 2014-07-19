@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 
 namespace DND.Controls
 {
-    public class ZenTabbedForm : IDisposable, IZenControlOwner, IZenTabsChangedListener
+    public class ZenTabbedForm : ZenControlBase, IDisposable, IZenTabsChangedListener
     {
         private readonly ZenWinForm form;
 
@@ -117,12 +117,12 @@ namespace DND.Controls
             }
         }
 
-        public Point MousePositionAbs
+        internal override sealed Point MousePositionAbs
         {
             get { return form.PointToClient(form.MousePosition); }
         }
 
-        public Rectangle AbsRect
+        public override sealed Rectangle AbsRect
         {
             get { return new Rectangle(0, 0, form.Width, form.Height); }
         }
@@ -271,23 +271,23 @@ namespace DND.Controls
             form.Invalidate();
         }
 
-        void IZenControlOwner.ControlAdded(ZenControl ctrl)
+        internal override sealed void ControlAdded(ZenControl ctrl)
         {
             // We do nothing here: main form creates its own controls and keeps track of them
             // explicitly (so we can pretend content controls are not there)
         }
 
-        void IZenControlOwner.AddWinFormsControlToForm(Control c)
+        internal override sealed void AddWinFormsControlToForm(Control c)
         {
             form.Controls.Add(c);
         }
 
-        void IZenControlOwner.InvokeOnForm(Delegate method)
+        internal override sealed void InvokeOnForm(Delegate method)
         {
             form.Invoke(method);
         }
 
-        void IZenControlOwner.MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
+        internal override sealed void MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
         {
             ZenWinForm.BitmapRenderer br = null;
             try

@@ -9,7 +9,7 @@ namespace DND.Controls
 {
     internal class SettingsControl : ZenControl
     {
-        public SettingsControl(float scale, IZenControlOwner owner)
+        public SettingsControl(float scale, ZenControlBase owner)
             : base(scale, owner)
         { }
 

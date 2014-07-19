@@ -16,7 +16,7 @@ namespace DND.Controls
         private ResultsControl resCtrl;
         private ZenControl blahCtrl;
 
-        public LookupControl(float scale, IZenControlOwner owner)
+        public LookupControl(float scale, ZenControlBase owner)
             : base(scale, owner)
         {
             writingPad = new WritingPad(scale, this);

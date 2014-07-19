@@ -11,7 +11,7 @@ namespace DND.Controls
     {
         private bool isHover = false;
 
-        public ZenCloseControl(float scale, IZenControlOwner owner)
+        public ZenCloseControl(float scale, ZenTabbedForm owner)
             : base(scale, owner)
         { }
 

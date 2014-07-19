@@ -17,7 +17,7 @@ namespace DND.Controls
         private Font font;
         private bool isSelected = false;
 
-        public ZenTabControl(float scale, IZenControlOwner owner, bool isMain)
+        public ZenTabControl(float scale, ZenTabbedForm owner, bool isMain)
             : base(scale, owner)
         {
             this.isMain = isMain;

@@ -47,7 +47,7 @@ namespace DND.Controls
         private float lemmaTop;
         private List<MeasuredBlock> lemmaBlocks;
 
-        public OneResultControl(float scale, IZenControlOwner owner, CedictResult cr)
+        public OneResultControl(float scale, ZenControl owner, CedictResult cr)
             : base(scale, owner)
         {
             this.Res = cr;

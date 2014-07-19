@@ -11,7 +11,7 @@ namespace DND.Controls
     {
         private bool isHover = false;
 
-        public ZenScrollbarCtrl(float scale, IZenControlOwner owner)
+        public ZenScrollbarCtrl(float scale, ZenControl owner)
             : base(scale, owner)
         { }
 
