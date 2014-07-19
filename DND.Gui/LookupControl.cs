@@ -16,8 +16,10 @@ namespace DND.Gui
 {
     internal class LookupControl : ZenControl
     {
+        bool searchTraditional = true;
+        bool searchSimplified = true;
         private const double looseness = 0.25;  // the "looseness" of lookup, 0-1, higher == looser, looser more computationally intensive
-        private const int numResults = 10;      // maximum number of results to return with each lookup
+        private const int numResults = 15;      // maximum number of results to return with each lookup
 
         private FileStream fsStrokes;
         private BinaryReader brStrokes;
@@ -26,6 +28,7 @@ namespace DND.Gui
         private WritingPad writingPad;
         private ResultsControl resCtrl;
         private CharPicker cpCtrl;
+        private SearchInputControl siCtrl;
 
         private readonly HashSet<StrokesMatcher> runningMatchers = new HashSet<StrokesMatcher>();
 
@@ -41,16 +44,21 @@ namespace DND.Gui
             writingPad.LogicalSize = new Size(200, 200);
             writingPad.StrokesChanged += writingPad_StrokesChanged;
 
-            resCtrl = new ResultsControl(this);
-            resCtrl.RelLocation = new Point(writingPad.RelRect.Right + writingPad.RelRect.Left, writingPad.RelRect.Top);
-
             cpCtrl = new CharPicker(this);
             //cpCtrl.FontFace = "Noto Sans S Chinese Regular";
-            //cpCtrl.FontFace = "䡡湄楮札䍓ⵆ潮瑳";
-            cpCtrl.FontFace = "SimSun";
+            cpCtrl.FontFace = "䡡湄楮札䍓ⵆ潮瑳";
+            //cpCtrl.FontFace = "SimSun";
             cpCtrl.RelLogicalLocation = new Point(5, 210);
             cpCtrl.LogicalSize = new Size(200, 80);
             cpCtrl.CharPicked += cpCtrl_CharPicked;
+
+            siCtrl = new SearchInputControl(Scale);
+            RegisterWinFormsControl(siCtrl);
+            siCtrl.Location = new Point(writingPad.AbsRect.Right + writingPad.RelRect.Left, writingPad.AbsRect.Top);
+            siCtrl.StartSearch += siCtrl_StartSearch;
+
+            resCtrl = new ResultsControl(this);
+            resCtrl.RelLocation = new Point(writingPad.RelRect.Right + writingPad.RelRect.Left, siCtrl.Bottom + writingPad.RelRect.Top);
         }
 
         public override void Dispose()
@@ -82,7 +90,7 @@ namespace DND.Gui
             if (wc.StrokeList.Count == 0)
             {
                 // Don't bother doing anything if nothing has been input yet (number of strokes == 0).
-                cpCtrl.SetItems(new char[0]);
+                cpCtrl.SetItems(null);
                 return;
             }
 
@@ -93,8 +101,6 @@ namespace DND.Gui
         {
             WrittenCharacter wc = ctxt as WrittenCharacter;
             CharacterDescriptor id = wc.BuildCharacterDescriptor();
-            bool searchTraditional = true;
-            bool searchSimplified = true;
             strokesData.Reset();
             StrokesMatcher matcher = new StrokesMatcher(id,
                                                      searchTraditional,
@@ -127,7 +133,12 @@ namespace DND.Gui
             });
         }
 
-        private void cpCtrl_CharPicked(char c)
+        private void siCtrl_StartSearch()
+        {
+            populateResults();
+        }
+
+        private void populateResults()
         {
             CedictMeaning[] xmAll = new CedictMeaning[9];
             xmAll[0] = new CedictMeaning(null, "pot-scrubbing brush made of bamboo strips", null);
@@ -159,6 +170,13 @@ namespace DND.Gui
             resCtrl.SetResults(new ReadOnlyCollection<CedictResult>(rs), 99);
         }
 
+        private void cpCtrl_CharPicked(char c)
+        {
+            writingPad.Clear();
+            cpCtrl.SetItems(null);
+            siCtrl.InsertCharacter(c);
+        }
+
         public override void DoPaint(Graphics g)
         {
             using (Brush b = new SolidBrush(ZenParams.PaddingBackColor))
@@ -171,6 +189,8 @@ namespace DND.Gui
 
         protected override void OnSizeChanged()
         {
+            siCtrl.Location = new Point(writingPad.AbsRect.Right + writingPad.RelRect.Left, writingPad.AbsRect.Top);
+            siCtrl.Width = Width - resCtrl.RelRect.Left - 5;
             resCtrl.Size = new Size(Width - resCtrl.RelRect.Left - 5, Height - resCtrl.RelRect.Top - 5);
         }
     }

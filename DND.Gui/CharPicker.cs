@@ -45,8 +45,14 @@ namespace DND.Gui
 
         public void SetItems(char[] items)
         {
-            if (items == null) throw new ArgumentNullException("items");
-            this.items = items;
+            if (items == null) items = new char[0];
+            List<char> filteredItems = new List<char>();
+            foreach (char c in items)
+            {
+                if (char.IsLetter(c)) filteredItems.Add(c);
+                if (filteredItems.Count == 10) break;
+            }
+            this.items = filteredItems.ToArray();
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
@@ -102,13 +108,19 @@ namespace DND.Gui
             MakeMePaint(true, RenderMode.Invalidate);
         }
 
-        public override bool DoMouseMove(Point p, System.Windows.Forms.MouseButtons button)
+        private int getCharRectIx(Point p)
         {
             int ix = -1;
             for (int i = 0; i != charRects.Count; ++i)
             {
                 if (charRects[i].Contains(p)) { ix = i; break; }
             }
+            return ix;
+        }
+
+        public override bool DoMouseMove(Point p, System.Windows.Forms.MouseButtons button)
+        {
+            int ix = getCharRectIx(p);
             if (ix != hoverRectIx)
             {
                 hoverRectIx = ix;
@@ -143,7 +155,7 @@ namespace DND.Gui
                     RectangleF rect = charRects[i];
                     // Background
                     Color col = Color.White;
-                    if (hoverRectIx == i) col = Color.FromArgb(240, 240, 240);
+                    if (hoverRectIx == i && i < items.Length) col = Color.FromArgb(240, 240, 240);
                     using (Brush bgb = new SolidBrush(col))
                     {
                         g.FillRectangle(bgb, rect);
@@ -166,7 +178,10 @@ namespace DND.Gui
 
         public override bool DoMouseClick(Point p, System.Windows.Forms.MouseButtons button)
         {
-            if (CharPicked != null) CharPicked('你');
+            int ix = getCharRectIx(p);
+            if (ix == -1) return true;
+            if (ix >= items.Length) return true;
+            if (CharPicked != null) CharPicked(items[ix]);
             return true;
         }
     }
