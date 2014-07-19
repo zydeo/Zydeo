@@ -48,14 +48,14 @@ namespace DND.Controls
         private float lemmaTop;
         private List<MeasuredBlock> lemmaBlocks;
 
-        public OneResultControl(float scale, ZenControl owner, CedictResult cr)
-            : base(scale, owner)
+        public OneResultControl(ZenControl owner, CedictResult cr)
+            : base(owner)
         {
             this.Res = cr;
-            padTop = (int)(5.0F * scale);
-            padBottom = (int)(10.0F * scale);
-            padMid = (int)(10.0F * scale);
-            padRight = (int)(5.0F * scale);
+            padTop = (int)(5.0F * Scale);
+            padBottom = (int)(10.0F * Scale);
+            padMid = (int)(10.0F * Scale);
+            padRight = (int)(5.0F * Scale);
         }
 
         // Graphics resource: static, singleton, never disposed

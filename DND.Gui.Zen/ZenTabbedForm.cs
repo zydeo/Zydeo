@@ -153,7 +153,7 @@ namespace DND.Gui.Zen
             int posx = mainTabCtrl.AbsLocation.X + mainTabCtrl.Width;
             for (int i = 0; i != tabs.Count; ++i)
             {
-                ZenTabControl tc = new ZenTabControl(Scale, this, false);
+                ZenTabControl tc = new ZenTabControl(this, false);
                 tc.Text = tabs[i].Header;
                 tc.LogicalSize = new Size(80, 30);
                 tc.Size = new Size(tc.PreferredWidth, tc.Height);
@@ -189,12 +189,12 @@ namespace DND.Gui.Zen
 
         private void createZenControls()
         {
-            ctrlClose = new ZenCloseControl(Scale, this);
+            ctrlClose = new ZenCloseControl(this);
             ctrlClose.LogicalSize = new Size(40, 20);
             ctrlClose.AbsLocation = new Point(form.Width - ctrlClose.Width - innerPadding, 0);
             ctrlClose.MouseClick += ctrlClose_MouseClick;
 
-            mainTabCtrl = new ZenTabControl(Scale, this, true);
+            mainTabCtrl = new ZenTabControl(this, true);
             mainTabCtrl.Text = "Main";
             mainTabCtrl.LogicalSize = new Size(80, 30);
             mainTabCtrl.Size = new Size(mainTabCtrl.PreferredWidth, mainTabCtrl.Height);
@@ -402,7 +402,6 @@ namespace DND.Gui.Zen
             Move
         }
 
-        private ZenControl zenCtrlWithMouse = null;
         private DragMode dragMode = DragMode.None;
         private Point dragStart;
         private Point formBeforeDragLocation;

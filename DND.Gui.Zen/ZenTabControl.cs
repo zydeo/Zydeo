@@ -17,8 +17,8 @@ namespace DND.Gui.Zen
         private Font font;
         private bool isSelected = false;
 
-        public ZenTabControl(float scale, ZenTabbedForm owner, bool isMain)
-            : base(scale, owner)
+        public ZenTabControl(ZenTabbedForm owner, bool isMain)
+            : base(owner)
         {
             this.isMain = isMain;
             font = new Font(new FontFamily(ZenParams.HeaderTabFontFamily),

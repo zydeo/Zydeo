@@ -10,7 +10,7 @@ namespace DND.Gui.Zen
 {
     public class ZenControl : ZenControlBase, IDisposable
     {
-        public ZenControl(float scale, ZenControlBase parent)
+        public ZenControl(ZenControlBase parent)
             : base(parent)
         {
         }

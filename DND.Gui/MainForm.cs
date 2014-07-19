@@ -20,8 +20,8 @@ namespace DND.Controls
         {
             LogicalSize = new Size(800, 500);
             Header = "Zydeo Chinese-English dictionary";
-            lc = new LookupControl(Scale, this);
-            stgs = new SettingsControl(Scale, this);
+            lc = new LookupControl(this);
+            stgs = new SettingsControl(this);
             MainTab = new ZenTab(stgs, "Zydeo");
             //MainTabHeader = "Zydeo";
             Tabs.Add(new ZenTab(lc, "Lookup"));

@@ -17,17 +17,17 @@ namespace DND.Controls
         private ResultsControl resCtrl;
         private ZenControl blahCtrl;
 
-        public LookupControl(float scale, ZenControlBase owner)
-            : base(scale, owner)
+        public LookupControl(ZenControlBase owner)
+            : base(owner)
         {
-            writingPad = new WritingPad(scale, this);
+            writingPad = new WritingPad(this);
             writingPad.RelLogicalLocation = new Point(5, 5);
             writingPad.LogicalSize = new Size(200, 200);
             
-            resCtrl = new ResultsControl(scale, this);
+            resCtrl = new ResultsControl(this);
             resCtrl.RelLocation = new Point(writingPad.RelRect.Right + writingPad.RelRect.Left, writingPad.RelRect.Top);
 
-            blahCtrl = new ZenControl(scale, this);
+            blahCtrl = new ZenControl(this);
             blahCtrl.RelLogicalLocation = new Point(5, 210);
             blahCtrl.LogicalSize = new Size(200, 20);
             blahCtrl.MouseClick += blahCtrl_MouseClick;

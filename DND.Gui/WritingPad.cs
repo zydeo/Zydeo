@@ -60,8 +60,8 @@ namespace DND.Controls
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
-        public WritingPad(float scale, ZenControl owner)
-            : base(scale, owner)
+        public WritingPad(ZenControl owner)
+            : base(owner)
         {
         }
         

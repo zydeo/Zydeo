@@ -11,8 +11,8 @@ namespace DND.Gui.Zen
     {
         private bool isHover = false;
 
-        public ZenCloseControl(float scale, ZenTabbedForm owner)
-            : base(scale, owner)
+        public ZenCloseControl(ZenTabbedForm owner)
+            : base(owner)
         { }
 
         public override void DoPaint(Graphics g)

@@ -23,8 +23,8 @@ namespace DND.Controls
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
         private readonly System.Timers.Timer timer;
 
-        public ResultsControl(float scale, ZenControl owner)
-            : base(scale, owner)
+        public ResultsControl(ZenControl owner)
+            : base(owner)
         {
             Application.AddMessageFilter(this);
 
@@ -147,7 +147,7 @@ namespace DND.Controls
             {
                 foreach (CedictResult cr in results)
                 {
-                    OneResultControl orc = new OneResultControl(Scale, this, cr);
+                    OneResultControl orc = new OneResultControl(this, cr);
                     orc.Analyze(g, contentRectSize.Width);
                     orc.AbsLocation = new Point(1, y + 1);
                     y += orc.Height;

@@ -11,8 +11,8 @@ namespace DND.Controls
 {
     internal class SettingsControl : ZenControl
     {
-        public SettingsControl(float scale, ZenControlBase owner)
-            : base(scale, owner)
+        public SettingsControl(ZenControlBase owner)
+            : base(owner)
         { }
 
         public override void DoPaint(Graphics g)
