@@ -322,7 +322,12 @@ namespace DND.Gui.Zen
                 if (pc == null) return;
                 Graphics g = pc.Graphics;
                 if (needBackground) DoPaint(g);
-                else ctrl.DoPaint(g);
+                else
+                {
+                    g.TranslateTransform(ctrl.AbsLeft, ctrl.AbsTop);
+                    g.Clip = new Region(new Rectangle(0, 0, ctrl.Width, ctrl.Height));
+                    ctrl.DoPaint(g);
+                }
             }
             finally
             {

@@ -21,13 +21,13 @@ namespace DND.Gui.Zen
             if (isHover) clr = ZenParams.CloseColorHover;
             using (Brush b = new SolidBrush(clr))
             {
-                g.FillRectangle(b, AbsLocation.X, AbsLocation.Y + 1, Size.Width, Size.Height - 1);
+                g.FillRectangle(b, 0, 1, Width, Height - 1);
             }
             using (Pen p = new Pen(Color.DarkGray))
             {
-                g.DrawLine(p, AbsLocation.X, AbsLocation.Y + 1, AbsLocation.X, AbsLocation.Y + Height - 1);
-                g.DrawLine(p, AbsLocation.X + Width - 1, AbsLocation.Y + 1, AbsLocation.X + Width - 1, AbsLocation.Y + Height - 1);
-                g.DrawLine(p, AbsLocation.X, AbsLocation.Y + Height - 1, AbsLocation.X + Width - 1, AbsLocation.Y + Height - 1);
+                g.DrawLine(p, 0, 1, 0, Height - 1);
+                g.DrawLine(p, Width - 1, 1, Width - 1, Height - 1);
+                g.DrawLine(p, 0, Height - 1, Width - 1, Height - 1);
             }
         }
 

@@ -19,7 +19,7 @@ namespace DND.Controls
         {
             using (Brush b = new SolidBrush(Color.White))
             {
-                g.FillRectangle(b, AbsLocation.X, AbsLocation.Y, Size.Width, Size.Height);
+                g.FillRectangle(b, 0, 0, Width, Height);
             }
         }
     }

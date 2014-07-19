@@ -114,17 +114,17 @@ namespace DND.Gui.Zen
             }
             using (Brush b = new SolidBrush(fillColor))
             {
-                g.FillRectangle(b, AbsLocation.X, AbsLocation.Y, Size.Width, Size.Height);
+                g.FillRectangle(b, 0, 0, Width, Height);
             }
             using (Pen p = new Pen(borderColor))
             {
-                g.DrawLine(p, AbsLocation.X, AbsLocation.Y, AbsLocation.X + Width, AbsLocation.Y);
-                g.DrawLine(p, AbsLocation.X + Width - 1, AbsLocation.Y, AbsLocation.X + Width - 1, AbsLocation.Y + Height - 1);
+                g.DrawLine(p, 0, 0, Width, 0);
+                g.DrawLine(p, Width - 1, 0, Width - 1, Height - 1);
             }
             using (Brush b = new SolidBrush(textColor))
             {
-                float x = AbsLocation.X + ZenParams.HeaderTabPadding* Scale;
-                float y = AbsLocation.Y + (((float)Height) - textHeight) / 2.0F;
+                float x = ZenParams.HeaderTabPadding* Scale;
+                float y = (((float)Height) - textHeight) / 2.0F;
                 g.DrawString(text, font, b, new PointF(x, y));
             }
         }

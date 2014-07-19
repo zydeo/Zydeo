@@ -19,7 +19,7 @@ namespace DND.Gui.Zen
         private Rectangle absRect = new Rectangle(0, 0, 0, 0);
         private ZenControlBase ctrlWithMouse = null;
 
-        protected ZenControlBase(ZenControlBase parent)
+        internal ZenControlBase(ZenControlBase parent)
         {
             this.parent = parent;
             if (Parent != null) Parent.zenChildren.Add(this);
@@ -64,7 +64,7 @@ namespace DND.Gui.Zen
 
         public int AbsRight
         {
-            get { return absRect.X + absRect.Width - 1; }
+            get { return absRect.X + absRect.Width; }
         }
 
         public int AbsTop
@@ -80,7 +80,7 @@ namespace DND.Gui.Zen
 
         public int AbsBottom
         {
-            get { return absRect.Y + absRect.Height - 1; }
+            get { return absRect.Y + absRect.Height; }
         }
 
         public int Width
@@ -188,8 +188,14 @@ namespace DND.Gui.Zen
 
         protected void DoPaintChildren(Graphics g)
         {
+            g.ResetTransform();
             foreach (ZenControl ctrl in zenChildren)
+            {
+                g.TranslateTransform(ctrl.AbsLeft, ctrl.AbsTop);
+                g.Clip = new Region(new Rectangle(0, 0, ctrl.Width, ctrl.Height));
                 ctrl.DoPaint(g);
+                g.ResetTransform();
+            }
         }
 
         protected void MakeMePaint(bool needBackground, RenderMode rm)

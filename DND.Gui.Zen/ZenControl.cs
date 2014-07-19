@@ -55,11 +55,11 @@ namespace DND.Gui.Zen
         {
             using (Brush b = new SolidBrush(SystemColors.Control))
             {
-                g.FillRectangle(b, AbsLocation.X, AbsLocation.Y, Size.Width, Size.Height);
+                g.FillRectangle(b, 0, 0, Width, Height);
             }
             using (Pen p = new Pen(Color.DarkGray))
             {
-                g.DrawRectangle(p, AbsLocation.X, AbsLocation.Y, Size.Width, Size.Height);
+                g.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
             }
             // Paint children
             DoPaintChildren(g);

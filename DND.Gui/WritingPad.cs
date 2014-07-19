@@ -72,16 +72,10 @@ namespace DND.Controls
 
         public override void DoPaint(Graphics g)
         {
-            Region oldClip = g.Clip;
-            Matrix oldTransform = g.Transform;
-            Rectangle rect = AbsRect;
-            g.Clip = new Region(new Rectangle(AbsLeft, AbsTop, Width, Height));
-            g.TranslateTransform(rect.X, rect.Y);
-
             // Background
             using (Brush b = new SolidBrush(Color.White))
             {
-                g.FillRectangle(b, 0, 0, rect.Width, rect.Height);
+                g.FillRectangle(b, 0, 0, Width, Height);
             }
             // Lines to structure character space
             using (Pen p = new Pen(Color.LightGray, 0.5F))
@@ -145,9 +139,6 @@ namespace DND.Controls
                     }
                 }
             }
-
-            g.Transform = oldTransform;
-            g.Clip = oldClip;
         }
 
         private PointF normToReal(PointF pp)

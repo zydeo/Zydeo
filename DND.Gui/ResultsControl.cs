@@ -163,12 +163,6 @@ namespace DND.Controls
 
         public override void DoPaint(Graphics g)
         {
-            Region oldClip = g.Clip;
-            Matrix oldTransform = g.Transform;
-            Rectangle rect = AbsRect;
-            g.Clip = new Region(new Rectangle(AbsLeft, AbsTop, Width, Height));
-            g.TranslateTransform(rect.X, rect.Y);
-
             // Background
             using (Brush b = new SolidBrush(Color.White))
             {
@@ -192,9 +186,6 @@ namespace DND.Controls
                     orc.DoPaint(g);
                 }
             }
-
-            g.Transform = oldTransform;
-            g.Clip = oldClip;
         }
 
     }
