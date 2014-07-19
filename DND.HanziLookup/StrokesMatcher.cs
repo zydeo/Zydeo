@@ -105,6 +105,8 @@ namespace DND.HanziLookup
 
                 // always add, it won't have any effect if it wasn't a good match
                 this.matches.AddMatch(match);
+
+                if (!running) break;
             }
 
             // Results available for us in the CharacterMatchCollector.
@@ -506,6 +508,11 @@ namespace DND.HanziLookup
         public void Stop()
         {
             this.running = false;
+        }
+
+        public bool IsRunning
+        {
+            get { return running; }
         }
     }
 }

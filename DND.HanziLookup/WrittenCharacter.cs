@@ -39,6 +39,10 @@ namespace DND.HanziLookup
 	
 	    public void AddStroke(WrittenStroke stroke)
         {
+            // TO-DO: enforce substroke count limit
+            // Otherwise BuildCharacterDescriptor will overindex
+            // CharacterDescriptor.MAX_CHARACTER_STROKE_COUNT
+            // CharacterDescriptor.MAX_CHARACTER_SUB_STROKE_COUNT
 		    strokeList.Add(stroke);
 	    }
 	

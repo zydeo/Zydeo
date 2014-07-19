@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
@@ -26,7 +27,7 @@ namespace DND.Gui
         private ResultsControl resCtrl;
         private CharPicker cpCtrl;
 
-        private char[] currentCharResults;
+        private readonly HashSet<StrokesMatcher> runningMatchers = new HashSet<StrokesMatcher>();
 
         public LookupControl(ZenControlBase owner)
             : base(owner)
@@ -61,6 +62,11 @@ namespace DND.Gui
 
         private void writingPad_StrokesChanged(object sender, IEnumerable<WritingPad.Stroke> strokes)
         {
+            // If there are other matchers running, stop them now
+            lock (runningMatchers)
+            {
+                foreach (StrokesMatcher sm in runningMatchers) sm.Stop();
+            }
             // Convert stroke data to HanziLookup's format
             WrittenCharacter wc = new WrittenCharacter();
             foreach (WritingPad.Stroke stroke in strokes)
@@ -80,11 +86,15 @@ namespace DND.Gui
                 return;
             }
 
-            CharacterDescriptor id = wc.BuildCharacterDescriptor();
+            ThreadPool.QueueUserWorkItem(recognize, wc);
+        }
 
+        private void recognize(object ctxt)
+        {
+            WrittenCharacter wc = ctxt as WrittenCharacter;
+            CharacterDescriptor id = wc.BuildCharacterDescriptor();
             bool searchTraditional = true;
             bool searchSimplified = true;
-
             strokesData.Reset();
             StrokesMatcher matcher = new StrokesMatcher(id,
                                                      searchTraditional,
@@ -92,10 +102,32 @@ namespace DND.Gui
                                                      looseness,
                                                      numResults,
                                                      strokesData);
-            cpCtrl.SetItems(matcher.DoMatching());
+            int matcherCount;
+            lock (runningMatchers)
+            {
+                runningMatchers.Add(matcher);
+                matcherCount = runningMatchers.Count;
+            }
+            while (matcher.IsRunning && matcherCount > 1)
+            {
+                Thread.Sleep(50);
+                lock (runningMatchers) { matcherCount = runningMatchers.Count; }
+            }
+            if (!matcher.IsRunning)
+            {
+                lock (runningMatchers) { runningMatchers.Remove(matcher); }
+                return;
+            }
+            char[] matches = matcher.DoMatching();
+            lock (runningMatchers) { runningMatchers.Remove(matcher); }
+            if (matches == null) return;
+            InvokeOnForm((MethodInvoker)delegate
+            {
+                cpCtrl.SetItems(matches);
+            });
         }
 
-        void cpCtrl_CharPicked(char c)
+        private void cpCtrl_CharPicked(char c)
         {
             CedictMeaning[] xmAll = new CedictMeaning[9];
             xmAll[0] = new CedictMeaning(null, "pot-scrubbing brush made of bamboo strips", null);

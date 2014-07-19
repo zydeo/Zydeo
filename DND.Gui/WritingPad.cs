@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -20,19 +21,10 @@ namespace DND.Gui
         public class Stroke
         {
             private readonly PointF[] points;
-            public IEnumerable<PointF> Points
-            {
-                get { return points; }
-            }
 
-            public int PointCount
+            public ReadOnlyCollection<PointF> Points
             {
-                get { return points.Length; }
-            }
-
-            public PointF GetPointAt(int index)
-            {
-                return points[index];
+                get { return new ReadOnlyCollection<PointF>(points); }
             }
 
             internal Stroke(List<PointF> points)
@@ -42,6 +34,11 @@ namespace DND.Gui
             }
         }
 
+        private readonly List<PointF> currentPoints = new List<PointF>();
+        const float canvasScale = 250.0F;
+        const float strokeThicknessLogical = 5.0F;
+        const float strokeThicknessAnimStart = 10.0F;
+        const float strokeBrightnessAnimStart = 180.0F;
         private readonly List<Stroke> strokes = new List<Stroke>();
 
         public IEnumerable<Stroke> Strokes
@@ -63,6 +60,7 @@ namespace DND.Gui
         public WritingPad(ZenControl owner)
             : base(owner)
         {
+            SubscribeToTimer();
         }
         
         protected override void OnSizeChanged()
@@ -70,8 +68,58 @@ namespace DND.Gui
             MakeMePaint(true, RenderMode.Invalidate);
         }
 
+        /// <summary>
+        /// Holds latest strokes being animated. Value goes from 0 to 1; when 1 is reached, item is removed.
+        /// </summary>
+        private readonly Dictionary<Stroke, float> strokeAnimStates = new Dictionary<Stroke, float>();
+
+        public override void DoTimer()
+        {
+            lock (strokeAnimStates)
+            {
+                if (strokeAnimStates.Count == 0) return;
+                // Remove those that have completed their animation; nudge others on
+                List<Stroke> toRemove = new List<Stroke>();
+                List<Stroke> toNudge = new List<Stroke>();
+                foreach (Stroke stroke in strokeAnimStates.Keys)
+                {
+                    if (strokeAnimStates[stroke] >= 1.0) toRemove.Add(stroke);
+                    else toNudge.Add(stroke);
+                }
+                foreach (Stroke stroke in toRemove) strokeAnimStates.Remove(stroke);
+                foreach (Stroke stroke in toNudge) strokeAnimStates[stroke] += 0.1F;
+            }
+            // Request a repaint
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        private void doPaintStroke(Graphics g, Pen p, ReadOnlyCollection<PointF> points)
+        {
+            PointF lastRP = normToReal(points[0]);
+            if (points.Count == 1)
+                g.DrawLine(p, lastRP, lastRP);
+            else
+            {
+                for (int i = 1; i < points.Count; ++i)
+                {
+                    PointF thisNP = points[i];
+                    PointF thisRP = normToReal(thisNP);
+                    g.DrawLine(p, lastRP, thisRP);
+                    lastRP = thisRP;
+                }
+            }
+        }
+
         public override void DoPaint(Graphics g)
         {
+            // Get strokes under animation - those will get special treatment.
+            // Must lock for thread safety
+            Dictionary<Stroke, float> animStates = new Dictionary<Stroke, float>();
+            lock (strokeAnimStates)
+            {
+                foreach (var x in strokeAnimStates) animStates[x.Key] = x.Value;
+            }
+
             // Background
             using (Brush b = new SolidBrush(Color.White))
             {
@@ -99,8 +147,9 @@ namespace DND.Gui
                 g.DrawLine(p, new PointF(0, ((float)Size.Height) / 2.0F), new PointF(Size.Width, ((float)Size.Height) / 2.0F));
             }
             // All strokes collected so far, plus current points
+            // Except strokes being animated: we'll treat those separately
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            float thickness = 5.0F * Scale;
+            float thickness = strokeThicknessLogical * Scale;
             using (Pen p = new Pen(Color.Black, thickness))
             {
                 p.StartCap = System.Drawing.Drawing2D.LineCap.Round;
@@ -108,36 +157,29 @@ namespace DND.Gui
                 // Previous strokes
                 foreach (Stroke stroke in strokes)
                 {
-                    PointF lastRP = normToReal(stroke.GetPointAt(0));
-                    if (stroke.PointCount == 1)
-                        g.DrawLine(p, lastRP, lastRP);
-                    else
-                    {
-                        for (int i = 1; i != stroke.PointCount; ++i)
-                        {
-                            PointF thisNP = stroke.GetPointAt(i);
-                            PointF thisRP = normToReal(thisNP);
-                            g.DrawLine(p, lastRP, thisRP);
-                            lastRP = thisRP;
-                        }
-                    }
+                    // If stroke is being animated, skip here
+                    if (animStates.ContainsKey(stroke)) continue;
+                    doPaintStroke(g, p, stroke.Points);
                 }
                 // Current stroke in progress
                 if (currentPoints.Count > 0)
                 {
-                    PointF lastRP = normToReal(currentPoints[0]);
-                    if (currentPoints.Count == 1)
-                        g.DrawLine(p, lastRP, lastRP);
-                    else
-                    {
-                        for (int i = 1; i != currentPoints.Count; ++i)
-                        {
-                            PointF thisNP = currentPoints[i];
-                            PointF thisRP = normToReal(thisNP);
-                            g.DrawLine(p, lastRP, thisRP);
-                            lastRP = thisRP;
-                        }
-                    }
+                    doPaintStroke(g, p, new ReadOnlyCollection<PointF>(currentPoints));
+                }
+            }
+            // Strokes being animated: different pen for each of 'em
+            foreach (var x in animStates)
+            {
+                // Anim state goes from 0 to 1. Line goes from thick to normal, light gray to black.
+                float thickStart = strokeThicknessAnimStart * Scale;
+                float thickNow = thickStart - (thickStart - thickness) * x.Value;
+                int brightNow = (int)(strokeBrightnessAnimStart * (1.0F - Math.Pow(x.Value, 3.0)));
+                Color colNow = Color.FromArgb(brightNow, brightNow, brightNow);
+                using (Pen p = new Pen(colNow, thickNow))
+                {
+                    p.StartCap = System.Drawing.Drawing2D.LineCap.Round;
+                    p.EndCap = System.Drawing.Drawing2D.LineCap.Round;
+                    doPaintStroke(g, p, x.Key.Points);
                 }
             }
         }
@@ -146,10 +188,6 @@ namespace DND.Gui
         {
             return new PointF(pp.X * ((float)Size.Width) / canvasScale, pp.Y * ((float)Size.Height) / canvasScale);
         }
-
-        private readonly List<PointF> currentPoints = new List<PointF>();
-
-        const float canvasScale = 250.0F;
 
         public override bool DoMouseDown(Point p, MouseButtons button)
         {
@@ -181,6 +219,7 @@ namespace DND.Gui
 
         private void doStrokeOver()
         {
+            Stroke newStroke = null;
             if (currentPoints.Count > 1)
             {
                 List<PointF> strokePoints = new List<PointF>();
@@ -192,10 +231,17 @@ namespace DND.Gui
                     if (i == currentPoints.Count - 1 || dist(lastPoint, thisCurrPoint) >= 5.0F)
                         strokePoints.Add(thisCurrPoint);
                 }
-                Stroke newStroke = new Stroke(strokePoints);
+                newStroke = new Stroke(strokePoints);
                 strokes.Add(newStroke);
             }
             currentPoints.Clear();
+            if (newStroke == null) return;
+            // Add to strokes being animated
+            lock (strokeAnimStates)
+            {
+                strokeAnimStates[newStroke] = 0;
+            }
+            // Repaint; tell the world
             MakeMePaint(false, RenderMode.Invalidate);
             if (StrokesChanged != null) StrokesChanged(this, Strokes);
         }
