@@ -437,6 +437,9 @@ namespace DND.Gui.Zen
             {
                 if (p.Y < 2 * innerPadding) return DragMode.ResizeNW;
                 if (p.Y > form.Height - 2 * innerPadding) return DragMode.ResizeSW;
+                // On the west, do not use border right next to main tab - 1px hot area looks silly
+                if (p.X == 0 && p.Y >= mainTabCtrl.AbsTop && p.Y <= mainTabCtrl.AbsBottom)
+                    return DragMode.None;
                 return DragMode.ResizeW;
             }
             Rectangle rNorth = new Rectangle(
