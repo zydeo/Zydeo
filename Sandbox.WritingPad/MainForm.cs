@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
 using DND.HanziLookup;
-using DND.Controls;
+using DND.Gui;
 
 namespace Sandbox
 {

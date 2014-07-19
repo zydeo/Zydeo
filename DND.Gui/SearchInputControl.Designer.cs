@@ -1,4 +1,4 @@
-﻿namespace DND.Controls
+﻿namespace DND.Gui
 {
     partial class SearchInputControl
     {

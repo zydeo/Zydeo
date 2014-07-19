@@ -13,7 +13,7 @@ using System.Threading;
 using DND.Common;
 using DND.Gui.Zen;
 
-namespace DND.Controls
+namespace DND.Gui
 {
     public class ResultsControl : ZenControl, IMessageFilter
     {

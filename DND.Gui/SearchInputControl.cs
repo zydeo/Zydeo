@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace DND.Controls
+namespace DND.Gui
 {
     public partial class SearchInputControl : UserControl
     {

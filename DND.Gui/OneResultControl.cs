@@ -9,7 +9,7 @@ using System.Drawing.Drawing2D;
 using DND.Common;
 using DND.Gui.Zen;
 
-namespace DND.Controls
+namespace DND.Gui
 {
     internal class OneResultControl : ZenControl
     {
@@ -178,7 +178,6 @@ namespace DND.Controls
             float entryHeight = blockY + lemmaLineHeight + padBottom;
             float trueHeight = Math.Max(entryHeight, zhoHeight);
             
-            //SetSizeNoInvalidate(new Size(width, (int)trueHeight));
             Size = new Size(width, (int)trueHeight);
         }
     }

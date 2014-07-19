@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 using DND.Gui.Zen;
 
-namespace DND.Controls
+namespace DND.Gui
 {
     public partial class WritingPad : ZenControl
     {
@@ -98,9 +98,10 @@ namespace DND.Controls
                 g.DrawLine(p, new PointF(((float)Size.Width) / 2.0F, 0), new PointF(((float)Size.Width) / 2.0F, Size.Height));
                 g.DrawLine(p, new PointF(0, ((float)Size.Height) / 2.0F), new PointF(Size.Width, ((float)Size.Height) / 2.0F));
             }
-            // All strokes collectd so far, plus current points
+            // All strokes collected so far, plus current points
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            using (Pen p = new Pen(Color.Black, 5.0F))
+            float thickness = 5.0F * Scale;
+            using (Pen p = new Pen(Color.Black, thickness))
             {
                 p.StartCap = System.Drawing.Drawing2D.LineCap.Round;
                 p.EndCap = System.Drawing.Drawing2D.LineCap.Round;

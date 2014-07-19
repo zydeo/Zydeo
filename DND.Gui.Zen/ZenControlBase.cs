@@ -38,7 +38,12 @@ namespace DND.Gui.Zen
         public Size Size
         {
             get { return absRect.Size; }
-            set { absRect.Size = value; OnSizeChanged(); }
+            set
+            {
+                if (absRect.Size == value) return;
+                absRect.Size = value;
+                OnSizeChanged();
+            }
         }
 
         public virtual Rectangle AbsRect
@@ -88,6 +93,7 @@ namespace DND.Gui.Zen
             get { return absRect.Width; }
             set
             {
+                if (Width == value) return;
                 absRect.Size = new Size(value, absRect.Height);
                 OnSizeChanged();
             }
@@ -98,6 +104,7 @@ namespace DND.Gui.Zen
             get { return absRect.Height; }
             set
             {
+                if (Height == value) return;
                 absRect.Size = new Size(absRect.Width, value);
                 OnSizeChanged();
             }
@@ -110,6 +117,7 @@ namespace DND.Gui.Zen
                 float w = ((float)value.Width) * Scale;
                 float h = ((float)value.Height) * Scale;
                 Size newSize = new Size((int)w, (int)h);
+                if (absRect.Size == newSize) return;
                 absRect.Size = newSize;
                 OnSizeChanged();
             }

@@ -5,35 +5,97 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
+using System.IO;
 
 using DND.Common;
+using DND.HanziLookup;
 using DND.Gui.Zen;
 
-namespace DND.Controls
+namespace DND.Gui
 {
     internal class LookupControl : ZenControl
     {
+        private const double looseness = 0.25;  // the "looseness" of lookup, 0-1, higher == looser, looser more computationally intensive
+        private const int numResults = 10;      // maximum number of results to return with each lookup
+
+        private FileStream fsStrokes;
+        private BinaryReader brStrokes;
+        private StrokesDataSource strokesData;
+
         private WritingPad writingPad;
         private ResultsControl resCtrl;
-        private ZenControl blahCtrl;
+        private CharPicker cpCtrl;
+
+        private char[] currentCharResults;
 
         public LookupControl(ZenControlBase owner)
             : base(owner)
         {
+            fsStrokes = new FileStream("strokes-extended.dat", FileMode.Open, FileAccess.Read);
+            brStrokes = new BinaryReader(fsStrokes);
+            strokesData = new StrokesDataSource(brStrokes);
+
             writingPad = new WritingPad(this);
             writingPad.RelLogicalLocation = new Point(5, 5);
             writingPad.LogicalSize = new Size(200, 200);
-            
+            writingPad.StrokesChanged += writingPad_StrokesChanged;
+
             resCtrl = new ResultsControl(this);
             resCtrl.RelLocation = new Point(writingPad.RelRect.Right + writingPad.RelRect.Left, writingPad.RelRect.Top);
 
-            blahCtrl = new ZenControl(this);
-            blahCtrl.RelLogicalLocation = new Point(5, 210);
-            blahCtrl.LogicalSize = new Size(200, 20);
-            blahCtrl.MouseClick += blahCtrl_MouseClick;
+            cpCtrl = new CharPicker(this);
+            //cpCtrl.FontFace = "Noto Sans S Chinese Regular";
+            //cpCtrl.FontFace = "䡡湄楮札䍓ⵆ潮瑳";
+            cpCtrl.FontFace = "SimSun";
+            cpCtrl.RelLogicalLocation = new Point(5, 210);
+            cpCtrl.LogicalSize = new Size(200, 80);
+            cpCtrl.CharPicked += cpCtrl_CharPicked;
         }
 
-        void blahCtrl_MouseClick(ZenControlBase sender)
+        public override void Dispose()
+        {
+            if (brStrokes != null) brStrokes.Dispose();
+            if (fsStrokes != null) fsStrokes.Dispose();
+            base.Dispose();
+        }
+
+        private void writingPad_StrokesChanged(object sender, IEnumerable<WritingPad.Stroke> strokes)
+        {
+            // Convert stroke data to HanziLookup's format
+            WrittenCharacter wc = new WrittenCharacter();
+            foreach (WritingPad.Stroke stroke in strokes)
+            {
+                WrittenStroke ws = new WrittenStroke();
+                foreach (PointF p in stroke.Points)
+                {
+                    WrittenPoint wp = new WrittenPoint((int)(p.X), (int)(p.Y));
+                    ws.AddPoint(wp, ref wc.LeftX, ref wc.RightX, ref wc.TopY, ref wc.BottomY);
+                }
+                wc.AddStroke(ws);
+            }
+            if (wc.StrokeList.Count == 0)
+            {
+                // Don't bother doing anything if nothing has been input yet (number of strokes == 0).
+                cpCtrl.SetItems(new char[0]);
+                return;
+            }
+
+            CharacterDescriptor id = wc.BuildCharacterDescriptor();
+
+            bool searchTraditional = true;
+            bool searchSimplified = true;
+
+            strokesData.Reset();
+            StrokesMatcher matcher = new StrokesMatcher(id,
+                                                     searchTraditional,
+                                                     searchSimplified,
+                                                     looseness,
+                                                     numResults,
+                                                     strokesData);
+            cpCtrl.SetItems(matcher.DoMatching());
+        }
+
+        void cpCtrl_CharPicked(char c)
         {
             CedictMeaning[] xmAll = new CedictMeaning[9];
             xmAll[0] = new CedictMeaning(null, "pot-scrubbing brush made of bamboo strips", null);
@@ -71,6 +133,7 @@ namespace DND.Controls
             {
                 g.FillRectangle(b, 0, 0, Width, Height);
             }
+
             DoPaintChildren(g);
         }
 

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 using DND.Gui.Zen;
 
-namespace DND.Controls
+namespace DND.Gui
 {
     public class MainForm : ZenTabbedForm
     {

@@ -22,9 +22,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 
-namespace DND.Controls
+namespace DND.Gui.Zen
 {
-	static class GraphicsExtension
+	public static class GraphicsExtension
 	{
 		private static GraphicsPath GenerateRoundedRectangle(
 				this Graphics graphics,

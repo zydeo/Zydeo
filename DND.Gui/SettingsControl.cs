@@ -7,7 +7,7 @@ using System.Drawing;
 
 using DND.Gui.Zen;
 
-namespace DND.Controls
+namespace DND.Gui
 {
     internal class SettingsControl : ZenControl
     {
