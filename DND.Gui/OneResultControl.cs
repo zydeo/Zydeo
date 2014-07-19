@@ -14,7 +14,7 @@ namespace DND.Gui
     internal class OneResultControl : ZenControl
     {
         private const string zhoTestStr = "中中中中";
-        private const string spaceTestStr = " ";
+        private const string spaceTestStr = "r";
         private readonly int padTop;
         private readonly int padBottom;
         private readonly int padMid;
@@ -112,10 +112,10 @@ namespace DND.Gui
                 lemmaLineHeight = sz.Height;
             }
 
-            simpSize = g.MeasureString(Res.Entry.ChSimpl, fntZho);
+            simpSize = g.MeasureString(Res.Entry.ChSimpl, fntZho, 65535, sf);
             simpLeft = (float)zhoWidth - simpSize.Width;
             simpTop = padTop;
-            tradSize = g.MeasureString(Res.Entry.ChTrad, fntZho);
+            tradSize = g.MeasureString(Res.Entry.ChTrad, fntZho, 65535, sf);
             tradLeft = (float)zhoWidth - tradSize.Width;
             tradTop = simpTop + simpSize.Height;
             float zhoHeight = tradTop + tradSize.Height + padBottom;
@@ -142,7 +142,7 @@ namespace DND.Gui
                 string meaningIdxStr = "(" + meaningIdx.ToString() + ")";
                 MeasuredBlock mbIdx = new MeasuredBlock
                 {
-                    Size = g.MeasureString(meaningIdxStr, fntLemma),
+                    Size = g.MeasureString(meaningIdxStr, fntLemma, 65535, sf),
                     Loc = new PointF(blockX, blockY),
                     StickRight = true,
                     Str = meaningIdxStr
@@ -160,7 +160,7 @@ namespace DND.Gui
                 {
                     MeasuredBlock mbWd = new MeasuredBlock
                     {
-                        Size = g.MeasureString(wd, fntLemma),
+                        Size = g.MeasureString(wd, fntLemma, 65535, sf),
                         Loc = new PointF(blockX, blockY),
                         StickRight = false,
                         Str = wd
