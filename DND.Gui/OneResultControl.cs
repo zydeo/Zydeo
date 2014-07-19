@@ -56,7 +56,6 @@ namespace DND.Controls
             padBottom = (int)(10.0F * scale);
             padMid = (int)(10.0F * scale);
             padRight = (int)(5.0F * scale);
-            SuspendPaint();
         }
 
         // Graphics resource: static, singleton, never disposed
@@ -179,7 +178,8 @@ namespace DND.Controls
             float entryHeight = blockY + lemmaLineHeight + padBottom;
             float trueHeight = Math.Max(entryHeight, zhoHeight);
             
-            SetSizeNoInvalidate(new Size(width, (int)trueHeight));
+            //SetSizeNoInvalidate(new Size(width, (int)trueHeight));
+            Size = new Size(width, (int)trueHeight);
         }
     }
 }

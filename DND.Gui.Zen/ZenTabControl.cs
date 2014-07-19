@@ -61,7 +61,7 @@ namespace DND.Gui.Zen
         {
             get
             {
-                return textWidth + (int)(2.0F * scale * ZenParams.HeaderTabPadding);
+                return textWidth + (int)(2.0F * Scale * ZenParams.HeaderTabPadding);
             }
         }
 
@@ -125,7 +125,7 @@ namespace DND.Gui.Zen
             }
             using (Brush b = new SolidBrush(textColor))
             {
-                float x = AbsLocation.X + ZenParams.HeaderTabPadding* scale;
+                float x = AbsLocation.X + ZenParams.HeaderTabPadding* Scale;
                 float y = AbsLocation.Y + (((float)Height) - textHeight) / 2.0F;
                 g.DrawString(text, font, b, new PointF(x, y));
             }

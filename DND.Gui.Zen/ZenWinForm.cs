@@ -12,13 +12,13 @@ namespace DND.Gui.Zen
 {
     internal class ZenWinForm : Form
     {
-        public class BitmapRenderer : IDisposable
+        public class PaintCanvas : IDisposable
         {
             private readonly Mutex dbufferMutex;
             private readonly Bitmap dbuffer;
             private readonly Graphics graphics;
 
-            internal BitmapRenderer(Mutex dbufferMutex, Bitmap dbuffer)
+            internal PaintCanvas(Mutex dbufferMutex, Bitmap dbuffer)
             {
                 this.dbufferMutex = dbufferMutex;
                 this.dbuffer = dbuffer;
@@ -109,10 +109,10 @@ namespace DND.Gui.Zen
             }
         }
 
-        public BitmapRenderer GetBitmapRenderer()
+        public PaintCanvas GetBitmapRenderer()
         {
             if (dbuffer == null) return null;
-            return new BitmapRenderer(dbufferMutex, dbuffer);
+            return new PaintCanvas(dbufferMutex, dbuffer);
         }
 
         protected override void OnPaintBackground(PaintEventArgs e)

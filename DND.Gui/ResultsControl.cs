@@ -29,12 +29,11 @@ namespace DND.Controls
             Application.AddMessageFilter(this);
 
             sb = new VScrollBar();
-            AddWinFormsControlToForm(sb);
+            RegisterWinFormsControl(sb);
             sb.Height = Height - 2;
             sb.Top = 1;
             sb.Left = Width - 1 - sb.Width;
             sb.Enabled = false;
-            sb.Scroll += sb_Scroll;
             sb.ValueChanged += sb_ValueChanged;
 
             contentRectSize = new Size(Width - 2 - sb.Width, Height - 2);
@@ -48,17 +47,11 @@ namespace DND.Controls
         void sb_ValueChanged(object sender, EventArgs e)
         {
             int y = 1 - sb.Value;
-            SuspendPaint();
             foreach (OneResultControl orc in resCtrls)
             {
                 orc.AbsTop = y;
                 y += orc.Height;
             }
-            ResumePaint(false, RenderMode.Invalidate);
-        }
-
-        void sb_Scroll(object sender, ScrollEventArgs e)
-        {
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
@@ -82,13 +75,6 @@ namespace DND.Controls
         private void onMouseWheel(MouseEventArgs e)
         {
             subscribeOrAddScrollTimer(-((float)e.Delta) * ((float)sb.LargeChange) / 1500.0F);
-
-            //float diff = ((float)sb.LargeChange) * ((float)e.Delta) / 240.0F;
-            //int idiff = -(int)diff;
-            //int newval = sb.Value + idiff;
-            //if (newval < 0) newval = 0;
-            //else if (newval > sb.Maximum - sb.LargeChange) newval = sb.Maximum - sb.LargeChange;
-            //sb.Value = newval;
         }
 
         private float scrollSpeed;
@@ -130,10 +116,11 @@ namespace DND.Controls
             });
         }
 
-        protected override void DoDispose()
+        public override void Dispose()
         {
             foreach (OneResultControl orc in resCtrls) orc.Dispose();
             timer.Dispose();
+            base.Dispose();
         }
 
         protected override void OnSizeChanged()
@@ -143,26 +130,23 @@ namespace DND.Controls
             sb.Top = AbsTop + 1;
             sb.Left = AbsLeft + Width - 1 - sb.Width;
             sb.LargeChange = contentRectSize.Height;
-            SuspendPaint();
             foreach (OneResultControl orc in resCtrls) orc.Width = contentRectSize.Width;
-            ResumePaint(true, RenderMode.Invalidate);
         }
 
         public void SetResults(ReadOnlyCollection<CedictResult> results, int pageSize)
         {
-            if (scale == 0) throw new InvalidOperationException("Scale must be set before setting results to show.");
+            if (Scale == 0) throw new InvalidOperationException("Scale must be set before setting results to show.");
             // Dispose old results controls
             foreach (OneResultControl orc in resCtrls) orc.Dispose();
             resCtrls.Clear();
             // Create new result controls
-            SuspendPaint();
             int y = 0;
             using (Bitmap bmp = new Bitmap(1, 1))
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 foreach (CedictResult cr in results)
                 {
-                    OneResultControl orc = new OneResultControl(scale, this, cr);
+                    OneResultControl orc = new OneResultControl(Scale, this, cr);
                     orc.Analyze(g, contentRectSize.Width);
                     orc.AbsLocation = new Point(1, y + 1);
                     y += orc.Height;
@@ -173,7 +157,7 @@ namespace DND.Controls
             sb.LargeChange = contentRectSize.Height;
             sb.Value = 0;
             sb.Enabled = true;
-            ResumePaint(false, RenderMode.Invalidate);
+            MakeMePaint(false, RenderMode.Invalidate);
         }
 
         public override void DoPaint(Graphics g)

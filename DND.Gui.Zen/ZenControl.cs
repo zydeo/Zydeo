@@ -13,194 +13,50 @@ namespace DND.Gui.Zen
         public delegate void ClickDelegate(ZenControl sender);
         public event ClickDelegate MouseClick;
 
-        protected readonly float scale;
-        protected readonly ZenControlBase parent;
-        private Rectangle absRect = new Rectangle(0, 0, 0, 0);
-        private List<ZenControl> zenChildren = new List<ZenControl>();
         private ZenControl zenCtrlWithMouse = null;
-        private bool paintSuspended = false;
-
-        public Size Size
-        {
-            get { return absRect.Size; }
-            set { absRect.Size = value; OnSizeChanged(); MakeMePaint(true, RenderMode.Invalidate); }
-        }
-
-        public override sealed Rectangle AbsRect
-        {
-            get { return absRect; }
-        }
-
-        public Rectangle RelRect
-        {
-            get { return new Rectangle(absRect.X - parent.AbsRect.X, absRect.Y - parent.AbsRect.Y, absRect.Width, absRect.Height); }
-        }
-
-        public int AbsLeft
-        {
-            get { return absRect.X; }
-            set
-            {
-                int diff = value - absRect.X;
-                absRect.Location = new Point(value, absRect.Location.Y);
-                foreach (ZenControl ctrl in zenChildren) ctrl.AbsLeft += diff;
-                MakeMePaint(true, RenderMode.Invalidate);
-            }
-        }
-
-        public int AbsRight
-        {
-            get { return absRect.X + absRect.Width - 1; }
-        }
-
-        public int AbsTop
-        {
-            get { return absRect.Y; }
-            set
-            {
-                int diff = value - absRect.Y;
-                absRect.Location = new Point(absRect.X, value);
-                foreach (ZenControl ctrl in zenChildren) ctrl.AbsTop += diff;
-                MakeMePaint(true, RenderMode.Invalidate);
-            }
-        }
-
-        public int AbsBottom
-        {
-            get { return absRect.Y + absRect.Height - 1; }
-        }
-
-        public int Width
-        {
-            get { return absRect.Width; }
-            set
-            {
-                absRect.Size = new Size(value, absRect.Height);
-                OnSizeChanged();
-                MakeMePaint(true, RenderMode.Invalidate);
-            }
-        }
-
-        public int Height
-        {
-            get { return absRect.Height; }
-            set
-            {
-                absRect.Size = new Size(absRect.Width, value);
-                OnSizeChanged();
-                MakeMePaint(true, RenderMode.Invalidate);
-            }
-        }
-
-        public Size LogicalSize
-        {
-            set
-            {
-                float w = ((float)value.Width) * scale;
-                float h = ((float)value.Height) * scale;
-                Size newSize = new Size((int)w, (int)h);
-                absRect.Size = newSize;
-                OnSizeChanged();
-                MakeMePaint(true, RenderMode.Invalidate);
-            }
-            get { return new Size((int)(absRect.Width / scale), (int)(absRect.Height / scale)); }
-        }
-
-        public Point AbsLocation
-        {
-            get { return absRect.Location; }
-            set
-            {
-                Point newLoc = value;
-                int diffX = newLoc.X - absRect.X;
-                int diffY = newLoc.Y - absRect.Y;
-                absRect.Location = newLoc;
-                foreach (ZenControl ctrl in zenChildren)
-                {
-                    Point childNewLoc = new Point(ctrl.AbsLocation.X + diffX, ctrl.AbsLocation.Y + diffY);
-                    ctrl.AbsLocation = childNewLoc;
-                }
-                MakeMePaint(true, RenderMode.Invalidate);
-            }
-        }
-
-        public Point RelLocation
-        {
-            get { return RelRect.Location; }
-            set
-            {
-                Point newLoc = value;
-                int diffX = newLoc.X - RelRect.X;
-                int diffY = newLoc.Y - RelRect.Y;
-                absRect.Location = new Point(absRect.X + diffX, absRect.Y + diffY);
-                foreach (ZenControl ctrl in zenChildren)
-                {
-                    Point childNewLoc = new Point(ctrl.AbsLocation.X + diffX, ctrl.AbsLocation.Y + diffY);
-                    ctrl.AbsLocation = childNewLoc;
-                }
-                MakeMePaint(true, RenderMode.Invalidate);
-            }
-        }
-
-        public Point AbsLogicalLocation
-        {
-            set
-            {
-                float x = ((float)value.X) * scale;
-                float y = ((float)value.Y) * scale;
-                AbsLocation = new Point((int)x, (int)y);
-            }
-            get { return new Point((int)(absRect.X / scale), (int)(absRect.Y / scale)); }
-        }
-
-        public Point RelLogicalLocation
-        {
-            set
-            {
-                float x = ((float)value.X) * scale;
-                float y = ((float)value.Y) * scale;
-                RelLocation = new Point((int)x, (int)y);
-            }
-            get { return new Point((int)(RelRect.X / scale), (int)(RelRect.Y / scale)); }
-        }
 
         public ZenControl(float scale, ZenControlBase parent)
             : base(parent)
         {
-            this.scale = scale;
-            this.parent = parent;
-            parent.ControlAdded(this);
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
-            DoDispose();
+            base.Dispose();
         }
 
-        protected void MakeMePaint(bool needBackground, RenderMode rm)
+        protected override sealed void RegisterWinFormsControl(Control c)
         {
-            if (paintSuspended) return;
-            MakeCtrlPaint(this, needBackground, rm);
+            base.RegisterWinFormsControl(c);
         }
 
-        protected void SuspendPaint()
+        internal sealed override void AddWinFormsControl(Control c)
         {
-            paintSuspended = true;
+            base.AddWinFormsControl(c);
         }
 
-        protected void ResumePaint(bool needBackground, RenderMode rm)
+        internal sealed override void RemoveWinFormsControl(Control c)
         {
-            paintSuspended = false;
-            MakeMePaint(needBackground, rm);
+            base.RemoveWinFormsControl(c);
         }
 
-        protected void DoPaintChildren(Graphics g)
+        public sealed override Size LogicalSize
         {
-            foreach (ZenControl ctrl in zenChildren)
-                ctrl.DoPaint(g);
+            get { return base.LogicalSize; }
+            set { base.LogicalSize = value; }
         }
 
-        public virtual void DoPaint(Graphics g)
+        public sealed override Rectangle AbsRect
+        {
+            get { return base.AbsRect; }
+        }
+
+        internal override sealed void MakeCtrlPaint(ZenControlBase ctrl, bool needBackground, RenderMode rm)
+        {
+            base.MakeCtrlPaint(ctrl, needBackground, rm);
+        }
+
+        public override void DoPaint(Graphics g)
         {
             using (Brush b = new SolidBrush(SystemColors.Control))
             {
@@ -214,48 +70,12 @@ namespace DND.Gui.Zen
             DoPaintChildren(g);
         }
 
-        protected virtual void OnSizeChanged()
-        {
-
-        }
-
-        protected void SetSizeNoInvalidate(Size sz)
-        {
-            absRect.Size = sz;
-        }
-
-        protected virtual void DoDispose()
-        {
-        }
-
-        protected SizeF MeasureText(string text, Font font, StringFormat fmt)
-        {
-            using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                return g.MeasureString(text, font, int.MaxValue, fmt);
-            }
-        }
-
-        private Point translateToControl(ZenControl ctrl, Point pParent)
-        {
-            int x = pParent.X - ctrl.RelRect.X;
-            int y = pParent.Y - ctrl.RelRect.Y;
-            return new Point(x, y);
-        }
-
-        private ZenControl getControl(Point pParent)
-        {
-            foreach (ZenControl ctrl in zenChildren)
-                if (ctrl.Contains(pParent)) return ctrl;
-            return null;
-        }
-
         public virtual bool DoMouseClick(Point p, MouseButtons button)
         {
-            ZenControl ctrl = getControl(p);
+            ZenControl ctrl = GetControl(p);
             if (ctrl != null)
             {
-                if (ctrl.DoMouseClick(translateToControl(ctrl, p), button))
+                if (ctrl.DoMouseClick(TranslateToControl(ctrl, p), button))
                     return true;
             }
             if (MouseClick != null)
@@ -268,7 +88,7 @@ namespace DND.Gui.Zen
 
         public virtual bool DoMouseMove(Point p, MouseButtons button)
         {
-            ZenControl ctrl = getControl(p);
+            ZenControl ctrl = GetControl(p);
             if (ctrl != null)
             {
                 if (zenCtrlWithMouse != ctrl)
@@ -277,7 +97,7 @@ namespace DND.Gui.Zen
                     ctrl.DoMouseEnter();
                     zenCtrlWithMouse = ctrl;
                 }
-                if (ctrl.DoMouseMove(translateToControl(ctrl, p), button))
+                if (ctrl.DoMouseMove(TranslateToControl(ctrl, p), button))
                     return true;
             }
             else if (zenCtrlWithMouse != null)
@@ -290,10 +110,10 @@ namespace DND.Gui.Zen
 
         public virtual bool DoMouseDown(Point p, MouseButtons button)
         {
-            ZenControl ctrl = getControl(p);
+            ZenControl ctrl = GetControl(p);
             if (ctrl != null)
             {
-                if (ctrl.DoMouseDown(translateToControl(ctrl, p), button))
+                if (ctrl.DoMouseDown(TranslateToControl(ctrl, p), button))
                     return true;
             }
             return false;
@@ -301,10 +121,10 @@ namespace DND.Gui.Zen
 
         public virtual bool DoMouseUp(Point p, MouseButtons button)
         {
-            ZenControl ctrl = getControl(p);
+            ZenControl ctrl = GetControl(p);
             if (ctrl != null)
             {
-                if (ctrl.DoMouseUp(translateToControl(ctrl, p), button))
+                if (ctrl.DoMouseUp(TranslateToControl(ctrl, p), button))
                     return true;
             }
             return false;
@@ -315,7 +135,7 @@ namespace DND.Gui.Zen
             bool res = false;
             Point pAbs = MousePositionAbs;
             Point pRel = new Point(pAbs.X - AbsLeft, pAbs.Y - AbsTop);
-            ZenControl ctrl = getControl(pRel);
+            ZenControl ctrl = GetControl(pRel);
             if (ctrl != null)
             {
                 if (zenCtrlWithMouse != ctrl)
@@ -342,11 +162,6 @@ namespace DND.Gui.Zen
         public bool Contains(Point pParent)
         {
             return RelRect.Contains(pParent);
-        }
-
-        internal override sealed void ControlAdded(ZenControl ctrl)
-        {
-            zenChildren.Add(ctrl);
         }
     }
 }
