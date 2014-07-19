@@ -22,7 +22,7 @@ namespace DND.Controls
             Header = "Zydeo Chinese-English dictionary";
             lc = new LookupControl(Scale, this);
             stgs = new SettingsControl(Scale, this);
-            MainTab = new ZenTab(stgs, "Zydeo");
+            MainTab = new ZenTab(stgs, "Zydeo video");
             //MainTabHeader = "Zydeo";
             Tabs.Add(new ZenTab(lc, "Lookup"));
         }

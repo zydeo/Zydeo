@@ -84,6 +84,7 @@ namespace DND.Gui.Zen
                 mainTab.Ctrl.AbsLocation = ContentLocation;
                 mainTab.Ctrl.Size = ContentSize;
                 mainTabCtrl.Text = mainTab.Header;
+                mainTabCtrl.Size = new Size(mainTabCtrl.PreferredWidth, mainTabCtrl.Height);
             }
         }
 
