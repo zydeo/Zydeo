@@ -14,6 +14,7 @@ namespace DND.Gui.Zen
     public class ZenTabbedForm : ZenControlBase, IDisposable, IZenTabsChangedListener
     {
         private readonly ZenWinForm form;
+        private readonly System.Timers.Timer timer;
 
         private readonly int headerHeight;
         private readonly int innerPadding;
@@ -25,11 +26,17 @@ namespace DND.Gui.Zen
         private ZenTab mainTab;
         private readonly ZenTabCollection tabs;
         private int activeTabIdx = 0;
+        private readonly List<ZenControlBase> timerSubscribers = new List<ZenControlBase>();
 
         public ZenTabbedForm()
             : base(null)
         {
             form = new ZenWinForm(DoPaint);
+
+            timer = new System.Timers.Timer(40);
+            timer.AutoReset = true;
+            timer.Start();
+            timer.Elapsed += onTimerEvent;
 
             headerHeight = (int)(ZenParams.HeaderHeight * Scale);
             innerPadding = (int)(ZenParams.InnerPadding * Scale);
@@ -183,8 +190,26 @@ namespace DND.Gui.Zen
 
         public override void Dispose()
         {
+            timer.Dispose();
             form.Dispose();
             base.Dispose();
+        }
+
+        internal override void SubscribeToTimer(ZenControlBase ctrl)
+        {
+            lock (timerSubscribers)
+            {
+                if (!timerSubscribers.Contains(ctrl))
+                    timerSubscribers.Add(ctrl);
+            }
+        }
+
+        private void onTimerEvent(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            lock (timerSubscribers)
+            {
+                foreach (ZenControlBase ctrl in timerSubscribers) ctrl.DoTimer();
+            }
         }
 
         private void createZenControls()

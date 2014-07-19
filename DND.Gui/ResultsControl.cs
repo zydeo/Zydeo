@@ -21,7 +21,6 @@ namespace DND.Gui
         private VScrollBar sb;
         private Size contentRectSize;
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
-        private readonly System.Timers.Timer timer;
 
         public ResultsControl(ZenControl owner)
             : base(owner)
@@ -38,10 +37,7 @@ namespace DND.Gui
 
             contentRectSize = new Size(Width - 2 - sb.Width, Height - 2);
 
-            timer = new System.Timers.Timer(40);
-            timer.AutoReset = true;
-            timer.Start();
-            timer.Elapsed += onScrollTimerEvent;
+            SubscribeToTimer();
         }
 
         void sb_ValueChanged(object sender, EventArgs e)
@@ -75,13 +71,13 @@ namespace DND.Gui
         private void onMouseWheel(MouseEventArgs e)
         {
             if (!sb.Enabled) return;
-            subscribeOrAddScrollTimer(-((float)e.Delta) * ((float)sb.LargeChange) / 1500.0F);
+            addMomentum(-((float)e.Delta) * ((float)sb.LargeChange) / 1500.0F);
         }
 
         private float scrollSpeed;
         private object scrollTimerLO = new object();
 
-        private void subscribeOrAddScrollTimer(float diffMomentum)
+        private void addMomentum(float diffMomentum)
         {
             lock (scrollTimerLO)
             {
@@ -89,7 +85,7 @@ namespace DND.Gui
             }
         }
 
-        private void onScrollTimerEvent(object sender, System.Timers.ElapsedEventArgs e)
+        public override void DoTimer()
         {
             float speed = 0;
             lock (scrollTimerLO)
@@ -120,7 +116,6 @@ namespace DND.Gui
         public override void Dispose()
         {
             foreach (OneResultControl orc in resCtrls) orc.Dispose();
-            timer.Dispose();
             base.Dispose();
         }
 

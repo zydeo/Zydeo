@@ -208,12 +208,20 @@ namespace DND.Gui.Zen
 
         protected void MakeMePaint(bool needBackground, RenderMode rm)
         {
-            Parent.MakeCtrlPaint(this, needBackground, rm);
+            // Request comes from background thread. In the UI thread, parent may just have been removed.
+            // If I have no parent, silently do not invoke.
+            // Happens when an animation is in progress and user switches to different tab in top form
+            ZenControlBase parent = Parent;
+            if (parent != null) parent.MakeCtrlPaint(this, needBackground, rm);
         }
 
         internal virtual void MakeCtrlPaint(ZenControlBase ctrl, bool needBackground, RenderMode rm)
         {
-            Parent.MakeCtrlPaint(ctrl, needBackground, rm);
+            // Request comes from background thread. In the UI thread, parent may just have been removed.
+            // If I have no parent, silently do not invoke.
+            // Happens when an animation is in progress and user switches to different tab in top form
+            ZenControlBase parent = Parent;
+            if (parent != null) parent.MakeCtrlPaint(ctrl, needBackground, rm);
         }
 
         protected virtual Point MousePositionAbs
@@ -287,6 +295,20 @@ namespace DND.Gui.Zen
             foreach (ZenControlBase child in zenChildren)
                 res.AddRange(child.GetWinFormsControlsRecursive());
             return res;
+        }
+
+        internal virtual void SubscribeToTimer(ZenControlBase ctrl)
+        {
+            Parent.SubscribeToTimer(ctrl);
+        }
+
+        protected void SubscribeToTimer()
+        {
+            SubscribeToTimer(this);
+        }
+
+        public virtual void DoTimer()
+        {
         }
 
         public bool Contains(Point pParent)
