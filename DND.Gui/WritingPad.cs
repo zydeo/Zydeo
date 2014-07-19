@@ -178,7 +178,7 @@ namespace DND.Controls
             return (float)Math.Sqrt(dx * dx + dy * dy);
         }
 
-        public override bool DoMouseUp(Point p, MouseButtons button)
+        private void doStrokeOver()
         {
             if (currentPoints.Count > 1)
             {
@@ -197,7 +197,17 @@ namespace DND.Controls
             currentPoints.Clear();
             MakeMePaint(false, RenderMode.Invalidate);
             if (StrokesChanged != null) StrokesChanged(this, Strokes);
+        }
+
+        public override bool DoMouseUp(Point p, MouseButtons button)
+        {
+            doStrokeOver();
             return true;
+        }
+
+        public override void DoMouseLeave()
+        {
+            doStrokeOver();
         }
     }
 }
