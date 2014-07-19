@@ -191,7 +191,7 @@ namespace DND.Gui.Zen
         {
             ctrlClose = new ZenCloseControl(Scale, this);
             ctrlClose.LogicalSize = new Size(40, 20);
-            ctrlClose.AbsLocation = new Point(form.Width - ctrlClose.Width - innerPadding, 1);
+            ctrlClose.AbsLocation = new Point(form.Width - ctrlClose.Width - innerPadding, 0);
             ctrlClose.MouseClick += ctrlClose_MouseClick;
 
             mainTabCtrl = new ZenTabControl(Scale, this, true);
@@ -228,7 +228,7 @@ namespace DND.Gui.Zen
                     form.Height - 2 * innerPadding - headerHeight);
             }
 
-            ctrlClose.AbsLocation = new Point(form.Width - ctrlClose.Size.Width - innerPadding, 1);
+            ctrlClose.AbsLocation = new Point(form.Width - ctrlClose.Size.Width - innerPadding, 0);
         }
 
         private void ctrlClose_MouseClick(ZenControlBase sender)
@@ -369,7 +369,9 @@ namespace DND.Gui.Zen
 
         public override void DoPaint(Graphics g)
         {
+            // Header, frame, content background...
             doPaintBackground(g);
+            // Text in header: my window title
             float x = contentTabControls[contentTabControls.Count - 1].AbsRight;
             x += ZenParams.HeaderTabPadding * 3.0F;
             float y = 7.0F * Scale;
@@ -382,8 +384,8 @@ namespace DND.Gui.Zen
                 sf.FormatFlags |= StringFormatFlags.NoWrap;
                 g.DrawString(header, f, b, rect, sf);
             }
-            // Draw my zen controls
-            foreach (ZenControl ctrl in ZenChildren) ctrl.DoPaint(g);
+            // All children
+            DoPaintChildren(g);
         }
 
         private enum DragMode
