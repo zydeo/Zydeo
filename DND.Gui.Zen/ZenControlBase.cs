@@ -211,7 +211,11 @@ namespace DND.Gui.Zen
 
         protected virtual void InvokeOnForm(Delegate method)
         {
-            Parent.InvokeOnForm(method);
+            // Invoke comes from background thread. In the UI thread, parent may just have been removed.
+            // If I have no parent, silently do not invoke.
+            // Happens when an animation is in progress and user switches to different tab in top form
+            ZenControlBase parent = Parent;
+            if (parent != null) parent.InvokeOnForm(method);
         }
 
 
