@@ -74,6 +74,7 @@ namespace DND.Controls
 
         private void onMouseWheel(MouseEventArgs e)
         {
+            if (!sb.Enabled) return;
             subscribeOrAddScrollTimer(-((float)e.Delta) * ((float)sb.LargeChange) / 1500.0F);
         }
 
