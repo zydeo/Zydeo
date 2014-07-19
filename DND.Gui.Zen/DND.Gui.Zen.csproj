@@ -49,7 +49,6 @@
     <Compile Include="ZenControl.cs" />
     <Compile Include="ZenControlBase.cs" />
     <Compile Include="ZenParams.cs" />
-    <Compile Include="ZenScrollbarCtrl.cs" />
     <Compile Include="ZenTab.cs" />
     <Compile Include="ZenTabbedForm.cs" />
     <Compile Include="ZenTabCollection.cs" />

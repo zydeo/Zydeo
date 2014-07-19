@@ -10,11 +10,6 @@ namespace DND.Gui.Zen
 {
     public class ZenControl : ZenControlBase, IDisposable
     {
-        public delegate void ClickDelegate(ZenControl sender);
-        public event ClickDelegate MouseClick;
-
-        private ZenControl zenCtrlWithMouse = null;
-
         public ZenControl(float scale, ZenControlBase parent)
             : base(parent)
         {
@@ -68,100 +63,6 @@ namespace DND.Gui.Zen
             }
             // Paint children
             DoPaintChildren(g);
-        }
-
-        public virtual bool DoMouseClick(Point p, MouseButtons button)
-        {
-            ZenControl ctrl = GetControl(p);
-            if (ctrl != null)
-            {
-                if (ctrl.DoMouseClick(TranslateToControl(ctrl, p), button))
-                    return true;
-            }
-            if (MouseClick != null)
-            {
-                MouseClick(this);
-                return true;
-            }
-            return false;
-        }
-
-        public virtual bool DoMouseMove(Point p, MouseButtons button)
-        {
-            ZenControl ctrl = GetControl(p);
-            if (ctrl != null)
-            {
-                if (zenCtrlWithMouse != ctrl)
-                {
-                    if (zenCtrlWithMouse != null) zenCtrlWithMouse.DoMouseLeave();
-                    ctrl.DoMouseEnter();
-                    zenCtrlWithMouse = ctrl;
-                }
-                if (ctrl.DoMouseMove(TranslateToControl(ctrl, p), button))
-                    return true;
-            }
-            else if (zenCtrlWithMouse != null)
-            {
-                zenCtrlWithMouse.DoMouseLeave();
-                zenCtrlWithMouse = null;
-            }
-            return false;
-        }
-
-        public virtual bool DoMouseDown(Point p, MouseButtons button)
-        {
-            ZenControl ctrl = GetControl(p);
-            if (ctrl != null)
-            {
-                if (ctrl.DoMouseDown(TranslateToControl(ctrl, p), button))
-                    return true;
-            }
-            return false;
-        }
-
-        public virtual bool DoMouseUp(Point p, MouseButtons button)
-        {
-            ZenControl ctrl = GetControl(p);
-            if (ctrl != null)
-            {
-                if (ctrl.DoMouseUp(TranslateToControl(ctrl, p), button))
-                    return true;
-            }
-            return false;
-        }
-
-        public virtual bool DoMouseEnter()
-        {
-            bool res = false;
-            Point pAbs = MousePositionAbs;
-            Point pRel = new Point(pAbs.X - AbsLeft, pAbs.Y - AbsTop);
-            ZenControl ctrl = GetControl(pRel);
-            if (ctrl != null)
-            {
-                if (zenCtrlWithMouse != ctrl)
-                {
-                    if (zenCtrlWithMouse != null) zenCtrlWithMouse.DoMouseLeave();
-                    res = ctrl.DoMouseEnter();
-                    zenCtrlWithMouse = ctrl;
-                }
-            }
-            return res;
-        }
-
-        public virtual bool DoMouseLeave()
-        {
-            bool res = false;
-            if (zenCtrlWithMouse != null)
-            {
-                res = zenCtrlWithMouse.DoMouseLeave();
-                zenCtrlWithMouse = null;
-            }
-            return res;
-        }
-
-        public bool Contains(Point pParent)
-        {
-            return RelRect.Contains(pParent);
         }
     }
 }

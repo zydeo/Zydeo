@@ -230,13 +230,13 @@ namespace DND.Gui.Zen
             ctrlClose.AbsLocation = new Point(form.Width - ctrlClose.Size.Width - innerPadding, 1);
         }
 
-        private void ctrlClose_MouseClick(ZenControl sender)
+        private void ctrlClose_MouseClick(ZenControlBase sender)
         {
             form.Close();
         }
 
 
-        private void tabCtrl_MouseClick(ZenControl sender)
+        private void tabCtrl_MouseClick(ZenControlBase sender)
         {
             ZenTabControl ztc = sender as ZenTabControl;
             // Click on active tab - nothing to do
@@ -461,50 +461,36 @@ namespace DND.Gui.Zen
             return DragMode.None;
         }
 
+        public override void DoMouseLeave()
+        {
+            base.DoMouseLeave();
+            // After dragging window border, reset cursor
+            if (dragMode == DragMode.None || dragMode == DragMode.Move)
+                form.Cursor = Cursors.Arrow;
+        }
+
         private void onFormMouseLeave(object sender, EventArgs e)
         {
-            if (zenCtrlWithMouse != null)
-            {
-                zenCtrlWithMouse.DoMouseLeave();
-                zenCtrlWithMouse = null;
-            }
-            if (dragMode == DragMode.None || dragMode == DragMode.Move)
-            {
-                form.Cursor = Cursors.Arrow;
-            }
+            DoMouseLeave();
         }
 
         private void onFormMouseEnter(object sender, EventArgs e)
         {
-            Point loc = form.PointToClient(form.MousePosition);
-            ZenControl ctrl = GetControl(loc);
-            if (ctrl != null)
-            {
-                if (zenCtrlWithMouse != ctrl)
-                {
-                    if (zenCtrlWithMouse != null) zenCtrlWithMouse.DoMouseLeave();
-                    ctrl.DoMouseEnter();
-                    zenCtrlWithMouse = ctrl;
-                }
-            }
+            DoMouseEnter();
         }
 
         private void onFormMouseClick(object sender, MouseEventArgs e)
         {
-            ZenControl ctrl = GetControl(e.Location);
-            if (ctrl != null) ctrl.DoMouseClick(TranslateToControl(ctrl, e.Location), e.Button);
+            DoMouseClick(e.Location, e.Button);
         }
 
         private void onFormMouseDown(object sender, MouseEventArgs e)
         {
             // Over any control? Not our job to handle.
-            ZenControl ctrl = GetControl(e.Location);
-            if (ctrl != null)
-            {
-                ctrl.DoMouseDown(TranslateToControl(ctrl, e.Location), e.Button);
+            if (DoMouseDown(e.Location, e.Button))
                 return;
-            }
 
+            // Resizing at window border
             var area = getDragArea(e.Location);
             if (area == DragMode.Move)
             {
@@ -523,29 +509,30 @@ namespace DND.Gui.Zen
 
         private void onFormMouseUp(object sender, MouseEventArgs e)
         {
+            // Resize by dragging border ends
             dragMode = DragMode.None;
-
-            ZenControl ctrl = GetControl(e.Location);
-            if (ctrl != null) ctrl.DoMouseUp(TranslateToControl(ctrl, e.Location), e.Button);
+            // Handle otherwise
+            DoMouseUp(e.Location, e.Button);
         }
 
-        private void onFormMouseMove(object sender, MouseEventArgs e)
+        public override bool DoMouseMove(Point p, MouseButtons button)
         {
-            Point loc = form.PointToScreen(e.Location);
+            // Window being resized by dragging at border
+            Point loc = form.PointToScreen(p);
             if (dragMode == DragMode.Move)
             {
                 int dx = loc.X - dragStart.X;
                 int dy = loc.Y - dragStart.Y;
                 Point newLocation = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y + dy);
                 ((Form)form.TopLevelControl).Location = newLocation;
-                return;
+                return true;
             }
             else if (dragMode == DragMode.ResizeE)
             {
                 int dx = loc.X - dragStart.X;
                 form.Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height);
                 form.Refresh();
-                return;
+                return true;
             }
             else if (dragMode == DragMode.ResizeW)
             {
@@ -553,7 +540,7 @@ namespace DND.Gui.Zen
                 form.Left = formBeforeDragLocation.X + dx;
                 form.Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height);
                 form.Refresh();
-                return;
+                return true;
             }
             else if (dragMode == DragMode.ResizeN)
             {
@@ -561,14 +548,14 @@ namespace DND.Gui.Zen
                 form.Top = formBeforeDragLocation.Y + dy;
                 form.Size = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height - dy);
                 form.Refresh();
-                return;
+                return true;
             }
             else if (dragMode == DragMode.ResizeS)
             {
                 int dy = loc.Y - dragStart.Y;
                 form.Size = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height + dy);
                 form.Refresh();
-                return;
+                return true;
             }
             else if (dragMode == DragMode.ResizeNW)
             {
@@ -577,7 +564,7 @@ namespace DND.Gui.Zen
                 form.Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height - dy);
                 form.Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y + dy);
                 form.Refresh();
-                return;
+                return true;
             }
             else if (dragMode == DragMode.ResizeSE)
             {
@@ -585,7 +572,7 @@ namespace DND.Gui.Zen
                 int dy = loc.Y - dragStart.Y;
                 form.Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height + dy);
                 form.Refresh();
-                return;
+                return true;
             }
             else if (dragMode == DragMode.ResizeNE)
             {
@@ -594,7 +581,7 @@ namespace DND.Gui.Zen
                 form.Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height - dy);
                 form.Location = new Point(formBeforeDragLocation.X, formBeforeDragLocation.Y + dy);
                 form.Refresh();
-                return;
+                return true;
             }
             else if (dragMode == DragMode.ResizeSW)
             {
@@ -603,30 +590,18 @@ namespace DND.Gui.Zen
                 form.Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height + dy);
                 form.Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y);
                 form.Refresh();
-                return;
+                return true;
             }
 
-            // Over any controls? Not our job to handle.
-            ZenControl ctrl = GetControl(e.Location);
-            if (ctrl != null)
+            // Over a control of ours? If yes, we're done.
+            if (base.DoMouseMove(p, button))
             {
                 form.Cursor = Cursors.Arrow;
-                if (zenCtrlWithMouse != ctrl)
-                {
-                    if (zenCtrlWithMouse != null) zenCtrlWithMouse.DoMouseLeave();
-                    ctrl.DoMouseEnter();
-                    zenCtrlWithMouse = ctrl;
-                }
-                ctrl.DoMouseMove(TranslateToControl(ctrl, e.Location), e.Button);
-                return;
-            }
-            else if (zenCtrlWithMouse != null)
-            {
-                zenCtrlWithMouse.DoMouseLeave();
-                zenCtrlWithMouse = null;
+                return true;
             }
 
-            var area = getDragArea(e.Location);
+            // Switch cursor when moving over resize hot areas in border
+            var area = getDragArea(p);
             if (area == DragMode.ResizeW || area == DragMode.ResizeE)
                 form.Cursor = Cursors.SizeWE;
             else if (area == DragMode.ResizeN || area == DragMode.ResizeS)
@@ -636,6 +611,13 @@ namespace DND.Gui.Zen
             else if (area == DragMode.ResizeNE || area == DragMode.ResizeSW)
                 form.Cursor = Cursors.SizeNESW;
             else form.Cursor = Cursors.Arrow;
+
+            return true;
+        }
+
+        private void onFormMouseMove(object sender, MouseEventArgs e)
+        {
+            DoMouseMove(e.Location, e.Button);
         }
     }
 }

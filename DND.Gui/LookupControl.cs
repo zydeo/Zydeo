@@ -33,7 +33,7 @@ namespace DND.Controls
             blahCtrl.MouseClick += blahCtrl_MouseClick;
         }
 
-        void blahCtrl_MouseClick(ZenControl sender)
+        void blahCtrl_MouseClick(ZenControlBase sender)
         {
             CedictMeaning[] xmAll = new CedictMeaning[9];
             xmAll[0] = new CedictMeaning(null, "pot-scrubbing brush made of bamboo strips", null);

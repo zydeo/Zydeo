@@ -65,18 +65,16 @@ namespace DND.Gui.Zen
             }
         }
 
-        public override bool DoMouseEnter()
+        public override void DoMouseEnter()
         {
             isHover = true;
             MakeMePaint(false, RenderMode.Invalidate);
-            return true;
         }
 
-        public override bool DoMouseLeave()
+        public override void DoMouseLeave()
         {
             isHover = false;
             MakeMePaint(false, RenderMode.Invalidate);
-            return true;
         }
 
         public override void DoPaint(Graphics g)

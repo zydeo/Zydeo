@@ -10,10 +10,14 @@ namespace DND.Gui.Zen
 {
     public abstract class ZenControlBase : IDisposable
     {
+        public delegate void ClickDelegate(ZenControlBase sender);
+        public event ClickDelegate MouseClick;
+
         private ZenControlBase parent;
         private readonly List<ZenControlBase> zenChildren = new List<ZenControlBase>();
         private readonly List<Control> winFormsControls = new List<Control>();
         private Rectangle absRect = new Rectangle(0, 0, 0, 0);
+        private ZenControlBase ctrlWithMouse = null;
 
         protected ZenControlBase(ZenControlBase parent)
         {
@@ -271,18 +275,97 @@ namespace DND.Gui.Zen
             return res;
         }
 
-        protected ZenControl GetControl(Point pParent)
+        public bool Contains(Point pParent)
         {
-            foreach (ZenControl ctrl in zenChildren)
+            return RelRect.Contains(pParent);
+        }
+
+        protected ZenControlBase GetControl(Point pParent)
+        {
+            foreach (ZenControlBase ctrl in zenChildren)
                 if (ctrl.Contains(pParent)) return ctrl;
             return null;
         }
 
-        protected Point TranslateToControl(ZenControl ctrl, Point pParent)
+        protected Point TranslateToControl(ZenControlBase ctrl, Point pParent)
         {
             int x = pParent.X - ctrl.RelRect.X;
             int y = pParent.Y - ctrl.RelRect.Y;
             return new Point(x, y);
+        }
+
+        public virtual bool DoMouseClick(Point p, MouseButtons button)
+        {
+            ZenControlBase ctrl = GetControl(p);
+            if (ctrl != null)
+                return ctrl.DoMouseClick(TranslateToControl(ctrl, p), button);
+            else if (MouseClick != null)
+                MouseClick(this);
+            return true;
+        }
+
+        public virtual bool DoMouseMove(Point p, MouseButtons button)
+        {
+            bool res = false;
+            ZenControlBase ctrl = GetControl(p);
+            if (ctrl != null)
+            {
+                if (ctrlWithMouse != ctrl)
+                {
+                    if (ctrlWithMouse != null) ctrlWithMouse.DoMouseLeave();
+                    ctrl.DoMouseEnter();
+                    ctrlWithMouse = ctrl;
+                }
+                ctrl.DoMouseMove(TranslateToControl(ctrl, p), button);
+                res = true;
+            }
+            else if (ctrlWithMouse != null)
+            {
+                ctrlWithMouse.DoMouseLeave();
+                ctrlWithMouse = null;
+            }
+            return res;
+        }
+
+        public virtual bool DoMouseDown(Point p, MouseButtons button)
+        {
+            ZenControlBase ctrl = GetControl(p);
+            if (ctrl != null)
+                return ctrl.DoMouseDown(TranslateToControl(ctrl, p), button);
+            return false;
+        }
+
+        public virtual bool DoMouseUp(Point p, MouseButtons button)
+        {
+            ZenControlBase ctrl = GetControl(p);
+            if (ctrl != null)
+                return ctrl.DoMouseUp(TranslateToControl(ctrl, p), button);
+            return false;
+        }
+
+        public virtual void DoMouseEnter()
+        {
+            Point pAbs = MousePositionAbs;
+            Point pRel = new Point(pAbs.X - AbsLeft, pAbs.Y - AbsTop);
+            ZenControlBase ctrl = GetControl(pRel);
+            if (ctrl != null)
+            {
+                if (ctrlWithMouse != ctrl)
+                {
+                    if (ctrlWithMouse != null) ctrlWithMouse.DoMouseLeave();
+                    ctrl.DoMouseEnter();
+                    ctrlWithMouse = ctrl;
+                }
+            }
+        }
+
+        public virtual void DoMouseLeave()
+        {
+            if (ctrlWithMouse != null)
+            {
+                ctrlWithMouse.DoMouseLeave();
+                ctrlWithMouse = null;
+            }
         }
     }
 }
