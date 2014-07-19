@@ -307,6 +307,16 @@ namespace DND.Gui.Zen
             SubscribeToTimer(this);
         }
 
+        internal virtual void UnsubscribeFromTimer(ZenControlBase ctrl)
+        {
+            Parent.UnsubscribeFromTimer(ctrl);
+        }
+
+        protected void UnsubscribeFromTimer()
+        {
+            UnsubscribeFromTimer(this);
+        }
+
         public virtual void DoTimer()
         {
         }

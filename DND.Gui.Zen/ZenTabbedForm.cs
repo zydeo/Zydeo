@@ -204,12 +204,23 @@ namespace DND.Gui.Zen
             }
         }
 
-        private void onTimerEvent(object sender, System.Timers.ElapsedEventArgs e)
+        internal override void UnsubscribeFromTimer(ZenControlBase ctrl)
         {
             lock (timerSubscribers)
             {
-                foreach (ZenControlBase ctrl in timerSubscribers) ctrl.DoTimer();
+                if (timerSubscribers.Contains(ctrl))
+                    timerSubscribers.Remove(ctrl);
             }
+        }
+
+        private void onTimerEvent(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            List<ZenControlBase> subscribers;
+            lock (timerSubscribers)
+            {
+                subscribers = new List<ZenControlBase>(timerSubscribers);
+            }
+            foreach (ZenControlBase ctrl in subscribers) ctrl.DoTimer();
         }
 
         private void createZenControls()
