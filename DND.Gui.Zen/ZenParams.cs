@@ -12,7 +12,6 @@ namespace DND.Gui.Zen
         public static readonly Color BorderColor = Color.FromArgb(13, 32, 45);
         public static readonly Color PaddingBackColor = Color.Honeydew;
         public static readonly Color HeaderBackColor = Color.YellowGreen;
-        public static readonly int ShadowAlphaStart = 90;
         public static readonly string HeaderTabFontFamily = "Segoe UI";
         public static readonly float HeaderTabFontSize = 12.0F;
         public static readonly float HeaderTabPadding = 12.0F;

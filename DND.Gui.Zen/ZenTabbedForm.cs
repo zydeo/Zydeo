@@ -288,7 +288,8 @@ namespace DND.Gui.Zen
         internal sealed override void RemoveWinFormsControl(Control c)
         {
             form.Controls.Remove(c);
-        }
+        }
+
 
         protected override sealed void InvokeOnForm(Delegate method)
         {
@@ -459,20 +460,6 @@ namespace DND.Gui.Zen
             }
             return DragMode.None;
         }
-
-        //private ZenControl getControl(Point p)
-        //{
-        //    foreach (ZenControl ctrl in zenControls)
-        //        if (ctrl.Contains(p)) return ctrl;
-        //    return null;
-        //}
-
-        //private Point translateToControl(ZenControl ctrl, Point p)
-        //{
-        //    int x = p.X - ctrl.AbsLocation.X;
-        //    int y = p.Y - ctrl.AbsLocation.Y;
-        //    return new Point(x, y);
-        //}
 
         private void onFormMouseLeave(object sender, EventArgs e)
         {

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace DND.Gui.Zen
 {
-    internal class ZenScrollbarCtrl : ZenControl
+    public class ZenScrollbarCtrl : ZenControl
     {
         private bool isHover = false;
 
