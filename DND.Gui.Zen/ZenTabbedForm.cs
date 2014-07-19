@@ -9,7 +9,7 @@ using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 
 
-namespace DND.Controls
+namespace DND.Gui.Zen
 {
     public class ZenTabbedForm : ZenControlBase, IDisposable, IZenTabsChangedListener
     {
@@ -28,6 +28,7 @@ namespace DND.Controls
         private int activeTabIdx = 0;
 
         public ZenTabbedForm()
+            : base(null)
         {
             form = new ZenWinForm(doRender);
 
@@ -117,7 +118,7 @@ namespace DND.Controls
             }
         }
 
-        internal override sealed Point MousePositionAbs
+        protected override sealed Point MousePositionAbs
         {
             get { return form.PointToClient(form.MousePosition); }
         }
@@ -277,17 +278,17 @@ namespace DND.Controls
             // explicitly (so we can pretend content controls are not there)
         }
 
-        internal override sealed void AddWinFormsControlToForm(Control c)
+        protected override sealed void AddWinFormsControlToForm(Control c)
         {
             form.Controls.Add(c);
         }
 
-        internal override sealed void InvokeOnForm(Delegate method)
+        protected override sealed void InvokeOnForm(Delegate method)
         {
             form.Invoke(method);
         }
 
-        internal override sealed void MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
+        protected override sealed void MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
         {
             ZenWinForm.BitmapRenderer br = null;
             try

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace DND.Controls
+namespace DND.Gui.Zen
 {
     public class ZenControl : ZenControlBase, IDisposable
     {
@@ -29,11 +29,6 @@ namespace DND.Controls
         public override sealed Rectangle AbsRect
         {
             get { return absRect; }
-        }
-
-        internal override sealed Point MousePositionAbs
-        {
-            get { return parent.MousePositionAbs; }
         }
 
         public Rectangle RelRect
@@ -170,6 +165,7 @@ namespace DND.Controls
         }
 
         public ZenControl(float scale, ZenControlBase parent)
+            : base(parent)
         {
             this.scale = scale;
             this.parent = parent;
@@ -181,26 +177,10 @@ namespace DND.Controls
             DoDispose();
         }
 
-        protected void AddWinFormsControl(Control c)
-        {
-            parent.AddWinFormsControlToForm(c);
-        }
-
-        internal override sealed void AddWinFormsControlToForm(Control c)
-        {
-            parent.AddWinFormsControlToForm(c);
-        }
-
         protected void MakeMePaint(bool needBackground, RenderMode rm)
         {
             if (paintSuspended) return;
-            parent.MakeCtrlPaint(this, needBackground, rm);
-        }
-
-        internal override sealed void MakeCtrlPaint(ZenControl ctrl, bool needBackground, RenderMode rm)
-        {
-            if (paintSuspended) return;
-            parent.MakeCtrlPaint(ctrl, needBackground, rm);
+            MakeCtrlPaint(this, needBackground, rm);
         }
 
         protected void SuspendPaint()
@@ -246,16 +226,6 @@ namespace DND.Controls
 
         protected virtual void DoDispose()
         {
-        }
-
-        protected void Invoke(Delegate method)
-        {
-            parent.InvokeOnForm(method);
-        }
-
-        internal override sealed void InvokeOnForm(Delegate method)
-        {
-            parent.InvokeOnForm(method);
         }
 
         protected SizeF MeasureText(string text, Font font, StringFormat fmt)
@@ -343,7 +313,7 @@ namespace DND.Controls
         public virtual bool DoMouseEnter()
         {
             bool res = false;
-            Point pAbs = parent.MousePositionAbs;
+            Point pAbs = MousePositionAbs;
             Point pRel = new Point(pAbs.X - AbsLeft, pAbs.Y - AbsTop);
             ZenControl ctrl = getControl(pRel);
             if (ctrl != null)

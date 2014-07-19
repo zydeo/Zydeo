@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Threading;
 
 using DND.Common;
+using DND.Gui.Zen;
 
 namespace DND.Controls
 {
@@ -28,7 +29,7 @@ namespace DND.Controls
             Application.AddMessageFilter(this);
 
             sb = new VScrollBar();
-            AddWinFormsControl(sb);
+            AddWinFormsControlToForm(sb);
             sb.Height = Height - 2;
             sb.Top = 1;
             sb.Left = Width - 1 - sb.Width;
@@ -113,7 +114,7 @@ namespace DND.Controls
                 if (Math.Abs(scrollSpeed) < 1.0F) scrollSpeed = 0;
             }
             if (speed == 0) return;
-            Invoke((MethodInvoker)delegate
+            InvokeOnForm((MethodInvoker)delegate
             {
                 int scrollVal = sb.Value;
                 scrollVal += (int)speed;

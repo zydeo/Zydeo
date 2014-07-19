@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace DND.Controls
+namespace DND.Gui.Zen
 {
     public class ZenTabCollection : IEnumerable<ZenTab>
     {

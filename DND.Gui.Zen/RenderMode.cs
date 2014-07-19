@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DND.Controls
+namespace DND.Gui.Zen
 {
-    internal interface IZenTabsChangedListener
+    public enum RenderMode
     {
-        void ZenTabsChanged();
+        Update,
+        Invalidate,
+        None
     }
 }

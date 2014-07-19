@@ -8,7 +8,7 @@ using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace DND.Controls
+namespace DND.Gui.Zen
 {
     internal class ZenWinForm : Form
     {

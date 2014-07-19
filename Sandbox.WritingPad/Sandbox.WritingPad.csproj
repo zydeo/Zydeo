@@ -80,11 +80,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DND.Controls\DND.Controls.csproj">
-      <Project>{e08421c2-073f-4e52-a4cc-1ab4baf1eee3}</Project>
-      <Name>DND.Controls</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\DND.HanziLookup\DND.HanziLookup.csproj">
       <Project>{2fc960ff-70a2-4c5e-a4ed-eb9557f01279}</Project>
       <Name>DND.HanziLookup</Name>

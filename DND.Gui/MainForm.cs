@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+using DND.Gui.Zen;
+
 namespace DND.Controls
 {
     public class MainForm : ZenTabbedForm

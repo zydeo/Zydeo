@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Drawing;
 
 using DND.Common;
+using DND.Gui.Zen;
 
 namespace DND.Controls
 {

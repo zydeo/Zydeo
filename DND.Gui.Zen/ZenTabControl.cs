@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace DND.Controls
+namespace DND.Gui.Zen
 {
     internal class ZenTabControl : ZenControl
     {

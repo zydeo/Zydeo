@@ -3,9 +3,9 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace DND.Controls
+namespace DND.Gui.Zen
 {
-    internal static class ZenParams
+    public static class ZenParams
     {
         public static readonly float HeaderHeight = 40;
         public static readonly float InnerPadding = 8;

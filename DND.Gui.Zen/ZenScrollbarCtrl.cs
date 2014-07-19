@@ -5,7 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace DND.Controls
+namespace DND.Gui.Zen
 {
     internal class ZenScrollbarCtrl : ZenControl
     {

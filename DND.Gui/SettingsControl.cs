@@ -5,6 +5,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 
+using DND.Gui.Zen;
+
 namespace DND.Controls
 {
     internal class SettingsControl : ZenControl
