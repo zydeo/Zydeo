@@ -14,9 +14,9 @@ namespace DND.StrokesCompiler
         {
             if (args.Length != 3)
             {
-                Console.WriteLine("Takes three arguments:\n");
-                Console.WriteLine("1: the plain-text strokes data file\n");
-                Console.WriteLine("2: the plain-text types data file\n");
+                Console.WriteLine("Takes three arguments:\r\n");
+                Console.WriteLine("1: the plain-text strokes data file\r\n");
+                Console.WriteLine("2: the plain-text types data file\r\n");
                 Console.WriteLine("3: the file to output the compiled data file to");
                 return -1;
             }

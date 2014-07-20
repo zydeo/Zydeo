@@ -150,7 +150,7 @@ namespace DND.Gui
             // Recreate list of blocks
             measuredBlocks = new List<Block>();
             int senseIdx = -1;
-            foreach (CedictMeaning cm in Res.Entry.Meanings)
+            foreach (CedictSense cm in Res.Entry.Senses)
             {
                 ++senseIdx;
                 // Add one block for sense ID

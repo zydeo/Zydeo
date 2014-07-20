@@ -4,16 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D151811C-2CF7-4EA9-8A09-052CC5C2F695}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{DBACF450-2FB8-4E48-BD22-D7DF9F058758}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DND.Common</RootNamespace>
-    <AssemblyName>DND.Common</AssemblyName>
+    <RootNamespace>DND.CedictCompileTool</RootNamespace>
+    <AssemblyName>DND.CedictCompileTool</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\_bin\</OutputPath>
@@ -40,16 +41,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinReader.cs" />
-    <Compile Include="BinWriter.cs" />
-    <Compile Include="CedictEntry.cs" />
-    <Compile Include="CedictLookupResult.cs" />
-    <Compile Include="CedictSense.cs" />
-    <Compile Include="CedictResult.cs" />
-    <Compile Include="IBinSerializable.cs" />
-    <Compile Include="ICedictEngine.cs" />
-    <Compile Include="LookupOptions.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DND.CedictEngine\DND.CedictEngine.csproj">
+      <Project>{5c3bd324-3b92-4f78-86a4-77dad6801bd2}</Project>
+      <Name>DND.CedictEngine</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\DND.Common\DND.Common.csproj">
+      <Project>{d151811c-2cf7-4ea9-8a09-052cc5c2f695}</Project>
+      <Name>DND.Common</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -10,6 +10,7 @@ using System.IO;
 
 using DND.Common;
 using DND.HanziLookup;
+using DND.CedictEngine;
 using DND.Gui.Zen;
 
 namespace DND.Gui
@@ -25,6 +26,8 @@ namespace DND.Gui
         private BinaryReader brStrokes;
         private StrokesDataSource strokesData;
 
+        private DictEngine dict;
+
         private WritingPad writingPad;
         private ResultsControl resCtrl;
         private CharPicker cpCtrl;
@@ -38,6 +41,8 @@ namespace DND.Gui
             fsStrokes = new FileStream("strokes-extended.dat", FileMode.Open, FileAccess.Read);
             brStrokes = new BinaryReader(fsStrokes);
             strokesData = new StrokesDataSource(brStrokes);
+
+            dict = new DictEngine("cedict-zydeo.bin");
 
             writingPad = new WritingPad(this);
             writingPad.RelLogicalLocation = new Point(5, 5);
@@ -140,22 +145,22 @@ namespace DND.Gui
 
         private void populateResults()
         {
-            CedictMeaning[] xmAll = new CedictMeaning[9];
-            xmAll[0] = new CedictMeaning(null, "pot-scrubbing brush made of bamboo strips", null);
-            xmAll[1] = new CedictMeaning(null, "basket (container) for chopsticks", null);
-            xmAll[2] = new CedictMeaning(null, "variant of 筲[shao1]", null);
-            xmAll[3] = new CedictMeaning(null, "mask of a god used in ceremonies to exorcise demons and drive away pestilence", null);
-            xmAll[4] = new CedictMeaning("(archaic)", "ugly", null);
-            xmAll[5] = new CedictMeaning(null, "pith", "(soft interior of plant stem)");
-            xmAll[6] = new CedictMeaning(null, "spoonbill", null);
-            xmAll[7] = new CedictMeaning(null, "ibis", null);
-            xmAll[8] = new CedictMeaning(null, "family Threskiornidae", null);
+            CedictSense[] xmAll = new CedictSense[9];
+            xmAll[0] = new CedictSense(null, "pot-scrubbing brush made of bamboo strips", null);
+            xmAll[1] = new CedictSense(null, "basket (container) for chopsticks", null);
+            xmAll[2] = new CedictSense(null, "variant of 筲[shao1]", null);
+            xmAll[3] = new CedictSense(null, "mask of a god used in ceremonies to exorcise demons and drive away pestilence", null);
+            xmAll[4] = new CedictSense("(archaic)", "ugly", null);
+            xmAll[5] = new CedictSense(null, "pith", "(soft interior of plant stem)");
+            xmAll[6] = new CedictSense(null, "spoonbill", null);
+            xmAll[7] = new CedictSense(null, "ibis", null);
+            xmAll[8] = new CedictSense(null, "family Threskiornidae", null);
             List<CedictResult> rs = new List<CedictResult>();
             for (int i = 0; i != 99; ++i)
             {
                 int meaningCount = (i % 9);
-                CedictMeaning[] xm = new CedictMeaning[meaningCount + 2];
-                xm[0] = new CedictMeaning(null, "ITEM-" + (i + 1).ToString("D3"), null);
+                CedictSense[] xm = new CedictSense[meaningCount + 2];
+                xm[0] = new CedictSense(null, "ITEM-" + (i + 1).ToString("D3"), null);
                 for (int j = 0; j <= meaningCount; ++j)
                     xm[j + 1] = xmAll[j];
                 string[] xs = new string[2];
@@ -163,7 +168,7 @@ namespace DND.Gui
                 xs[1] = "qíng";
                 CedictEntry ce = new CedictEntry("爱情", "爱情",
                     new ReadOnlyCollection<string>(xs),
-                    new ReadOnlyCollection<CedictMeaning>(xm));
+                    new ReadOnlyCollection<CedictSense>(xm));
                 CedictResult cr = new CedictResult(ce);
                 rs.Add(cr);
             }

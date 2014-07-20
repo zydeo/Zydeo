@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D151811C-2CF7-4EA9-8A09-052CC5C2F695}</ProjectGuid>
+    <ProjectGuid>{5C3BD324-3B92-4F78-86A4-77DAD6801BD2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DND.Common</RootNamespace>
-    <AssemblyName>DND.Common</AssemblyName>
+    <RootNamespace>DND.CedictEngine</RootNamespace>
+    <AssemblyName>DND.CedictEngine</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,16 +39,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinReader.cs" />
-    <Compile Include="BinWriter.cs" />
-    <Compile Include="CedictEntry.cs" />
-    <Compile Include="CedictLookupResult.cs" />
-    <Compile Include="CedictSense.cs" />
-    <Compile Include="CedictResult.cs" />
-    <Compile Include="IBinSerializable.cs" />
-    <Compile Include="ICedictEngine.cs" />
-    <Compile Include="LookupOptions.cs" />
+    <Compile Include="CedictCompiler.cs" />
+    <Compile Include="DictEngine.cs" />
+    <Compile Include="IdeoIndexItem.cs" />
+    <Compile Include="Index.cs" />
+    <Compile Include="PinyinIndexItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DND.Common\DND.Common.csproj">
+      <Project>{d151811c-2cf7-4ea9-8a09-052cc5c2f695}</Project>
+      <Name>DND.Common</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
