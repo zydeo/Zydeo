@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CedictEngineFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -72,6 +73,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DND.CedictEngine\DND.CedictEngine.csproj">
+      <Project>{5c3bd324-3b92-4f78-86a4-77dad6801bd2}</Project>
+      <Name>DND.CedictEngine</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\DND.Common\DND.Common.csproj">
       <Project>{d151811c-2cf7-4ea9-8a09-052cc5c2f695}</Project>
       <Name>DND.Common</Name>

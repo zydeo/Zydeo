@@ -6,8 +6,13 @@ using System.Text;
 
 namespace DND.Common
 {
-    public interface ICedictEngine : IDisposable
+    public interface ICedictEngine
     {
         CedictLookupResult Lookup(string what, SearchScript script, SearchLang lang);
+    }
+
+    public interface ICedictEngineFactory
+    {
+        ICedictEngine Create(string dictFileName);
     }
 }

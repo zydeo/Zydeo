@@ -7,11 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+using DND.Common;
+
 namespace DND.Gui
 {
     public partial class SearchInputControl : UserControl
     {
-        public delegate void StartSearchDelegate();
+        public delegate void StartSearchDelegate(string text, SearchScript script, SearchLang lang);
         public event StartSearchDelegate StartSearch;
 
         private readonly float scale;
@@ -41,7 +43,8 @@ namespace DND.Gui
         {
             if (e.KeyChar == (char)13)
             {
-                if (StartSearch != null) StartSearch();
+                if (StartSearch != null)
+                    StartSearch(txtInput.Text, SearchScript.Both, SearchLang.Chinese);
                 e.Handled = true;
             }
         }

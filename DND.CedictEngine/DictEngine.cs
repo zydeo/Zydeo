@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -23,12 +24,8 @@ namespace DND.CedictEngine
 
         public CedictLookupResult Lookup(string what, SearchScript script, SearchLang lang)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
+            List<CedictResult> res = new List<CedictResult>();
+            return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), lang);
         }
     }
 }

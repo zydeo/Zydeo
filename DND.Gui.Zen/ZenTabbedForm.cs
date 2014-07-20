@@ -52,6 +52,7 @@ namespace DND.Gui.Zen
             form.MouseEnter += onFormMouseEnter;
             form.MouseLeave += onFormMouseLeave;
             form.FormClosed += onFormClosed;
+            form.Load += onFormLoaded;
         }
 
         public Form WinForm
@@ -664,6 +665,11 @@ namespace DND.Gui.Zen
         private void onFormMouseMove(object sender, MouseEventArgs e)
         {
             DoMouseMove(e.Location, e.Button);
+        }
+
+        private void onFormLoaded(object sender, EventArgs e)
+        {
+            OnFormLoaded();
         }
     }
 }

@@ -184,6 +184,11 @@ namespace DND.Gui.Zen
         {
         }
 
+        protected virtual void OnFormLoaded()
+        {
+            foreach (ZenControlBase child in zenChildren) child.OnFormLoaded();
+        }
+
         public abstract void DoPaint(Graphics g);
 
         protected SizeF MeasureText(string text, Font font, StringFormat fmt)

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+using DND.Common;
 using DND.Gui.Zen;
 
 namespace DND.Gui
@@ -16,11 +17,11 @@ namespace DND.Gui
         private LookupControl lc;
         private SettingsControl stgs;
 
-        public MainForm()
+        public MainForm(ICedictEngineFactory dictFact)
         {
             LogicalSize = new Size(800, 500);
             Header = "Zydeo Chinese-English dictionary";
-            lc = new LookupControl(this);
+            lc = new LookupControl(this, dictFact);
             stgs = new SettingsControl(this);
             MainTab = new ZenTab(stgs, "Zydeo");
             //MainTabHeader = "Zydeo";

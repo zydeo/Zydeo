@@ -10,13 +10,14 @@ using System.IO;
 
 using DND.Common;
 using DND.HanziLookup;
-using DND.CedictEngine;
 using DND.Gui.Zen;
 
 namespace DND.Gui
 {
     internal class LookupControl : ZenControl
     {
+        private readonly ICedictEngineFactory dictFact;
+
         bool searchTraditional = true;
         bool searchSimplified = true;
         private const double looseness = 0.25;  // the "looseness" of lookup, 0-1, higher == looser, looser more computationally intensive
@@ -26,7 +27,7 @@ namespace DND.Gui
         private BinaryReader brStrokes;
         private StrokesDataSource strokesData;
 
-        private DictEngine dict;
+        private ICedictEngine dict;
 
         private WritingPad writingPad;
         private ResultsControl resCtrl;
@@ -35,14 +36,14 @@ namespace DND.Gui
 
         private readonly HashSet<StrokesMatcher> runningMatchers = new HashSet<StrokesMatcher>();
 
-        public LookupControl(ZenControlBase owner)
+        public LookupControl(ZenControlBase owner, ICedictEngineFactory dictFact)
             : base(owner)
         {
+            this.dictFact = dictFact;
+
             fsStrokes = new FileStream("strokes-extended.dat", FileMode.Open, FileAccess.Read);
             brStrokes = new BinaryReader(fsStrokes);
             strokesData = new StrokesDataSource(brStrokes);
-
-            dict = new DictEngine("cedict-zydeo.bin");
 
             writingPad = new WritingPad(this);
             writingPad.RelLogicalLocation = new Point(5, 5);
@@ -71,6 +72,18 @@ namespace DND.Gui
             if (brStrokes != null) brStrokes.Dispose();
             if (fsStrokes != null) fsStrokes.Dispose();
             base.Dispose();
+        }
+
+        protected override void OnFormLoaded()
+        {
+            base.OnFormLoaded();
+            ThreadPool.QueueUserWorkItem(loadDictionary);
+        }
+
+        private void loadDictionary(object ctxt)
+        {
+            Thread.Sleep(100);
+            dict = dictFact.Create("cedict-zydeo.bin");
         }
 
         private void writingPad_StrokesChanged(object sender, IEnumerable<WritingPad.Stroke> strokes)
@@ -138,9 +151,10 @@ namespace DND.Gui
             });
         }
 
-        private void siCtrl_StartSearch()
+        private void siCtrl_StartSearch(string text, SearchScript script, SearchLang lang)
         {
-            populateResults();
+            if (dict == null) return;
+            CedictLookupResult res = dict.Lookup(text, script, lang);
         }
 
         private void populateResults()

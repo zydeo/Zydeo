@@ -19,10 +19,12 @@ namespace Sandbox
         [STAThread]
         static void Main()
         {
+            CedictEngineFactory cef = new CedictEngineFactory();
+
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var mf = new MainForm();
+            var mf = new MainForm(cef);
             Application.Run(mf.WinForm);
         }
     }
