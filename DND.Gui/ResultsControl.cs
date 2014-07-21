@@ -21,6 +21,7 @@ namespace DND.Gui
         private VScrollBar sb;
         private Size contentRectSize;
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
+        private SearchScript currScript;
 
         public ResultsControl(ZenControl owner)
             : base(owner)
@@ -122,12 +123,57 @@ namespace DND.Gui
 
         protected override void OnSizeChanged()
         {
+            // Update content rectangle - just a cache for other calculations
             contentRectSize = new Size(Width - 2 - sb.Width, Height - 2);
+            // Put Windows scroll bar in its place, update its large change (which is always one full screen)
             sb.Height = Height - 2;
             sb.Top = AbsTop + 1;
             sb.Left = AbsLeft + Width - 1 - sb.Width;
             sb.LargeChange = contentRectSize.Height;
-            foreach (OneResultControl orc in resCtrls) orc.Width = contentRectSize.Width;
+
+            // No results being shown: done 'ere
+            if (resCtrls.Count == 0) return;
+            // Find bottom of first visible control
+            int pivotY = 1;
+            int pivotIX = -1;
+            OneResultControl pivotCtrl = null;
+            for (int i = 0; i != resCtrls.Count; ++i)
+            {
+                OneResultControl orc = resCtrls[i];
+                // Results controls' absolute locations are within my full canvas
+                // First visible one is the guy whose bottom is greater than 1
+                if (orc.AbsBottom > pivotY)
+                {
+                    pivotY = orc.AbsBottom;
+                    pivotCtrl = orc;
+                    pivotIX = i;
+                    break;
+                }
+            }
+            // Recalculate each result control's layout, and height
+            using (Bitmap bmp = new Bitmap(1,1))
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                foreach (OneResultControl orc in resCtrls)
+                {
+                    orc.Analyze(g, contentRectSize.Width, currScript);
+                    //orc.Width = contentRectSize.Width;
+                }
+            }
+            // Move pivot control back in place
+            int diff = pivotY - pivotCtrl.AbsBottom;
+            pivotCtrl.AbsTop += diff;
+            // Lay out remaining controls up and down
+            for (int i = pivotIX + 1; i < resCtrls.Count; ++i)
+                resCtrls[i].AbsTop = resCtrls[i - 1].AbsBottom;
+            for (int i = pivotIX - 1; i >= 0; --i)
+                resCtrls[i].AbsTop = resCtrls[i + 1].AbsTop - resCtrls[i].Height;
+            // Very first control's top must be 1
+            // TO-DO from here: edge cases
+            // Reset scroll bar's max value and position
+            // TO-DO from here
+            // Invalidate
+            MakeMePaint(false, RenderMode.Invalidate);
         }
 
         public void SetResults(ReadOnlyCollection<CedictResult> results, SearchScript script)
@@ -136,6 +182,7 @@ namespace DND.Gui
             // Dispose old results controls
             foreach (OneResultControl orc in resCtrls) orc.Dispose();
             resCtrls.Clear();
+            currScript = script;
             // Find longest character count in headwords
             int maxHeadLength = 0;
             if (results.Count > 0) maxHeadLength = results.Max(r => r.Entry.ChSimpl.Length);
