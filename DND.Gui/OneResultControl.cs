@@ -47,7 +47,7 @@ namespace DND.Gui
 
             padLeft = (int)(5.0F * Scale);
             padTop = (int)(5.0F * Scale);
-            padBottom = (int)(10.0F * Scale);
+            padBottom = (int)(7.0F * Scale);
             padMid = (int)(20.0F * Scale);
             padRight = (int)(10.0F * Scale);
         }
@@ -76,19 +76,10 @@ namespace DND.Gui
             if (analyzedWidth != Width) Analyze(g, Width, analyzedScript);
 
             // Background. Alternating at that!
-            if (odd)
+            Color bgcol = odd ? Color.FromArgb(248, 248, 255) : Color.White;
+            using (Brush b = new SolidBrush(bgcol))
             {
-                using (Brush b = new SolidBrush(Color.FromArgb(248, 248, 255)))
-                {
-                    g.FillRectangle(b, AbsLeft, AbsTop, Width, Height);
-                }
-            }
-            else
-            {
-                using (Brush b = new SolidBrush(Color.White))
-                {
-                    g.FillRectangle(b, AbsLeft, AbsTop, Width, Height);
-                }
+                g.FillRectangle(b, AbsLeft, AbsTop, Width, Height);
             }
 
             // This is how we draw text
@@ -218,7 +209,7 @@ namespace DND.Gui
         /// <returns>Bottom of content area.</returns>
         private float doArrangeBlocks(float lemmaL, float lemmaW)
         {
-            float lemmaTop = (float)padTop + pinyinInfo.PinyinSize.Height;
+            float lemmaTop = (float)padTop + pinyinInfo.PinyinSize.Height * 1.3F;
 
             // Will not work reduntantly
             if (positionedBlocks != null)
@@ -450,7 +441,7 @@ namespace DND.Gui
             {
                 SizeF sz = g.MeasureString(spaceTestStr, fntEquiv, 65535, sf);
                 spaceWidth = (int)sz.Width;
-                lemmaLineHeight = sz.Height;
+                lemmaLineHeight = sz.Height * 1.1F;
             }
 
             // Headword and pinyin
@@ -469,8 +460,9 @@ namespace DND.Gui
             float lastTop = doArrangeBlocks(lemmaL, lemmaW);
 
             // My height: bottom of headword or bottom of entry, whichever is lower
-            float entryHeight = lastTop + lemmaLineHeight + padBottom;
-            float zhoHeight = headInfo.HeadwordBottom + padBottom;
+            float entryHeight = lastTop + padBottom;
+            // No need for bottom padding under Chinese: font has empty area
+            float zhoHeight = headInfo.HeadwordBottom;
             float trueHeight = Math.Max(entryHeight, zhoHeight);
 
             // Assume this height, and also provided width
