@@ -108,6 +108,7 @@ namespace DND.Gui
                 else if (scrollVal > sb.Maximum - contentRectSize.Height)
                 {
                     scrollVal = sb.Maximum - contentRectSize.Height;
+                    if (scrollVal < 0) scrollVal = 0;
                 }
                 sb.Value = scrollVal;
             });

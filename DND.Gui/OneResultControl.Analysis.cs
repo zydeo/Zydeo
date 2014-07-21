@@ -10,6 +10,9 @@ namespace DND.Gui
 {
     partial class OneResultControl
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private class Block
         {
             public SizeF Size;

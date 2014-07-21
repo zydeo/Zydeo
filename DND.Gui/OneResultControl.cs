@@ -24,7 +24,7 @@ namespace DND.Gui
         private readonly int padRight;
 
         private const string ideoTestStr = "中";
-        private const string spaceTestStr = "x";
+        private const string spaceTestStr = "f";
         private static SizeF ideoSize = new SizeF(0, 0);
         private static float spaceWidth = 0;
         private static float lemmaLineHeight = 0;
