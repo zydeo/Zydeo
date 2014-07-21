@@ -38,26 +38,21 @@ namespace DND.CedictEngine
                     br.Position = pos;
                     CedictEntry entry = new CedictEntry(br);
                     // Figure out position/length of query string in simplified and traditional headwords
-                    int simpHiliteStart = -1;
-                    int simpHiliteLength = 0;
-                    int tradHiliteStart = -1;
-                    int tradHiliteLength = 0;
-                    if (script == SearchScript.Simplified || script == SearchScript.Both)
+                    int hiliteStart = -1;
+                    int hiliteLength = 0;
+                    hiliteStart = entry.ChSimpl.IndexOf(query);
+                    if (hiliteStart != -1) hiliteLength = query.Length;
+                    // If not found in simplified, check in traditional
+                    if (hiliteLength == 0)
                     {
-                        simpHiliteStart = entry.ChSimpl.IndexOf(query);
-                        if (simpHiliteStart != -1) simpHiliteLength = query.Length;
-                    }
-                    if (script == SearchScript.Traditional || script == SearchScript.Both)
-                    {
-                        tradHiliteStart = entry.ChTrad.IndexOf(query);
-                        if (tradHiliteStart != -1) tradHiliteLength = query.Length;
+                        hiliteStart = entry.ChTrad.IndexOf(query);
+                        if (hiliteStart != -1) hiliteLength = query.Length;
                     }
                     // Entry is a keeper if either source or target headword contains query
-                    if (simpHiliteLength != 0 || tradHiliteLength != 0)
+                    if (hiliteLength != 0)
                     {
                         CedictResult res = new CedictResult(entry,
-                            simpHiliteStart, simpHiliteLength,
-                            tradHiliteStart, tradHiliteLength);
+                            hiliteStart, hiliteLength);
                         resList.Add(res);
                     }
                 }
@@ -67,16 +62,11 @@ namespace DND.CedictEngine
 
         private static int hrComp(CedictResult a, CedictResult b)
         {
-            // Start of match
-            int aMatchStart = a.SimpHiliteStart;
-            if (aMatchStart < 0) aMatchStart = a.TradHiliteStart;
-            int bMatchStart = b.SimpHiliteStart;
-            if (bMatchStart < 0) aMatchStart = b.TradHiliteStart;
             // Shorter entry comes first
             int lengthCmp = a.Entry.ChSimpl.Length.CompareTo(b.Entry.ChSimpl.Length);
             if (lengthCmp != 0) return lengthCmp;
             // Between equally long headwords where match starts sooner comes first
-            int startCmp = aMatchStart.CompareTo(bMatchStart);
+            int startCmp = a.HanziHiliteStart.CompareTo(b.HanziHiliteStart);
             if (startCmp != 0) return startCmp;
             // Order equally long entries by pinyin lexicographical order
             return a.Entry.PinyinCompare(b.Entry);

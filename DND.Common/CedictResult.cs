@@ -8,20 +8,15 @@ namespace DND.Common
     public class CedictResult
     {
         public readonly CedictEntry Entry;
-        public readonly int SimpHiliteStart;
-        public readonly int SimpHiliteLength;
-        public readonly int TradHiliteStart;
-        public readonly int TradHiliteLength;
+        public readonly int HanziHiliteStart;
+        public readonly int HanziHiliteLength;
 
         public CedictResult(CedictEntry entry,
-            int simpHiliteStart, int simpHiliteLength,
-            int tradHiliteStart, int tradHiliteLength)
+            int hanziHiliteStart, int hanziHiliteLength)
         {
             Entry = entry;
-            SimpHiliteStart = simpHiliteStart;
-            SimpHiliteLength = simpHiliteLength;
-            TradHiliteStart = tradHiliteStart;
-            TradHiliteLength = tradHiliteLength;
+            HanziHiliteStart = hanziHiliteStart;
+            HanziHiliteLength = hanziHiliteLength;
         }
     }
 }

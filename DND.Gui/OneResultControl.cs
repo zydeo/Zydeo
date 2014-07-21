@@ -47,7 +47,7 @@ namespace DND.Gui
 
             padLeft = (int)(5.0F * Scale);
             padTop = (int)(5.0F * Scale);
-            padBottom = (int)(7.0F * Scale);
+            padBottom = (int)(8.0F * Scale);
             padMid = (int)(20.0F * Scale);
             padRight = (int)(10.0F * Scale);
         }
@@ -69,7 +69,81 @@ namespace DND.Gui
             fntSenseId = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize * 0.8F);
         }
 
-        public override void DoPaint(System.Drawing.Graphics g)
+        private void doHiliteOneHeadBlock(Graphics g, Pen p, HeadBlock hb, bool tradSimpMid,
+            bool leftHorn, bool rightHorn)
+        {
+            float leftX = hb.Loc.X + (float)AbsLeft;
+            float y = hb.Loc.Y + hb.Size.Height + (float)AbsTop;
+            if (!tradSimpMid) y -= ideoSize.Height * 0.1F;
+            else y -= ideoSize.Height * 0.05F;
+            // Left horn
+            if (leftHorn)
+            {
+                // If only pinyin or both but with line break: go up
+                if (!tradSimpMid)
+                {
+                    float hornY = y - ideoSize.Height / 9.0F;
+                    g.DrawLine(p, (int)leftX, (int)y, (int)leftX, (int)hornY);
+                }
+                // Otherwise, go up and down: this will be sitting between traditional and simplified
+                else
+                {
+                    float hornY1 = y - ideoSize.Height / 9.0F;
+                    float hornY2 = y + ideoSize.Height / 9.0F;
+                    g.DrawLine(p, (int)leftX, (int)hornY1, (int)leftX, (int)hornY2);
+                }
+            }
+            // Underline
+            float rightX = hb.Loc.X + hb.Size.Width + (float)AbsLeft;
+            g.DrawLine(p, (int)leftX, (int)y, (int)rightX, (int)y);
+            // Right horn
+            if (rightHorn)
+            {
+                // If only pinyin or both but with line break: go up
+                if (!tradSimpMid)
+                {
+                    float hornY = y - ideoSize.Height / 9.0F;
+                    g.DrawLine(p, (int)rightX, (int)y, (int)rightX, (int)hornY);
+                }
+                // Otherwise, go up and down: this will be sitting between traditional and simplified
+                else
+                {
+                    float hornY1 = y - ideoSize.Height / 9.0F;
+                    float hornY2 = y + ideoSize.Height / 9.0F;
+                    g.DrawLine(p, (int)rightX, (int)hornY1, (int)rightX, (int)hornY2);
+                }
+            }
+        }
+
+        private void doPaintHanziHilites(Graphics g)
+        {
+            using (Pen p = new Pen(Color.Maroon))
+            {
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                // In simplified
+                if (headInfo.SimpBlocks.Count != 0)
+                {
+                    for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
+                    {
+                        HeadBlock hb = headInfo.SimpBlocks[ix];
+                        doHiliteOneHeadBlock(g, p, hb, headInfo.HeadMode == HeadMode.BothSingleLine,
+                            ix == Res.HanziHiliteStart, ix + 1 == Res.HanziHiliteStart + Res.HanziHiliteLength);
+                    }
+                }
+                // In traditional
+                if (headInfo.TradBlocks.Count != 0 && headInfo.HeadMode != HeadMode.BothSingleLine)
+                {
+                    for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
+                    {
+                        HeadBlock hb = headInfo.TradBlocks[ix];
+                        doHiliteOneHeadBlock(g, p, hb, false,
+                            ix == Res.HanziHiliteStart, ix + 1 == Res.HanziHiliteStart + Res.HanziHiliteLength);
+                    }
+                }
+            }
+        }
+
+        public override void DoPaint(Graphics g)
         {
             // If size changed and we get a pain requested without having re-analized:
             // Analyze now. Not the best time here in paint, but must do.
@@ -84,6 +158,8 @@ namespace DND.Gui
 
             // This is how we draw text
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+            StringFormat sf = StringFormat.GenericTypographic;
+            // Headword, pinyin, entry body
             using (Brush bnorm = new SolidBrush(Color.Black))
             using (Brush bfade = new SolidBrush(Color.FromArgb(200, 200, 200)))
             using (Pen pnorm = new Pen(bnorm))
@@ -92,17 +168,17 @@ namespace DND.Gui
                 foreach (HeadBlock hb in headInfo.SimpBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X + (float)AbsLeft, hb.Loc.Y + (float)AbsTop);
-                    g.DrawString(hb.Char, fntZho, bnorm, loc);
+                    g.DrawString(hb.Char, fntZho, bnorm, loc, sf);
                 }
                 foreach (HeadBlock hb in headInfo.TradBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X + (float)AbsLeft, hb.Loc.Y + (float)AbsTop);
                     Brush b = hb.Faded ? bfade : bnorm;
-                    g.DrawString(hb.Char, fntZho, b, loc);
+                    g.DrawString(hb.Char, fntZho, b, loc, sf);
                 }
                 // Pinyin
                 float rx = (float)AbsLeft + headInfo.HeadwordRight + (float)padMid;
-                g.DrawString(pinyinInfo.PinyinDisplay, fntPinyin, bnorm, rx, padTop + (float)AbsTop);
+                g.DrawString(pinyinInfo.PinyinDisplay, fntPinyin, bnorm, rx, padTop + (float)AbsTop, sf);
                 // All the measured and positioned blocks in entry body
                 float fLeft = (float)AbsLeft;
                 float fTop = (float)AbsTop;
@@ -115,22 +191,24 @@ namespace DND.Gui
                         SenseIdBlock sib = pb.Block as SenseIdBlock;
                         float pad = lemmaLineHeight * 0.1F;
                         g.DrawEllipse(pnorm,
-                            pb.Loc.X + fLeft + pad,
+                            pb.Loc.X + fLeft,
                             pb.Loc.Y + fTop + Scale * pad,
                             sib.Size.Width - 2.0F * pad,
                             sib.Size.Height - 2.0F * pad);
                         g.DrawString(sib.Text, fntSenseId, bnorm,
-                            pb.Loc.X + fLeft + 2.5F * pad,
-                            pb.Loc.Y + fTop + 1.5F * pad);
+                            pb.Loc.X + fLeft + 2.0F * pad,
+                            pb.Loc.Y + fTop + 1.5F * pad, sf);
                     }
                     // Text
                     else if (pb.Block is TextBlock)
                     {
                         TextBlock tb = pb.Block as TextBlock;
-                        g.DrawString(tb.Text, tb.Font, bnorm, pb.Loc.X + fLeft, pb.Loc.Y + fTop);
+                        g.DrawString(tb.Text, tb.Font, bnorm, pb.Loc.X + fLeft, pb.Loc.Y + fTop, sf);
                     }
                 }
             }
+            // Hanzi highlights
+            doPaintHanziHilites(g);
         }
 
         /// <summary>
@@ -304,7 +382,7 @@ namespace DND.Gui
                 HeadBlock hb = new HeadBlock
                 {
                     Char = cstr,
-                    Size = g.MeasureString(cstr, fntZho, 2, sf),
+                    Size = g.MeasureString(cstr, fntZho, 65535, sf),
                     Loc = loc,
                     Faded = false,
                 };
@@ -347,7 +425,7 @@ namespace DND.Gui
 
             // On-demand: measure a single ideograph's width
             if (ideoSize.Width == 0)
-                ideoSize = g.MeasureString(ideoTestStr, fntZho, 2, sf);
+                ideoSize = g.MeasureString(ideoTestStr, fntZho, 65535, sf);
 
             headInfo = new HeadInfo();
             if (analyzedScript == SearchScript.Simplified) headInfo.HeadMode = HeadMode.OnlySimp;
@@ -361,17 +439,17 @@ namespace DND.Gui
             float hwidth = ((float)hwChars) * ideoSize.Width;
             headInfo.HeadwordRight = padLeft + hwidth;
             // Measure simplified chars from start; break when needed
-            PointF loc = new PointF(padLeft, padTop);
+            PointF loc = new PointF(padLeft, padTop / 2.0F); // Less padding above hanzi - font leaves enough space
             bool lbrk = false;
             if (analyzedScript == SearchScript.Simplified || analyzedScript == SearchScript.Both)
             {
-                lbrk &= doAnalyzeHanzi(g, Res.Entry.ChSimpl, sf, headInfo.SimpBlocks, ref loc, headInfo.HeadwordRight);
+                lbrk |= doAnalyzeHanzi(g, Res.Entry.ChSimpl, sf, headInfo.SimpBlocks, ref loc, headInfo.HeadwordRight);
             }
             if (analyzedScript == SearchScript.Traditional || analyzedScript == SearchScript.Both)
             {
                 loc.X = padLeft;
                 if (analyzedScript == SearchScript.Both) loc.Y += ideoSize.Height;
-                lbrk &= doAnalyzeHanzi(g, Res.Entry.ChTrad, sf, headInfo.TradBlocks, ref loc, headInfo.HeadwordRight);
+                lbrk |= doAnalyzeHanzi(g, Res.Entry.ChTrad, sf, headInfo.TradBlocks, ref loc, headInfo.HeadwordRight);
             }
             // If we're displaying both simplified and traditional, fade out
             // traditional chars that are same as simplified, right above them
@@ -461,8 +539,7 @@ namespace DND.Gui
 
             // My height: bottom of headword or bottom of entry, whichever is lower
             float entryHeight = lastTop + padBottom;
-            // No need for bottom padding under Chinese: font has empty area
-            float zhoHeight = headInfo.HeadwordBottom;
+            float zhoHeight = headInfo.HeadwordBottom + padBottom;
             float trueHeight = Math.Max(entryHeight, zhoHeight);
 
             // Assume this height, and also provided width

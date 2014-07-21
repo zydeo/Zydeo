@@ -136,7 +136,8 @@ namespace DND.Gui
             foreach (OneResultControl orc in resCtrls) orc.Dispose();
             resCtrls.Clear();
             // Find longest character count in headwords
-            int maxHeadLength = results.Max(r => r.Entry.ChSimpl.Length);
+            int maxHeadLength = 0;
+            if (results.Count > 0) maxHeadLength = results.Max(r => r.Entry.ChSimpl.Length);
             // Create new result controls
             int y = 0;
             using (Bitmap bmp = new Bitmap(1, 1))
