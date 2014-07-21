@@ -12,14 +12,35 @@ namespace DND.Common
         private readonly CedictSense[] senses;
 
         public readonly string ChSimpl;
+
         public readonly string ChTrad;
+
         public IEnumerable<string> Pinyin
         {
             get { return pinyin; }
         }
+
         public IEnumerable<CedictSense> Senses
         {
             get { return senses; }
+        }
+
+        public int PinyinCompare(CedictEntry other)
+        {
+            // TO-DO: correct lexicographical order by pinyin
+            StringBuilder pinyinInOne = new StringBuilder();
+            foreach (string str in pinyin)
+            {
+                if (pinyinInOne.Length != 0) pinyinInOne.Append(' ');
+                pinyinInOne.Append(str);
+            }
+            StringBuilder otherPinyinInOne = new StringBuilder();
+            foreach (string str in other.pinyin)
+            {
+                if (otherPinyinInOne.Length != 0) otherPinyinInOne.Append(' ');
+                otherPinyinInOne.Append(str);
+            }
+            return pinyinInOne.ToString().CompareTo(otherPinyinInOne.ToString());
         }
 
         public CedictEntry(string chSimpl, string chTrad,

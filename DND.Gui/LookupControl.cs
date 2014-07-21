@@ -155,6 +155,7 @@ namespace DND.Gui
         {
             if (dict == null) return;
             CedictLookupResult res = dict.Lookup(text, script, lang);
+            resCtrl.SetResults(res.Results, res.Results.Count);
         }
 
         private void populateResults()
@@ -183,7 +184,7 @@ namespace DND.Gui
                 CedictEntry ce = new CedictEntry("爱情", "爱情",
                     new ReadOnlyCollection<string>(xs),
                     new ReadOnlyCollection<CedictSense>(xm));
-                CedictResult cr = new CedictResult(ce);
+                CedictResult cr = new CedictResult(ce, 0, 2, 0, 2);
                 rs.Add(cr);
             }
             resCtrl.SetResults(new ReadOnlyCollection<CedictResult>(rs), 99);
