@@ -44,5 +44,36 @@ namespace DND.Gui
             public Block Block;
             public PointF Loc;
         }
+
+        private class HeadBlock
+        {
+            public string Char;
+            public PointF Loc;
+            public SizeF Size;
+            public bool Faded;
+        }
+
+        private enum HeadMode
+        {
+            OnlyTrad,
+            OnlySimp,
+            BothSingleLine,
+            BothMultiLine,
+        }
+
+        private class HeadInfo
+        {
+            public float HeadwordRight;
+            public float HeadwordBottom;
+            public readonly List<HeadBlock> SimpBlocks = new List<HeadBlock>();
+            public readonly List<HeadBlock> TradBlocks = new List<HeadBlock>();
+            public HeadMode HeadMode;
+        }
+
+        private class PinyinInfo
+        {
+            public string PinyinDisplay;
+            public SizeF PinyinSize;
+        }
     }
 }

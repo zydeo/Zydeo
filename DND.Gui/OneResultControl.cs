@@ -13,41 +13,43 @@ namespace DND.Gui
 {
     internal partial class OneResultControl : ZenControl
     {
-        private const string zhoTestStr = "中中中中";
-        private const string spaceTestStr = "x";
+        public readonly CedictResult Res;
+        private readonly int maxHeadLength;
+        private readonly bool odd;
+
+        private readonly int padLeft;
         private readonly int padTop;
         private readonly int padBottom;
         private readonly int padMid;
         private readonly int padRight;
 
-        public int LastTop = int.MinValue;
-        public readonly CedictResult Res;
-
-        private static int zhoWidth = 0;
+        private const string ideoTestStr = "中";
+        private const string spaceTestStr = "x";
+        private static SizeF ideoSize = new SizeF(0, 0);
         private static float spaceWidth = 0;
-        private static float lemmaLineHeight;
-
+        private static float lemmaLineHeight = 0;
+        
         private int analyzedWidth = int.MinValue;
-        private float simpTop = float.MinValue;
-        private SizeF simpSize;
-        private float simpLeft;
-        private float tradTop;
-        private SizeF tradSize;
-        private float tradLeft;
-        private string strPinyin;
-        private SizeF pinyinSize;
-        private float lemmaTop;
+        private SearchScript analyzedScript;
+        private HeadInfo headInfo = null;
+        private PinyinInfo pinyinInfo = null;
         private List<Block> measuredBlocks = null;
         private List<PositionedBlock> positionedBlocks = null;
 
-        public OneResultControl(ZenControl owner, CedictResult cr)
+        public OneResultControl(ZenControl owner, CedictResult cr, int maxHeadLength,
+            SearchScript script, bool odd)
             : base(owner)
         {
             this.Res = cr;
+            this.maxHeadLength = maxHeadLength;
+            this.analyzedScript = script;
+            this.odd = odd;
+
+            padLeft = (int)(5.0F * Scale);
             padTop = (int)(5.0F * Scale);
             padBottom = (int)(10.0F * Scale);
-            padMid = (int)(10.0F * Scale);
-            padRight = (int)(5.0F * Scale);
+            padMid = (int)(20.0F * Scale);
+            padRight = (int)(10.0F * Scale);
         }
 
         // Graphics resource: static, singleton, never disposed.
@@ -69,24 +71,47 @@ namespace DND.Gui
 
         public override void DoPaint(System.Drawing.Graphics g)
         {
-            if (analyzedWidth != Width) Analyze(g, Width);
-            for (int i = 0; i != Height; ++i)
+            // If size changed and we get a pain requested without having re-analized:
+            // Analyze now. Not the best time here in paint, but must do.
+            if (analyzedWidth != Width) Analyze(g, Width, analyzedScript);
+
+            // Background. Alternating at that!
+            if (odd)
             {
-                using (Pen p = new Pen(Color.White))
+                using (Brush b = new SolidBrush(Color.FromArgb(248, 248, 255)))
                 {
-                    g.DrawLine(p, AbsLeft, AbsTop + i, AbsLeft + Width, AbsTop + i);
+                    g.FillRectangle(b, AbsLeft, AbsTop, Width, Height);
                 }
             }
+            else
+            {
+                using (Brush b = new SolidBrush(Color.White))
+                {
+                    g.FillRectangle(b, AbsLeft, AbsTop, Width, Height);
+                }
+            }
+
+            // This is how we draw text
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
-            using (Brush b = new SolidBrush(Color.Black))
-            using (Pen p = new Pen(b))
+            using (Brush bnorm = new SolidBrush(Color.Black))
+            using (Brush bfade = new SolidBrush(Color.FromArgb(200, 200, 200)))
+            using (Pen pnorm = new Pen(bnorm))
             {
                 // Simplified and traditional - headword
-                g.DrawString(Res.Entry.ChSimpl, fntZho, b, simpLeft + (float)AbsLeft, simpTop + (float)AbsTop);
-                g.DrawString(Res.Entry.ChTrad, fntZho, b, tradLeft + (float)AbsLeft, tradTop + (float)AbsTop);
+                foreach (HeadBlock hb in headInfo.SimpBlocks)
+                {
+                    PointF loc = new PointF(hb.Loc.X + (float)AbsLeft, hb.Loc.Y + (float)AbsTop);
+                    g.DrawString(hb.Char, fntZho, bnorm, loc);
+                }
+                foreach (HeadBlock hb in headInfo.TradBlocks)
+                {
+                    PointF loc = new PointF(hb.Loc.X + (float)AbsLeft, hb.Loc.Y + (float)AbsTop);
+                    Brush b = hb.Faded ? bfade : bnorm;
+                    g.DrawString(hb.Char, fntZho, b, loc);
+                }
                 // Pinyin
-                float rx = (float)AbsLeft + zhoWidth + (float)padMid;
-                g.DrawString(strPinyin, fntPinyin, b, rx, padTop + (float)AbsTop);
+                float rx = (float)AbsLeft + headInfo.HeadwordRight + (float)padMid;
+                g.DrawString(pinyinInfo.PinyinDisplay, fntPinyin, bnorm, rx, padTop + (float)AbsTop);
                 // All the measured and positioned blocks in entry body
                 float fLeft = (float)AbsLeft;
                 float fTop = (float)AbsTop;
@@ -98,12 +123,12 @@ namespace DND.Gui
                     {
                         SenseIdBlock sib = pb.Block as SenseIdBlock;
                         float pad = lemmaLineHeight * 0.1F;
-                        g.DrawEllipse(p,
+                        g.DrawEllipse(pnorm,
                             pb.Loc.X + fLeft + pad,
                             pb.Loc.Y + fTop + Scale * pad,
                             sib.Size.Width - 2.0F * pad,
                             sib.Size.Height - 2.0F * pad);
-                        g.DrawString(sib.Text, fntSenseId, b,
+                        g.DrawString(sib.Text, fntSenseId, bnorm,
                             pb.Loc.X + fLeft + 2.5F * pad,
                             pb.Loc.Y + fTop + 1.5F * pad);
                     }
@@ -111,12 +136,20 @@ namespace DND.Gui
                     else if (pb.Block is TextBlock)
                     {
                         TextBlock tb = pb.Block as TextBlock;
-                        g.DrawString(tb.Text, tb.Font, b, pb.Loc.X + fLeft, pb.Loc.Y + fTop);
+                        g.DrawString(tb.Text, tb.Font, bnorm, pb.Loc.X + fLeft, pb.Loc.Y + fTop);
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Measures an array of alphabetic words, which are all typographic display blocks.
+        /// </summary>
+        /// <param name="g">A Graphics object used for measurements.</param>
+        /// <param name="sf">StringFormat used for measurements.</param>
+        /// <param name="font">Display font for block.</param>
+        /// <param name="words">Array of words to measure.</param>
+        /// <param name="blocks">List of measured blocks to APPEND to.</param>
         private static void doMeasureWords(Graphics g, StringFormat sf, Font font,
             string[] words, List<Block> blocks)
         {
@@ -134,6 +167,10 @@ namespace DND.Gui
             }
         }
 
+        /// <summary>
+        /// Breaks down body content into typographic blocks and caches the size of these.
+        /// </summary>
+        /// <param name="g">A Graphics object used for measurements.</param>
         private void doMeasureBlocks(Graphics g)
         {
             // Once measured, blocks don't change. Nothing to do then.
@@ -173,8 +210,23 @@ namespace DND.Gui
             }
         }
 
-        public float doArrangeBlocks(float lemmaL, float lemmaW)
+        /// <summary>
+        /// Calculates layout of content in entry body, taking current width into account for line breaks.
+        /// </summary>
+        /// <param name="lemmaL">Left position of body content area.</param>
+        /// <param name="lemmaW">Width of body content area.</param>
+        /// <returns>Bottom of content area.</returns>
+        private float doArrangeBlocks(float lemmaL, float lemmaW)
         {
+            float lemmaTop = (float)padTop + pinyinInfo.PinyinSize.Height;
+
+            // Will not work reduntantly
+            if (positionedBlocks != null)
+            {
+                if (positionedBlocks.Count == 0) return lemmaTop;
+                else return positionedBlocks[positionedBlocks.Count - 1].Loc.Y + lemmaLineHeight;
+            }
+
             // This is always re-done when function is called
             // We only get here when width has changed, so we do need to rearrange
             positionedBlocks = new List<PositionedBlock>();
@@ -223,23 +275,175 @@ namespace DND.Gui
                 // This is last block
                 lastPB = pb;
             }
-            return blockY;
+            return measuredBlocks.Count == 0 ? blockY : blockY + lemmaLineHeight;
         }
 
-        // Analyze layout with provided width; assume corresponding height; does not invalidate
-        public void Analyze(Graphics g, int width)
+        /// <summary>
+        /// Right-align a range of headword blocks.
+        /// </summary>
+        /// <param name="blocks">The full headword blocks list.</param>
+        /// <param name="start">Index of the first character to right-align.</param>
+        /// <param name="length">Lengt of range to right-align.</param>
+        /// <param name="right">The right edge.</param>
+        private static void doRightAlign(List<HeadBlock> blocks,
+            int start, int length, float right)
         {
-            // If width has not changed, nothing to do.
-            if (analyzedWidth == width) return;
-            analyzedWidth = Width;
+            float x = right;
+            for (int i = start + length - 1; i >= start; --i)
+            {
+                HeadBlock block = blocks[i];
+                block.Loc = new PointF(x - block.Size.Width, block.Loc.Y);
+                x -= block.Size.Width;
+            }
+        }
+
+        private static bool doAnalyzeHanzi(Graphics g, string str, StringFormat sf,
+            List<HeadBlock> blocks, ref PointF loc, float right)
+        {
+            float left = loc.X;
+            bool lineBreak = false;
+            int firstCharOfLine = 0;
+            int charsOnLine = 0;
+            // Measure and position each character
+            for (int i = 0; i != str.Length; ++i)
+            {
+                ++charsOnLine;
+                string cstr = str[i].ToString();
+                // Measure each character. They may not all be hanzi: there are latin letters in some HWS
+                HeadBlock hb = new HeadBlock
+                {
+                    Char = cstr,
+                    Size = g.MeasureString(cstr, fntZho, 2, sf),
+                    Loc = loc,
+                    Faded = false,
+                };
+                blocks.Add(hb);
+                // Location moves right
+                loc.X += hb.Size.Width;
+                // If location is beyond headword's right edge, break line now.
+                // This involves
+                // - moving last added block to next line
+                // - right-aligning blocks added so far
+                if (loc.X > right)
+                {
+                    lineBreak = true;
+                    loc.X = left;
+                    loc.Y += ideoSize.Height;
+                    doRightAlign(blocks, firstCharOfLine, charsOnLine - 1, right);
+                    charsOnLine = 1;
+                    firstCharOfLine = blocks.Count - 1;
+                    hb.Loc = loc;
+                }
+            }
+            // Right-align the final bit
+            doRightAlign(blocks, firstCharOfLine, charsOnLine, right);
+            // Done - tell call if we had line break or not
+            return lineBreak;
+        }
+
+        /// <summary>
+        /// Analyzes layout of headword.
+        /// </summary>
+        /// <param name="g">A Graphics object used for measurements.</param>
+        private void doAnalyzeHeadword(Graphics g)
+        {
+            // If already analyzed, nothing to do
+            if (headInfo != null) return;
 
             // This is how we measure
             StringFormat sf = StringFormat.GenericTypographic;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
 
-            // On-demand: measure a single ideograph's width - for headword
-            if (zhoWidth == 0)
-                zhoWidth = (int)g.MeasureString(zhoTestStr, fntZho, 65535, sf).Width;
+            // On-demand: measure a single ideograph's width
+            if (ideoSize.Width == 0)
+                ideoSize = g.MeasureString(ideoTestStr, fntZho, 2, sf);
+
+            headInfo = new HeadInfo();
+            if (analyzedScript == SearchScript.Simplified) headInfo.HeadMode = HeadMode.OnlySimp;
+            else if (analyzedScript == SearchScript.Traditional) headInfo.HeadMode = HeadMode.OnlyTrad;
+            else headInfo.HeadMode = HeadMode.BothSingleLine;
+            // For width of headword, use padLeft from border, plus 4 to 6 ideographs' worth of space
+            // Depending on longest headword in entire list
+            int hwChars = maxHeadLength;
+            if (hwChars < 4) hwChars = 4;
+            if (hwChars > 6) hwChars = 6;
+            float hwidth = ((float)hwChars) * ideoSize.Width;
+            headInfo.HeadwordRight = padLeft + hwidth;
+            // Measure simplified chars from start; break when needed
+            PointF loc = new PointF(padLeft, padTop);
+            bool lbrk = false;
+            if (analyzedScript == SearchScript.Simplified || analyzedScript == SearchScript.Both)
+            {
+                lbrk &= doAnalyzeHanzi(g, Res.Entry.ChSimpl, sf, headInfo.SimpBlocks, ref loc, headInfo.HeadwordRight);
+            }
+            if (analyzedScript == SearchScript.Traditional || analyzedScript == SearchScript.Both)
+            {
+                loc.X = padLeft;
+                if (analyzedScript == SearchScript.Both) loc.Y += ideoSize.Height;
+                lbrk &= doAnalyzeHanzi(g, Res.Entry.ChTrad, sf, headInfo.TradBlocks, ref loc, headInfo.HeadwordRight);
+            }
+            // If we're displaying both simplified and traditional, fade out
+            // traditional chars that are same as simplified, right above them
+            if (analyzedScript == SearchScript.Both)
+            {
+                for (int i = 0; i != headInfo.SimpBlocks.Count; ++i)
+                {
+                    if (headInfo.SimpBlocks[i].Char == headInfo.TradBlocks[i].Char)
+                        headInfo.TradBlocks[i].Faded = true;
+                }
+            }
+            // Bottom of headword area
+            headInfo.HeadwordBottom = loc.Y + ideoSize.Height;
+            // If we had a line break and we're showing both scripts, update info
+            if (analyzedScript == SearchScript.Both && lbrk)
+                headInfo.HeadMode = HeadMode.BothMultiLine;
+        }
+
+        private void doAnalyzePinyin(Graphics g)
+        {
+            // If already measured, nothing to do
+            if (pinyinInfo != null) return;
+
+            // This is how we measure
+            StringFormat sf = StringFormat.GenericTypographic;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+
+            pinyinInfo = new PinyinInfo();
+            // Measure pinyin text
+            pinyinInfo.PinyinDisplay = "";
+            foreach (string ps in Res.Entry.Pinyin)
+            {
+                if (pinyinInfo.PinyinDisplay.Length > 0) pinyinInfo.PinyinDisplay += " ";
+                // TO-DO: convert tone numbers to accents here
+                pinyinInfo.PinyinDisplay += ps;
+            }
+            pinyinInfo.PinyinSize = g.MeasureString(pinyinInfo.PinyinDisplay, fntPinyin, 65535, sf);
+        }
+
+        /// <summary>
+        /// Analyzes UI for display. Assumes ideal height for provided width wihtout invalidating or painting.
+        /// </summary>
+        /// <param name="g">A Graphics object used for measurements.</param>
+        /// <param name="width">Control's width.</param>
+        public void Analyze(Graphics g, int width, SearchScript script)
+        {
+            // If width or script has not changed, nothing to do.
+            if (analyzedWidth == width && script == analyzedScript) return;
+            if (analyzedWidth != width)
+            {
+                analyzedWidth = Width;
+                positionedBlocks = null;
+            }
+            if (analyzedScript != script)
+            {
+                analyzedScript = script;
+                headInfo = null;
+            }
+
+            // This is how we measure
+            StringFormat sf = StringFormat.GenericTypographic;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+
             // On-demand: measure a space's width - for entry text flow
             // Also line height in entry text
             if (spaceWidth == 0)
@@ -249,42 +453,26 @@ namespace DND.Gui
                 lemmaLineHeight = sz.Height;
             }
 
-            // Size and location of headword: simplified and traditional chars
-            // If simpTop is not float.MinValue, we've done this already
-            // On that value hinges pinyin measurement too
-            if (simpTop == float.MinValue)
-            {
-                simpSize = g.MeasureString(Res.Entry.ChSimpl, fntZho, 65535, sf);
-                simpLeft = (float)zhoWidth - simpSize.Width;
-                simpTop = padTop;
-                tradSize = g.MeasureString(Res.Entry.ChTrad, fntZho, 65535, sf);
-                tradLeft = (float)zhoWidth - tradSize.Width;
-                tradTop = simpTop + simpSize.Height;
+            // Headword and pinyin
+            // Will not measure redundantly
+            doAnalyzeHeadword(g);
+            doAnalyzePinyin(g);
 
-                // Measure pinyin text
-                strPinyin = "";
-                foreach (string ps in Res.Entry.Pinyin)
-                {
-                    if (strPinyin.Length > 0) strPinyin += " ";
-                    // TO-DO: convert tone numbers to accents here
-                    strPinyin += ps;
-                }
-                pinyinSize = g.MeasureString(strPinyin, fntPinyin, 65535, sf);
-            }
-
-            // OK, now onto entry
-            lemmaTop = padTop + pinyinSize.Height;
+            // OK, now onto body
             // Measure blocks in themselves on demand
+            // Will not measure redundantly
             doMeasureBlocks(g);
+
             // Arrange blocks
-            float lemmaW = (float)width - zhoWidth - padMid - padRight;
-            float lemmaL = zhoWidth + padMid;
+            float lemmaW = ((float)width) - headInfo.HeadwordRight - padMid - padRight;
+            float lemmaL = headInfo.HeadwordRight + padMid;
             float lastTop = doArrangeBlocks(lemmaL, lemmaW);
 
             // My height: bottom of headword or bottom of entry, whichever is lower
             float entryHeight = lastTop + lemmaLineHeight + padBottom;
-            float zhoHeight = tradTop + tradSize.Height + padBottom;
+            float zhoHeight = headInfo.HeadwordBottom + padBottom;
             float trueHeight = Math.Max(entryHeight, zhoHeight);
+
             // Assume this height, and also provided width
             Size = new Size(width, (int)trueHeight);
         }

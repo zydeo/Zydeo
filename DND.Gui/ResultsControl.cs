@@ -129,24 +129,28 @@ namespace DND.Gui
             foreach (OneResultControl orc in resCtrls) orc.Width = contentRectSize.Width;
         }
 
-        public void SetResults(ReadOnlyCollection<CedictResult> results, int pageSize)
+        public void SetResults(ReadOnlyCollection<CedictResult> results, SearchScript script)
         {
             if (Scale == 0) throw new InvalidOperationException("Scale must be set before setting results to show.");
             // Dispose old results controls
             foreach (OneResultControl orc in resCtrls) orc.Dispose();
             resCtrls.Clear();
+            // Find longest character count in headwords
+            int maxHeadLength = results.Max(r => r.Entry.ChSimpl.Length);
             // Create new result controls
             int y = 0;
             using (Bitmap bmp = new Bitmap(1, 1))
             using (Graphics g = Graphics.FromImage(bmp))
             {
+                bool odd = true;
                 foreach (CedictResult cr in results)
                 {
-                    OneResultControl orc = new OneResultControl(this, cr);
-                    orc.Analyze(g, contentRectSize.Width);
+                    OneResultControl orc = new OneResultControl(this, cr, maxHeadLength, script, odd);
+                    orc.Analyze(g, contentRectSize.Width, script);
                     orc.AbsLocation = new Point(1, y + 1);
                     y += orc.Height;
                     resCtrls.Add(orc);
+                    odd = !odd;
                 }
             }
             sb.Maximum = y;
