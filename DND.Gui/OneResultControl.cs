@@ -11,31 +11,85 @@ using DND.Gui.Zen;
 
 namespace DND.Gui
 {
+    /// <summary>
+    /// Displays a single lookup result, with one dictionary entry, within the results list.
+    /// </summary>
     internal partial class OneResultControl : ZenControl
     {
+        /// <summary>
+        /// The entry this control displays.
+        /// </summary>
         public readonly CedictResult Res;
+        /// <summary>
+        /// The maximum hanzi length in the entire result set. Affects width of my headword area.
+        /// </summary>
         private readonly int maxHeadLength;
+        /// <summary>
+        /// True if my position in the results list is odd; false for even. Drives alternating BG color.
+        /// </summary>
         private readonly bool odd;
 
+        // Paddings internal and external; calculated for current scale in ctor.
         private readonly int padLeft;
         private readonly int padTop;
         private readonly int padBottom;
         private readonly int padMid;
         private readonly int padRight;
 
+        /// <summary>
+        /// Used to measure size of ideographic characters.
+        /// </summary>
         private const string ideoTestStr = "中";
+        /// <summary>
+        /// Used to measure width of space in entry body.
+        /// </summary>
         private const string spaceTestStr = "f";
+        /// <summary>
+        /// Size of an ideographic character.
+        /// </summary>
         private static SizeF ideoSize = new SizeF(0, 0);
+        /// <summary>
+        /// Measured width of a space.
+        /// </summary>
         private static float spaceWidth = 0;
+        /// <summary>
+        /// Line height in the entry body.
+        /// </summary>
         private static float lemmaLineHeight = 0;
         
+        /// <summary>
+        /// The width I last analyzed my layout for.
+        /// </summary>
         private int analyzedWidth = int.MinValue;
+        /// <summary>
+        /// Scripts to display (simp/trad/both). If this changes, I must re-analyze: height may grow or shrink.
+        /// </summary>
         private SearchScript analyzedScript;
+        /// <summary>
+        /// Typographically analyzed headword.
+        /// </summary>
         private HeadInfo headInfo = null;
+        /// <summary>
+        /// Typographically analyzed pinyin.
+        /// </summary>
         private PinyinInfo pinyinInfo = null;
+        /// <summary>
+        /// Typographically analyzed body text.
+        /// </summary>
         private List<Block> measuredBlocks = null;
+        /// <summary>
+        /// Body text laid out for current width.
+        /// </summary>
         private List<PositionedBlock> positionedBlocks = null;
 
+        /// <summary>
+        /// Ctor: takes data to display.
+        /// </summary>
+        /// <param name="owner">Zen control that owns me.</param>
+        /// <param name="cr">The lookup result this control will show.</param>
+        /// <param name="maxHeadLength">Longest headword in full results list.</param>
+        /// <param name="script">Scripts to show in headword.</param>
+        /// <param name="odd">Odd/even position in list, for alternating BG color.</param>
         public OneResultControl(ZenControl owner, CedictResult cr, int maxHeadLength,
             SearchScript script, bool odd)
             : base(owner)
@@ -52,14 +106,18 @@ namespace DND.Gui
             padRight = (int)(10.0F * Scale);
         }
 
-        // Graphics resource: static, singleton, never disposed.
+        // Graphics resources: static, singleton, never disposed.
         // When we're quitting it doesn't matter anymore, anyway.
+        // TO-DO: double-check for thread safety when control starts drawing animations in worker thread!
         private static Font fntZho;
         private static Font fntPinyin;
         private static Font fntEquiv;
         private static Font fntMeta;
         private static Font fntSenseId;
 
+        /// <summary>
+        /// Static ctor: initializes static graphics resources.
+        /// </summary>
         static OneResultControl()
         {
             fntZho = new Font(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
@@ -69,6 +127,9 @@ namespace DND.Gui
             fntSenseId = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize * 0.8F);
         }
 
+        /// <summary>
+        /// Draws hilite for one character in headword.
+        /// </summary>
         private void doHiliteOneHeadBlock(Graphics g, Pen p, HeadBlock hb, bool tradSimpMid,
             bool leftHorn, bool rightHorn)
         {
@@ -115,6 +176,9 @@ namespace DND.Gui
             }
         }
 
+        /// <summary>
+        /// Paints all hilites in headword.
+        /// </summary>
         private void doPaintHanziHilites(Graphics g)
         {
             using (Pen p = new Pen(Color.Maroon))
@@ -143,6 +207,9 @@ namespace DND.Gui
             }
         }
 
+        /// <summary>
+        /// Paints full control. Analyzes on demand, but meant to be called after analysis up front.
+        /// </summary>
         public override void DoPaint(Graphics g)
         {
             // If size changed and we get a pain requested without having re-analized:
@@ -366,6 +433,9 @@ namespace DND.Gui
             }
         }
 
+        /// <summary>
+        /// Calculates right-aligned layout in headword area.
+        /// </summary>
         private static bool doAnalyzeHanzi(Graphics g, string str, StringFormat sf,
             List<HeadBlock> blocks, ref PointF loc, float right)
         {
@@ -468,6 +538,9 @@ namespace DND.Gui
                 headInfo.HeadMode = HeadMode.BothMultiLine;
         }
 
+        /// <summary>
+        /// Calculates pinyin layout.
+        /// </summary>
         private void doAnalyzePinyin(Graphics g)
         {
             // If already measured, nothing to do
