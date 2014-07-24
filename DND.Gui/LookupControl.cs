@@ -155,6 +155,7 @@ namespace DND.Gui
         {
             if (dict == null) return;
             CedictLookupResult res = dict.Lookup(text, script, lang);
+            siCtrl.SelectAll();
             resCtrl.SetResults(res.Results, script);
         }
 
