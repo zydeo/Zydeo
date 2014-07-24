@@ -19,9 +19,22 @@ namespace DND.Gui
     {
         // TEMP standard scroll bar
         private VScrollBar sb;
-        private Size contentRectSize;
+
+        /// <summary>
+        /// One result control for each result I'm showin.
+        /// </summary>
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
+
+        /// <summary>
+        /// Currently shown scripts (simp/trad/both).
+        /// </summary>
         private SearchScript currScript;
+
+        /// <summary>
+        /// <para>Suppresses scroll changed event handler.</para>
+        /// <para>Needed to avoid recursion when we set to scroll thumb upon re-layout on resize.</para>
+        /// </summary>
+        private bool suppressScrollChanged = false;
 
         public ResultsControl(ZenControl owner)
             : base(owner)
@@ -33,16 +46,19 @@ namespace DND.Gui
             sb.Height = Height - 2;
             sb.Top = 1;
             sb.Left = Width - 1 - sb.Width;
-            sb.Enabled = false;
             sb.ValueChanged += sb_ValueChanged;
-
-            contentRectSize = new Size(Width - 2 - sb.Width, Height - 2);
+            sb.Visible = false;
 
             SubscribeToTimer();
         }
 
+        /// <summary>
+        /// Called when scroll thumb moves: repositions results list and trigger paint.
+        /// </summary>
         void sb_ValueChanged(object sender, EventArgs e)
         {
+            if (suppressScrollChanged) return;
+
             int y = 1 - sb.Value;
             foreach (OneResultControl orc in resCtrls)
             {
@@ -55,6 +71,9 @@ namespace DND.Gui
         public static ushort HIWORD(IntPtr l) { return (ushort)((l.ToInt64() >> 16) & 0xFFFF); }
         public static ushort LOWORD(IntPtr l) { return (ushort)((l.ToInt64()) & 0xFFFF); }
 
+        /// <summary>
+        /// Pre-filters Windows messages to fish out mouse wheel events.
+        /// </summary>
         public bool PreFilterMessage(ref Message m)
         {
             bool r = false;
@@ -69,23 +88,34 @@ namespace DND.Gui
             return r;
         }
 
+        /// <summary>
+        /// Handles the mouse wheel event: adds momentum to animated scrolling.
+        /// </summary>
         private void onMouseWheel(MouseEventArgs e)
         {
-            if (!sb.Enabled) return;
-            addMomentum(-((float)e.Delta) * ((float)sb.LargeChange) / 1500.0F);
-        }
+            // Don't handle mouse wheel even if we have no scroll bar.
+            if (!sb.Visible || !sb.Enabled) return;
 
-        private float scrollSpeed;
-        private object scrollTimerLO = new object();
-
-        private void addMomentum(float diffMomentum)
-        {
+            // Input from the mouse wheel adds momentum to animated scrolling.
+            float extraMomentum = -((float)e.Delta) * ((float)sb.LargeChange) / 1500.0F;
             lock (scrollTimerLO)
             {
-                scrollSpeed += diffMomentum;
+                scrollSpeed += extraMomentum;
             }
         }
 
+        /// <summary>
+        /// Current speed of animated scrolling. Lock with <see cref="scrollTimerLO"/>.
+        /// </summary>
+        private float scrollSpeed;
+        /// <summary>
+        /// Lock object for accessing <see cref="scrollSpeed"/>.
+        /// </summary>
+        private object scrollTimerLO = new object();
+
+        /// <summary>
+        /// Executes animations (e.g., scrolling with momentum)
+        /// </summary>
         public override void DoTimer()
         {
             float speed = 0;
@@ -100,15 +130,17 @@ namespace DND.Gui
             if (speed == 0) return;
             InvokeOnForm((MethodInvoker)delegate
             {
+                // Height of content: my height minus 2 for top and bottom border
+                int ch = Height - 2;
                 int scrollVal = sb.Value;
                 scrollVal += (int)speed;
                 if (scrollVal < 0)
                 {
                     scrollVal = 0;
                 }
-                else if (scrollVal > sb.Maximum - contentRectSize.Height)
+                else if (scrollVal > sb.Maximum - ch)
                 {
-                    scrollVal = sb.Maximum - contentRectSize.Height;
+                    scrollVal = sb.Maximum - ch;
                     if (scrollVal < 0) scrollVal = 0;
                 }
                 sb.Value = scrollVal;
@@ -121,19 +153,74 @@ namespace DND.Gui
             base.Dispose();
         }
 
+        /// <summary>
+        /// Gets width and height of content area (occupied by individual results controls)
+        /// </summary>
+        private void getContentSize(out int cw, out int ch)
+        {
+            ch = Height - 2; // Top and bottom border
+            cw = Width - 2; // Left and right borders
+            if (sb.Visible) cw -= sb.Width; // Scrollbar, if visible
+        }
+
+        /// <summary>
+        /// <para>Shows or hides scroll bar as needed; sets maximum and large value.</para>
+        /// <para>Changes content area width if scrollbar appears or disappears.</para>
+        /// </summary>
+        /// <returns>Content area width afterwards.</returns>
+        private int showOrHideScrollbar()
+        {
+            int cw, ch;
+            getContentSize(out cw, out ch);
+            if (sb.Visible && resCtrls[resCtrls.Count - 1].AbsBottom < Height - 1 ||
+                !sb.Visible && resCtrls[resCtrls.Count - 1].AbsBottom >= Height - 1)
+            {
+                sb.Visible = !sb.Visible;
+                sb.Enabled = sb.Visible;
+                // Get content size again - scrollbar visibility affects it
+                getContentSize(out cw, out ch);
+                // Reposition results controls, laying them out from top
+                int y = 0;
+                using (Bitmap bmp = new Bitmap(1, 1))
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    bool odd = true;
+                    foreach (OneResultControl orc in resCtrls)
+                    {
+                        orc.Analyze(g, cw, currScript);
+                        orc.AbsLocation = new Point(1, y + 1);
+                        y += orc.Height;
+                        odd = !odd;
+                    }
+                }
+            }
+            // If scroll bar is now visible, set its large value and position
+            if (sb.Visible)
+            {
+                suppressScrollChanged = true;
+                sb.Maximum = resCtrls[resCtrls.Count - 1].AbsBottom;
+                sb.LargeChange = ch;
+                sb.Value = 1 - resCtrls[0].AbsTop;
+                suppressScrollChanged = false;
+            }
+            return cw;
+        }
+
         protected override void OnSizeChanged()
         {
-            // Update content rectangle - just a cache for other calculations
-            contentRectSize = new Size(Width - 2 - sb.Width, Height - 2);
+            // Content rectangle height and width
+            int cw, ch;
+            getContentSize(out cw, out ch);
+
             // Put Windows scroll bar in its place, update its large change (which is always one full screen)
             sb.Height = Height - 2;
             sb.Top = AbsTop + 1;
             sb.Left = AbsLeft + Width - 1 - sb.Width;
-            sb.LargeChange = contentRectSize.Height;
 
-            // No results being shown: done 'ere
+            // No results being shown: done here
             if (resCtrls.Count == 0) return;
-            // Find bottom of first visible control
+
+            // Pivot control: first one that's at least partially visible
             int pivotY = 1;
             int pivotIX = -1;
             OneResultControl pivotCtrl = null;
@@ -156,8 +243,7 @@ namespace DND.Gui
             {
                 foreach (OneResultControl orc in resCtrls)
                 {
-                    orc.Analyze(g, contentRectSize.Width, currScript);
-                    //orc.Width = contentRectSize.Width;
+                    orc.Analyze(g, cw, currScript);
                 }
             }
             // Move pivot control back in place
@@ -168,21 +254,58 @@ namespace DND.Gui
                 resCtrls[i].AbsTop = resCtrls[i - 1].AbsBottom;
             for (int i = pivotIX - 1; i >= 0; --i)
                 resCtrls[i].AbsTop = resCtrls[i + 1].AbsTop - resCtrls[i].Height;
-            // Very first control's top must be 1
-            // TO-DO from here: edge cases
-            // Reset scroll bar's max value and position
-            // TO-DO from here
-            // Invalidate
-            MakeMePaint(false, RenderMode.Invalidate);
+            // Edge case: very first control's top must not be greater than 1
+            if (resCtrls[0].AbsTop > 1)
+            {
+                diff = resCtrls[0].AbsTop - 1;
+                foreach (OneResultControl orc in resCtrls) orc.AbsTop -= diff;
+            }
+            // If there is space below very last control's bottom, but first control is above window edge
+            // > Move down, but without detaching creating empty space at top
+            int emptyAtBottom = Height - 1 - resCtrls[resCtrls.Count - 1].AbsBottom;
+            if (emptyAtBottom > 0)
+            {
+                int outsideAtTop = 1 - resCtrls[0].AbsTop;
+                diff = Math.Min(outsideAtTop, emptyAtBottom);
+                if (diff > 0)
+                {
+                    foreach (OneResultControl orc in resCtrls)
+                        orc.AbsTop += diff;
+                }
+            }
+            // Change our mind about scrollbar control?
+            cw = showOrHideScrollbar();
+            
+            // No need to invalidate here. Form will redraw evertyhing from top down.
+            // Done.
         }
 
         public void SetResults(ReadOnlyCollection<CedictResult> results, SearchScript script)
         {
-            if (Scale == 0) throw new InvalidOperationException("Scale must be set before setting results to show.");
+            // Decide if we first try with scrollbar visible or not
+            // This is a very rough heuristics (10 results or more), but doesn't matter
+            // Recalc costs much if there are many results, and the number covers that safely
+            sb.Visible = results.Count > 10;
+            sb.Enabled = results.Count > 10;
+
+            // Content rectangle height and width
+            int cw, ch;
+            getContentSize(out cw, out ch);
+            
             // Dispose old results controls
             foreach (OneResultControl orc in resCtrls) orc.Dispose();
             resCtrls.Clear();
             currScript = script;
+
+            // No results
+            if (results.Count == 0)
+            {
+                sb.Visible = false;
+                sb.Enabled = false;
+                MakeMePaint(false, RenderMode.Invalidate);
+                return;
+            }
+
             // Find longest character count in headwords
             int maxHeadLength = 0;
             if (results.Count > 0) maxHeadLength = results.Max(r => r.Entry.ChSimpl.Length);
@@ -195,22 +318,25 @@ namespace DND.Gui
                 foreach (CedictResult cr in results)
                 {
                     OneResultControl orc = new OneResultControl(this, cr, maxHeadLength, script, odd);
-                    orc.Analyze(g, contentRectSize.Width, script);
+                    orc.Analyze(g, cw, script);
                     orc.AbsLocation = new Point(1, y + 1);
                     y += orc.Height;
                     resCtrls.Add(orc);
                     odd = !odd;
                 }
             }
-            sb.Maximum = y;
-            sb.LargeChange = contentRectSize.Height;
-            sb.Value = 0;
-            sb.Enabled = true;
+            // Change our mind about scrollbar?
+            cw = showOrHideScrollbar();
+            // Render
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
         public override void DoPaint(Graphics g)
         {
+            // Content rectangle height and width
+            int cw, ch;
+            getContentSize(out cw, out ch);
+
             // Background
             using (Brush b = new SolidBrush(Color.White))
             {
@@ -225,11 +351,11 @@ namespace DND.Gui
                 g.DrawLine(p, 0, Height - 1, 0, 0);
             }
             // Results
-            g.Clip = new Region(new Rectangle(1, 1, contentRectSize.Width, contentRectSize.Height));
+            g.Clip = new Region(new Rectangle(1, 1, cw, ch));
             foreach (OneResultControl orc in resCtrls)
             {
-                if ((orc.AbsBottom < contentRectSize.Height && orc.AbsBottom >= 0) ||
-                    (orc.AbsTop < contentRectSize.Height && orc.AbsTop >= 0))
+                if ((orc.AbsBottom < ch && orc.AbsBottom >= 0) ||
+                    (orc.AbsTop < ch && orc.AbsTop >= 0))
                 {
                     orc.DoPaint(g);
                 }
