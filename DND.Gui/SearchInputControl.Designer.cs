@@ -16,8 +16,6 @@
         private void InitializeComponent()
         {
             this.txtInput = new System.Windows.Forms.TextBox();
-            this.pnlBg = new System.Windows.Forms.Panel();
-            this.pnlBg.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtInput
@@ -31,30 +29,16 @@
             this.txtInput.Size = new System.Drawing.Size(290, 23);
             this.txtInput.TabIndex = 0;
             // 
-            // pnlBg
-            // 
-            this.pnlBg.BackColor = System.Drawing.Color.White;
-            this.pnlBg.Controls.Add(this.txtInput);
-            this.pnlBg.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlBg.Location = new System.Drawing.Point(0, 0);
-            this.pnlBg.Margin = new System.Windows.Forms.Padding(0);
-            this.pnlBg.Name = "pnlBg";
-            this.pnlBg.Padding = new System.Windows.Forms.Padding(4);
-            this.pnlBg.Size = new System.Drawing.Size(298, 30);
-            this.pnlBg.TabIndex = 1;
-            // 
             // SearchInputControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.Controls.Add(this.pnlBg);
+            this.Controls.Add(this.txtInput);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "SearchInputControl";
             this.Size = new System.Drawing.Size(298, 30);
-            this.pnlBg.ResumeLayout(false);
-            this.pnlBg.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -62,6 +46,5 @@
         #endregion
 
         private System.Windows.Forms.TextBox txtInput;
-        private System.Windows.Forms.Panel pnlBg;
     }
 }

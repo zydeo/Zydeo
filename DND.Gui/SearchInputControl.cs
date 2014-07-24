@@ -37,11 +37,9 @@ namespace DND.Gui
             txtInput.KeyPress += txtInput_KeyPress;
 
             getResources();
-            pnlBg.Paint += onPnlPaint;
-            pnlBg.Click += onPnlClick;
-            pnlBg.MouseEnter += onMouseEnter;
+            MouseEnter += onMouseEnter;
             txtInput.MouseEnter += onMouseEnter;
-            pnlBg.MouseLeave += onMouseLeave;
+            MouseLeave += onMouseLeave;
             txtInput.MouseLeave += onMouseLeave;
         }
 
@@ -98,26 +96,20 @@ namespace DND.Gui
             {
                 Point p = MousePosition;
                 p = PointToClient(p);
-                if (pnlBg.ClientRectangle.Contains(p)) return;
-            }
-            if (sender == pnlBg)
-            {
-                Point p = MousePosition;
-                p = PointToClient(p);
-                if (txtInput.ClientRectangle.Contains(p)) return;
+                if (ClientRectangle.Contains(p)) return;
             }
             isHover = false;
-            pnlBg.Invalidate();
+            Invalidate();
         }
 
         private void onMouseEnter(object sender, EventArgs e)
         {
             if (isHover) return;
             isHover = true;
-            pnlBg.Invalidate();
+            Invalidate();
         }
 
-        private void onPnlClick(object sender, EventArgs e)
+        protected override void OnClick(EventArgs e)
         {
             Point p = MousePosition;
             p = PointToClient(p);
@@ -128,9 +120,19 @@ namespace DND.Gui
             if (rectImgCancel.Contains(p)) txtInput.Text = "";
         }
 
-        private void onPnlPaint(object sender, PaintEventArgs e)
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            // NOP
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
         {
             Graphics g = e.Graphics;
+            // Paint my BG
+            using (SolidBrush b = new SolidBrush(Color.White))
+            {
+                g.FillRectangle(b, ClientRectangle);
+            }
             // Paint my icons
             int ctrlHeight = ClientRectangle.Height - 2 * padding;
             Rectangle rectImgSearch = new Rectangle(padding, padding, ctrlHeight, ctrlHeight);
