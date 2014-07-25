@@ -13,7 +13,7 @@ namespace DND.Gui
 {
     internal class SearchInputControl : ZenControl
     {
-        public delegate void StartSearchDelegate(string text, SearchScript script, SearchLang lang);
+        public delegate void StartSearchDelegate(string text);
         public event StartSearchDelegate StartSearch;
 
         private readonly TextBox txtInput;
@@ -97,7 +97,7 @@ namespace DND.Gui
         private void doStartSearch()
         {
             if (StartSearch != null)
-                StartSearch(txtInput.Text, SearchScript.Both, SearchLang.Chinese);
+                StartSearch(txtInput.Text);
         }
 
         public override void DoMouseEnter()

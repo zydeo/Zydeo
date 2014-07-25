@@ -7,9 +7,9 @@ namespace DND.Common
 {
     public enum SearchScript
     {
-        Simplified,
-        Traditional,
-        Both,
+        Simplified = 0,
+        Traditional = 1,
+        Both = 2,
     }
 
     public enum SearchLang

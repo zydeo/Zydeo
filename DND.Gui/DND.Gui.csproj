@@ -50,6 +50,7 @@
     <Compile Include="SettingsControl.cs" />
     <Compile Include="OneResultControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Texts.cs" />
     <Compile Include="WritingPad.cs" />
     <Compile Include="WritingPad.Designer.cs">
       <DependentUpon>WritingPad.cs</DependentUpon>

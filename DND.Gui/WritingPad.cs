@@ -15,7 +15,7 @@ namespace DND.Gui
 {
     public partial class WritingPad : ZenControl
     {
-        public delegate void StrokesChangedDelegate(object sender, IEnumerable<Stroke> strokes);
+        public delegate void StrokesChangedDelegate(IEnumerable<Stroke> strokes);
         public event StrokesChangedDelegate StrokesChanged;
 
         public class Stroke
@@ -346,7 +346,7 @@ namespace DND.Gui
             }
             // Repaint; tell the world
             MakeMePaint(false, RenderMode.Invalidate);
-            if (StrokesChanged != null) StrokesChanged(this, Strokes);
+            if (StrokesChanged != null) StrokesChanged(Strokes);
         }
 
         public override bool DoMouseUp(Point p, MouseButtons button)

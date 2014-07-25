@@ -206,7 +206,7 @@ namespace DND.Gui
             return cw;
         }
 
-        protected override void OnSizeChanged()
+        private void reAnalyzeResultsDisplay()
         {
             // Content rectangle height and width
             int cw, ch;
@@ -238,7 +238,7 @@ namespace DND.Gui
                 }
             }
             // Recalculate each result control's layout, and height
-            using (Bitmap bmp = new Bitmap(1,1))
+            using (Bitmap bmp = new Bitmap(1, 1))
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 foreach (OneResultControl orc in resCtrls)
@@ -246,8 +246,10 @@ namespace DND.Gui
                     orc.Analyze(g, cw, currScript);
                 }
             }
-            // Move pivot control back in place
+            // Move pivot control back in place so bottom stays where it was
+            // But: if pivot was first shown control at top, keep top in place
             int diff = pivotY - pivotCtrl.AbsBottom;
+            if (pivotIX == 0 && pivotCtrl.AbsTop == 1) diff = 0;
             pivotCtrl.AbsTop += diff;
             // Lay out remaining controls up and down
             for (int i = pivotIX + 1; i < resCtrls.Count; ++i)
@@ -275,11 +277,31 @@ namespace DND.Gui
             }
             // Change our mind about scrollbar control?
             cw = showOrHideScrollbar();
-            
+        }
+
+        protected override void OnSizeChanged()
+        {
+            reAnalyzeResultsDisplay();
             // No need to invalidate here. Form will redraw evertyhing from top down.
             // Done.
         }
 
+        /// <summary>
+        /// Changes the display script, keeping existing results on screen.
+        /// </summary>
+        /// <param name="script">The new script(s) to show.</param>
+        public void ChangeScript(SearchScript script)
+        {
+            currScript = script;
+            reAnalyzeResultsDisplay();
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        /// <summary>
+        /// Displays the received results, discarding existing data.
+        /// </summary>
+        /// <param name="results">Cedict lookup results to show.</param>
+        /// <param name="script">Defines which script(s) to show.</param>
         public void SetResults(ReadOnlyCollection<CedictResult> results, SearchScript script)
         {
             // Decide if we first try with scrollbar visible or not

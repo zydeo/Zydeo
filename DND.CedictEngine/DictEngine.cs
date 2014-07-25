@@ -51,7 +51,9 @@ namespace DND.CedictEngine
                     // Entry is a keeper if either source or target headword contains query
                     if (hiliteLength != 0)
                     {
-                        CedictResult res = new CedictResult(entry,
+                        // TO-DO: indicate wrong script in result
+                        CedictResult res = new CedictResult(CedictResult.SimpTradWarning.None,
+                            entry,
                             hiliteStart, hiliteLength);
                         resList.Add(res);
                     }
@@ -86,21 +88,15 @@ namespace DND.CedictEngine
                 if (!index.IdeoIndex.ContainsKey(c)) continue;
                 IdeoIndexItem iii = index.IdeoIndex[c];
                 // Count separately for simplified and traditional
-                if (script == SearchScript.Simplified || script == SearchScript.Both)
+                foreach (int pos in iii.EntriesHeadwordSimp)
                 {
-                    foreach (int pos in iii.EntriesHeadwordSimp)
-                    {
-                        if (posToCountSimp.ContainsKey(pos)) ++posToCountSimp[pos];
-                        else posToCountSimp[pos] = 1;
-                    }
+                    if (posToCountSimp.ContainsKey(pos)) ++posToCountSimp[pos];
+                    else posToCountSimp[pos] = 1;
                 }
-                if (script == SearchScript.Traditional || script == SearchScript.Both)
+                foreach (int pos in iii.EntriesHeadwordTrad)
                 {
-                    foreach (int pos in iii.EntriesHeadwordTrad)
-                    {
-                        if (posToCountTrad.ContainsKey(pos)) ++posToCountTrad[pos];
-                        else posToCountTrad[pos] = 1;
-                    }
+                    if (posToCountTrad.ContainsKey(pos)) ++posToCountTrad[pos];
+                    else posToCountTrad[pos] = 1;
                 }
             }
             // Get positions that contain all chars from query

@@ -20,12 +20,12 @@ namespace DND.Gui
         public MainForm(ICedictEngineFactory dictFact)
         {
             LogicalSize = new Size(800, 500);
-            Header = "Zydeo Chinese-English dictionary";
+            Header = Texts.WinHeader;
             lc = new LookupControl(this, dictFact);
             stgs = new SettingsControl(this);
-            MainTab = new ZenTab(stgs, "Zydeo");
+            MainTab = new ZenTab(stgs, Texts.TabMain);
             //MainTabHeader = "Zydeo";
-            Tabs.Add(new ZenTab(lc, "Lookup"));
+            Tabs.Add(new ZenTab(lc, Texts.TabLookup));
         }
     }
 }

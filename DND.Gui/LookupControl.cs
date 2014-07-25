@@ -19,11 +19,10 @@ namespace DND.Gui
         private readonly ICedictEngineFactory dictFact;
         private readonly int padding;
 
-        bool searchTraditional = true;
-        bool searchSimplified = true;
+        private SearchScript searchScript = SearchScript.Simplified;
+
         private const double looseness = 0.25;  // the "looseness" of lookup, 0-1, higher == looser, looser more computationally intensive
         private const int numResults = 15;      // maximum number of results to return with each lookup
-
         private FileStream fsStrokes;
         private BinaryReader brStrokes;
         private StrokesDataSource strokesData;
@@ -66,11 +65,11 @@ namespace DND.Gui
             siCtrl.StartSearch += siCtrl_StartSearch;
 
             simpTradCtrl = new ZenButton(this);
-            simpTradCtrl.Text = "Traditional";
             simpTradCtrl.RelTop = padding;
             simpTradCtrl.Height = siCtrl.Height;
-            simpTradCtrl.Width = simpTradCtrl.GetPreferredWidth(false, "xxx" + "Traditional");
+            simpTradCtrl.Width = getSimpTradWidth();
             simpTradCtrl.MouseClick += simpTradCtrl_MouseClick;
+            setSimpTradText();
 
             resCtrl = new ResultsControl(this);
             resCtrl.RelLocation = new Point(writingPad.RelRight + padding, siCtrl.RelBottom + padding);
@@ -95,7 +94,7 @@ namespace DND.Gui
             dict = dictFact.Create("cedict-zydeo.bin");
         }
 
-        private void writingPad_StrokesChanged(object sender, IEnumerable<WritingPad.Stroke> strokes)
+        private void startNewCharRecog(IEnumerable<WritingPad.Stroke> strokes)
         {
             // If there are other matchers running, stop them now
             lock (runningMatchers)
@@ -124,17 +123,22 @@ namespace DND.Gui
             ThreadPool.QueueUserWorkItem(recognize, wc);
         }
 
+        private void writingPad_StrokesChanged(IEnumerable<WritingPad.Stroke> strokes)
+        {
+            startNewCharRecog(strokes);
+        }
+
         private void recognize(object ctxt)
         {
             WrittenCharacter wc = ctxt as WrittenCharacter;
             CharacterDescriptor id = wc.BuildCharacterDescriptor();
             strokesData.Reset();
             StrokesMatcher matcher = new StrokesMatcher(id,
-                                                     searchTraditional,
-                                                     searchSimplified,
-                                                     looseness,
-                                                     numResults,
-                                                     strokesData);
+                searchScript != SearchScript.Simplified,
+                searchScript != SearchScript.Traditional,
+                looseness,
+                numResults,
+                strokesData);
             int matcherCount;
             lock (runningMatchers)
             {
@@ -160,17 +164,47 @@ namespace DND.Gui
             });
         }
 
-        private void siCtrl_StartSearch(string text, SearchScript script, SearchLang lang)
+        private void siCtrl_StartSearch(string text)
         {
             if (dict == null) return;
-            CedictLookupResult res = dict.Lookup(text, script, lang);
+            CedictLookupResult res = dict.Lookup(text, searchScript, SearchLang.Chinese);
             siCtrl.SelectAll();
-            resCtrl.SetResults(res.Results, script);
+            resCtrl.SetResults(res.Results, searchScript);
         }
 
-        void simpTradCtrl_MouseClick(ZenControlBase sender)
+        private int getSimpTradWidth()
         {
-            throw new NotImplementedException();
+            int w = simpTradCtrl.GetPreferredWidth(false, "mmm" + Texts.SearchSimp);
+            w = Math.Max(w, simpTradCtrl.GetPreferredWidth(false, "mmm" + Texts.SearchTrad));
+            w = Math.Max(w, simpTradCtrl.GetPreferredWidth(false, "mmm" + Texts.SearchBoth));
+            return w;
+        }
+
+        private void setSimpTradText()
+        {
+            string text;
+            if (searchScript == SearchScript.Simplified)
+                text = Texts.SearchSimp;
+            else if (searchScript == SearchScript.Traditional)
+                text = Texts.SearchTrad;
+            else text = Texts.SearchBoth;
+            simpTradCtrl.Text = text;
+            simpTradCtrl.Invalidate();
+        }
+
+        private void simpTradCtrl_MouseClick(ZenControlBase sender)
+        {
+            // Next in row
+            int scri = (int)searchScript;
+            ++scri;
+            if (scri > 2) scri = 0;
+            searchScript = (SearchScript)scri;
+            // Update button
+            setSimpTradText();
+            // Re-recognize strokes, if there are any
+            startNewCharRecog(writingPad.Strokes);
+            // Re-render results list with desired script(s) shown
+            resCtrl.ChangeScript(searchScript);
         }
 
         private void cpCtrl_CharPicked(char c)
