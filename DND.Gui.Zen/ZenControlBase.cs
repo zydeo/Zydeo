@@ -252,6 +252,15 @@ namespace DND.Gui.Zen
         }
 
         /// <summary>
+        /// <para>Makes the control repaint itself and invalidates Form for rendering.</para>
+        /// <para>Does not request new background. Override in controls using opacity/transparency.</para>
+        /// </summary>
+        public virtual void Invalidate()
+        {
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        /// <summary>
         /// Returns mouse position in top form's coordinates (canvas's absolute coordinates).
         /// </summary>
         protected virtual Point MousePositionAbs
@@ -381,6 +390,14 @@ namespace DND.Gui.Zen
         protected Point AbsToControl(Point pAbs)
         {
             return new Point(pAbs.X - RelLocation.X, pAbs.Y - RelLocation.Y);
+        }
+
+        /// <summary>
+        /// Fires the mouse click event.
+        /// </summary>
+        protected void FireClick()
+        {
+            if (MouseClick != null) MouseClick(this);
         }
 
         public virtual bool DoMouseClick(Point p, MouseButtons button)

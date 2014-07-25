@@ -19,6 +19,8 @@ namespace DND.Gui.Zen
         public static readonly float HeaderFontSize = 13.0F;
         public static readonly Color CloseColorBase = Color.FromArgb(199, 80, 80);
         public static readonly Color CloseColorHover = Color.FromArgb(224, 67, 67);
+        public static readonly string GenericFontFamily = "Segoe UI";
+
         public static readonly string ZhoFontFamily = "DFKai-SB";
         public static readonly float ZhoFontSize = 22.0F;
         public static readonly string PinyinFontFamily = "Tahoma";

@@ -18,10 +18,9 @@ namespace DND.Gui
 
         private readonly TextBox txtInput;
         private readonly int padding;
-        private Image imgSearch;
-        private Image imgCancel;
+        private readonly ZenButton btnSearch;
+        private readonly ZenButton btnCancel;
         private bool blockSizeChanged = false;
-        private bool isHover = false;
 
         public SearchInputControl(ZenControl owner)
             : base(owner)
@@ -41,15 +40,31 @@ namespace DND.Gui
             blockSizeChanged = false;
             txtInput.KeyPress += txtInput_KeyPress;
 
-            getResources();
+            Assembly a = Assembly.GetExecutingAssembly();
+            var imgSearch = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.search.png"));
+            btnSearch = new ZenButton(this);
+            btnSearch.RelLocation = new Point(padding, padding);
+            btnSearch.Size = new Size(Height - 2 * padding, Height - 2 * padding);
+            btnSearch.Image = imgSearch;
+            btnSearch.HasBorder = false;
+            btnSearch.MouseClick += onClickSearch;
+
+            var imgCancel = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.cancel.png"));
+            btnCancel = new ZenButton(this);
+            btnCancel.Size = new Size(Height - 2 * padding, Height - 2 * padding);
+            btnCancel.RelLocation = new Point(Width - padding - btnCancel.Width, padding);
+            btnCancel.Image = imgCancel;
+            btnCancel.HasBorder = false;
+            btnCancel.Visible = false;
+            btnCancel.MouseClick += onClickCancel;
+
+
             txtInput.MouseEnter += onTxtMouseEnter;
             txtInput.MouseLeave += onTxtMouseLeave;
         }
 
         public override void Dispose()
         {
-            if (imgSearch != null) imgSearch.Dispose();
-            if (imgCancel != null) imgCancel.Dispose();
             base.Dispose();
         }
 
@@ -74,6 +89,9 @@ namespace DND.Gui
             // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
             txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + padding);
             txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, ctrlHeight);
+
+            // Cancel button: right-aligned
+            btnCancel.RelLocation = new Point(Width - padding - btnCancel.Width, padding);
         }
 
         private void doStartSearch()
@@ -82,22 +100,15 @@ namespace DND.Gui
                 StartSearch(txtInput.Text, SearchScript.Both, SearchLang.Chinese);
         }
 
-        private void getResources()
-        {
-            Assembly a = Assembly.GetExecutingAssembly();
-            imgSearch = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.search.png"));
-            imgCancel = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.cancel.png"));
-        }
-
         public override void DoMouseEnter()
         {
-            isHover = true;
+            btnCancel.Visible = true;
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
         public override void DoMouseLeave()
         {
-            isHover = false;
+            btnCancel.Visible = false;
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
@@ -114,19 +125,19 @@ namespace DND.Gui
 
         private void onTxtMouseEnter(object sender, EventArgs e)
         {
-            if (isHover) return;
-            isHover = true;
+            if (btnCancel.Visible) return;
+            btnCancel.Visible = true;
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
-        public override bool DoMouseClick(Point p, MouseButtons button)
+        private void onClickSearch(ZenControlBase sender)
         {
-            int ctrlHeight = Height - 2 * padding;
-            Rectangle rectImgSearch = new Rectangle(padding, padding, ctrlHeight, ctrlHeight);
-            if (rectImgSearch.Contains(p)) doStartSearch();
-            Rectangle rectImgCancel = new Rectangle(Width - padding - ctrlHeight, padding, ctrlHeight, ctrlHeight);
-            if (rectImgCancel.Contains(p)) txtInput.Text = "";
-            return true;
+            doStartSearch();
+        }
+
+        private void onClickCancel(ZenControlBase sender)
+        {
+            txtInput.Text = "";
         }
 
         public override void DoPaint(Graphics g)
@@ -141,19 +152,8 @@ namespace DND.Gui
             {
                 g.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
             }
-            // Paint my icons
-            int ctrlHeight = Height - 2 * padding;
-            Rectangle rectImgSearch = new Rectangle(padding, padding, ctrlHeight, ctrlHeight);
-            g.DrawImage(imgSearch, rectImgSearch);
-            if (isHover)
-            {
-                Rectangle rectImgCancel = new Rectangle(Width - padding - ctrlHeight, padding, ctrlHeight, ctrlHeight);
-                g.DrawImage(imgCancel, rectImgCancel);
-                using (Brush b = new SolidBrush(Color.FromArgb(192, Color.White)))
-                {
-                    g.FillRectangle(b, rectImgCancel);
-                }
-            }
+            // Children! My buttons.
+            DoPaintChildren(g);
         }
 
         private void txtInput_KeyPress(object sender, KeyPressEventArgs e)
