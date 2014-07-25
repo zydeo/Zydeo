@@ -293,7 +293,11 @@ namespace DND.Gui
             getContentSize(out cw, out ch);
             
             // Dispose old results controls
-            foreach (OneResultControl orc in resCtrls) orc.Dispose();
+            foreach (OneResultControl orc in resCtrls)
+            {
+                RemoveChild(orc);
+                orc.Dispose();
+            }
             resCtrls.Clear();
             currScript = script;
 
