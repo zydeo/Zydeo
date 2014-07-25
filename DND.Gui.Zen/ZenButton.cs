@@ -94,9 +94,6 @@ namespace DND.Gui.Zen
             : base(parent)
         {
             fntText = new Font(ZenParams.GenericFontFamily, fontSize);
-
-            // TO-DO: subscribe on-deman; unsubscribe when animation is over
-            SubscribeToTimer();
         }
 
         public override void Dispose()
@@ -155,11 +152,6 @@ namespace DND.Gui.Zen
                 val = (Math.Cos(sizeAnimVal * Math.PI) + 1.0) / 2.0;
                 val *= (1.0 - smallProp);
                 float res = (float)(1.0 - val);
-
-                string diagStr = "X: {0} Val: {1} Res: {2}";
-                diagStr = string.Format(diagStr, sizeAnimVal, val, res);
-                Console.WriteLine(diagStr);
-
                 return res;
             }
         }
@@ -173,8 +165,14 @@ namespace DND.Gui.Zen
                 else if (sizeAnimState == SizeAnimState.GrowAfterShrink || sizeAnimState == SizeAnimState.Grow)
                     sizeAnimVal = -sizeAnimVal;
                 sizeAnimState = SizeAnimState.ShrinkBeforeGrow;
+                if (stableShrinkedState)
+                {
+                    sizeAnimVal = 0;
+                    sizeAnimState = SizeAnimState.GrowAfterShrink;
+                }
                 stableShrinkedState = false;
             }
+            SubscribeToTimer();
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
@@ -189,6 +187,7 @@ namespace DND.Gui.Zen
                 sizeAnimState = SizeAnimState.Shrink;
                 stableShrinkedState = false;
             }
+            SubscribeToTimer();
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
@@ -203,6 +202,7 @@ namespace DND.Gui.Zen
                 sizeAnimState = SizeAnimState.Grow;
                 stableShrinkedState = false;
             }
+            SubscribeToTimer();
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
@@ -210,7 +210,11 @@ namespace DND.Gui.Zen
         {
             lock (animLO)
             {
-                if (sizeAnimState == SizeAnimState.None) return; // TO-DO: unsubscribe here!
+                if (sizeAnimState == SizeAnimState.None)
+                {
+                    UnsubscribeFromTimer();
+                    return;
+                }
                 if (sizeAnimState == SizeAnimState.Shrink || sizeAnimState == SizeAnimState.ShrinkBeforeGrow)
                 {
                     sizeAnimVal += 0.2;
