@@ -69,6 +69,8 @@ namespace DND.Gui
             simpTradCtrl.Height = siCtrl.Height;
             simpTradCtrl.Width = getSimpTradWidth();
             simpTradCtrl.MouseClick += simpTradCtrl_MouseClick;
+            simpTradCtrl.HoverBackColor = Color.PaleTurquoise;
+            simpTradCtrl.PressedBackColor = Color.LightCoral;
             setSimpTradText();
 
             resCtrl = new ResultsControl(this);
