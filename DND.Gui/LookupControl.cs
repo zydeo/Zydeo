@@ -17,6 +17,7 @@ namespace DND.Gui
     internal class LookupControl : ZenControl
     {
         private readonly ICedictEngineFactory dictFact;
+        private readonly int padding;
 
         bool searchTraditional = true;
         bool searchSimplified = true;
@@ -33,6 +34,7 @@ namespace DND.Gui
         private ResultsControl resCtrl;
         private CharPicker cpCtrl;
         private SearchInputControl siCtrl;
+        private ZenButton simpTradCtrl;
 
         private readonly HashSet<StrokesMatcher> runningMatchers = new HashSet<StrokesMatcher>();
 
@@ -40,13 +42,14 @@ namespace DND.Gui
             : base(owner)
         {
             this.dictFact = dictFact;
+            padding = (int)Math.Round(5.0F * Scale);
 
             fsStrokes = new FileStream("strokes-extended.dat", FileMode.Open, FileAccess.Read);
             brStrokes = new BinaryReader(fsStrokes);
             strokesData = new StrokesDataSource(brStrokes);
 
             writingPad = new WritingPad(this);
-            writingPad.RelLogicalLocation = new Point(5, 5);
+            writingPad.RelLocation = new Point(padding, padding);
             writingPad.LogicalSize = new Size(200, 200);
             writingPad.StrokesChanged += writingPad_StrokesChanged;
 
@@ -54,16 +57,23 @@ namespace DND.Gui
             //cpCtrl.FontFace = "Noto Sans S Chinese Regular";
             cpCtrl.FontFace = "䡡湄楮札䍓ⵆ潮瑳";
             //cpCtrl.FontFace = "SimSun";
-            cpCtrl.RelLogicalLocation = new Point(5, 210);
+            cpCtrl.RelLocation = new Point(padding, writingPad.RelBottom + padding);
             cpCtrl.LogicalSize = new Size(200, 80);
             cpCtrl.CharPicked += cpCtrl_CharPicked;
 
             siCtrl = new SearchInputControl(this);
-            siCtrl.RelLocation = new Point(writingPad.AbsRect.Right + writingPad.RelRect.Left, writingPad.AbsRect.Top);
+            siCtrl.RelLocation = new Point(writingPad.RelRight + padding, padding);
             siCtrl.StartSearch += siCtrl_StartSearch;
 
+            simpTradCtrl = new ZenButton(this);
+            simpTradCtrl.Text = "Traditional";
+            simpTradCtrl.RelTop = padding;
+            simpTradCtrl.Height = siCtrl.Height;
+            simpTradCtrl.Width = simpTradCtrl.GetPreferredWidth(false, "xxx" + "Traditional");
+            simpTradCtrl.MouseClick += simpTradCtrl_MouseClick;
+
             resCtrl = new ResultsControl(this);
-            resCtrl.RelLocation = new Point(writingPad.RelRect.Right + writingPad.RelRect.Left, siCtrl.RelBottom + writingPad.RelTop);
+            resCtrl.RelLocation = new Point(writingPad.RelRight + padding, siCtrl.RelBottom + padding);
         }
 
         public override void Dispose()
@@ -158,36 +168,9 @@ namespace DND.Gui
             resCtrl.SetResults(res.Results, script);
         }
 
-        private void populateResults()
+        void simpTradCtrl_MouseClick(ZenControlBase sender)
         {
-            CedictSense[] xmAll = new CedictSense[9];
-            xmAll[0] = new CedictSense(null, "pot-scrubbing brush made of bamboo strips", null);
-            xmAll[1] = new CedictSense(null, "basket (container) for chopsticks", null);
-            xmAll[2] = new CedictSense(null, "variant of 筲[shao1]", null);
-            xmAll[3] = new CedictSense(null, "mask of a god used in ceremonies to exorcise demons and drive away pestilence", null);
-            xmAll[4] = new CedictSense("(archaic)", "ugly", null);
-            xmAll[5] = new CedictSense(null, "pith", "(soft interior of plant stem)");
-            xmAll[6] = new CedictSense(null, "spoonbill", null);
-            xmAll[7] = new CedictSense(null, "ibis", null);
-            xmAll[8] = new CedictSense(null, "family Threskiornidae", null);
-            List<CedictResult> rs = new List<CedictResult>();
-            for (int i = 0; i != 99; ++i)
-            {
-                int meaningCount = (i % 9);
-                CedictSense[] xm = new CedictSense[meaningCount + 2];
-                xm[0] = new CedictSense(null, "ITEM-" + (i + 1).ToString("D3"), null);
-                for (int j = 0; j <= meaningCount; ++j)
-                    xm[j + 1] = xmAll[j];
-                string[] xs = new string[2];
-                xs[0] = "ài​";
-                xs[1] = "qíng";
-                CedictEntry ce = new CedictEntry("爱情", "爱情",
-                    new ReadOnlyCollection<string>(xs),
-                    new ReadOnlyCollection<CedictSense>(xm));
-                CedictResult cr = new CedictResult(ce, 0, 2);
-                rs.Add(cr);
-            }
-            resCtrl.SetResults(new ReadOnlyCollection<CedictResult>(rs), SearchScript.Both);
+            throw new NotImplementedException();
         }
 
         private void cpCtrl_CharPicked(char c)
@@ -209,9 +192,11 @@ namespace DND.Gui
 
         protected override void OnSizeChanged()
         {
-            siCtrl.RelLocation = new Point(writingPad.RelRight + writingPad.RelRect.Left, writingPad.RelTop);
-            siCtrl.Width = Width - resCtrl.RelRect.Left - 5;
-            resCtrl.Size = new Size(Width - resCtrl.RelRect.Left - 5, Height - resCtrl.RelRect.Top - 5);
+            siCtrl.RelLocation = new Point(writingPad.RelRight + padding, padding);
+            siCtrl.Width = Width - resCtrl.RelLeft - simpTradCtrl.Width - 2 * padding;
+            simpTradCtrl.RelLeft = Width - padding - simpTradCtrl.Width;
+            simpTradCtrl.Height = siCtrl.Height;
+            resCtrl.Size = new Size(Width - resCtrl.RelLeft - padding, Height - resCtrl.RelTop - padding);
         }
     }
 }

@@ -94,6 +94,9 @@ namespace DND.Gui.Zen
             : base(parent)
         {
             fntText = new Font(ZenParams.GenericFontFamily, fontSize);
+
+            // TO-DO: subscribe on-deman; unsubscribe when animation is over
+            SubscribeToTimer();
         }
 
         public override void Dispose()
@@ -128,14 +131,142 @@ namespace DND.Gui.Zen
             return MeasureText(text, fntText, sf);
         }
 
-        /// <summary>
-        /// Fires the mouse click event, provided the control is in a state when it can do that.
-        /// </summary>
+        private enum SizeAnimState
+        {
+            None,
+            ShrinkBeforeGrow,
+            GrowAfterShrink,
+            Shrink,
+            Grow,
+        }
+        private readonly object animLO = new object();
+        private const double smallProp = 0.8;
+        private SizeAnimState sizeAnimState = SizeAnimState.None;
+        private double sizeAnimVal = double.MinValue;
+        private bool stableShrinkedState = false;
+
+        private float getAnimSizeNow()
+        {
+            lock (animLO)
+            {
+                if (sizeAnimVal == double.MinValue) return stableShrinkedState ? (float)smallProp : 1.0F;
+                double val;
+                val = 1.0 - Math.Pow(sizeAnimVal, 2.0);
+                val = (Math.Cos(sizeAnimVal * Math.PI) + 1.0) / 2.0;
+                val *= (1.0 - smallProp);
+                float res = (float)(1.0 - val);
+
+                string diagStr = "X: {0} Val: {1} Res: {2}";
+                diagStr = string.Format(diagStr, sizeAnimVal, val, res);
+                Console.WriteLine(diagStr);
+
+                return res;
+            }
+        }
+
+        private void doStartAnimShrinkGrow()
+        {
+            lock (animLO)
+            {
+                if (sizeAnimState == SizeAnimState.None)
+                    sizeAnimVal = -1.0;
+                else if (sizeAnimState == SizeAnimState.GrowAfterShrink || sizeAnimState == SizeAnimState.Grow)
+                    sizeAnimVal = -sizeAnimVal;
+                sizeAnimState = SizeAnimState.ShrinkBeforeGrow;
+                stableShrinkedState = false;
+            }
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        private void doStartAnimShrink()
+        {
+            lock (animLO)
+            {
+                if (sizeAnimState == SizeAnimState.None)
+                    sizeAnimVal = -1.0;
+                else if (sizeAnimState == SizeAnimState.GrowAfterShrink || sizeAnimState == SizeAnimState.Grow)
+                    sizeAnimVal = -sizeAnimVal;
+                sizeAnimState = SizeAnimState.Shrink;
+                stableShrinkedState = false;
+            }
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        private void doStartAnimGrow()
+        {
+            lock (animLO)
+            {
+                if (sizeAnimState == SizeAnimState.None)
+                    sizeAnimVal = 0;
+                else if (sizeAnimState == SizeAnimState.ShrinkBeforeGrow || sizeAnimState == SizeAnimState.Shrink)
+                    sizeAnimVal = -sizeAnimVal;
+                sizeAnimState = SizeAnimState.Grow;
+                stableShrinkedState = false;
+            }
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        public override void DoTimer()
+        {
+            lock (animLO)
+            {
+                if (sizeAnimState == SizeAnimState.None) return; // TO-DO: unsubscribe here!
+                if (sizeAnimState == SizeAnimState.Shrink || sizeAnimState == SizeAnimState.ShrinkBeforeGrow)
+                {
+                    sizeAnimVal += 0.2;
+                    if (sizeAnimVal >= 0)
+                    {
+                        if (sizeAnimState == SizeAnimState.Shrink)
+                        {
+                            sizeAnimState = SizeAnimState.None;
+                            sizeAnimVal = double.MinValue;
+                            stableShrinkedState = true;
+                        }
+                        else sizeAnimState = SizeAnimState.GrowAfterShrink;
+                    }
+                }
+                else if (sizeAnimState == SizeAnimState.Grow || sizeAnimState == SizeAnimState.GrowAfterShrink)
+                {
+                    sizeAnimVal += 0.2;
+                    if (sizeAnimVal >= 1)
+                    {
+                        sizeAnimState = SizeAnimState.None;
+                        sizeAnimVal = double.MinValue;
+                    }
+                }
+            }
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
         public override bool DoMouseClick(Point p, MouseButtons button)
         {
-            if (visible) FireClick();
+            // Make sure control's base does not send click event
+            // We already did in MouseUp
             return visible;
         }
+
+        public override bool DoMouseDown(Point p, MouseButtons button)
+        {
+            if (!Visible) return false;
+            doStartAnimShrink();
+            return true;
+        }
+
+        public override bool DoMouseUp(Point p, MouseButtons button)
+        {
+            if (!Visible) return false;
+            doStartAnimShrinkGrow();
+            FireClick();
+            return true;
+        }
+
+        public override void DoMouseEnter()
+        {
+            if (!Visible) return;
+            doStartAnimShrinkGrow();
+        }
+
+        // TO-DO: mouse down, mouse up
 
         public override void DoPaint(Graphics g)
         {
@@ -160,9 +291,38 @@ namespace DND.Gui.Zen
             if (image != null)
             {
                 int border = hasBorder ? 1 : 0;
-                Rectangle imgRect = new Rectangle(padding + border, padding + border,
-                    Height - 2 * (padding + border), Height - 2 * (padding + border));
+                RectangleF imgRect;
+                double asNow = getAnimSizeNow();
+                if (asNow != 1.0)
+                {
+                    float sz = (float)(Height - 2 * (padding + border));
+                    sz *= getAnimSizeNow();
+                    float szHalf = sz / 2.0F;
+                    float imgMid = ((float)(Height + padding)) / 2.0F;
+                    imgRect = new RectangleF(imgMid - szHalf, imgMid - szHalf, sz, sz);
+                }
+                else
+                {
+                    imgRect = new RectangleF(padding + border, padding + border,
+                       Height - 2 * (padding + border), Height - 2 * (padding + border));
+                }
                 g.DrawImage(image, imgRect);
+            }
+            // Text, if there is one
+            if (text != string.Empty)
+            {
+                // To the right of image
+                int txtLeft = (int)Math.Round((((float)Width) - textSize.Width) / 2.0F);
+                if (image != null) txtLeft += Height - padding;
+                // Aligner to center, both horizontally & vertically
+                int txtTop = (int)(((float)Height) * 0.5F - (textSize.Height / 2.0F));
+                RectangleF textRect = new RectangleF(txtLeft, txtTop, textSize.Width, textSize.Height);
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                StringFormat sf = StringFormat.GenericTypographic;
+                using (Brush b = new SolidBrush(Color.Black))
+                {
+                    g.DrawString(text, fntText, b, textRect, sf);
+                }
             }
         }
     }
