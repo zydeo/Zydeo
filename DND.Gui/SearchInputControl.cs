@@ -1,57 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 using System.Reflection;
+using System.Drawing;
+using System.Windows.Forms;
 
 using DND.Common;
+using DND.Gui.Zen;
 
 namespace DND.Gui
 {
-    public partial class SearchInputControl : UserControl
+    internal class SearchInputControl : ZenControl
     {
         public delegate void StartSearchDelegate(string text, SearchScript script, SearchLang lang);
         public event StartSearchDelegate StartSearch;
 
-        private readonly float scale;
+        private readonly TextBox txtInput;
         private readonly int padding;
         private Image imgSearch;
         private Image imgCancel;
         private bool blockSizeChanged = false;
         private bool isHover = false;
 
-        public SearchInputControl(float scale)
+        public SearchInputControl(ZenControl owner)
+            : base(owner)
         {
-            this.scale = scale;
-            padding = (int)Math.Round(4.0F * scale);
-            InitializeComponent();
+            txtInput = new TextBox();
+            txtInput.Name = "txtInput";
+            txtInput.BorderStyle = BorderStyle.None;
+            txtInput.TabIndex = 0;
+            RegisterWinFormsControl(txtInput);
+            txtInput.Font = new System.Drawing.Font("Segoe UI", 12.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             txtInput.AutoSize = false;
             txtInput.Height = (int)(((float)txtInput.PreferredHeight) * 1.1F);
+
+            padding = (int)Math.Round(4.0F * Scale);
             blockSizeChanged = true;
             Height = 2 + txtInput.Height + 2 * padding;
             blockSizeChanged = false;
             txtInput.KeyPress += txtInput_KeyPress;
 
             getResources();
-            MouseEnter += onMouseEnter;
-            txtInput.MouseEnter += onMouseEnter;
-            MouseLeave += onMouseLeave;
-            txtInput.MouseLeave += onMouseLeave;
+            txtInput.MouseEnter += onTxtMouseEnter;
+            txtInput.MouseLeave += onTxtMouseLeave;
         }
 
-        protected override void Dispose(bool disposing)
+        public override void Dispose()
         {
-            if (disposing)
-            {
-                if (components != null) components.Dispose();
-                if (imgSearch != null) imgSearch.Dispose();
-                if (imgCancel != null) imgCancel.Dispose();
-            }
-            base.Dispose(disposing);
+            if (imgSearch != null) imgSearch.Dispose();
+            if (imgCancel != null) imgCancel.Dispose();
+            base.Dispose();
         }
 
         public void InsertCharacter(char c)
@@ -65,16 +64,16 @@ namespace DND.Gui
             txtInput.SelectAll();
         }
 
-        protected override void OnSizeChanged(EventArgs e)
+        protected override void OnSizeChanged()
         {
             if (blockSizeChanged) return;
-            base.OnSizeChanged(e);
 
             // The height of the text box and icons
-            int ctrlHeight = ClientRectangle.Height - 2 * padding;
+            int ctrlHeight = Height - 2 * padding;
             // Text field: search icon on left, X icon on right
-            txtInput.Location = new Point(padding + ctrlHeight + padding, padding);
-            txtInput.Size = new Size(ClientRectangle.Width - 4 * padding - 2 * ctrlHeight, ctrlHeight);
+            // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
+            txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + padding);
+            txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, ctrlHeight);
         }
 
         private void doStartSearch()
@@ -90,51 +89,60 @@ namespace DND.Gui
             imgCancel = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.cancel.png"));
         }
 
-        private void onMouseLeave(object sender, EventArgs e)
+        public override void DoMouseEnter()
         {
-            if (sender == txtInput)
-            {
-                Point p = MousePosition;
-                p = PointToClient(p);
-                if (ClientRectangle.Contains(p)) return;
-            }
-            isHover = false;
-            Invalidate();
+            isHover = true;
+            MakeMePaint(false, RenderMode.Invalidate);
         }
 
-        private void onMouseEnter(object sender, EventArgs e)
+        public override void DoMouseLeave()
+        {
+            isHover = false;
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        private void onTxtMouseLeave(object sender, EventArgs e)
+        {
+            // Pointer may lease text box but still be inside me
+            if (sender == txtInput)
+            {
+                Point p = MousePositionAbs;
+                if (AbsRect.Contains(p)) return;
+            }
+            DoMouseLeave();
+        }
+
+        private void onTxtMouseEnter(object sender, EventArgs e)
         {
             if (isHover) return;
             isHover = true;
-            Invalidate();
+            MakeMePaint(false, RenderMode.Invalidate);
         }
 
-        protected override void OnClick(EventArgs e)
+        public override bool DoMouseClick(Point p, MouseButtons button)
         {
-            Point p = MousePosition;
-            p = PointToClient(p);
-            int ctrlHeight = ClientRectangle.Height - 2 * padding;
+            int ctrlHeight = Height - 2 * padding;
             Rectangle rectImgSearch = new Rectangle(padding, padding, ctrlHeight, ctrlHeight);
             if (rectImgSearch.Contains(p)) doStartSearch();
             Rectangle rectImgCancel = new Rectangle(Width - padding - ctrlHeight, padding, ctrlHeight, ctrlHeight);
             if (rectImgCancel.Contains(p)) txtInput.Text = "";
+            return true;
         }
 
-        protected override void OnPaintBackground(PaintEventArgs e)
+        public override void DoPaint(Graphics g)
         {
-            // NOP
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
             // Paint my BG
             using (SolidBrush b = new SolidBrush(Color.White))
             {
-                g.FillRectangle(b, ClientRectangle);
+                g.FillRectangle(b, new Rectangle(0, 0, Width, Height));
+            }
+            // Draw my border
+            using (Pen p = new Pen(ZenParams.BorderColor))
+            {
+                g.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
             }
             // Paint my icons
-            int ctrlHeight = ClientRectangle.Height - 2 * padding;
+            int ctrlHeight = Height - 2 * padding;
             Rectangle rectImgSearch = new Rectangle(padding, padding, ctrlHeight, ctrlHeight);
             g.DrawImage(imgSearch, rectImgSearch);
             if (isHover)

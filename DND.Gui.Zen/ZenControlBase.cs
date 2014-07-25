@@ -158,6 +158,28 @@ namespace DND.Gui.Zen
             }
         }
 
+        public int RelLeft
+        {
+            get { return absRect.X - Parent.absRect.X; }
+            set { RelLocation = new Point(value, RelTop); }
+        }
+
+        public int RelTop
+        {
+            get { return absRect.Y - parent.absRect.Y; }
+            set { RelLocation = new Point(RelLeft, value); }
+        }
+
+        public int RelRight
+        {
+            get { return RelLeft + Width; }
+        }
+
+        public int RelBottom
+        {
+            get { return RelTop + Height; }
+        }
+
         public Point AbsLogicalLocation
         {
             set
@@ -229,6 +251,9 @@ namespace DND.Gui.Zen
             if (parent != null) parent.MakeCtrlPaint(ctrl, needBackground, rm);
         }
 
+        /// <summary>
+        /// Returns mouse position in top form's coordinates (canvas's absolute coordinates).
+        /// </summary>
         protected virtual Point MousePositionAbs
         {
             get { return Parent.MousePositionAbs; }
@@ -338,18 +363,31 @@ namespace DND.Gui.Zen
             return null;
         }
 
-        protected Point TranslateToControl(ZenControlBase ctrl, Point pParent)
+        /// <summary>
+        /// Translates a location in the parent's coordinate system to a control's coordinate system.
+        /// </summary>
+        private Point parentToControl(ZenControlBase ctrl, Point pParent)
         {
             int x = pParent.X - ctrl.RelRect.X;
             int y = pParent.Y - ctrl.RelRect.Y;
             return new Point(x, y);
         }
 
+        /// <summary>
+        /// Translates absolute (canvas) coordinates to this control's local coordinates.
+        /// </summary>
+        /// <param name="pAbs">The point in absolute coordinates.</param>
+        /// <returns>The local position within this control.</returns>
+        protected Point AbsToControl(Point pAbs)
+        {
+            return new Point(pAbs.X - RelLocation.X, pAbs.Y - RelLocation.Y);
+        }
+
         public virtual bool DoMouseClick(Point p, MouseButtons button)
         {
             ZenControlBase ctrl = GetControl(p);
             if (ctrl != null)
-                return ctrl.DoMouseClick(TranslateToControl(ctrl, p), button);
+                return ctrl.DoMouseClick(parentToControl(ctrl, p), button);
             else if (MouseClick != null)
                 MouseClick(this);
             return true;
@@ -367,7 +405,7 @@ namespace DND.Gui.Zen
                     ctrl.DoMouseEnter();
                     ctrlWithMouse = ctrl;
                 }
-                ctrl.DoMouseMove(TranslateToControl(ctrl, p), button);
+                ctrl.DoMouseMove(parentToControl(ctrl, p), button);
                 res = true;
             }
             else if (ctrlWithMouse != null)
@@ -382,7 +420,7 @@ namespace DND.Gui.Zen
         {
             ZenControlBase ctrl = GetControl(p);
             if (ctrl != null)
-                return ctrl.DoMouseDown(TranslateToControl(ctrl, p), button);
+                return ctrl.DoMouseDown(parentToControl(ctrl, p), button);
             return false;
         }
 
@@ -390,7 +428,7 @@ namespace DND.Gui.Zen
         {
             ZenControlBase ctrl = GetControl(p);
             if (ctrl != null)
-                return ctrl.DoMouseUp(TranslateToControl(ctrl, p), button);
+                return ctrl.DoMouseUp(parentToControl(ctrl, p), button);
             return false;
         }
 

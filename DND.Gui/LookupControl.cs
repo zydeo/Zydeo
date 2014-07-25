@@ -58,13 +58,12 @@ namespace DND.Gui
             cpCtrl.LogicalSize = new Size(200, 80);
             cpCtrl.CharPicked += cpCtrl_CharPicked;
 
-            siCtrl = new SearchInputControl(Scale);
-            RegisterWinFormsControl(siCtrl);
-            siCtrl.Location = new Point(writingPad.AbsRect.Right + writingPad.RelRect.Left, writingPad.AbsRect.Top);
+            siCtrl = new SearchInputControl(this);
+            siCtrl.RelLocation = new Point(writingPad.AbsRect.Right + writingPad.RelRect.Left, writingPad.AbsRect.Top);
             siCtrl.StartSearch += siCtrl_StartSearch;
 
             resCtrl = new ResultsControl(this);
-            resCtrl.RelLocation = new Point(writingPad.RelRect.Right + writingPad.RelRect.Left, siCtrl.Bottom + writingPad.RelRect.Top);
+            resCtrl.RelLocation = new Point(writingPad.RelRect.Right + writingPad.RelRect.Left, siCtrl.RelBottom + writingPad.RelTop);
         }
 
         public override void Dispose()
@@ -210,7 +209,7 @@ namespace DND.Gui
 
         protected override void OnSizeChanged()
         {
-            siCtrl.Location = new Point(writingPad.AbsRect.Right + writingPad.RelRect.Left, writingPad.AbsRect.Top);
+            siCtrl.RelLocation = new Point(writingPad.RelRight + writingPad.RelRect.Left, writingPad.RelTop);
             siCtrl.Width = Width - resCtrl.RelRect.Left - 5;
             resCtrl.Size = new Size(Width - resCtrl.RelRect.Left - 5, Height - resCtrl.RelRect.Top - 5);
         }
