@@ -44,9 +44,14 @@
     <Compile Include="CharStats\CharStatInfo.cs" />
     <Compile Include="IWorker.cs" />
     <Compile Include="CharStats\OptCharStats.cs" />
+    <Compile Include="Strokes\OptStrokes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CharStats\WrkCharStats.cs" />
+    <Compile Include="Strokes\WrkStrokes.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Strokes\NewStrokesBlurb.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

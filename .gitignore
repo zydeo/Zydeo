@@ -21,7 +21,6 @@ _ReSharper*/
 # Work folder: include only character and strokes data
 _work/*
 !_work/*.txt
-_work/charstats.txt
 !_work/charstats.xlsx
 
 # Bin folder: ignore altogether

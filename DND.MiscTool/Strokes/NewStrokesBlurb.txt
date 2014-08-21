@@ -1,0 +1,14 @@
+﻿// copyright (C) 2004 Jordan Kiang
+// additions from Erik Peterson
+// format change to include character type by Gabor Ugray (2014)
+
+// this file contains stroke data for use by HanziDict's C# port
+
+// format of the file is as follows:
+// each line is the data for a single character
+// first item is unicode in hex, followed by space
+// second item is character type: S = simplified, T = traditional, B = both
+// strokes follow, separated by "|" characters
+// strokes can be divided into substrokes, substrokes defined by (direction, length)
+// substrokes separated by "#" characters
+// direction is in radians, 0 to the right, PI/2 up, etc... length is from 0-1
