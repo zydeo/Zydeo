@@ -44,11 +44,13 @@
     <Compile Include="CharStats\CharStatInfo.cs" />
     <Compile Include="IWorker.cs" />
     <Compile Include="CharStats\OptCharStats.cs" />
+    <Compile Include="PinyinSyllables\OptPinyinSyllables.cs" />
     <Compile Include="Strokes\OptStrokes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CharStats\WrkCharStats.cs" />
     <Compile Include="Strokes\WrkStrokes.cs" />
+    <Compile Include="PinyinSyllables\WrkPinyinSyllables.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Strokes\NewStrokesBlurb.txt" />

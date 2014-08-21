@@ -22,6 +22,9 @@ namespace DND.MiscTool
             Console.WriteLine("  Compiles new strokes file, keeping only chars that occur in dictionary");
             Console.WriteLine("  Simplified/traditional/both comes from occurrence in headwords");
             Console.WriteLine();
+            Console.WriteLine("--pinyin    <cedict-file> <output-file>");
+            Console.WriteLine("  Parses dictionary file and collects pinyin syllables");
+            Console.WriteLine();
         }
 
         private static object parseArgs(string[] args)
@@ -38,6 +41,12 @@ namespace DND.MiscTool
                 OptStrokes opt = new OptStrokes(args[1], args[2], args[3]);
                 return opt;
             }
+            if (args[0] == "--pinyin")
+            {
+                if (args.Length != 3) return null;
+                OptPinyinSyllables opt = new OptPinyinSyllables(args[1], args[2]);
+                return opt;
+            }
             return null;
         }
 
@@ -45,6 +54,7 @@ namespace DND.MiscTool
         {
             if (opt is OptCharStats) return new WrkCharStats(opt as OptCharStats);
             if (opt is OptStrokes) return new WrkStrokes(opt as OptStrokes);
+            if (opt is OptPinyinSyllables) return new WrkPinyinSyllables(opt as OptPinyinSyllables);
             throw new Exception(opt.GetType().ToString() + " is not recognized as an options type.");
         }
 
