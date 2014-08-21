@@ -43,8 +43,6 @@
     <Compile Include="CharacterDescriptor.cs" />
     <Compile Include="CharacterMatch.cs" />
     <Compile Include="CharacterMatchCollector.cs" />
-    <Compile Include="CharacterTypeParser.cs" />
-    <Compile Include="CharacterTypeRepository.cs" />
     <Compile Include="CubicCurve2D.cs" />
     <Compile Include="LineParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

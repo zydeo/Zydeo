@@ -43,7 +43,7 @@ namespace DND.Gui
             this.dictFact = dictFact;
             padding = (int)Math.Round(5.0F * Scale);
 
-            fsStrokes = new FileStream("strokes-extended.dat", FileMode.Open, FileAccess.Read);
+            fsStrokes = new FileStream("strokes-zydeo.dat", FileMode.Open, FileAccess.Read);
             brStrokes = new BinaryReader(fsStrokes);
             strokesData = new StrokesDataSource(brStrokes);
 

@@ -18,9 +18,6 @@ namespace DND.HanziLookup
         private BinaryWriter[] simplifiedOutStreams;
         private BinaryWriter[] traditionalOutStreams;
 
-        // We need a CharacterTypeRepository to look up types of characters to write into our byte data array.
-        private readonly CharacterTypeRepository typeRepository;
-
         // Below a couple of reusable arrays.  Allocating them once should save a little.
 
         // Holds the number of substrokes in the stroke for the given order index.
@@ -35,9 +32,9 @@ namespace DND.HanziLookup
 
         // Store patterns as instance variables so that we can reuse them and don't need to reinstantiate them for every entry.
         // linePattern identifies the unicode code point and allows us to group it apart from the SubStroke data.
-        private Regex reLinePattern = new Regex("^([a-fA-F0-9]{4})\\s*\\|(.*)$");
+        private Regex reLinePattern = new Regex(@"^([a-fA-F0-9]{4})\s+(S|T|B)\s+\|(.*)$");
         // subStrokePattern groups the direction and length of a SubStroke.
-        private Regex reSubStrokePattern = new Regex("^\\s*\\((\\d+(\\.\\d{1,10})?)\\s*,\\s*(\\d+(\\.\\d{1,10})?)\\)\\s*$");
+        private Regex reSubStrokePattern = new Regex(@"^\s*\((\d+(\.\d{1,10})?)\s*,\s*(\d+(\.\d{1,10})?)\)\s*$");
 
         /**
          * Build a new parser.
@@ -45,23 +42,8 @@ namespace DND.HanziLookup
          * @param typeRepository the CharacterTypeRepository to get type data from
          * @throws IOException
          */
-        public StrokesParser(StreamReader strokesIn, CharacterTypeRepository typeRepository)
+        public StrokesParser(StreamReader strokesIn)
         {
-            this.typeRepository = typeRepository;
-            this.initStrokes(strokesIn);
-        }
-
-        /**
-         * Build a new parser, parsing a new CharacterTypeRepository from the given types InputStream
-         * @param strokesIn
-         * @param typesIn
-         * @throws IOException
-         */
-        public StrokesParser(StreamReader strokesIn, StreamReader typesIn)
-        {
-            CharacterTypeParser typeParser = new CharacterTypeParser(typesIn);
-            this.typeRepository = typeParser.BuildCharacterTypeRepository();
-
             this.initStrokes(strokesIn);
         }
 
@@ -163,7 +145,9 @@ namespace DND.HanziLookup
                 string unicodeString = match.Groups[1].Value;
                 char character = (char)Convert.ToInt32(unicodeString, 16);
 
-                string lineRemainder = match.Groups[2].Value;
+                string script = match.Groups[2].Value;
+
+                string lineRemainder = match.Groups[3].Value;
 
                 // Strokes are separated by "|" characters, separate them.
                 int strokeCount = 0;
@@ -194,29 +178,17 @@ namespace DND.HanziLookup
 
                 if (parsedOk)
                 {
-                    // Get the type of the character from the CharacterTypeRepository.
-                    // Type is used to filter when only traditional or only simplified characters are wanted.
-                    int type = this.typeRepository.GetType(character);
-                    if (type == -1)
-                    {
-                        // If type == -1, then the type wasn't found for this character in the type repository.
-                        // We just set it so that the character can be found by either a simplified or traditional search.
-                        // TODO Will want to add all characters to the type file, or find a better already existing source for this data.
-                        type = CharacterTypeRepository.GENERIC_TYPE;
-                    }
-
-                    BinaryWriter dataOut;
-                    if (type == CharacterTypeRepository.TRADITIONAL_TYPE)
+                    BinaryWriter dataOut = dataOut = this.genericOutStreams[strokeCount - 1]; ;
+                    byte type = 0;
+                    if (script == "T")
                     {
                         dataOut = this.traditionalOutStreams[strokeCount - 1];
+                        type = 2;
                     }
-                    else if (type == CharacterTypeRepository.SIMPLIFIED_TYPE)
+                    else if (script == "S")
                     {
                         dataOut = this.simplifiedOutStreams[strokeCount - 1];
-                    }
-                    else
-                    {
-                        dataOut = this.genericOutStreams[strokeCount - 1];
+                        type = 1;
                     }
 
                     // Write the parsed data out to the byte array, return true if the writing was successful.
