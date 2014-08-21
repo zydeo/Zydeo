@@ -53,8 +53,8 @@ namespace DND.Gui
             writingPad.StrokesChanged += writingPad_StrokesChanged;
 
             cpCtrl = new CharPicker(this);
-            //cpCtrl.FontFace = "Noto Sans S Chinese Regular";
-            cpCtrl.FontFace = "䡡湄楮札䍓ⵆ潮瑳";
+            cpCtrl.FontFace = "Noto Sans S Chinese Regular";
+            //cpCtrl.FontFace = "䡡湄楮札䍓ⵆ潮瑳";
             //cpCtrl.FontFace = "SimSun";
             cpCtrl.RelLocation = new Point(padding, writingPad.RelBottom + padding);
             cpCtrl.LogicalSize = new Size(200, 80);
