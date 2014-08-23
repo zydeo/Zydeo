@@ -47,6 +47,13 @@ namespace DND.Common
             int displayTone = Tone;
             if (displayTone == 0) displayTone = 5;
 
+            // This is a standalone "r5"
+            if (Text == "r" && displayTone == 5)
+            {
+                if (diacritics) return "r";
+                else return "r5";
+            }
+
             // We've got display version: go ahead
             if (toneMap.ContainsKey(Text))
             {

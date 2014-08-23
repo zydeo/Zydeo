@@ -80,7 +80,6 @@ namespace DND.CedictEngine
             }
             // Transform map so it says, for each hanzi, which pinyin syllable it corresponds to
             // Some chars in hanzi may have no pinyin: when hanzi includes a non-ideagraphic character
-            // Multiple ideo chars may have a single pinyin: r5 merged
             int[] hanziToPinyin = transformPinyinMap(hm.Groups[1].Value, pinyinMap);
             // Headword MUST have same number of ideo characters as non-weird pinyin syllables
             if (pinyinMap == null)
@@ -127,8 +126,7 @@ namespace DND.CedictEngine
         /// <summary>
         /// <para>Receives hanzi and pinyin map from <see cref="normalizePinyin"/>.</para>
         /// <para>Returns list as long as hanzi. Each number in list is info for a hanzi,</para>
-        /// <para>identifying the correpondping pinyin syllable.</para>
-        /// <para>Multiple hanzi can have a single syllable: r5</para>
+        /// <para>identifying the corresponding pinyin syllable.</para>
         /// <para>Non-ideo chars in hanzi have no pinyin syllable.</para>
         /// </summary>
         private int[] transformPinyinMap(string hanzi, List<int> mapIn)
@@ -165,7 +163,6 @@ namespace DND.CedictEngine
         {
             // What this function does:
             // - Separates tone mark from text (unless it's a "weird" syllable
-            // - Appends retroflex "r5" to preceding syllable
             // - Replaces "u:" with "v"
             // - Maps every non-weird input syllable to r5-merged output syllables
             //   List has as many values as there are non-weird input syllables
@@ -195,18 +192,7 @@ namespace DND.CedictEngine
                 // Add to map
                 pinyinMap.Add(sylls.Count - 1);
             }
-            // Check all syllables; if we encounter "r5", append r to preceding one and update map
-            for (int i = 0; i < sylls.Count; ++i)
-            {
-                CedictPinyinSyllable syll = sylls[i];
-                if (syll.Text == "r" && syll.Tone == 0 && i > 0)
-                {
-                    sylls.RemoveAt(i);
-                    sylls[i - 1] = new CedictPinyinSyllable(sylls[i - 1].Text + "r", sylls[i - 1].Tone);
-                    for (int j = i; j < pinyinMap.Count; ++j) pinyinMap[j] = pinyinMap[j] - 1;
-                }
-            }
-            // Result: the syllables
+            // Result: the syllables as an array.
             syllsArr = sylls.ToArray();
         }
 

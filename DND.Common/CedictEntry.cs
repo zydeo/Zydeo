@@ -40,6 +40,31 @@ namespace DND.Common
         }
 
         /// <summary>
+        /// Gets the entry's pinyin display string.
+        /// </summary>
+        /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>
+        /// <returns>String representation to show in UI.</returns>
+        public ReadOnlyCollection<CedictPinyinSyllable> GetPinyinForDisplay(bool diacritics)
+        {
+            // If pinyin does not have an "r5", no transformation needed
+            if (Array.FindIndex(pinyin, x => x.Text == "r" && x.Tone == 0) == -1)
+                return Pinyin;
+            // Create new array where we merge "r" into previous syllable
+            List<CedictPinyinSyllable> res = new List<CedictPinyinSyllable>(pinyin);
+            for (int i = 0; i < res.Count; ++i)
+            {
+                CedictPinyinSyllable ps = res[i];
+                if (i >= 0 && ps.Text == "r" && ps.Tone == 0)
+                {
+                    res[i - 1] = new CedictPinyinSyllable(res[i - 1].Text + "r", res[i - 1].Tone);
+                    res.RemoveAt(i);
+                }
+            }
+            // Done
+            return new ReadOnlyCollection<CedictPinyinSyllable>(res);
+        }
+
+        /// <summary>
         /// Gets an enumerator of the entry's target-language senses.
         /// </summary>
         public IEnumerable<CedictSense> Senses
