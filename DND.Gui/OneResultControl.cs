@@ -553,11 +553,11 @@ namespace DND.Gui
             pinyinInfo = new PinyinInfo();
             // Measure pinyin text
             pinyinInfo.PinyinDisplay = "";
-            foreach (string ps in Res.Entry.Pinyin)
+            foreach (CedictPinyinSyllable ps in Res.Entry.Pinyin)
             {
                 if (pinyinInfo.PinyinDisplay.Length > 0) pinyinInfo.PinyinDisplay += " ";
                 // TO-DO: convert tone numbers to accents here
-                pinyinInfo.PinyinDisplay += ps;
+                pinyinInfo.PinyinDisplay += ps.GetDisplayString(true);
             }
             pinyinInfo.PinyinSize = g.MeasureString(pinyinInfo.PinyinDisplay, fntPinyin, 65535, sf);
         }

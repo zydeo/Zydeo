@@ -10,26 +10,41 @@ using DND.Common;
 
 namespace DND.CedictEngine
 {
-    public class CedictCompiler
+    /// <summary>
+    /// Parses Cedict text file and compiles indexed dictionary in binary format.
+    /// </summary>
+    public partial class CedictCompiler
     {
+        /// <summary>
+        /// Current line number, so we can indicate errors/warnings
+        /// </summary>
         private int lineNum = 0;
+
+        /// <summary>
+        /// <para>True if compiler already serialized results. This is just a bit of a consistency check:</para>
+        /// <para>Results must only be written once, and no new lines may be parsed afterwards.</para>
+        /// <para>Writing results converts indexes into file positions.</para>
+        /// </summary>
         private bool resultsWritten = false;
 
+        /// <summary>
+        /// Parsed entries; all kept in memory during parse.
+        /// </summary>
         private readonly List<CedictEntry> entries = new List<CedictEntry>();
+
+        /// <summary>
+        /// Index created during parse.
+        /// </summary>
         private readonly Index index = new Index();
-        
-        public CedictCompiler()
-        {
-        }
 
-        private void parseSense(string sense, out string domain, out string equiv, out string note)
-        {
-            equiv = sense;
-            domain = note = "";
-        }
-
+        /// <summary>
+        /// Decomposes headword: hanzi and pinyin.
+        /// </summary>
         private Regex reHead = new Regex(@"^([^ ]+) ([^ ]+) \[([^\]]+)\]$");
 
+        /// <summary>
+        /// Parses an entry (line) that has been separated into headword and rest.
+        /// </summary>
         private CedictEntry parseEntry(string strHead, string strBody, StreamWriter logStream)
         {
             // Decompose head
@@ -43,11 +58,15 @@ namespace DND.CedictEngine
             }
             // Split pinyin by spaces
             string[] pinyinParts = hm.Groups[3].Value.Split(new char[] { ' ' });
-            // Validate: simp / trad / pinyin count
-            // Not strict about this, exceptions exist
-            if (hm.Groups[2].Value.Length != pinyinParts.Length)
+
+            // Convert pinyin to our normalized format
+            CedictPinyinSyllable[] pinyinSylls;
+            List<int> pinyinMap;
+            normalizePinyin(pinyinParts, out pinyinSylls, out pinyinMap);
+            // Weird syllables found > warning
+            if (Array.FindIndex(pinyinSylls, x => x.Tone == -1) != -1)
             {
-                string msg = "Line {0}: Warning: Character / pinyin count mismatch: {1}";
+                string msg = "Line {0}: Warning: Weird pinyin syllable: {1}";
                 msg = string.Format(msg, lineNum, strHead);
                 logStream.WriteLine(msg);
             }
@@ -55,6 +74,18 @@ namespace DND.CedictEngine
             if (hm.Groups[1].Value.Length != hm.Groups[2].Value.Length)
             {
                 string msg = "Line {0}: ERROR: Trad/simp char count mismatch: {1}";
+                msg = string.Format(msg, lineNum, strHead);
+                logStream.WriteLine(msg);
+                return null;
+            }
+            // Transform map so it says, for each hanzi, which pinyin syllable it corresponds to
+            // Some chars in hanzi may have no pinyin: when hanzi includes a non-ideagraphic character
+            // Multiple ideo chars may have a single pinyin: r5 merged
+            int[] hanziToPinyin = transformPinyinMap(hm.Groups[1].Value, pinyinMap);
+            // Headword MUST have same number of ideo characters as non-weird pinyin syllables
+            if (pinyinMap == null)
+            {
+                string msg = "Line {0}: ERROR: Failed to match hanzi to pinyin: {1}";
                 msg = string.Format(msg, lineNum, strHead);
                 logStream.WriteLine(msg);
                 return null;
@@ -88,13 +119,105 @@ namespace DND.CedictEngine
             }
             // Done with entry
             CedictEntry res = new CedictEntry(hm.Groups[2].Value, hm.Groups[1].Value,
-                new ReadOnlyCollection<string>(pinyinParts),
+                new ReadOnlyCollection<CedictPinyinSyllable>(pinyinSylls),
                 new ReadOnlyCollection<CedictSense>(cedictSenses));
             return res;
         }
 
+        /// <summary>
+        /// <para>Receives hanzi and pinyin map from <see cref="normalizePinyin"/>.</para>
+        /// <para>Returns list as long as hanzi. Each number in list is info for a hanzi,</para>
+        /// <para>identifying the correpondping pinyin syllable.</para>
+        /// <para>Multiple hanzi can have a single syllable: r5</para>
+        /// <para>Non-ideo chars in hanzi have no pinyin syllable.</para>
+        /// </summary>
+        private int[] transformPinyinMap(string hanzi, List<int> mapIn)
+        {
+            int[] res = new int[hanzi.Length];
+            int ppos = 0; // position in incoming map; that map has an entry for each normal pinyin syllable
+            for (int i = 0; i != hanzi.Length; ++i)
+            {
+                char c = hanzi[i];
+                // Character is not ideographic: no corresponding pinyin
+                // VERY rough "definition" but if works for out purpose
+                int cval = (int)c;
+                if (cval < 0x2e80)
+                {
+                    res[i] = -1;
+                    continue;
+                }
+                // We have run out of pinyin map: BAD
+                if (ppos >= mapIn.Count) return null;
+                // We've got this hanzi's pinyin syllable
+                res[i] = mapIn[ppos];
+                ++ppos;
+            }
+            // At this stage we must have consumed incoming map
+            // Otherwise: BAD
+            if (ppos != mapIn.Count) return null;
+            return res;
+        }
+
+        /// <summary>
+        /// Normalizes array of Cedict-style pinyin syllables into our format.
+        /// </summary>
+        private void normalizePinyin(string[] parts, out CedictPinyinSyllable[] syllsArr, out List<int> pinyinMap)
+        {
+            // What this function does:
+            // - Separates tone mark from text (unless it's a "weird" syllable
+            // - Appends retroflex "r5" to preceding syllable
+            // - Replaces "u:" with "v"
+            // - Maps every non-weird input syllable to r5-merged output syllables
+            //   List has as many values as there are non-weird input syllables
+            //   Values in list point into "sylls" output array
+            //   Up to two positions can have same value (for r5 appending)
+            pinyinMap = new List<int>();
+            List<CedictPinyinSyllable> sylls = new List<CedictPinyinSyllable>();
+            foreach (string ps in parts)
+            {
+                // Does not end with a tone mark (1 thru 5): weird
+                char chrLast = ps[ps.Length - 1];
+                if (chrLast < '1' || chrLast > '5')
+                {
+                    sylls.Add(new CedictPinyinSyllable(ps, -1));
+                    continue;
+                }
+                // Separate tone and text
+                string text = ps.Substring(0, ps.Length - 1);
+                int tone = ((int)chrLast) - ((int)'0');
+                // Neutral tone for us is 0, not five
+                if (tone == 5) tone = 0;
+                // "u:" is for us "v"
+                text = text.Replace("u:", "v");
+                text = text.Replace("U:", "V");
+                // Store new syllable
+                sylls.Add(new CedictPinyinSyllable(text, tone));
+                // Add to map
+                pinyinMap.Add(sylls.Count - 1);
+            }
+            // Check all syllables; if we encounter "r5", append r to preceding one and update map
+            for (int i = 0; i < sylls.Count; ++i)
+            {
+                CedictPinyinSyllable syll = sylls[i];
+                if (syll.Text == "r" && syll.Tone == 0 && i > 0)
+                {
+                    sylls.RemoveAt(i);
+                    sylls[i - 1] = new CedictPinyinSyllable(sylls[i - 1].Text + "r", sylls[i - 1].Tone);
+                    for (int j = i; j < pinyinMap.Count; ++j) pinyinMap[j] = pinyinMap[j] - 1;
+                }
+            }
+            // Result: the syllables
+            syllsArr = sylls.ToArray();
+        }
+
+        /// <summary>
+        /// Processes one line of the text-based Cedict input file.
+        /// </summary>
         public void ProcessLine(string line, StreamWriter logStream)
         {
+            // Must not parse new lines once results have been written
+            if (resultsWritten) throw new Exception("WriteResults already called, cannot parse additional lines.");
+
             ++lineNum;
             // Comments, empty lines
             if (line.Trim() == "" || line.StartsWith("#")) return;
@@ -111,6 +234,9 @@ namespace DND.CedictEngine
             indexEntry(entry, id);
         }
 
+        /// <summary>
+        /// Indexes one parsed Cedict entry (hanzi, pinyin and target-language indexes).
+        /// </summary>
         private void indexEntry(CedictEntry entry, int id)
         {
             foreach (char c in entry.ChSimpl)
@@ -141,14 +267,15 @@ namespace DND.CedictEngine
                     ii.EntriesHeadwordTrad[ii.EntriesHeadwordTrad.Count - 1] != id)
                     ii.EntriesHeadwordTrad.Add(id);
             }
-            foreach (string pys in entry.Pinyin)
+            foreach (CedictPinyinSyllable pys in entry.Pinyin)
             {
                 PinyinIndexItem pi;
-                if (index.PinyinIndex.ContainsKey(pys)) pi = index.PinyinIndex[pys];
+                string textLo = pys.Text.ToLowerInvariant();
+                if (index.PinyinIndex.ContainsKey(textLo)) pi = index.PinyinIndex[textLo];
                 else
                 {
                     pi = new PinyinIndexItem();
-                    index.PinyinIndex[pys] = pi;
+                    index.PinyinIndex[textLo] = pi;
                 }
                 // Avoid indexing same entry twice if a syllable occurs multiple times
                 if (pi.Entries.Count == 0 || pi.Entries[pi.Entries.Count - 1] != id)
@@ -156,6 +283,9 @@ namespace DND.CedictEngine
             }
         }
 
+        /// <summary>
+        /// Replaces entry IDs with file positions in list. Called when finalizing index.
+        /// </summary>
         private static void replaceIdsWithPositions(List<int> list, Dictionary<int, int> idToPos)
         {
             for (int i = 0; i != list.Count; ++i)
@@ -166,6 +296,9 @@ namespace DND.CedictEngine
             }
         }
 
+        /// <summary>
+        /// Writes parsed and indexed dictionary to compiled binary file.
+        /// </summary>
         public void WriteResults(string dictFileName, string statsFolder)
         {
             // Cannot do this twice: we'll have replaced entry IDs with file positions in index

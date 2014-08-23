@@ -39,6 +39,11 @@ namespace DND.Common
             writer.Write(i);
         }
 
+        public void WriteByte(byte b)
+        {
+            writer.Write(b);
+        }
+
         public void WriteString(string str)
         {
             if (str.Length > ushort.MaxValue) throw new InvalidOperationException("String exceeds supported length.");
