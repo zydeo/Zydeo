@@ -8,11 +8,24 @@ using DND.Common;
 
 namespace DND.CedictEngine
 {
+    /// <summary>
+    /// Dictionary engine: loads index from file, provides thread-safe lookup functionality.
+    /// </summary>
     public class DictEngine : ICedictEngine
     {
+        /// <summary>
+        /// Name of binary dictionary file.
+        /// </summary>
         private readonly string dictFileName;
+
+        /// <summary>
+        /// Index: loaded from dictionary file when object is created.
+        /// </summary>
         private readonly Index index;
 
+        /// <summary>
+        /// Ctor: initialize from binary dictionary file.
+        /// </summary>
         public DictEngine(string dictFileName)
         {
             this.dictFileName = dictFileName;
@@ -24,6 +37,9 @@ namespace DND.CedictEngine
             }
         }
 
+        /// <summary>
+        /// Retrieves hanzi lookup candidates, verifies actual presence of search expression in headword.
+        /// </summary>
         List<CedictResult> doLoadVerifyHanzi(IEnumerable<int> poss, string query, SearchScript script)
         {
             List<CedictResult> resList = new List<CedictResult>();
@@ -62,6 +78,9 @@ namespace DND.CedictEngine
             return resList;
         }
 
+        /// <summary>
+        /// Compares lookup results after hanzi lookup for sorted presentation.
+        /// </summary>
         private static int hrComp(CedictResult a, CedictResult b)
         {
             // Shorter entry comes first
@@ -74,6 +93,9 @@ namespace DND.CedictEngine
             return a.Entry.PinyinCompare(b.Entry);
         }
 
+        /// <summary>
+        /// Retrieves entries (sorted) whose headword contains hanzi from search expression.
+        /// </summary>
         List<CedictResult> doHanziLookupHead(string query, SearchScript script)
         {
             // Get every character once - we ignore repeats
@@ -111,13 +133,85 @@ namespace DND.CedictEngine
             return res;
         }
 
+        /// <summary>
+        /// Returns true if search string has ideographic characters, false otherwise.
+        /// </summary>
+        private static bool hasIdeo(string str)
+        {
+            foreach (char c in str)
+            {
+                // VERY rough "definition" but if works for out purpose
+                int cval = (int)c;
+                if (cval >= 0x2e80) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Retrieves entries for a Chinese search expression (pinyin vs. hanzi auto-detected)
+        /// </summary>
+        private List<CedictResult> doChineseLookup(string query, SearchScript script)
+        {
+            List<CedictResult> res = new List<CedictResult>();
+            // If query string has ideographic characters, do hanzi looup
+            if (hasIdeo(query)) res = doHanziLookupHead(query, script);
+            // Otherwise, do pinyin lookup
+            else
+            {
+                // TO-DO
+            }
+            // Done
+            return res;
+        }
+
+        /// <summary>
+        /// Retrieves matching entries for a target-language search expression.
+        /// </summary>
+        private List<CedictResult> doTargetLookup(string query)
+        {
+            // TO-DO
+            return new List<CedictResult>();
+        }
+
+        /// <summary>
+        /// Find entries that match the search expression.
+        /// </summary>
+        /// <param name="query">The query string, as entered by the user.</param>
+        /// <param name="script">For hanzi lookup: simplified, traditional or both.</param>
+        /// <param name="lang">Chinese or target language (English).</param>
+        /// <returns>The lookup result.</returns>
         public CedictLookupResult Lookup(string query, SearchScript script, SearchLang lang)
         {
-            List<CedictResult> res;
-            // For now, always just do hanzi lookup
-            // TO-DO: heuristics based on search string; pinyin and EN lookup
-            res = doHanziLookupHead(query, script);
-
+            List<CedictResult> res = new List<CedictResult>();
+            
+            // Try first in language requested by user
+            // If no results that way, try in opposite language
+            // Override if lookup in opposite language is successful
+            if (lang == SearchLang.Chinese)
+            {
+                res = doChineseLookup(query, script);
+                // We got fish
+                if (res.Count > 0)
+                    return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), lang);
+                // OK, try opposite (target)
+                res = doTargetLookup(query);
+                // We got fish: override
+                if (res.Count > 0)
+                    return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), SearchLang.Target);
+            }
+            else
+            {
+                res = doTargetLookup(query);
+                // We got fish
+                if (res.Count > 0)
+                    return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), lang);
+                // OK, try opposite (target)
+                res = doChineseLookup(query, script);
+                // We got fish: override
+                if (res.Count > 0)
+                    return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), SearchLang.Chinese);
+            }
+            // Sorry, no results, no override
             return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), lang);
         }
     }

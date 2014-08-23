@@ -7,17 +7,33 @@ using DND.Common;
 
 namespace DND.CedictEngine
 {
+    /// <summary>
+    /// Index for hanzi, pinyin and target-language content.
+    /// </summary>
     internal class Index : IBinSerializable
     {
+        /// <summary>
+        /// Maps hanzi characters to the list of entries where they occur.
+        /// </summary>
         public readonly Dictionary<char, IdeoIndexItem> IdeoIndex;
+
+        /// <summary>
+        /// Maps basic pinyin syllables (w/o tone) to entries where they occur with different tones.
+        /// </summary>
         public readonly Dictionary<string, PinyinIndexItem> PinyinIndex;
 
+        /// <summary>
+        /// Ctor: creates an empty instance (used while compiling index).
+        /// </summary>
         public Index()
         {
             IdeoIndex = new Dictionary<char, IdeoIndexItem>();
             PinyinIndex = new Dictionary<string, PinyinIndexItem>();
         }
 
+        /// <summary>
+        /// Ctor: deserializes binary data.
+        /// </summary>
         public Index(BinReader br)
         {
             IdeoIndex = new Dictionary<char, IdeoIndexItem>();
@@ -40,6 +56,9 @@ namespace DND.CedictEngine
             }
         }
 
+        /// <summary>
+        /// Serializes index into binary stream.
+        /// </summary>
         public void Serialize(BinWriter bw)
         {
             int ideoIndexKeyCount = IdeoIndex.Count;

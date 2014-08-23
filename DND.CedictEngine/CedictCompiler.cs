@@ -239,6 +239,7 @@ namespace DND.CedictEngine
         /// </summary>
         private void indexEntry(CedictEntry entry, int id)
         {
+            // Index character of simplified headword
             foreach (char c in entry.ChSimpl)
             {
                 IdeoIndexItem ii;
@@ -253,6 +254,7 @@ namespace DND.CedictEngine
                     ii.EntriesHeadwordSimp[ii.EntriesHeadwordSimp.Count - 1] != id)
                     ii.EntriesHeadwordSimp.Add(id);
             }
+            // Index characters of traditional headword
             foreach (char c in entry.ChTrad)
             {
                 IdeoIndexItem ii;
@@ -267,9 +269,11 @@ namespace DND.CedictEngine
                     ii.EntriesHeadwordTrad[ii.EntriesHeadwordTrad.Count - 1] != id)
                     ii.EntriesHeadwordTrad.Add(id);
             }
+            // Index pinyin syllables
             foreach (CedictPinyinSyllable pys in entry.Pinyin)
             {
                 PinyinIndexItem pi;
+                // Index contains lower-case syllables
                 string textLo = pys.Text.ToLowerInvariant();
                 if (index.PinyinIndex.ContainsKey(textLo)) pi = index.PinyinIndex[textLo];
                 else
@@ -277,9 +281,18 @@ namespace DND.CedictEngine
                     pi = new PinyinIndexItem();
                     index.PinyinIndex[textLo] = pi;
                 }
+                // Figure out which list in index item - by tone
+                List<int> entryList;
+                if (pys.Tone == -1) entryList = pi.EntriesNT;
+                else if (pys.Tone == 0) entryList = pi.Entries0;
+                else if (pys.Tone == 1) entryList = pi.Entries1;
+                else if (pys.Tone == 2) entryList = pi.Entries2;
+                else if (pys.Tone == 3) entryList = pi.Entries3;
+                else if (pys.Tone == 4) entryList = pi.Entries4;
+                else throw new Exception("Invalid tone: " + pys.Tone.ToString());
                 // Avoid indexing same entry twice if a syllable occurs multiple times
-                if (pi.Entries.Count == 0 || pi.Entries[pi.Entries.Count - 1] != id)
-                    pi.Entries.Add(id);
+                if (entryList.Count == 0 || entryList[entryList.Count - 1] != id)
+                    entryList.Add(id);
             }
         }
 
@@ -327,11 +340,16 @@ namespace DND.CedictEngine
                 {
                     replaceIdsWithPositions(x.Value.EntriesHeadwordSimp, idToPos);
                     replaceIdsWithPositions(x.Value.EntriesHeadwordTrad, idToPos);
-                    replaceIdsWithPositions(x.Value.EntriesText, idToPos);
+                    replaceIdsWithPositions(x.Value.EntriesSense, idToPos);
                 }
                 foreach (var x in index.PinyinIndex)
                 {
-                    replaceIdsWithPositions(x.Value.Entries, idToPos);
+                    replaceIdsWithPositions(x.Value.EntriesNT, idToPos);
+                    replaceIdsWithPositions(x.Value.Entries0, idToPos);
+                    replaceIdsWithPositions(x.Value.Entries1, idToPos);
+                    replaceIdsWithPositions(x.Value.Entries2, idToPos);
+                    replaceIdsWithPositions(x.Value.Entries3, idToPos);
+                    replaceIdsWithPositions(x.Value.Entries4, idToPos);
                 }
                 // Serialize index
                 index.Serialize(bw);
