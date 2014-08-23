@@ -40,6 +40,22 @@ namespace DND.Common
         }
 
         /// <summary>
+        /// Gets count of pinyin syllables.
+        /// </summary>
+        public int PinyinCount
+        {
+            get { return pinyin.Length; }
+        }
+
+        /// <summary>
+        /// Returns pinyin syllable at specific index.
+        /// </summary>
+        public CedictPinyinSyllable GetPinyinAt(int pos)
+        {
+            return pinyin[pos];
+        }
+
+        /// <summary>
         /// Gets the entry's pinyin display string.
         /// </summary>
         /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>

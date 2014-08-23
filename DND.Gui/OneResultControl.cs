@@ -181,6 +181,9 @@ namespace DND.Gui
         /// </summary>
         private void doPaintHanziHilites(Graphics g)
         {
+            if (Res.HanziHiliteStart == -1)
+                return;
+
             using (Pen p = new Pen(Color.Maroon))
             {
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;

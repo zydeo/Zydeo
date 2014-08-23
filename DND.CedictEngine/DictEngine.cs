@@ -107,7 +107,10 @@ namespace DND.CedictEngine
             // Look at each character's entry position vector, increment counts
             foreach (char c in queryChars)
             {
-                if (!index.IdeoIndex.ContainsKey(c)) continue;
+                // If there's a hanzi that's not in index, we'll sure have not hits!
+                if (!index.IdeoIndex.ContainsKey(c))
+                    return new List<CedictResult>();
+                
                 IdeoIndexItem iii = index.IdeoIndex[c];
                 // Count separately for simplified and traditional
                 foreach (int pos in iii.EntriesHeadwordSimp)
@@ -134,6 +137,140 @@ namespace DND.CedictEngine
         }
 
         /// <summary>
+        /// Retrieves pinyin lookup candidates, verifies actual presence of search expression in headword.
+        /// </summary>
+        List<CedictResult> doLoadVerifyPinyin(IEnumerable<int> poss, List<CedictPinyinSyllable> sylls)
+        {
+            List<CedictResult> resList = new List<CedictResult>();
+            // Yes, we only open our file on-demand
+            // But we do this within each lookup's scope, so lookup stays thread-safe
+            using (BinReader br = new BinReader(dictFileName))
+            {
+                // Look at each entry: load, verify, keep or drop
+                foreach (int pos in poss)
+                {
+                    // Load up entry from file
+                    br.Position = pos;
+                    CedictEntry entry = new CedictEntry(br);
+
+                    // Find query syllables in entry
+                    int syllStart = -1;
+                    for (int i = 0; i <= entry.PinyinCount - sylls.Count; ++i)
+                    {
+                        int j;
+                        for (j = 0; j != sylls.Count; ++j)
+                        {
+                            CedictPinyinSyllable syllEntry = entry.GetPinyinAt(i + j);
+                            CedictPinyinSyllable syllQuery = sylls[j];
+                            if (syllEntry.Text != syllQuery.Text) break;
+                            if (syllQuery.Tone != -1 && syllEntry.Tone != syllQuery.Tone) break;
+                        }
+                        if (j == sylls.Count)
+                        {
+                            syllStart = i;
+                            break;
+                        }
+                    }
+                    // Entry is a keeper if query syllables found
+                    if (syllStart == -1) continue;
+                    // Keeper!
+                    CedictResult res = new CedictResult(entry, syllStart, sylls.Count);
+                    resList.Add(res);
+                }
+            }
+            return resList;
+        }
+
+        /// <summary>
+        /// Compares lookup results after pinyin lookup for sorted presentation.
+        /// </summary>
+        private static int pyComp(CedictResult a, CedictResult b)
+        {
+            // Shorter entry comes first
+            int lengthCmp = a.Entry.PinyinCount.CompareTo(b.Entry.PinyinCount);
+            if (lengthCmp != 0) return lengthCmp;
+            // Between equally long headwords where match starts sooner comes first
+            int startCmp = a.PinyinHiliteStart.CompareTo(b.PinyinHiliteStart);
+            if (startCmp != 0) return startCmp;
+            // Order equally long entries by pinyin lexicographical order
+            return a.Entry.PinyinCompare(b.Entry);
+        }
+
+        /// <summary>
+        /// Retrieves entries (sorted) whose headword contains pinyin from search expression.
+        /// </summary>
+        List<CedictResult> doPinyinLookupHead(List<CedictPinyinSyllable> sylls)
+        {
+            // Get every syllable once - we ignore repeats
+            // If a syllable occurs with unspecified tone once, or if it occurs with multiple tone marks
+            // -> We only take it as once item with unspecified tone
+            // Otherwise, take it as is, with tone mark
+            Dictionary<string, int> syllDict = new Dictionary<string, int>();
+            foreach (var syll in sylls)
+            {
+                if (!syllDict.ContainsKey(syll.Text)) syllDict[syll.Text] = syll.Tone;
+                else if (syllDict[syll.Text] != syll.Tone) syllDict[syll.Text] = -1;
+            }
+            List<CedictPinyinSyllable> querySylls = new List<CedictPinyinSyllable>();
+            foreach (var x in syllDict)
+                querySylls.Add(new CedictPinyinSyllable(x.Key, x.Value));
+
+            // Map from keys (entry positions) to # of query syllables found in entry
+            Dictionary<int, int> posToCount = new Dictionary<int, int>();
+            // Look at each query syllable, increment counts for entries in syllable's list(s)
+            foreach (CedictPinyinSyllable syll in querySylls)
+            {
+                // If this syllable is not index, we sure won't have any hits
+                if (!index.PinyinIndex.ContainsKey(syll.Text))
+                    return new List<CedictResult>();
+                
+                PinyinIndexItem pii = index.PinyinIndex[syll.Text];
+                // Query specifies a tone mark: just that list
+                if (syll.Tone != -1)
+                {
+                    List<int> instanceList;
+                    if (syll.Tone == 0) instanceList = pii.Entries0;
+                    else if (syll.Tone == 1) instanceList = pii.Entries1;
+                    else if (syll.Tone == 2) instanceList = pii.Entries2;
+                    else if (syll.Tone == 3) instanceList = pii.Entries3;
+                    else if (syll.Tone == 4) instanceList = pii.Entries4;
+                    else throw new Exception("Invalid tone: " + syll.Tone.ToString());
+                    foreach (int pos in instanceList)
+                    {
+                        if (!posToCount.ContainsKey(pos)) posToCount[pos] = 1;
+                        else ++posToCount[pos];
+                    }
+                }
+                // Query does not specify a tone mark
+                // Get union of instance vectors, increment each position once
+                else
+                {
+                    HashSet<int> posSet = new HashSet<int>();
+                    foreach (int pos in pii.Entries0) posSet.Add(pos);
+                    foreach (int pos in pii.Entries1) posSet.Add(pos);
+                    foreach (int pos in pii.Entries2) posSet.Add(pos);
+                    foreach (int pos in pii.Entries3) posSet.Add(pos);
+                    foreach (int pos in pii.Entries4) posSet.Add(pos);
+                    foreach (int pos in pii.EntriesNT) posSet.Add(pos);
+                    foreach (int pos in posSet)
+                    {
+                        if (!posToCount.ContainsKey(pos)) posToCount[pos] = 1;
+                        else ++posToCount[pos];
+                    }
+                }
+            }
+            // Get positions that contain all chars from query
+            HashSet<int> matchingPositions = new HashSet<int>();
+            foreach (var x in posToCount) if (x.Value == querySylls.Count) matchingPositions.Add(x.Key);
+            // Now fetch and verify results
+            List<CedictResult> res = doLoadVerifyPinyin(matchingPositions, sylls);
+            // Sort pinyin results
+            res.Sort((a, b) => pyComp(a, b));
+            // Done.
+            return res;
+        }
+
+        /// <summary>
         /// Returns true if search string has ideographic characters, false otherwise.
         /// </summary>
         private static bool hasIdeo(string str)
@@ -148,6 +285,96 @@ namespace DND.CedictEngine
         }
 
         /// <summary>
+        /// Split string into assumed pinyin syllables by tone marks
+        /// </summary>
+        private static List<string> doPinyinSplitDigits(string str)
+        {
+            List<string> res = new List<string>();
+            string syll = "";
+            foreach (char c in str)
+            {
+                syll += c;
+                bool isToneMark = (c >= '0' && c <= '5');
+                if (isToneMark)
+                {
+                    res.Add(syll);
+                    syll = "";
+                }
+            }
+            if (syll != string.Empty) res.Add(syll);
+            return res;
+        }
+
+        /// <summary>
+        /// Split string into possible multiple pinyin syllables, or return as whole if not possible.
+        /// </summary>
+        private static List<string> doPinyinSplitSyllables(string str)
+        {
+            // TO-DO
+            List<string> res = new List<string>();
+            res.Add(str);
+            return res;
+        }
+
+        private static List<CedictPinyinSyllable> doParsePinyin(string query)
+        {
+            // If query is empty string or WS only: no syllables
+            query = query.Trim();
+            if (query == string.Empty) return new List<CedictPinyinSyllable>();
+
+            // Only deal with lower-case
+            query = query.ToLowerInvariant();
+            // Convert "u:" > "v" and "ü" > "v"
+            query = query.Replace("u:", "v");
+            query = query.Replace("ü", "v");
+
+            // Split by syllables and apostrophes
+            string[] explicitSplit = query.Split(new char[] { ' ', '\'', '’' });
+            // Further split each part, in case input did not have spaces
+            List<string> pinyinSplit = new List<string>();
+            foreach (string str in explicitSplit)
+            {
+                // Find numbers 1 thru 5: tone marks always come at end of syllable
+                List<string> numSplit = doPinyinSplitDigits(str);
+                // Split the rest by matching known pinyin syllables
+                foreach (string str2 in numSplit)
+                {
+                    List<string> syllSplit = doPinyinSplitSyllables(str2);
+                    pinyinSplit.AddRange(syllSplit);
+                }
+            }
+            // Create normalized syllable by separating tone mark, if present
+            List<CedictPinyinSyllable> res = new List<CedictPinyinSyllable>();
+            foreach (string str in pinyinSplit)
+            {
+                char c = str[str.Length - 1];
+                int val = (int)(c - '0');
+                // Tone mark here
+                if (val >= 1 && val <= 5 && str.Length > 1)
+                {
+                    if (val == 5) val = 0;
+                    res.Add(new CedictPinyinSyllable(str.Substring(0, str.Length - 1), val));
+                }
+                // No tone mark: add as unspecified
+                else res.Add(new CedictPinyinSyllable(str, -1));
+            }
+            // If we have syllables ending in "r", split that into separate "r5"
+            for (int i = 0; i < res.Count; ++i)
+            {
+                CedictPinyinSyllable ps = res[i];
+                if (ps.Text != "er" && ps.Text.Length > 1 && ps.Text.EndsWith("r"))
+                {
+                    CedictPinyinSyllable ps1 = new CedictPinyinSyllable(ps.Text.Substring(0, ps.Text.Length - 1), ps.Tone);
+                    CedictPinyinSyllable ps2 = new CedictPinyinSyllable("r", 0);
+                    res[i] = ps1;
+                    res.Insert(i + 1, ps2);
+                }
+            }
+            // Done
+            return res;
+        }
+
+        /// <summary>
         /// Retrieves entries for a Chinese search expression (pinyin vs. hanzi auto-detected)
         /// </summary>
         private List<CedictResult> doChineseLookup(string query, SearchScript script)
@@ -158,7 +385,10 @@ namespace DND.CedictEngine
             // Otherwise, do pinyin lookup
             else
             {
-                // TO-DO
+                // Parse pinyin query string
+                List<CedictPinyinSyllable> sylls = doParsePinyin(query);
+                // Lookup
+                res = doPinyinLookupHead(sylls);
             }
             // Done
             return res;

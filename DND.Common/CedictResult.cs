@@ -47,7 +47,17 @@ namespace DND.Common
         public readonly int HanziHiliteLength;
 
         /// <summary>
-        /// Ctor: init immutable instance.
+        /// Start of search term in entry's headword (pinyin syllables), or -1.
+        /// </summary>
+        public readonly int PinyinHiliteStart;
+
+        /// <summary>
+        /// Length of search term in entry's headword (pinyin syllables), or 0.
+        /// </summary>
+        public readonly int PinyinHiliteLength;
+
+        /// <summary>
+        /// Ctor: init immutable instance - result of hanzi lookup.
         /// </summary>
         public CedictResult(SimpTradWarning hanziWarning, CedictEntry entry,
             int hanziHiliteStart, int hanziHiliteLength)
@@ -56,6 +66,22 @@ namespace DND.Common
             Entry = entry;
             HanziHiliteStart = hanziHiliteStart;
             HanziHiliteLength = hanziHiliteLength;
+            PinyinHiliteStart = -1;
+            PinyinHiliteLength = 0;
+        }
+
+        /// <summary>
+        /// Ctor: init immutable instance - result of pinyin lookup.
+        /// </summary>
+        public CedictResult(CedictEntry entry,
+            int pinyinHiliteStart, int pinyinHiliteLength)
+        {
+            HanziWarning = SimpTradWarning.None;
+            Entry = entry;
+            HanziHiliteStart = -1;
+            HanziHiliteLength = 01;
+            PinyinHiliteStart = pinyinHiliteStart;
+            PinyinHiliteLength = pinyinHiliteLength;
         }
     }
 }
