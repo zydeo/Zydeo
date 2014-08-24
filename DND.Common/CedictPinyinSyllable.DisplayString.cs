@@ -37,6 +37,18 @@ namespace DND.Common
         }
 
         /// <summary>
+        /// Upper-cases first character of string, depending on casing of other string's first character.
+        /// </summary>
+        private static string upperCaseIfNeeded(string to, string from)
+        {
+            if (!char.IsUpper(from[0])) return to;
+            string res = "";
+            res += char.ToUpperInvariant(to[0]);
+            if (to.Length > 1) res += to.Substring(1);
+            return res;
+        }
+
+        /// <summary>
         /// Gets the syllable's display string.
         /// </summary>
         /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>
@@ -55,28 +67,35 @@ namespace DND.Common
             }
 
             // We've got display version: go ahead
-            if (toneMap.ContainsKey(Text))
+            string textLo = Text.ToLowerInvariant();
+            if (toneMap.ContainsKey(textLo))
             {
                 if (!diacritics)
                 {
-                    string res = toneMap[Text][0];
+                    string res = toneMap[textLo][0];
+                    res = upperCaseIfNeeded(res, Text);
                     res += displayTone.ToString();
                     return res;
                 }
-                return toneMap[Text][Tone];
+                string resD = toneMap[textLo][Tone];
+                resD = upperCaseIfNeeded(resD, Text);
+                return resD;
             }
             // Try removing retroflex r
-            if (Text.EndsWith("r") && toneMap.ContainsKey(Text.Substring(0, Text.Length - 1)))
+            if (textLo.EndsWith("r") && toneMap.ContainsKey(textLo.Substring(0, textLo.Length - 1)))
             {
-                string syllKey = Text.Substring(0, Text.Length - 1);
+                string syllKey = textLo.Substring(0, Text.Length - 1);
                 if (!diacritics)
                 {
                     string res = toneMap[syllKey][0];
                     res += "r";
                     res += displayTone.ToString();
+                    res = upperCaseIfNeeded(res, Text);
                     return res;
                 }
-                return toneMap[syllKey][Tone] + "r";
+                string resD = toneMap[syllKey][Tone] + "r";
+                resD = upperCaseIfNeeded(resD, Text);
+                return resD;
             }
             // Still not found: return as is, but add tone mark
             return Text + displayTone.ToString();

@@ -170,7 +170,7 @@ namespace DND.CedictEngine
                         {
                             CedictPinyinSyllable syllEntry = entry.GetPinyinAt(i + j);
                             CedictPinyinSyllable syllQuery = sylls[j];
-                            if (syllEntry.Text != syllQuery.Text) break;
+                            if (syllEntry.Text.ToLowerInvariant() != syllQuery.Text) break;
                             if (syllQuery.Tone != -1 && syllEntry.Tone != syllQuery.Tone) break;
                         }
                         if (j == sylls.Count)
