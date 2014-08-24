@@ -115,6 +115,13 @@ namespace DND.CedictEngine
                 string domain, equiv, note;
                 parseSense(s, out domain, out equiv, out note);
                 cedictSenses.Add(new CedictSense(domain, equiv, note));
+                // Equiv is empty: merits at least a warning
+                if (equiv == "")
+                {
+                    string msg = "Line {0}: Warning: No equivalent in sense, only domain/notes: {1}";
+                    msg = string.Format(msg, lineNum, s);
+                    logStream.WriteLine(msg);
+                }
             }
             // Done with entry
             CedictEntry res = new CedictEntry(hm.Groups[2].Value, hm.Groups[1].Value,
