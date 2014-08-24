@@ -17,6 +17,7 @@ namespace DND.Gui
     internal class LookupControl : ZenControl
     {
         private readonly ICedictEngineFactory dictFact;
+        private readonly ITextProvider tprov;
         private readonly int padding;
 
         private SearchScript searchScript = SearchScript.Simplified;
@@ -37,10 +38,11 @@ namespace DND.Gui
 
         private readonly HashSet<StrokesMatcher> runningMatchers = new HashSet<StrokesMatcher>();
 
-        public LookupControl(ZenControlBase owner, ICedictEngineFactory dictFact)
+        public LookupControl(ZenControlBase owner, ICedictEngineFactory dictFact, ITextProvider tprov)
             : base(owner)
         {
             this.dictFact = dictFact;
+            this.tprov = tprov;
             padding = (int)Math.Round(5.0F * Scale);
 
             fsStrokes = new FileStream("strokes-zydeo.dat", FileMode.Open, FileAccess.Read);
@@ -73,7 +75,7 @@ namespace DND.Gui
             simpTradCtrl.PressedBackColor = Color.LightCoral;
             setSimpTradText();
 
-            resCtrl = new ResultsControl(this);
+            resCtrl = new ResultsControl(this, tprov);
             resCtrl.RelLocation = new Point(writingPad.RelRight + padding, siCtrl.RelBottom + padding);
         }
 

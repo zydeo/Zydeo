@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5550F54A-EFBC-4A7B-876A-227D335193DB}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <ProjectGuid>{78DC52AB-427A-4EF7-9466-61417520295A}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sandbox</RootNamespace>
-    <AssemblyName>Sandbox.ZenTabbedForm</AssemblyName>
+    <RootNamespace>DND.Texts</RootNamespace>
+    <AssemblyName>DND.Texts</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\_bin\</OutputPath>
@@ -32,7 +29,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -40,62 +36,19 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CedictEngineFactory.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="TextProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <EmbeddedResource Include="Resources\en.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DND.CedictEngine\DND.CedictEngine.csproj">
-      <Project>{5c3bd324-3b92-4f78-86a4-77dad6801bd2}</Project>
-      <Name>DND.CedictEngine</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\DND.Common\DND.Common.csproj">
       <Project>{d151811c-2cf7-4ea9-8a09-052cc5c2f695}</Project>
       <Name>DND.Common</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\DND.Gui.Zen\DND.Gui.Zen.csproj">
-      <Project>{eb902a28-802f-4ee8-a98b-221706bcca44}</Project>
-      <Name>DND.Gui.Zen</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\DND.Gui\DND.Gui.csproj">
-      <Project>{e08421c2-073f-4e52-a4cc-1ab4baf1eee3}</Project>
-      <Name>DND.Gui</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\DND.Texts\DND.Texts.csproj">
-      <Project>{78dc52ab-427a-4ef7-9466-61417520295a}</Project>
-      <Name>DND.Texts</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

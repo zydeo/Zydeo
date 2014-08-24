@@ -50,6 +50,7 @@
     <Compile Include="CedictResult.cs" />
     <Compile Include="IBinSerializable.cs" />
     <Compile Include="ICedictEngine.cs" />
+    <Compile Include="ITextProvider.cs" />
     <Compile Include="LookupOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

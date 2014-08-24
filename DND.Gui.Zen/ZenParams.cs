@@ -29,5 +29,6 @@ namespace DND.Gui.Zen
         public static readonly float PinyinFontSize = 11.0F;
         public static readonly string LemmaFontFamily = "Segoe UI";
         public static readonly float LemmaFontSize = 10.0F;
+        public static readonly float ResultsCountFontSize = 9.0F;
     }
 }

@@ -17,6 +17,11 @@ namespace DND.Gui
 {
     public class ResultsControl : ZenControl, IMessageFilter
     {
+        /// <summary>
+        /// UI text provider.
+        /// </summary>
+        private readonly ITextProvider tprov;
+
         // TEMP standard scroll bar
         private VScrollBar sb;
 
@@ -24,6 +29,11 @@ namespace DND.Gui
         /// One result control for each result I'm showin.
         /// </summary>
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
+
+        /// <summary>
+        /// Text shown in bottom right: N results found. Or empty, if no search yet.
+        /// </summary>
+        private string txtResCount = string.Empty;
 
         /// <summary>
         /// Currently shown scripts (simp/trad/both).
@@ -36,9 +46,13 @@ namespace DND.Gui
         /// </summary>
         private bool suppressScrollChanged = false;
 
-        public ResultsControl(ZenControl owner)
+        /// <summary>
+        /// Ctor.
+        /// </summary>
+        public ResultsControl(ZenControl owner, ITextProvider tprov)
             : base(owner)
         {
+            this.tprov = tprov;
             Application.AddMessageFilter(this);
 
             sb = new VScrollBar();
@@ -326,6 +340,7 @@ namespace DND.Gui
             // No results
             if (results.Count == 0)
             {
+                txtResCount = tprov.GetString("ResultsCountNone");
                 sb.Visible = false;
                 sb.Enabled = false;
                 MakeMePaint(false, RenderMode.Invalidate);
@@ -353,8 +368,63 @@ namespace DND.Gui
             }
             // Change our mind about scrollbar?
             cw = showOrHideScrollbar();
+
+            // Results count text
+            if (resCtrls.Count == 1) txtResCount = tprov.GetString("ResultsCountOne");
+            else
+            {
+                txtResCount = tprov.GetString("ResultsCountN");
+                txtResCount = string.Format(txtResCount, resCtrls.Count);
+            }
+
             // Render
             MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        private void doPaintBottomOverlay(Graphics g)
+        {
+            // If results count text is empty, nothing to draw.
+            // (This will change as overlay receives zoom/settings functionality)
+            if (txtResCount == string.Empty) return;
+
+            // First, measure size of "N results" text
+            StringFormat sf = StringFormat.GenericTypographic;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+            using (Font fnt = new Font(ZenParams.GenericFontFamily, ZenParams.ResultsCountFontSize))
+            {
+                // Measure label size: this is solid BG
+                SizeF txtSizeF = g.MeasureString(txtResCount, fnt);
+                int olHeight = (int)(txtSizeF.Height * 1.5F);
+                int lblPad = (int)(txtSizeF.Height * 0.25F);
+                int olRight = Width - 1;
+                if (sb.Visible) olRight -= sb.Width;
+                int lblWidth = ((int)txtSizeF.Width) + lblPad;
+
+                // If we smoothing is on, gradient and normal opaque rectangles will never match up.
+                g.SmoothingMode = SmoothingMode.None;
+
+                // Gradient fade out on left
+                int gradWidth = olHeight;
+                Color colR = Color.FromArgb(196, 0, 0, 0);
+                Color colL = Color.FromArgb(0, 0, 0, 0);
+                Rectangle grRect = new Rectangle(olRight - lblWidth - gradWidth, Height - olHeight, gradWidth, olHeight);
+                using (LinearGradientBrush gb = new LinearGradientBrush(grRect, colL, colR, LinearGradientMode.Horizontal))
+                {
+                    g.FillRectangle(gb, grRect);
+                }
+
+                // Draw solid BG for label
+                //using (Brush b = new SolidBrush(Color.FromArgb(255, 59, 59, 59)))
+                using (Brush b = new SolidBrush(Color.FromArgb(196, 0, 0, 0)))
+                {
+                    g.FillRectangle(b, olRight - lblWidth, Height - olHeight, lblWidth, olHeight);
+                }
+                // Write text
+                using (Brush b = new SolidBrush(Color.FromArgb(240, 240, 240)))
+                {
+                    g.DrawString(txtResCount, fnt, b, olRight - lblWidth, Height - olHeight + lblPad);
+                }
+            }
         }
 
         public override void DoPaint(Graphics g)
@@ -386,6 +456,8 @@ namespace DND.Gui
                     orc.DoPaint(g);
                 }
             }
+            // Bottom overlay (results count, zoom, settings)
+            doPaintBottomOverlay(g);
         }
 
     }

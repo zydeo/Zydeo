@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
 using DND.Gui;
+using DND.Texts;
 
 namespace Sandbox
 {
@@ -20,11 +21,12 @@ namespace Sandbox
         static void Main()
         {
             CedictEngineFactory cef = new CedictEngineFactory();
+            TextProvider tprov = new TextProvider("en");
 
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var mf = new MainForm(cef);
+            var mf = new MainForm(cef, tprov);
             Application.Run(mf.WinForm);
         }
     }

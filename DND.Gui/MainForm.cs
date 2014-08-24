@@ -17,11 +17,11 @@ namespace DND.Gui
         private LookupControl lc;
         private SettingsControl stgs;
 
-        public MainForm(ICedictEngineFactory dictFact)
+        public MainForm(ICedictEngineFactory dictFact, ITextProvider tprov)
         {
             LogicalSize = new Size(800, 500);
             Header = Texts.WinHeader;
-            lc = new LookupControl(this, dictFact);
+            lc = new LookupControl(this, dictFact, tprov);
             stgs = new SettingsControl(this);
             MainTab = new ZenTab(stgs, Texts.TabMain);
             //MainTabHeader = "Zydeo";

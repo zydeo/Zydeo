@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DND.CedictCompileTool", "DN
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DND.MiscTool", "DND.MiscTool\DND.MiscTool.csproj", "{3E83478E-F8BF-476A-9F53-AAC026F26EEB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DND.Texts", "DND.Texts\DND.Texts.csproj", "{78DC52AB-427A-4EF7-9466-61417520295A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{3E83478E-F8BF-476A-9F53-AAC026F26EEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E83478E-F8BF-476A-9F53-AAC026F26EEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E83478E-F8BF-476A-9F53-AAC026F26EEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78DC52AB-427A-4EF7-9466-61417520295A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78DC52AB-427A-4EF7-9466-61417520295A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78DC52AB-427A-4EF7-9466-61417520295A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78DC52AB-427A-4EF7-9466-61417520295A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

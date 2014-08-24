@@ -1,0 +1,4 @@
+﻿# Show in dark overlay at bottom of scrollable results area: number of lookup results
+ResultsCountNone			No results
+ResultsCountOne				1 result
+ResultsCountN				{0} results
