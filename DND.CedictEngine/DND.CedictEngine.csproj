@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="CedictCompiler.cs" />
     <Compile Include="DictEngine.cs" />
+    <Compile Include="DictEngine.Pinyin.cs" />
     <Compile Include="IdeoIndexItem.cs" />
     <Compile Include="Index.cs" />
     <Compile Include="PinyinIndexItem.cs" />
@@ -55,6 +56,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CedictCompiler.ParseSense.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\pinyin.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

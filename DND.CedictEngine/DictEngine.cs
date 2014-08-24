@@ -11,7 +11,7 @@ namespace DND.CedictEngine
     /// <summary>
     /// Dictionary engine: loads index from file, provides thread-safe lookup functionality.
     /// </summary>
-    public class DictEngine : ICedictEngine
+    public partial class DictEngine : ICedictEngine
     {
         /// <summary>
         /// Name of binary dictionary file.
@@ -35,6 +35,14 @@ namespace DND.CedictEngine
                 br.Position = idxPos;
                 index = new Index(br);
             }
+        }
+
+        /// <summary>
+        /// Static ctor: load info stored in static members.
+        /// </summary>
+        static DictEngine()
+        {
+            loadSyllabary();
         }
 
         /// <summary>
@@ -306,16 +314,8 @@ namespace DND.CedictEngine
         }
 
         /// <summary>
-        /// Split string into possible multiple pinyin syllables, or return as whole if not possible.
+        /// Parses a pinyin query string into normalized syllables.
         /// </summary>
-        private static List<string> doPinyinSplitSyllables(string str)
-        {
-            // TO-DO
-            List<string> res = new List<string>();
-            res.Add(str);
-            return res;
-        }
-
         private static List<CedictPinyinSyllable> doParsePinyin(string query)
         {
             // If query is empty string or WS only: no syllables
@@ -335,6 +335,7 @@ namespace DND.CedictEngine
             foreach (string str in explicitSplit)
             {
                 // Find numbers 1 thru 5: tone marks always come at end of syllable
+                // Important: this also eliminates empty syllables
                 List<string> numSplit = doPinyinSplitDigits(str);
                 // Split the rest by matching known pinyin syllables
                 foreach (string str2 in numSplit)
