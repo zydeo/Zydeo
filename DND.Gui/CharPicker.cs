@@ -62,18 +62,23 @@ namespace DND.Gui
             calibrateFont();
         }
 
+        /// <summary>
+        /// <para>Finds the right font size to fit characters (2x5 with default size, but it varies).</para>
+        /// <para>Finds right vertical area based on font's actual display properties.</para>
+        /// </summary>
         private void calibrateFont()
         {
             float width = Width;
             float fontSize = 10.0F;
-            float descentPixels;
 
+            // Measuring artefacts
             using (Bitmap bmp = new Bitmap(1, 1))
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 StringFormat sf = StringFormat.GenericTypographic;
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
 
+                // Keep growing font until we reach a comfortable width
                 while (true)
                 {
                     using (Font fnt = new Font(fontFace, fontSize))
@@ -83,17 +88,20 @@ namespace DND.Gui
                     if (charSize.Width * 5.0F >= width * 0.8F) break;
                     fontSize += 0.5F;
                 }
-
                 if (font != null) font.Dispose(); font = null;
                 font = new Font(fontFace, fontSize);
-                int descent = font.FontFamily.GetCellDescent(FontStyle.Regular);
-                descentPixels = font.Size * ((float)descent) /
-                    ((float)font.FontFamily.GetEmHeight(FontStyle.Regular));
-                descentPixels *= Scale;
             }
 
+            // Width of rectangle: using my space equally
             float rectWidth = (width - 2.0F) / 5.0F;
-            float rectHeight = charSize.Height;
+            // Height of rectange: depends on font's actual drawing behavior!
+            var si = HanziMeasure.Instance.GetMeasures(fontFace, fontSize);
+            float rectHeight = si.RealRect.Bottom + si.RealRect.Top;
+            // Horizontal padding is rectangle width minus measured char width, over two
+            float hPad = (rectWidth - si.AllegedSize.Width) / 2.0F;
+            // Add twice horizontal padding to rectangle height; offset chars from top by padding
+            rectHeight += 3.0F * hPad;
+
             for (int i = 0; i != 5; ++i)
             {
                 float x = ((float)i) * rectWidth + 1.0F;
@@ -103,7 +111,7 @@ namespace DND.Gui
                 charRects[i + 5] = rbot;
             }
             charOfsX = (rectWidth - charSize.Width) / 2.0F;
-            charOfsY = descentPixels / 1.5F;
+            charOfsY = 1.5F * hPad;
             Height = (int)Math.Round((rectHeight) * 2.0F + 0.5F);
             MakeMePaint(true, RenderMode.Invalidate);
         }
