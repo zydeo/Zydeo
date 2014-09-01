@@ -46,6 +46,7 @@
     <Compile Include="HanziMeasure.cs" />
     <Compile Include="LookupControl.cs" />
     <Compile Include="MainForm.cs" />
+    <Compile Include="OneResultControl.Paint.cs" />
     <Compile Include="ResultsControl.cs" />
     <Compile Include="SearchInputControl.cs" />
     <Compile Include="SettingsControl.cs" />

@@ -156,18 +156,64 @@ namespace DND.Gui
         }
 
         /// <summary>
+        /// Type of highlight on a Pinyin syllable.
+        /// </summary>
+        private enum PinyinHighlight
+        {
+            /// <summary>
+            /// No highlight on this syllable.
+            /// </summary>
+            None,
+            /// <summary>
+            /// First hilighted syllable among many.
+            /// </summary>
+            First,
+            /// <summary>
+            /// Syllable in the middle of highlighted range.
+            /// </summary>
+            Middle,
+            /// <summary>
+            /// Last highlighted syllable among many.
+            /// </summary>
+            Last,
+            /// <summary>
+            /// This is the only highlighted syllable.
+            /// </summary>
+            Single,
+        }
+
+        /// <summary>
+        /// One pinyin syllable: rectangle and display text.
+        /// </summary>
+        private class PinyinBlock
+        {
+            /// <summary>
+            /// The rectangle occupied by the syllable.
+            /// </summary>
+            public RectangleF Rect;
+            /// <summary>
+            /// The syllable's display text.
+            /// </summary>
+            public string Text;
+            /// <summary>
+            /// The syllable's highlight, if any.
+            /// </summary>
+            public PinyinHighlight Hilite;
+        }
+
+        /// <summary>
         /// Information about the entry's pinyin text.
         /// </summary>
         private class PinyinInfo
         {
             /// <summary>
-            /// The pinyin display text, with tone marks instead of numbers.
+            /// A list of each displayed syllable.
             /// </summary>
-            public string PinyinDisplay;
+            public readonly List<PinyinBlock> Blocks = new List<PinyinBlock>();
             /// <summary>
-            /// The size of the entire pinyin text.
+            /// The height of the entire pinyin text.
             /// </summary>
-            public SizeF PinyinSize;
+            public float PinyinHeight;
         }
     }
 }

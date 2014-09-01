@@ -30,5 +30,7 @@ namespace DND.Gui.Zen
         public static readonly string LemmaFontFamily = "Segoe UI";
         public static readonly float LemmaFontSize = 10.0F;
         public static readonly float ResultsCountFontSize = 9.0F;
+        public static readonly Color PinyinHiliteColor = Color.FromArgb(255, 232, 189);
+        //public static readonly Color PinyinHiliteColor = Color.Orange;
     }
 }

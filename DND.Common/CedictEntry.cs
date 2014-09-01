@@ -59,24 +59,47 @@ namespace DND.Common
         /// Gets the entry's pinyin display string.
         /// </summary>
         /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>
+        /// <param name="origHiliteStart">Start of pinyin highlight from result, or -1.</param>
+        /// <param name="origHiliteLength">Length of pinyin highlight from result, or 0.</param>
+        /// <param name="hiliteStart">Start of pinyin hilight in returned collection, or -1.</param>
+        /// <param name="hiliteLength">Length of pinyin hilight in returned collection, or 0.</param>
         /// <returns>String representation to show in UI.</returns>
-        public ReadOnlyCollection<CedictPinyinSyllable> GetPinyinForDisplay(bool diacritics)
+        public ReadOnlyCollection<CedictPinyinSyllable> GetPinyinForDisplay(bool diacritics,
+            int origHiliteStart, int origHiliteLength,
+            out int hiliteStart, out int hiliteLength)
         {
             // If pinyin does not have an "r5", no transformation needed
             if (Array.FindIndex(pinyin, x => x.Text == "r" && x.Tone == 0) == -1)
+            {
+                hiliteStart = origHiliteStart;
+                hiliteLength = origHiliteLength;
                 return Pinyin;
+            }
             // Create new array where we merge "r" into previous syllable
+            // Map decomposed positions to merged positions
+            int[] posMap = new int[pinyin.Length];
+            for (int i = 0; i != posMap.Length; ++i) posMap[i] = i;
             List<CedictPinyinSyllable> res = new List<CedictPinyinSyllable>(pinyin);
-            for (int i = 0; i < res.Count; ++i)
+            int mi = 0;
+            for (int i = 0; i < res.Count; ++i, ++mi)
             {
                 CedictPinyinSyllable ps = res[i];
                 if (i >= 0 && ps.Text == "r" && ps.Tone == 0)
                 {
                     res[i - 1] = new CedictPinyinSyllable(res[i - 1].Text + "r", res[i - 1].Tone);
                     res.RemoveAt(i);
+                    for (int j = mi; j != posMap.Length; ++j) --posMap[j];
                 }
             }
-            // Done
+            // Done.
+            if (origHiliteStart == -1){ hiliteStart = -1; hiliteLength = 0; }
+            else
+            {
+                hiliteStart = posMap[origHiliteStart];
+                int hiliteEnd = origHiliteStart + origHiliteLength - 1;
+                hiliteEnd = posMap[hiliteEnd];
+                hiliteLength = hiliteEnd - hiliteStart + 1;
+            }
             return new ReadOnlyCollection<CedictPinyinSyllable>(res);
         }
 
