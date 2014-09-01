@@ -178,9 +178,9 @@ namespace DND.Gui
 
         private int getSimpTradWidth()
         {
-            int w = simpTradCtrl.GetPreferredWidth(false, "mmm" + Texts.SearchSimp);
-            w = Math.Max(w, simpTradCtrl.GetPreferredWidth(false, "mmm" + Texts.SearchTrad));
-            w = Math.Max(w, simpTradCtrl.GetPreferredWidth(false, "mmm" + Texts.SearchBoth));
+            int w = simpTradCtrl.GetPreferredWidth(false, "mm" + Texts.SearchSimp);
+            w = Math.Max(w, simpTradCtrl.GetPreferredWidth(false, "mm" + Texts.SearchTrad));
+            w = Math.Max(w, simpTradCtrl.GetPreferredWidth(false, "mm" + Texts.SearchBoth));
             return w;
         }
 

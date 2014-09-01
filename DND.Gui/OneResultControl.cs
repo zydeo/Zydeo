@@ -475,6 +475,7 @@ namespace DND.Gui
                     charsOnLine = 1;
                     firstCharOfLine = blocks.Count - 1;
                     hb.Loc = loc;
+                    loc.X += hb.Size.Width;
                 }
             }
             // Right-align the final bit
@@ -504,15 +505,19 @@ namespace DND.Gui
             if (analyzedScript == SearchScript.Simplified) headInfo.HeadMode = HeadMode.OnlySimp;
             else if (analyzedScript == SearchScript.Traditional) headInfo.HeadMode = HeadMode.OnlyTrad;
             else headInfo.HeadMode = HeadMode.BothSingleLine;
-            // For width of headword, use padLeft from border, plus 4 to 6 ideographs' worth of space
-            // Depending on longest headword in entire list
-            int hwChars = maxHeadLength;
-            if (hwChars < 4) hwChars = 4;
-            if (hwChars > 6) hwChars = 6;
-            float hwidth = ((float)hwChars) * ideoSize.Width;
+            //// For width of headword, use padLeft from border, plus 4 to 6 ideographs' worth of space
+            //// Depending on longest headword in entire list
+            //int hwChars = maxHeadLength;
+            //if (hwChars < 4) hwChars = 4;
+            //if (hwChars > 6) hwChars = 6;
+            //float hwidth = ((float)hwChars) * ideoSize.Width;
+            // Revised
+            // For width of headword, always take 5 characters' width of space
+            float hwidth = 5.0F * ideoSize.Width;
             headInfo.HeadwordRight = padLeft + hwidth;
             // Measure simplified chars from start; break when needed
-            PointF loc = new PointF(padLeft, padTop / 2.0F); // Less padding above hanzi - font leaves enough space
+            PointF loc = new PointF(((float)padLeft) + ideoSize.Width, padTop / 2.0F); // Less padding above hanzi - font leaves enough space
+            //PointF loc = new PointF(padLeft, padTop / 2.0F); // Less padding above hanzi - font leaves enough space
             bool lbrk = false;
             if (analyzedScript == SearchScript.Simplified || analyzedScript == SearchScript.Both)
             {
@@ -520,7 +525,8 @@ namespace DND.Gui
             }
             if (analyzedScript == SearchScript.Traditional || analyzedScript == SearchScript.Both)
             {
-                loc.X = padLeft;
+                //loc.X = padLeft;
+                loc.X = ((float)padLeft) + ideoSize.Width;
                 if (analyzedScript == SearchScript.Both) loc.Y += ideoSize.Height;
                 lbrk |= doAnalyzeHanzi(g, Res.Entry.ChTrad, sf, headInfo.TradBlocks, ref loc, headInfo.HeadwordRight);
             }

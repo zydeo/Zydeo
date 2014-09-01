@@ -658,7 +658,7 @@ namespace DND.Gui.Zen
                 // Aligner to center, both horizontally & vertically
                 // Take proportion (shrink effect) into consideration
                 int txtTop = (int)(((float)Height) * 0.5F - (textSize.Height / 2.0F));
-                RectangleF textRect = new RectangleF(txtLeft, txtTop, textSize.Width, textSize.Height);
+                RectangleF textRect = new RectangleF(txtLeft, txtTop, textSize.Width + 1, textSize.Height + 1);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
                 StringFormat sf = StringFormat.GenericTypographic;
                 using (Brush b = new SolidBrush(Color.Black))

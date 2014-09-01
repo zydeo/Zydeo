@@ -212,7 +212,7 @@ namespace DND.Gui
             if (sb.Visible)
             {
                 suppressScrollChanged = true;
-                sb.Maximum = resCtrls[resCtrls.Count - 1].AbsBottom;
+                sb.Maximum = resCtrls[resCtrls.Count - 1].AbsBottom - resCtrls[0].AbsTop;
                 sb.LargeChange = ch;
                 sb.Value = 1 - resCtrls[0].AbsTop;
                 suppressScrollChanged = false;

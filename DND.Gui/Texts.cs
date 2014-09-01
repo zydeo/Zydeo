@@ -12,8 +12,8 @@ namespace DND.Gui
         public readonly static string TabMain = "Zydeo";
         public readonly static string TabLookup = "Lookup";
 
-        public readonly static string SearchSimp = "Simplified";
-        public readonly static string SearchTrad = "Traditional";
-        public readonly static string SearchBoth = "Both";
+        public readonly static string SearchSimp = "语";
+        public readonly static string SearchTrad = "語";
+        public readonly static string SearchBoth = "语+語";
     }
 }
