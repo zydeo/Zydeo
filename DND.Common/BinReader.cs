@@ -39,6 +39,11 @@ namespace DND.Common
             return reader.ReadInt32();
         }
 
+        public short ReadShort()
+        {
+            return reader.ReadInt16();
+        }
+
         public byte ReadByte()
         {
             return reader.ReadByte();

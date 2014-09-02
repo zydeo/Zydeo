@@ -80,14 +80,13 @@ namespace DND.CedictEngine
             }
             // Transform map so it says, for each hanzi, which pinyin syllable it corresponds to
             // Some chars in hanzi may have no pinyin: when hanzi includes a non-ideagraphic character
-            int[] hanziToPinyin = transformPinyinMap(hm.Groups[1].Value, pinyinMap);
+            short[] hanziToPinyin = transformPinyinMap(hm.Groups[1].Value, pinyinMap);
             // Headword MUST have same number of ideo characters as non-weird pinyin syllables
-            if (pinyinMap == null)
+            if (hanziToPinyin == null)
             {
-                string msg = "Line {0}: ERROR: Failed to match hanzi to pinyin: {1}";
+                string msg = "Line {0}: Warning: Failed to match hanzi to pinyin: {1}";
                 msg = string.Format(msg, lineNum, strHead);
                 logStream.WriteLine(msg);
-                return null;
             }
             // Split meanings by slash
             string[] meaningsRaw = strBody.Split(new char[] { '/' });
@@ -126,7 +125,8 @@ namespace DND.CedictEngine
             // Done with entry
             CedictEntry res = new CedictEntry(hm.Groups[2].Value, hm.Groups[1].Value,
                 new ReadOnlyCollection<CedictPinyinSyllable>(pinyinSylls),
-                new ReadOnlyCollection<CedictSense>(cedictSenses));
+                new ReadOnlyCollection<CedictSense>(cedictSenses),
+                hanziToPinyin);
             return res;
         }
 
@@ -136,10 +136,13 @@ namespace DND.CedictEngine
         /// <para>identifying the corresponding pinyin syllable.</para>
         /// <para>Non-ideo chars in hanzi have no pinyin syllable.</para>
         /// </summary>
-        private int[] transformPinyinMap(string hanzi, List<int> mapIn)
+        private short[] transformPinyinMap(string hanzi, List<int> mapIn)
         {
-            int[] res = new int[hanzi.Length];
-            int ppos = 0; // position in incoming map; that map has an entry for each normal pinyin syllable
+            if (hanzi.Length >= short.MaxValue || mapIn.Count >= short.MaxValue)
+                throw new Exception("Hanzi too long, or too many pinyin syllables.");
+
+            short[] res = new short[hanzi.Length];
+            short ppos = 0; // position in incoming map; that map has an entry for each normal pinyin syllable
             for (int i = 0; i != hanzi.Length; ++i)
             {
                 char c = hanzi[i];
@@ -154,7 +157,7 @@ namespace DND.CedictEngine
                 // We have run out of pinyin map: BAD
                 if (ppos >= mapIn.Count) return null;
                 // We've got this hanzi's pinyin syllable
-                res[i] = mapIn[ppos];
+                res[i] = (short)mapIn[ppos];
                 ++ppos;
             }
             // At this stage we must have consumed incoming map

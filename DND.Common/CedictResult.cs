@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -66,8 +67,7 @@ namespace DND.Common
             Entry = entry;
             HanziHiliteStart = hanziHiliteStart;
             HanziHiliteLength = hanziHiliteLength;
-            PinyinHiliteStart = -1;
-            PinyinHiliteLength = 0;
+            calculatePinyinHighlights(out PinyinHiliteStart, out PinyinHiliteLength);
         }
 
         /// <summary>
@@ -78,10 +78,86 @@ namespace DND.Common
         {
             HanziWarning = SimpTradWarning.None;
             Entry = entry;
-            HanziHiliteStart = -1;
-            HanziHiliteLength = 01;
             PinyinHiliteStart = pinyinHiliteStart;
             PinyinHiliteLength = pinyinHiliteLength;
+            calculateHanziHighlights(out HanziHiliteStart, out HanziHiliteLength);
+        }
+
+        /// <summary>
+        /// Calculates hanzi highlights from pinyin highlights.
+        /// </summary>
+        private void calculateHanziHighlights(out int hhStart, out int hhLength)
+        {
+            // No pinyin highlights either.
+            if (PinyinHiliteStart == -1)
+            {
+                hhStart = -1;
+                hhLength = 0;
+                return;
+            }
+            int first = -1;
+            int lastResolved = -1;
+            ReadOnlyCollection<short> map = Entry.HanziPinyinMap;
+            for (int i = 0; i != map.Count; ++i)
+            {
+                int pix = map[i];
+                // Current hanzi does not resolve - nothing to do
+                if (pix == -1) continue;
+                // Hanzi resolves into a pinyin that's outside our pinyin highlight range
+                if (pix < PinyinHiliteStart || pix >= PinyinHiliteStart + PinyinHiliteLength)
+                    continue;
+                // First hanzi we've found?
+                if (first == -1) first = i;
+                // Also the last one so far
+                lastResolved = i;
+            }
+            // Could not resolve anything
+            if (first == -1)
+            {
+                hhStart = -1;
+                hhLength = 0;
+                return;
+            }
+            // All good
+            hhStart = first;
+            hhLength = lastResolved - first + 1;
+        }
+
+        /// <summary>
+        /// Calculates pinyin highlights from hanzi highlights.
+        /// </summary>
+        private void calculatePinyinHighlights(out int phStart, out int phLength)
+        {
+            // No hanzi highlights either.
+            if (HanziHiliteStart == -1)
+            {
+                phStart = -1;
+                phLength = 0;
+                return;
+            }
+            int first = -1;
+            int lastResolved = -1;
+            ReadOnlyCollection<short> map = Entry.HanziPinyinMap;
+            for (int i = HanziHiliteStart; i != HanziHiliteStart + HanziHiliteLength; ++i)
+            {
+                int pix = map[i];
+                // Current hanzi does not resolve - nothing to do
+                if (pix == -1) continue;
+                // First one we can resolve
+                if (first == -1) first = pix;
+                // Also the last one so far
+                lastResolved = pix;
+            }
+            // Could not resolve anything
+            if (first == -1)
+            {
+                phStart = -1;
+                phLength = 0;
+                return;
+            }
+            // All good
+            phStart = first;
+            phLength = lastResolved - first + 1;
         }
     }
 }

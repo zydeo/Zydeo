@@ -39,6 +39,11 @@ namespace DND.Common
             writer.Write(i);
         }
 
+        public void WriteShort(short s)
+        {
+            writer.Write(s);
+        }
+
         public void WriteByte(byte b)
         {
             writer.Write(b);

@@ -22,6 +22,11 @@ namespace DND.Common
         private readonly CedictSense[] senses;
 
         /// <summary>
+        /// For each Hanzi, contains index of corresponding pinyin syllable, or -1.
+        /// </summary>
+        private readonly short[] hanziPinyinMap;
+
+        /// <summary>
         /// Headword in simplified script.
         /// </summary>
         public readonly string ChSimpl;
@@ -40,7 +45,7 @@ namespace DND.Common
         }
 
         /// <summary>
-        /// Gets count of pinyin syllables.
+        /// Gets count of unnormalized ("raw") pinyin syllables.
         /// </summary>
         public int PinyinCount
         {
@@ -48,7 +53,15 @@ namespace DND.Common
         }
 
         /// <summary>
-        /// Returns pinyin syllable at specific index.
+        /// Gets hanzi-to-pinyin map: for each hanzi, contains index of corresponding Pinyin syllable, or -1.
+        /// </summary>
+        public ReadOnlyCollection<short> HanziPinyinMap
+        {
+            get { return new ReadOnlyCollection<short>(hanziPinyinMap); }
+        }
+
+        /// <summary>
+        /// Returns (unnormalized, "raw") pinyin syllable at specific index.
         /// </summary>
         public CedictPinyinSyllable GetPinyinAt(int pos)
         {
@@ -56,7 +69,7 @@ namespace DND.Common
         }
 
         /// <summary>
-        /// Gets the entry's pinyin display string.
+        /// Gets the entry's pinyin display string: normalized; may have fewer items than raw syllables.
         /// </summary>
         /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>
         /// <param name="origHiliteStart">Start of pinyin highlight from result, or -1.</param>
@@ -132,14 +145,30 @@ namespace DND.Common
         /// </summary>
         public CedictEntry(string chSimpl, string chTrad,
             ReadOnlyCollection<CedictPinyinSyllable> pinyin,
-            ReadOnlyCollection<CedictSense> senses)
+            ReadOnlyCollection<CedictSense> senses,
+            short[] hanziPinyinMap)
         {
+            if (chSimpl.Length != chTrad.Length)
+                throw new ArgumentException("Different number of simplified and traditional hanzi.");
+
             ChSimpl = chSimpl;
             ChTrad = chTrad;
             this.pinyin = new CedictPinyinSyllable[pinyin.Count];
             for (int i = 0; i != pinyin.Count; ++i) this.pinyin[i] = pinyin[i];
             this.senses = new CedictSense[senses.Count];
             for (int i = 0; i != senses.Count; ++i) this.senses[i] = senses[i];
+            if (hanziPinyinMap != null)
+            {
+                if (hanziPinyinMap.Length != ChSimpl.Length)
+                    throw new ArgumentException("hanziPinyinMap.Length does not equal number of hanzi.");
+                this.hanziPinyinMap = hanziPinyinMap;
+            }
+            else
+            {
+                this.hanziPinyinMap = new short[ChSimpl.Length];
+                for (int i = 0; i != this.hanziPinyinMap.Length; ++i)
+                    this.hanziPinyinMap[i] = -1;
+            }
         }
 
         /// <summary>
@@ -151,6 +180,7 @@ namespace DND.Common
             ChSimpl = br.ReadString();
             ChTrad = br.ReadString();
             senses = br.ReadArray(brr => new CedictSense(brr));
+            hanziPinyinMap = br.ReadArray(brr => brr.ReadShort());
         }
 
         /// <summary>
@@ -162,6 +192,7 @@ namespace DND.Common
             bw.WriteString(ChSimpl);
             bw.WriteString(ChTrad);
             bw.WriteArray(senses);
+            bw.WriteArray(hanziPinyinMap, (x, bwr) => bwr.WriteShort(x));
         }
     }
 }
