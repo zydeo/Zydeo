@@ -49,6 +49,10 @@ namespace DND.Gui
         /// </summary>
         private static SizeF ideoSize = new SizeF(0, 0);
         /// <summary>
+        /// Line height of ideographic characters. Less than ideoSize's height due to weird rendering.
+        /// </summary>
+        private static float ideoLineHeight = 0;
+        /// <summary>
         /// Measured width of a space.
         /// </summary>
         private static float spaceWidth = 0;
@@ -320,7 +324,7 @@ namespace DND.Gui
                 {
                     lineBreak = true;
                     loc.X = left;
-                    loc.Y += ideoSize.Height;
+                    loc.Y += ideoLineHeight;
                     doRightAlign(blocks, firstCharOfLine, charsOnLine - 1, right);
                     charsOnLine = 1;
                     firstCharOfLine = blocks.Count - 1;
@@ -347,9 +351,15 @@ namespace DND.Gui
             StringFormat sf = StringFormat.GenericTypographic;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
 
-            // On-demand: measure a single ideograph's width
+            // On-demand: measure a single ideograph's dimensions
             if (ideoSize.Width == 0)
+            {
                 ideoSize = g.MeasureString(ideoTestStr, fntZho, 65535, sf);
+                var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
+                float hanziLinePad = 6.0F;
+                hanziLinePad *= Scale;
+                ideoLineHeight = si.RealRect.Height + hanziLinePad;
+            }
 
             headInfo = new HeadInfo();
             if (analyzedScript == SearchScript.Simplified) headInfo.HeadMode = HeadMode.OnlySimp;
@@ -377,7 +387,7 @@ namespace DND.Gui
             {
                 //loc.X = padLeft;
                 loc.X = ((float)padLeft) + ideoSize.Width;
-                if (analyzedScript == SearchScript.Both) loc.Y += ideoSize.Height;
+                if (analyzedScript == SearchScript.Both) loc.Y += ideoLineHeight;
                 lbrk |= doAnalyzeHanzi(g, Res.Entry.ChTrad, sf, headInfo.TradBlocks, ref loc, headInfo.HeadwordRight);
             }
             // If we're displaying both simplified and traditional, fade out
@@ -391,7 +401,7 @@ namespace DND.Gui
                 }
             }
             // Bottom of headword area
-            headInfo.HeadwordBottom = loc.Y + ideoSize.Height;
+            headInfo.HeadwordBottom = loc.Y + ideoLineHeight;
             // If we had a line break and we're showing both scripts, update info
             if (analyzedScript == SearchScript.Both && lbrk)
                 headInfo.HeadMode = HeadMode.BothMultiLine;

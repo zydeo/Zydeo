@@ -14,86 +14,97 @@ namespace DND.Gui
     partial class OneResultControl
     {
         /// <summary>
-        /// Draws hilite for one character in headword.
-        /// </summary>
-        private void doHiliteOneHeadBlock(Graphics g, Pen p, HeadBlock hb, bool tradSimpMid,
-            bool leftHorn, bool rightHorn)
-        {
-            float leftX = hb.Loc.X + (float)AbsLeft;
-            float y = hb.Loc.Y + hb.Size.Height + (float)AbsTop;
-            if (!tradSimpMid) y -= ideoSize.Height * 0.1F;
-            else y -= ideoSize.Height * 0.05F;
-            // Left horn
-            if (leftHorn)
-            {
-                // If only pinyin or both but with line break: go up
-                if (!tradSimpMid)
-                {
-                    float hornY = y - ideoSize.Height / 9.0F;
-                    g.DrawLine(p, (int)leftX, (int)y, (int)leftX, (int)hornY);
-                }
-                // Otherwise, go up and down: this will be sitting between traditional and simplified
-                else
-                {
-                    float hornY1 = y - ideoSize.Height / 9.0F;
-                    float hornY2 = y + ideoSize.Height / 9.0F;
-                    g.DrawLine(p, (int)leftX, (int)hornY1, (int)leftX, (int)hornY2);
-                }
-            }
-            // Underline
-            float rightX = hb.Loc.X + hb.Size.Width + (float)AbsLeft;
-            g.DrawLine(p, (int)leftX, (int)y, (int)rightX, (int)y);
-            // Right horn
-            if (rightHorn)
-            {
-                // If only pinyin or both but with line break: go up
-                if (!tradSimpMid)
-                {
-                    float hornY = y - ideoSize.Height / 9.0F;
-                    g.DrawLine(p, (int)rightX, (int)y, (int)rightX, (int)hornY);
-                }
-                // Otherwise, go up and down: this will be sitting between traditional and simplified
-                else
-                {
-                    float hornY1 = y - ideoSize.Height / 9.0F;
-                    float hornY2 = y + ideoSize.Height / 9.0F;
-                    g.DrawLine(p, (int)rightX, (int)hornY1, (int)rightX, (int)hornY2);
-                }
-            }
-        }
-
-        /// <summary>
         /// Paints all hilites in headword.
         /// </summary>
-        private void doPaintHanziHilites(Graphics g)
+        private void doPaintHanziHilites(Graphics g, Color bgcol)
         {
             if (Res.HanziHiliteStart == -1)
                 return;
 
-            using (Pen p = new Pen(Color.Maroon))
+            g.SmoothingMode = SmoothingMode.None;
+            var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
+            HeadBlock hb;
+            RectangleF rect;
+            // Width of gradient
+            float gradw = ideoSize.Width / 2.0F;
+            // Extent of gradient outside character
+            float gradext = 0;
+            using (Brush b = new SolidBrush(ZenParams.HanziHiliteColor))
             {
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                 // In simplified
                 if (headInfo.SimpBlocks.Count != 0)
                 {
+                    // Solid highlight on each character
                     for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
                     {
-                        HeadBlock hb = headInfo.SimpBlocks[ix];
-                        doHiliteOneHeadBlock(g, p, hb, headInfo.HeadMode == HeadMode.BothSingleLine,
-                            ix == Res.HanziHiliteStart, ix + 1 == Res.HanziHiliteStart + Res.HanziHiliteLength);
+                        hb = headInfo.SimpBlocks[ix];
+                        rect = new RectangleF(hb.Loc.X, hb.Loc.Y, hb.Size.Width, si.RealRect.Height);
+                        rect.X += (float)AbsLeft;
+                        rect.Y += (float)AbsTop;
+                        g.FillRectangle(b, rect);
                     }
-                }
-                // In traditional
-                if (headInfo.TradBlocks.Count != 0 && headInfo.HeadMode != HeadMode.BothSingleLine)
-                {
-                    for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
+                    // First and last chars get gradient on left and right
+                    hb = headInfo.SimpBlocks[Res.HanziHiliteStart];
+                    rect = new RectangleF(hb.Loc.X, hb.Loc.Y, gradw, si.RealRect.Height);
+                    rect.X += (float)AbsLeft;
+                    rect.X -= gradext;
+                    rect.Y += (float)AbsTop;
+                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, ZenParams.HanziHiliteColor, LinearGradientMode.Horizontal))
                     {
-                        HeadBlock hb = headInfo.TradBlocks[ix];
-                        doHiliteOneHeadBlock(g, p, hb, false,
-                            ix == Res.HanziHiliteStart, ix + 1 == Res.HanziHiliteStart + Res.HanziHiliteLength);
+                        g.FillRectangle(lgb, rect);
+                    }
+                    hb = headInfo.SimpBlocks[Res.HanziHiliteStart + Res.HanziHiliteLength - 1];
+                    rect = new RectangleF(hb.Loc.X + hb.Size.Width, hb.Loc.Y, gradw, si.RealRect.Height);
+                    rect.X += (float)AbsLeft;
+                    rect.X += gradext;
+                    rect.X -= gradw;
+                    rect.Y += (float)AbsTop;
+                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, ZenParams.HanziHiliteColor, bgcol, LinearGradientMode.Horizontal))
+                    {
+                        g.FillRectangle(lgb, rect);
                     }
                 }
             }
+
+            //using (Brush b = new SolidBrush(ZenParams.HanziHiliteColor))
+            //{
+            //    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            //    // Only a single line, or both simplified and traditional are multi-line
+            //    // Highlight each character individually
+            //    if (headInfo.HeadMode != HeadMode.BothSingleLine)
+            //    {
+            //        // In simplified
+            //        if (headInfo.SimpBlocks.Count != 0)
+            //        {
+            //            var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
+            //            for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
+            //            {
+            //                HeadBlock hb = headInfo.SimpBlocks[ix];
+            //                float hlHeight = 3.0F;
+            //                hlHeight *= Scale;
+            //                float hlTop = hb.Loc.Y + si.RealRect.Height;
+            //                hlTop += ((float)AbsTop);
+            //                RectangleF rect = new RectangleF(((float)AbsLeft) + hb.Loc.X, hlTop, hb.Size.Width, hlHeight);
+            //                g.FillRectangle(b, rect);
+            //            }
+            //        }
+            //        // In traditional
+            //        if (headInfo.TradBlocks.Count != 0)
+            //        {
+            //            var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
+            //            for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
+            //            {
+            //                HeadBlock hb = headInfo.TradBlocks[ix];
+            //                float hlHeight = 3.0F;
+            //                hlHeight *= Scale;
+            //                float hlTop = hb.Loc.Y + si.RealRect.Height;
+            //                hlTop += ((float)AbsTop);
+            //                RectangleF rect = new RectangleF(((float)AbsLeft) + hb.Loc.X, hlTop, hb.Size.Width, hlHeight);
+            //                g.FillRectangle(b, rect);
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         /// <summary>
@@ -123,7 +134,7 @@ namespace DND.Gui
                     // Remember edges
                     if (i == pinyinInfo.HiliteStart)
                         edgeLeft = pb.Rect.Left;
-                    if (i + 1 == pinyinInfo.HiliteStart + pinyinInfo.PinyinHeight)
+                    if (i + 1 == pinyinInfo.HiliteStart + pinyinInfo.HiliteLength)
                         edgeRight = pb.Rect.Right;
                     // Hilight syllable itself
                     RectangleF hlr = new RectangleF(loc, pb.Rect.Size);
@@ -195,6 +206,9 @@ namespace DND.Gui
                 g.FillRectangle(b, AbsLeft, AbsTop, Width, Height);
             }
 
+            // Hanzi highlights. May draw on top, so must come before actual characters are drawn.
+            doPaintHanziHilites(g, bgcol);
+
             // This is how we draw text
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
             StringFormat sf = StringFormat.GenericTypographic;
@@ -248,8 +262,6 @@ namespace DND.Gui
                     }
                 }
             }
-            // Hanzi highlights
-            doPaintHanziHilites(g);
         }
     }
 }
