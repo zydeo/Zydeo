@@ -64,6 +64,39 @@ namespace DND.Gui
                         g.FillRectangle(lgb, rect);
                     }
                 }
+                // In traditional
+                if (headInfo.TradBlocks.Count != 0)
+                {
+                    // Solid highlight on each character
+                    for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
+                    {
+                        hb = headInfo.TradBlocks[ix];
+                        rect = new RectangleF(hb.Loc.X, hb.Loc.Y, hb.Size.Width, si.RealRect.Height);
+                        rect.X += (float)AbsLeft;
+                        rect.Y += (float)AbsTop;
+                        g.FillRectangle(b, rect);
+                    }
+                    // First and last chars get gradient on left and right
+                    hb = headInfo.TradBlocks[Res.HanziHiliteStart];
+                    rect = new RectangleF(hb.Loc.X, hb.Loc.Y, gradw, si.RealRect.Height);
+                    rect.X += (float)AbsLeft;
+                    rect.X -= gradext;
+                    rect.Y += (float)AbsTop;
+                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, ZenParams.HanziHiliteColor, LinearGradientMode.Horizontal))
+                    {
+                        g.FillRectangle(lgb, rect);
+                    }
+                    hb = headInfo.TradBlocks[Res.HanziHiliteStart + Res.HanziHiliteLength - 1];
+                    rect = new RectangleF(hb.Loc.X + hb.Size.Width, hb.Loc.Y, gradw, si.RealRect.Height);
+                    rect.X += (float)AbsLeft;
+                    rect.X += gradext;
+                    rect.X -= gradw;
+                    rect.Y += (float)AbsTop;
+                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, ZenParams.HanziHiliteColor, bgcol, LinearGradientMode.Horizontal))
+                    {
+                        g.FillRectangle(lgb, rect);
+                    }
+                }
             }
 
             //using (Brush b = new SolidBrush(ZenParams.HanziHiliteColor))
