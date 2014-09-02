@@ -104,31 +104,32 @@ namespace DND.Gui
             if (pinyinInfo == null || pinyinInfo.Blocks.Count == 0)
                 return;
 
-            // Needed to make gradient work
-            g.SmoothingMode = SmoothingMode.None;
-
-            // Hilites for relevant syllables
-            float edgeLeft = 0;
-            float edgeRight = 0;
-            for (int i = 0; i != pinyinInfo.Blocks.Count; ++i)
+            // We do have highlights
+            if (pinyinInfo.HiliteStart != -1)
             {
-                PinyinBlock pb = pinyinInfo.Blocks[i];
-                // Where?
-                PointF loc = pb.Rect.Location;
-                loc.Y += (float)AbsTop;
-                // Draw hilite
-                if (pb.Hilite != PinyinHighlight.None)
+                // Needed to make gradient work
+                g.SmoothingMode = SmoothingMode.None;
+                float edgeLeft = 0;
+                float edgeRight = 0;
+                for (int i = 0; i != pinyinInfo.Blocks.Count; ++i)
                 {
+                    PinyinBlock pb = pinyinInfo.Blocks[i];
+                    // Where?
+                    PointF loc = pb.Rect.Location;
+                    loc.Y += (float)AbsTop;
+                    // Not in highlight now
+                    if (i < pinyinInfo.HiliteStart || i >= pinyinInfo.HiliteStart + pinyinInfo.HiliteLength)
+                        continue;
                     // Remember edges
-                    if (pb.Hilite == PinyinHighlight.First || pb.Hilite == PinyinHighlight.Single)
+                    if (i == pinyinInfo.HiliteStart)
                         edgeLeft = pb.Rect.Left;
-                    if (pb.Hilite == PinyinHighlight.Last || pb.Hilite == PinyinHighlight.Single)
+                    if (i + 1 == pinyinInfo.HiliteStart + pinyinInfo.PinyinHeight)
                         edgeRight = pb.Rect.Right;
                     // Hilight syllable itself
                     RectangleF hlr = new RectangleF(loc, pb.Rect.Size);
                     g.FillRectangle(bhilite, hlr);
                     // For middle and last: hilight space before
-                    if (pb.Hilite == PinyinHighlight.Middle || pb.Hilite == PinyinHighlight.Last)
+                    if (i > pinyinInfo.HiliteStart)
                     {
                         float xprev = pinyinInfo.Blocks[i - 1].Rect.Right;
                         hlr.X = xprev;
@@ -136,36 +137,37 @@ namespace DND.Gui
                         g.FillRectangle(bhilite, hlr);
                     }
                 }
-            }
-            // Left and right edges: gradient
-            // Extends one space's width beyond edge
-            // Reach max color two spaces' width within syllable, OR
-            // by midpoint, if edgeRight - edgeLeft < 4 spaces
-            float y = pinyinInfo.Blocks[0].Rect.Top + (float)AbsTop;
-            float w = pinyinSpaceWidth;
-            if (edgeLeft != 0 && edgeRight != 0)
-            {
-                float midPoint = (edgeLeft + edgeRight) / 2.0F;
-                float whalf = (edgeRight - edgeLeft) / 2.0F;
-                RectangleF rleft;
-                if (whalf < 2.0F * w)
-                    rleft = new RectangleF(edgeLeft - w, y, w + whalf, pinyinInfo.PinyinHeight);
-                else
-                    rleft = new RectangleF(edgeLeft - w, y, w * 3.0F, pinyinInfo.PinyinHeight);
-                using (LinearGradientBrush lbr = new LinearGradientBrush(rleft, bgcol, ZenParams.PinyinHiliteColor, LinearGradientMode.Horizontal))
+                // Left and right edges: gradient
+                // Extends one space's width beyond edge
+                // Reach max color two spaces' width within syllable, OR
+                // by midpoint, if edgeRight - edgeLeft < 4 spaces
+                float y = pinyinInfo.Blocks[0].Rect.Top + (float)AbsTop;
+                float w = pinyinSpaceWidth;
+                if (edgeLeft != 0 && edgeRight != 0)
                 {
-                    g.FillRectangle(lbr, rleft);
-                }
-                RectangleF rright;
-                if (whalf < 2.0F * w)
-                    rright = new RectangleF(midPoint, y, w + whalf, pinyinInfo.PinyinHeight);
-                else
-                    rright = new RectangleF(edgeRight - 2.0F * w, y, w * 3.0F, pinyinInfo.PinyinHeight);
-                using (LinearGradientBrush lbr = new LinearGradientBrush(rright, ZenParams.PinyinHiliteColor, bgcol, LinearGradientMode.Horizontal))
-                {
-                    g.FillRectangle(lbr, rright);
+                    float midPoint = (edgeLeft + edgeRight) / 2.0F;
+                    float whalf = (edgeRight - edgeLeft) / 2.0F;
+                    RectangleF rleft;
+                    if (whalf < 2.0F * w)
+                        rleft = new RectangleF(edgeLeft - w, y, w + whalf, pinyinInfo.PinyinHeight);
+                    else
+                        rleft = new RectangleF(edgeLeft - w, y, w * 3.0F, pinyinInfo.PinyinHeight);
+                    using (LinearGradientBrush lbr = new LinearGradientBrush(rleft, bgcol, ZenParams.PinyinHiliteColor, LinearGradientMode.Horizontal))
+                    {
+                        g.FillRectangle(lbr, rleft);
+                    }
+                    RectangleF rright;
+                    if (whalf < 2.0F * w)
+                        rright = new RectangleF(midPoint, y, w + whalf, pinyinInfo.PinyinHeight);
+                    else
+                        rright = new RectangleF(edgeRight - 2.0F * w, y, w * 3.0F, pinyinInfo.PinyinHeight);
+                    using (LinearGradientBrush lbr = new LinearGradientBrush(rright, ZenParams.PinyinHiliteColor, bgcol, LinearGradientMode.Horizontal))
+                    {
+                        g.FillRectangle(lbr, rright);
+                    }
                 }
             }
+
             // Now, write each syllable - so it goes on top of hilites
             foreach (PinyinBlock pb in pinyinInfo.Blocks)
             {

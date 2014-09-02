@@ -412,8 +412,9 @@ namespace DND.Gui
             pinyinInfo = new PinyinInfo();
             // Measure each pinyin syllable
             bool diacritics = true;
-            int hiliteStart, hiliteLength;
-            var pcoll = Res.Entry.GetPinyinForDisplay(diacritics, Res.PinyinHiliteStart, Res.PinyinHiliteLength, out hiliteStart, out hiliteLength);
+            var pcoll = Res.Entry.GetPinyinForDisplay(diacritics,
+                Res.PinyinHiliteStart, Res.PinyinHiliteLength,
+                out pinyinInfo.HiliteStart, out pinyinInfo.HiliteLength);
             float cx = (float)AbsLeft + headInfo.HeadwordRight + (float)padMid;
             float ctop = padTop;
             for (int i = 0; i != pcoll.Count; ++i)
@@ -427,18 +428,6 @@ namespace DND.Gui
                 SizeF sz = g.MeasureString(pb.Text, fntPinyin, 65535, sf);
                 pb.Rect = new RectangleF(cx, ctop, sz.Width, sz.Height);
                 cx += sz.Width + pinyinSpaceWidth;
-                // Highlight this syllable?
-                if (hiliteStart == -1 || i < hiliteStart || i >= hiliteStart + hiliteLength)
-                {
-                    pb.Hilite = PinyinHighlight.None;
-                }
-                else
-                {
-                    if (hiliteLength == 1) pb.Hilite = PinyinHighlight.Single;
-                    else if (i == hiliteStart) pb.Hilite = PinyinHighlight.First;
-                    else if (i == hiliteStart + hiliteLength - 1) pb.Hilite = PinyinHighlight.Last;
-                    else pb.Hilite = PinyinHighlight.Middle;
-                }
                 // Add block
                 pinyinInfo.Blocks.Add(pb);
             }
