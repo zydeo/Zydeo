@@ -114,18 +114,21 @@ namespace DND.Gui
 
         public override bool DoMouseMove(Point p, MouseButtons button)
         {
+            base.DoMouseMove(p, button);
             btnCancel.Visible = isCancelVisible();
             return true;
         }
 
         public override void DoMouseEnter()
         {
+            base.DoMouseEnter();
             btnCancel.Visible = isCancelVisible();
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
         public override void DoMouseLeave()
         {
+            base.DoMouseLeave();
             btnCancel.Visible = false;
             MakeMePaint(false, RenderMode.Invalidate);
         }

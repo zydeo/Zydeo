@@ -62,142 +62,49 @@ namespace DND.Gui.Zen
         }
 
         /// <summary>
-        /// Represents shrink/grow animation states.
-        /// </summary>
-        private enum SizeAnimState
-        {
-            /// <summary>
-            /// No animation in progress.
-            /// </summary>
-            None,
-            /// <summary>
-            /// Image is being shrunk, to be grown again. Used on hover.
-            /// </summary>
-            ShrinkBeforeGrow,
-            /// <summary>
-            /// Image is being grown after shrinking. Used on hover.
-            /// </summary>
-            GrowAfterShrink,
-            /// <summary>
-            /// Image is being shrunk, to stay shrunk. Used on mouse down.
-            /// </summary>
-            Shrink,
-            /// <summary>
-            /// Image is being grown back. Used on mouse up.
-            /// </summary>
-            Grow,
-        }
-
-        /// <summary>
         /// Lock object around animation's status parameters.
         /// </summary>
         private readonly object animLO = new object();
         /// <summary>
         /// Proportion to original to shrink to (relative minimum size of image).
         /// </summary>
-        private const double smallProp = 0.8;
+        private const float smallProp = 0.8F;
         /// <summary>
-        /// Current animation state.
+        /// Current animation state:
+        /// 0: not animating (stable)
+        /// -1: shrinking
+        /// -2: shrinking, should re-grow when done; FAST
+        /// 1: growing
+        /// 2: growing, FAST
         /// </summary>
-        private SizeAnimState sizeAnimState = SizeAnimState.None;
+        private int sizeAnimState = 0;
         /// <summary>
-        /// Current value in animation; between -1 and 1.
+        /// Current value in animation; between 0 and 1.
+        /// 0: fully shrunken state
+        /// 1: fully grown state
         /// </summary>
-        private double sizeAnimVal = double.MinValue;
-        /// <summary>
-        /// If true, image must remain shrunk after finished shrinking. Used while mouse is down.
-        /// </summary>
-        private bool stableShrinkedState = false;
+        private float sizeAnimVal = 0;
 
         /// <summary>
         /// Gets the current transitional values for painting.
         /// </summary>
+        /// <param name="prop">Image proportion for sizing</param>
         private void getAnimValues(out float prop)
         {
             lock (animLO)
             {
-                // Image size
-                if (sizeAnimVal == double.MinValue)
-                    prop = stableShrinkedState ? (float)smallProp : 1.0F;
+                if (sizeAnimVal == 1) prop = 1;
+                else if (sizeAnimVal == 0) prop = smallProp;
                 else
                 {
-                    double val;
-                    val = 1.0 - Math.Pow(sizeAnimVal, 2.0);
-                    val = (Math.Cos(sizeAnimVal * Math.PI) + 1.0) / 2.0;
-                    val *= (1.0 - smallProp);
-                    prop = (float)(1.0 - val);
+                    // We don't want linear ease-in and ease-out
+                    // Cubic's chique.
+                    float ts = sizeAnimVal * sizeAnimVal;
+	                float tc = ts * sizeAnimVal;
+	                float cubeVal = -2.0F * tc + 3.0F * ts;
+                    prop = smallProp + 0.2F * cubeVal;
                 }
             }
-        }
-
-        /// <summary>
-        /// Starts a shrink-grow animation (on hover). Can transition from other animation in progress.
-        /// </summary>
-        private void doStartAnimShrinkGrow()
-        {
-            // Only bother if there is an image
-            if (image == null) return;
-            lock (animLO)
-            {
-                if (sizeAnimState == SizeAnimState.None)
-                    sizeAnimVal = -1.0;
-                else if (sizeAnimState == SizeAnimState.GrowAfterShrink || sizeAnimState == SizeAnimState.Grow)
-                    sizeAnimVal = -sizeAnimVal;
-                sizeAnimState = SizeAnimState.ShrinkBeforeGrow;
-                if (stableShrinkedState)
-                {
-                    sizeAnimVal = 0;
-                    sizeAnimState = SizeAnimState.GrowAfterShrink;
-                }
-                stableShrinkedState = false;
-            }
-            SubscribeToTimer();
-            MakeMePaint(false, RenderMode.Invalidate);
-        }
-
-        /// <summary>
-        /// Starts a shrink animation (on mouse down). Can transition from other animation in progress.
-        /// </summary>
-        private void doStartAnimShrink()
-        {
-            // Only bother if there is an image
-            if (image == null) return;
-            lock (animLO)
-            {
-                if (sizeAnimState == SizeAnimState.None)
-                    sizeAnimVal = -1.0;
-                else if (sizeAnimState == SizeAnimState.GrowAfterShrink || sizeAnimState == SizeAnimState.Grow)
-                    sizeAnimVal = -sizeAnimVal;
-                sizeAnimState = SizeAnimState.Shrink;
-                stableShrinkedState = false;
-            }
-            SubscribeToTimer();
-            MakeMePaint(false, RenderMode.Invalidate);
-        }
-
-        /// <summary>
-        /// Starts a grow animation (on mouse up). Can transition from other animation in progress.
-        /// </summary>
-        private void doStartAnimGrow()
-        {
-            // Only bother if there is an image
-            if (image == null) return;
-            lock (animLO)
-            {
-                if (sizeAnimState == SizeAnimState.None)
-                {
-                    // Only grow back if image is permanently shrunk. Would be ugly to start growing
-                    // from small when we're actually large.
-                    if (!stableShrinkedState) return;
-                    sizeAnimVal = 0;
-                }
-                else if (sizeAnimState == SizeAnimState.ShrinkBeforeGrow || sizeAnimState == SizeAnimState.Shrink)
-                    sizeAnimVal = -sizeAnimVal;
-                sizeAnimState = SizeAnimState.Grow;
-                stableShrinkedState = false;
-            }
-            SubscribeToTimer();
-            MakeMePaint(false, RenderMode.Invalidate);
         }
 
         /// <summary>
@@ -207,35 +114,37 @@ namespace DND.Gui.Zen
         /// <returns>True if timer is still needed; false otherwise.</returns>
         private bool doTimerSize()
         {
-            // Done: say we don't need timer no more.
-            if (sizeAnimState == SizeAnimState.None) return false;
-            // Shrinking
-            if (sizeAnimState == SizeAnimState.Shrink || sizeAnimState == SizeAnimState.ShrinkBeforeGrow)
+            lock (animLO)
             {
-                sizeAnimVal += 0.2;
-                if (sizeAnimVal >= 0)
+                // Shrinking
+                if (sizeAnimState < 0)
                 {
-                    if (sizeAnimState == SizeAnimState.Shrink)
+                    sizeAnimVal -= 0.1F;
+                    if (sizeAnimState == -2) sizeAnimVal -= 0.1F;
+                    // Reached minimum size?
+                    if (sizeAnimVal < 0)
                     {
-                        sizeAnimState = SizeAnimState.None;
-                        sizeAnimVal = double.MinValue;
-                        stableShrinkedState = true;
+                        sizeAnimVal = 0;
+                        // Need to re-grow?
+                        if (sizeAnimState == -2) sizeAnimState = 2;
+                        else sizeAnimState = 0;
                     }
-                    else sizeAnimState = SizeAnimState.GrowAfterShrink;
                 }
-            }
-            // Growing
-            else if (sizeAnimState == SizeAnimState.Grow || sizeAnimState == SizeAnimState.GrowAfterShrink)
-            {
-                sizeAnimVal += 0.2;
-                if (sizeAnimVal >= 1)
+                // Growing
+                else if (sizeAnimState > 0)
                 {
-                    sizeAnimState = SizeAnimState.None;
-                    sizeAnimVal = double.MinValue;
+                    sizeAnimVal += 0.1F;
+                    if (sizeAnimState == 2) sizeAnimVal += 0.1F;
+                    // Reached maximum size?
+                    if (sizeAnimVal > 1)
+                    {
+                        sizeAnimVal = 1;
+                        sizeAnimState = 0;
+                    }
                 }
             }
             // Keep up the timer
-            return true;
+            return sizeAnimState != 0;
         }
 
         /// <summary>
@@ -250,6 +159,49 @@ namespace DND.Gui.Zen
                 if (!timerNeeded) UnsubscribeFromTimer();
             }
             MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        /// <summary>
+        /// Start grow animation (on mouse enter).
+        /// </summary>
+        private void doAnimGrow()
+        {
+            lock (animLO)
+            {
+                // Currently growing: we're good.
+                if (sizeAnimState == 1) return;
+                // Currently shrinking: to to grow if it's slow
+                if (sizeAnimState == -1) sizeAnimState = 1;
+                // Currently shrinking with regrow: good
+                else if (sizeAnimState == -2) { /* NOP */ }
+                // Not animating: grow
+                else sizeAnimState = 1;
+            }
+            SubscribeToTimer();
+        }
+
+        /// <summary>
+        /// Start shrink animation (on mouse leave, or in click).
+        /// </summary>
+        /// <param name="regrow">If true, icon must re-grow (click completed with mouse up).</param>
+        private void doAnimShrink(bool regrow)
+        {
+            lock (animLO)
+            {
+                // Currently shrinking
+                if (sizeAnimState < 0)
+                {
+                    // Make sure we re-grow if needed
+                    // And we don't if it's not
+                    if (regrow) sizeAnimState = -2;
+                    else sizeAnimState = -1;
+                }
+                // Currently growing: reverse course
+                else if (sizeAnimState > 0) sizeAnimState = regrow ? -2 : -1;
+                // Not animating: shrink
+                else sizeAnimState = regrow ? -2 : -1;
+            }
+            SubscribeToTimer();
         }
 
         /// <summary>
@@ -268,7 +220,7 @@ namespace DND.Gui.Zen
         public override bool DoMouseDown(Point p, MouseButtons button)
         {
             if (!Visible) return false;
-            doStartAnimShrink();
+            doAnimShrink(false);
             return true;
         }
 
@@ -278,7 +230,7 @@ namespace DND.Gui.Zen
         public override bool DoMouseUp(Point p, MouseButtons button)
         {
             if (!Visible) return false;
-            doStartAnimShrinkGrow();
+            doAnimShrink(true);
             FireClick();
             return true;
         }
@@ -289,7 +241,7 @@ namespace DND.Gui.Zen
         public override void DoMouseEnter()
         {
             if (!Visible) return;
-            doStartAnimShrinkGrow();
+            doAnimGrow();
         }
 
         /// <summary>
@@ -298,8 +250,7 @@ namespace DND.Gui.Zen
         public override void DoMouseLeave()
         {
             if (!Visible) return;
-            // This is only really needed if mouse leaves button while shrinking or permanently shrunk.
-            doStartAnimGrow();
+            doAnimShrink(false);
         }
 
         /// <summary>
