@@ -1,9 +1,16 @@
-﻿# Show in dark overlay at bottom of scrollable results area: number of lookup results
+﻿# Zydeo window header
+WinHeader					Zydeo Chinese-English dictionary
+
+# Main window tabs
+TabMain						Zydeo
+TabLookup					Lookup
+
+# Show in dark overlay at bottom of scrollable results area: number of lookup results
 ResultsCountNone			No results
 ResultsCountOne				1 result
 ResultsCountN				{0} results
 
-#Buttons under writing pad
+# Buttons under writing pad
 WritingPadClear				Clear
 WritingPadUndo				Undo
 

@@ -373,11 +373,20 @@ namespace DND.Gui.Zen
             if (rm == RenderMode.None) return;
             if (form.InvokeRequired)
             {
-                form.Invoke((MethodInvoker)delegate
+                try
                 {
-                    if (rm == RenderMode.Invalidate) form.Invalidate();
-                    else form.Refresh();
-                });
+                    form.Invoke((MethodInvoker)delegate
+                    {
+                        if (rm == RenderMode.Invalidate) form.Invalidate();
+                        else form.Refresh();
+                    });
+                }
+                catch (ObjectDisposedException)
+                {
+                    // We just swallow this.
+                    // Cannot prevent timer threads from requesting a repaint
+                    // As window gets disposed in GUI thread
+                }
             }
             else
             {

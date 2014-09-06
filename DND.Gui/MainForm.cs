@@ -16,15 +16,18 @@ namespace DND.Gui
     {
         private LookupControl lc;
         private SettingsControl stgs;
+        private ITextProvider tprov;
 
         public MainForm(ICedictEngineFactory dictFact, ITextProvider tprov)
         {
+            this.tprov = tprov;
+
             LogicalSize = new Size(800, 500);
-            Header = Texts.WinHeader;
+            Header = tprov.GetString("WinHeader");
             lc = new LookupControl(this, dictFact, tprov);
             stgs = new SettingsControl(this);
-            MainTab = new ZenTab(stgs, Texts.TabMain);
-            Tabs.Add(new ZenTab(lc, Texts.TabLookup));
+            MainTab = new ZenTab(stgs, tprov.GetString("TabMain"));
+            Tabs.Add(new ZenTab(lc, tprov.GetString("TabLookup")));
         }
     }
 }
