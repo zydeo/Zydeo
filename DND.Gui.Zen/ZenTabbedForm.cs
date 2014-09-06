@@ -427,7 +427,7 @@ namespace DND.Gui.Zen
             x += ZenParams.HeaderTabPadding * 3.0F;
             float y = 7.0F * Scale;
             RectangleF rect = new RectangleF(x, y, ctrlClose.AbsLeft - x, headerHeight - y);
-            using (Brush b = new SolidBrush(Color.Black))
+            using (Brush b = new SolidBrush(ZenParams.StandardTextColor))
             using (Font f = new Font(new FontFamily(ZenParams.HeaderFontFamily), ZenParams.HeaderFontSize))
             {
                 StringFormat sf = StringFormat.GenericDefault;

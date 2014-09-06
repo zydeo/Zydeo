@@ -21,10 +21,13 @@ namespace DND.Gui.Zen
         public static readonly Color CloseColorHover = Color.FromArgb(224, 67, 67);
         public static readonly string GenericFontFamily = "Segoe UI";
         public static readonly float StandardFontSize = 12.0F;
+        public static readonly Color StandardTextColor = Color.Black;
+        public static readonly Color DisabledTextColor = Color.FromArgb(128, 128, 128);
 
         public static readonly Color BtnGradLightColor = Color.White;
         public static readonly Color BtnGradDarkColorBase = Color.FromArgb(175, 238, 238);
         public static readonly Color BtnGradDarkColorHover = Color.YellowGreen;
+        public static readonly Color BtnGradDarkColorDisabled = Color.FromArgb(240, 240, 240);
         public static readonly Color BtnPressColor = Color.FromArgb(240, 128, 128);
 
         //public static readonly string ZhoFontFamily = "DFKai-SB";

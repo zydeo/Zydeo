@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
 
 using DND.Common;
 using DND.HanziLookup;
@@ -56,19 +57,31 @@ namespace DND.Gui
             writingPad.LogicalSize = new Size(200, 200);
             writingPad.StrokesChanged += writingPad_StrokesChanged;
 
+            Assembly a = Assembly.GetExecutingAssembly();
+            var imgStrokesClear = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.strokes-clear.png"));
+            var imgStrokesUndo = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.strokes-undo.png"));
+
             float leftBtnWidth = writingPad.Width / 2 + 1;
             float btnHeight = 22.0F * Scale;
+
             btnClearWritingPad = new ZenGradientButton(this);
             btnClearWritingPad.RelLocation = new Point(writingPad.RelLeft, writingPad.RelBottom - 1);
             btnClearWritingPad.Size = new Size((int)leftBtnWidth, (int)btnHeight);
             btnClearWritingPad.Text = tprov.GetString("WritingPadClear");
             btnClearWritingPad.SetFont(ZenParams.GenericFontFamily, 9.0F);
+            btnClearWritingPad.Padding = (int)(3.0F * Scale);
+            btnClearWritingPad.Image = imgStrokesClear;
+            btnClearWritingPad.Enabled = false;
             btnClearWritingPad.MouseClick += btnClearWritingPad_MouseClick;
+           
             btnUndoStroke = new ZenGradientButton(this);
             btnUndoStroke.RelLocation = new Point(btnClearWritingPad.RelRight - 1, writingPad.RelBottom - 1);
             btnUndoStroke.Size = new Size(writingPad.RelRight - btnUndoStroke.RelLeft, (int)btnHeight);
             btnUndoStroke.Text = tprov.GetString("WritingPadUndo");
             btnUndoStroke.SetFont(ZenParams.GenericFontFamily, 9.0F);
+            btnUndoStroke.Padding = (int)(3.0F * Scale);
+            btnUndoStroke.Image = imgStrokesUndo;
+            btnUndoStroke.Enabled = false;
             btnUndoStroke.MouseClick += btnUndoStroke_MouseClick;
 
             cpCtrl = new CharPicker(this);
@@ -147,6 +160,9 @@ namespace DND.Gui
         private void writingPad_StrokesChanged(IEnumerable<WritingPad.Stroke> strokes)
         {
             startNewCharRecog(strokes);
+            int cnt = 0;
+            foreach (var x in strokes) ++cnt;
+            btnClearWritingPad.Enabled = btnUndoStroke.Enabled = cnt > 0;
         }
 
         private void recognize(object ctxt)
@@ -188,11 +204,13 @@ namespace DND.Gui
         void btnUndoStroke_MouseClick(ZenControlBase sender)
         {
             writingPad.UndoLast();
+            // Button states will be updated in "strokes changed" event handler.
         }
 
         void btnClearWritingPad_MouseClick(ZenControlBase sender)
         {
             writingPad.Clear();
+            // Button states will be updated in "strokes changed" event handler.
         }
 
         private void siCtrl_StartSearch(string text)

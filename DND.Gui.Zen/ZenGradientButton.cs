@@ -54,6 +54,16 @@ namespace DND.Gui.Zen
         private Image image = null;
 
         /// <summary>
+        /// Disabled image: calculated on the fly by greyscaling.
+        /// </summary>
+        private Image disabledImage = null;
+
+        /// <summary>
+        /// Whether or not button is enabled.
+        /// </summary>
+        private bool enabled = true;
+
+        /// <summary>
         /// Ctor: take parent.
         /// </summary>
         public ZenGradientButton(ZenControlBase parent)
@@ -69,6 +79,7 @@ namespace DND.Gui.Zen
         {
             if (fntText != null) fntText.Dispose();
             if (image != null) image.Dispose();
+            if (disabledImage != null) image.Dispose();
             base.Dispose();
         }
 
@@ -132,8 +143,11 @@ namespace DND.Gui.Zen
             get { return image; }
             set
             {
-                if (image != null) image.Dispose();
+                if (image != null) { image.Dispose(); image = null; }
+                if (disabledImage != null) { disabledImage.Dispose(); image = null; }
                 image = value;
+                disabledImage = makeDisabledImage(image);
+                MakeMePaint(false, RenderMode.Invalidate);
             }
         }
 
@@ -143,7 +157,30 @@ namespace DND.Gui.Zen
         public int Padding
         {
             get { return padding; }
-            set { padding = value; }
+            set
+            {
+                padding = value;
+                MakeMePaint(false, RenderMode.Invalidate);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether button is enabled.
+        /// </summary>
+        public bool Enabled
+        {
+            get { return enabled; }
+            set
+            {
+                // Kill any animation that may be in progress
+                lock (animLO)
+                {
+                    pressAnimState = hoverAnimState = 0;
+                    pressAnimVal = hoverAnimVal = 0;
+                }
+                enabled = value;
+                MakeMePaint(false, RenderMode.Invalidate);
+            }
         }
 
         /// <summary>
@@ -167,6 +204,7 @@ namespace DND.Gui.Zen
         /// </summary>
         public override void DoMouseEnter()
         {
+            if (!enabled) return;
             doStartHoverAnim(true);
         }
 
@@ -175,6 +213,7 @@ namespace DND.Gui.Zen
         /// </summary>
         public override void DoMouseLeave()
         {
+            if (!enabled) return;
             doStartHoverAnim(false);
             doStartPressAnim(false);
         }
@@ -193,6 +232,7 @@ namespace DND.Gui.Zen
         /// </summary>
         public override bool DoMouseDown(Point p, MouseButtons button)
         {
+            if (!enabled) return true;
             doStartPressAnim(true);
             return true;
         }
@@ -202,6 +242,7 @@ namespace DND.Gui.Zen
         /// </summary>
         public override bool DoMouseUp(Point p, MouseButtons button)
         {
+            if (!enabled) return true;
             doStartPressAnim(false);
             FireClick();
             return true;
@@ -374,6 +415,22 @@ namespace DND.Gui.Zen
             return MeasureText(text, fntText, sf);
         }
 
+        private Image makeDisabledImage(Image image)
+        {
+            Bitmap bmp = new Bitmap(image);
+            for (int x = 0; x != bmp.Width; ++x)
+            {
+                for (int y = 0; y != bmp.Height; ++y)
+                {
+                    Color c = bmp.GetPixel(x, y);
+                    int avg = c.R + c.G + c.B;
+                    avg /= 3;
+                    bmp.SetPixel(x, y, Color.FromArgb(c.A /2, avg, avg, avg));
+                }
+            }
+            return bmp;
+        }
+
         /// <summary>
         /// Paints gradient background blend.
         /// </summary>
@@ -425,17 +482,42 @@ namespace DND.Gui.Zen
                 g.FillRectangle(b, rect);
             }
 
-            // Three gradients, with different alfa levels depending on animation state
-            doPaintGradientBg(g, ZenParams.BtnGradLightColor, ZenParams.BtnGradDarkColorBase, (byte)(255 - hoverAlfa), false);
-            doPaintGradientBg(g, ZenParams.BtnGradLightColor, ZenParams.BtnGradDarkColorHover, (byte)hoverAlfa, true);
-            doPaintGradientBg(g, ZenParams.BtnGradLightColor, ZenParams.BtnPressColor, (byte)pressAlfa, true);
+            if (enabled)
+            {
+                // Three gradients, with different alfa levels depending on animation state
+                doPaintGradientBg(g, ZenParams.BtnGradLightColor, ZenParams.BtnGradDarkColorBase, (byte)(255 - hoverAlfa), false);
+                doPaintGradientBg(g, ZenParams.BtnGradLightColor, ZenParams.BtnGradDarkColorHover, (byte)hoverAlfa, true);
+                doPaintGradientBg(g, ZenParams.BtnGradLightColor, ZenParams.BtnPressColor, (byte)pressAlfa, true);
+            }
+            else
+            {
+                // For a disabled button, only one gradient, no blending b/c no states
+                doPaintGradientBg(g, ZenParams.BtnGradLightColor, ZenParams.BtnGradDarkColorDisabled, 255, false);
+            }
+
+            // Image, if we have any
+            if (image != null)
+            {
+                RectangleF imgRect = new RectangleF(padding, padding,
+                    Height - 2 * (padding), Height - 2 * (padding));
+                if (enabled) g.DrawImage(image, imgRect);
+                else g.DrawImage(disabledImage, imgRect);
+            }
 
             // Text, if we have any
             if (text != string.Empty)
             {
-                // To the right of image
-                int txtLeft = (int)Math.Round((((float)Width) - textSize.Width) / 2.0F);
-                if (image != null) txtLeft += Height - padding;
+                int txtLeft;
+                // Centered if no image
+                if (image == null)
+                {
+                    txtLeft = (int)Math.Round((((float)Width) - textSize.Width) / 2.0F);
+                }
+                // To the right of left-aligned image otherwise
+                else
+                {
+                    txtLeft = Height + padding;
+                }
                 // Aligner to center, both horizontally & vertically
                 int txtTop = (int)(((float)Height) * 0.5F - (textSize.Height / 2.0F));
                 // For Hanzi, need different strategy
@@ -443,7 +525,8 @@ namespace DND.Gui.Zen
                 RectangleF textRect = new RectangleF(txtLeft, txtTop, textSize.Width + 1, textSize.Height + 1);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
                 StringFormat sf = StringFormat.GenericTypographic;
-                using (Brush b = new SolidBrush(Color.Black))
+                Color txtColor = enabled ? ZenParams.StandardTextColor : ZenParams.DisabledTextColor;
+                using (Brush b = new SolidBrush(txtColor))
                 {
                     g.DrawString(text, fntText, b, textRect, sf);
                 }
