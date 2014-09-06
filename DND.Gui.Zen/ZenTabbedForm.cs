@@ -105,7 +105,7 @@ namespace DND.Gui.Zen
         protected string Header
         {
             get { return header; }
-            set { header = value; doRepaint(); form.Invalidate(); }
+            set { header = value; headerEllipsed = null; doRepaint(); form.Invalidate(); }
         }
 
         /// <summary>
