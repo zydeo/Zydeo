@@ -56,7 +56,6 @@ namespace DND.Gui
             btnCancel.Visible = false;
             btnCancel.MouseClick += onClickCancel;
 
-
             txtInput.MouseEnter += onTxtMouseEnter;
             txtInput.MouseLeave += onTxtMouseLeave;
         }

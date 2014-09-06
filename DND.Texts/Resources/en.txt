@@ -2,3 +2,8 @@
 ResultsCountNone			No results
 ResultsCountOne				1 result
 ResultsCountN				{0} results
+
+#Buttons under writing pad
+WritingPadClear				Clear
+WritingPadUndo				Undo
+

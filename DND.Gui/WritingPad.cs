@@ -61,6 +61,16 @@ namespace DND.Gui
                 clearAnimState = 0;
                 SubscribeToTimer();
             }
+            if (StrokesChanged != null) StrokesChanged(new Stroke[0]);
+        }
+
+        public void UndoLast()
+        {
+            if (strokes.Count == 0) return;
+            strokes.RemoveAt(strokes.Count - 1);
+            // Repaint; tell the world
+            MakeMePaint(false, RenderMode.Invalidate);
+            if (StrokesChanged != null) StrokesChanged(Strokes);
         }
 
         public WritingPad(ZenControl owner)

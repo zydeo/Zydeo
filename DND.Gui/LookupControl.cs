@@ -31,6 +31,8 @@ namespace DND.Gui
         private ICedictEngine dict;
 
         private WritingPad writingPad;
+        private ZenGradientButton btnClearWritingPad;
+        private ZenGradientButton btnUndoStroke;
         private ResultsControl resCtrl;
         private CharPicker cpCtrl;
         private SearchInputControl siCtrl;
@@ -54,11 +56,26 @@ namespace DND.Gui
             writingPad.LogicalSize = new Size(200, 200);
             writingPad.StrokesChanged += writingPad_StrokesChanged;
 
+            float leftBtnWidth = writingPad.Width / 2 + 1;
+            float btnHeight = 22.0F * Scale;
+            btnClearWritingPad = new ZenGradientButton(this);
+            btnClearWritingPad.RelLocation = new Point(writingPad.RelLeft, writingPad.RelBottom - 1);
+            btnClearWritingPad.Size = new Size((int)leftBtnWidth, (int)btnHeight);
+            btnClearWritingPad.Text = tprov.GetString("WritingPadClear");
+            btnClearWritingPad.SetFont(ZenParams.GenericFontFamily, 9.0F);
+            btnClearWritingPad.MouseClick += btnClearWritingPad_MouseClick;
+            btnUndoStroke = new ZenGradientButton(this);
+            btnUndoStroke.RelLocation = new Point(btnClearWritingPad.RelRight - 1, writingPad.RelBottom - 1);
+            btnUndoStroke.Size = new Size(writingPad.RelRight - btnUndoStroke.RelLeft, (int)btnHeight);
+            btnUndoStroke.Text = tprov.GetString("WritingPadUndo");
+            btnUndoStroke.SetFont(ZenParams.GenericFontFamily, 9.0F);
+            btnUndoStroke.MouseClick += btnUndoStroke_MouseClick;
+
             cpCtrl = new CharPicker(this);
             cpCtrl.FontFace = "Noto Sans S Chinese Regular";
             //cpCtrl.FontFace = "䡡湄楮札䍓ⵆ潮瑳";
             //cpCtrl.FontFace = "SimSun";
-            cpCtrl.RelLocation = new Point(padding, writingPad.RelBottom + padding);
+            cpCtrl.RelLocation = new Point(padding, btnClearWritingPad.RelBottom + padding);
             cpCtrl.LogicalSize = new Size(200, 80);
             cpCtrl.CharPicked += cpCtrl_CharPicked;
 
@@ -166,6 +183,16 @@ namespace DND.Gui
             {
                 cpCtrl.SetItems(matches);
             });
+        }
+
+        void btnUndoStroke_MouseClick(ZenControlBase sender)
+        {
+            writingPad.UndoLast();
+        }
+
+        void btnClearWritingPad_MouseClick(ZenControlBase sender)
+        {
+            writingPad.Clear();
         }
 
         private void siCtrl_StartSearch(string text)
