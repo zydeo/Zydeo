@@ -13,7 +13,7 @@ namespace DND.Gui
 {
     internal class SearchInputControl : ZenControl
     {
-        public delegate void StartSearchDelegate(string text);
+        public delegate void StartSearchDelegate(object sender, string text);
         public event StartSearchDelegate StartSearch;
 
         private readonly TextBox txtInput;
@@ -25,18 +25,21 @@ namespace DND.Gui
         public SearchInputControl(ZenControl owner)
             : base(owner)
         {
+            padding = (int)Math.Round(4.0F * Scale);
+
             txtInput = new TextBox();
             txtInput.Name = "txtInput";
             txtInput.BorderStyle = BorderStyle.None;
             txtInput.TabIndex = 0;
             RegisterWinFormsControl(txtInput);
-            txtInput.Font = new System.Drawing.Font("Segoe UI", 12.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            string fface = ZenParams.ZhoFontFamily;
+            txtInput.Font = new System.Drawing.Font(fface, 16F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
             txtInput.AutoSize = false;
-            txtInput.Height = (int)(((float)txtInput.PreferredHeight) * 1.1F);
+            txtInput.Height = txtInput.PreferredHeight + padding;
+            //txtInput.BackColor = Color.Magenta;
 
-            padding = (int)Math.Round(4.0F * Scale);
             blockSizeChanged = true;
-            Height = 2 + txtInput.Height + 2 * padding;
+            Height = 2 + txtInput.Height;
             blockSizeChanged = false;
             txtInput.KeyPress += txtInput_KeyPress;
 
@@ -76,6 +79,11 @@ namespace DND.Gui
             txtInput.SelectAll();
         }
 
+        public string Text
+        {
+            get { return txtInput.Text; }
+        }
+
         protected override void OnSizeChanged()
         {
             if (blockSizeChanged) return;
@@ -84,7 +92,7 @@ namespace DND.Gui
             int ctrlHeight = Height - 2 * padding;
             // Text field: search icon on left, X icon on right
             // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
-            txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + padding);
+            txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + padding /2);
             txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, ctrlHeight);
 
             // Cancel button: right-aligned
@@ -94,7 +102,7 @@ namespace DND.Gui
         private void doStartSearch()
         {
             if (StartSearch != null)
-                StartSearch(txtInput.Text);
+                StartSearch(this, txtInput.Text);
         }
 
         public override void DoMouseEnter()

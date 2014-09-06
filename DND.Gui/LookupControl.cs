@@ -94,7 +94,7 @@ namespace DND.Gui
 
             siCtrl = new SearchInputControl(this);
             siCtrl.RelLocation = new Point(writingPad.RelRight + padding, padding);
-            siCtrl.StartSearch += siCtrl_StartSearch;
+            siCtrl.StartSearch += onStartSearch;
 
             btnSimpTrad = new ZenGradientButton(this);
             btnSimpTrad.RelTop = padding;
@@ -213,11 +213,11 @@ namespace DND.Gui
             // Button states will be updated in "strokes changed" event handler.
         }
 
-        private void siCtrl_StartSearch(string text)
+        private void onStartSearch(object sender, string text)
         {
             if (dict == null) return;
             CedictLookupResult res = dict.Lookup(text, searchScript, SearchLang.Chinese);
-            siCtrl.SelectAll();
+            if (sender == siCtrl) siCtrl.SelectAll();
             resCtrl.SetResults(res.Results, searchScript);
         }
 
@@ -261,6 +261,7 @@ namespace DND.Gui
             writingPad.Clear();
             cpCtrl.SetItems(null);
             siCtrl.InsertCharacter(c);
+            onStartSearch(this, siCtrl.Text);
         }
 
         public override void DoPaint(Graphics g)
