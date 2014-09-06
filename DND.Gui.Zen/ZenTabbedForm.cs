@@ -19,6 +19,7 @@ namespace DND.Gui.Zen
         private readonly int headerHeight;
         private readonly int innerPadding;
         private string header;
+        private string headerEllipsed = null;
         private ZenCloseControl ctrlClose;
         private ZenTabControl mainTabCtrl;
         private readonly List<ZenTabControl> contentTabControls = new List<ZenTabControl>();
@@ -244,6 +245,8 @@ namespace DND.Gui.Zen
         private void arrangeControls()
         {
             if (!controlsCreated) return;
+
+            headerEllipsed = null;
             
             // Resize and place active content tab, if any
             foreach (ZenTab zt in tabs)
@@ -418,23 +421,52 @@ namespace DND.Gui.Zen
             }
         }
 
-        public override void DoPaint(Graphics g)
+        private void doPaintHeaderText(Graphics g)
         {
-            // Header, frame, content background...
-            doPaintBackground(g);
             // Text in header: my window title
             float x = contentTabControls[contentTabControls.Count - 1].AbsRight;
             x += ZenParams.HeaderTabPadding * 3.0F;
             float y = 7.0F * Scale;
-            RectangleF rect = new RectangleF(x, y, ctrlClose.AbsLeft - x, headerHeight - y);
+            float w = ctrlClose.AbsLeft - x;
+            RectangleF rectHeader = new RectangleF(x, y, ctrlClose.AbsLeft - w, headerHeight - y);
             using (Brush b = new SolidBrush(ZenParams.StandardTextColor))
             using (Font f = new Font(new FontFamily(ZenParams.HeaderFontFamily), ZenParams.HeaderFontSize))
             {
-                StringFormat sf = StringFormat.GenericDefault;
-                sf.Trimming = StringTrimming.Word;
-                sf.FormatFlags |= StringFormatFlags.NoWrap;
-                g.DrawString(header, f, b, rect, sf);
+                SizeF hsz;
+                StringFormat sf = StringFormat.GenericTypographic;
+                // Header is not ellipsed yet. Measure full text. Maybe it just fits.
+                if (headerEllipsed == null)
+                {
+                    hsz = g.MeasureString(header, f, 65535, sf);
+                    if (hsz.Width < w) headerEllipsed = header;
+                }
+                // Our manual ellipsis - or not
+                if (headerEllipsed == null)
+                {
+                    headerEllipsed = header.Substring(0, header.Length - 1) + "…";
+                    while (true)
+                    {
+                        if (headerEllipsed.Length == 1) break;
+                        hsz = g.MeasureString(headerEllipsed, f, 65535, sf);
+                        if (hsz.Width < w) break;
+                        headerEllipsed = headerEllipsed.Substring(0, headerEllipsed.Length - 2) + "…";
+                    }
+                }
+                // Draw ellipsed text - centered
+                hsz = g.MeasureString(headerEllipsed, f, 65535, sf);
+                rectHeader.Width = hsz.Width + 1.0F;
+                if (headerEllipsed == header)
+                    rectHeader.X = x + (w - rectHeader.Width) / 2.0F;
+                g.DrawString(headerEllipsed, f, b, rectHeader, sf);
             }
+        }
+
+        public override void DoPaint(Graphics g)
+        {
+            // Header, frame, content background...
+            doPaintBackground(g);
+            // Header text
+            doPaintHeaderText(g);
             // All children
             DoPaintChildren(g);
         }
