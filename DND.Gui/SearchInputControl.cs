@@ -92,11 +92,11 @@ namespace DND.Gui
             int ctrlHeight = Height - 2 * padding;
             // Text field: search icon on left, X icon on right
             // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
-            txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + padding /2);
+            txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + padding);
             txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, ctrlHeight);
 
             // Cancel button: right-aligned
-            btnCancel.RelLocation = new Point(Width - padding - btnCancel.Width, padding);
+            btnCancel.RelLocation = new Point(Width - padding - btnCancel.Width, 2 * padding / 3);
         }
 
         private void doStartSearch()
@@ -105,9 +105,22 @@ namespace DND.Gui
                 StartSearch(this, txtInput.Text);
         }
 
+        private bool isCancelVisible()
+        {
+            Point p = MousePosition;
+            Rectangle rect = new Rectangle(txtInput.Left, 1, Width - txtInput.Left - 1, Height - 2);
+            return rect.Contains(p);
+        }
+
+        public override bool DoMouseMove(Point p, MouseButtons button)
+        {
+            btnCancel.Visible = isCancelVisible();
+            return true;
+        }
+
         public override void DoMouseEnter()
         {
-            btnCancel.Visible = true;
+            btnCancel.Visible = isCancelVisible();
             MakeMePaint(false, RenderMode.Invalidate);
         }
 

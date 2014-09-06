@@ -64,5 +64,15 @@ namespace DND.Gui.Zen
             // Paint children
             DoPaintChildren(g);
         }
+
+        protected Point MousePosition
+        {
+            get
+            {
+                Point pAbs = MousePositionAbs;
+                Point pRel = new Point(pAbs.X - AbsLeft, pAbs.Y - AbsTop);
+                return pRel;
+            }
+        }
     }
 }
