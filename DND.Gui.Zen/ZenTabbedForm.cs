@@ -28,6 +28,7 @@ namespace DND.Gui.Zen
         private readonly ZenTabCollection tabs;
         private int activeTabIdx = 0;
         private readonly List<ZenControlBase> timerSubscribers = new List<ZenControlBase>();
+        private Cursor desiredCursor = Cursors.Arrow;
 
         public ZenTabbedForm()
             : base(null)
@@ -59,6 +60,15 @@ namespace DND.Gui.Zen
         public Form WinForm
         {
             get { return form; }
+        }
+
+        /// <summary>
+        /// Gets or sets the form's cursor.
+        /// </summary>
+        public override sealed Cursor Cursor
+        {
+            get { return form.Cursor; }
+            set { desiredCursor = value; form.Cursor = value; }
         }
 
         public override float Scale
@@ -684,7 +694,7 @@ namespace DND.Gui.Zen
             // Over a control of ours? If yes, we're done.
             if (base.DoMouseMove(p, button))
             {
-                form.Cursor = Cursors.Arrow;
+                form.Cursor = desiredCursor;
                 return true;
             }
 

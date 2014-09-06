@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomCursor.cs" />
     <Compile Include="GraphicsExtension.cs" />
     <Compile Include="IZenTabsChangedListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

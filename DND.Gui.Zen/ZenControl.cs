@@ -74,5 +74,14 @@ namespace DND.Gui.Zen
                 return pRel;
             }
         }
+
+        /// <summary>
+        /// Gets or sets the form's cursor.
+        /// </summary>
+        public override sealed Cursor Cursor
+        {
+            get { return Parent.Cursor; }
+            set { Parent.Cursor = value; }
+        }
     }
 }

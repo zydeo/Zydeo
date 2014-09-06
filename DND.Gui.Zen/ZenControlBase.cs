@@ -202,6 +202,15 @@ namespace DND.Gui.Zen
             get { return new Point((int)(RelRect.X / Scale), (int)(RelRect.Y / Scale)); }
         }
 
+        /// <summary>
+        /// Gets or sets the cursor.
+        /// </summary>
+        public abstract Cursor Cursor
+        {
+            get;
+            set;
+        }
+
         protected virtual void OnSizeChanged()
         {
         }

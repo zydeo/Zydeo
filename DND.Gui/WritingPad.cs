@@ -34,6 +34,15 @@ namespace DND.Gui
             }
         }
 
+        /// <summary>
+        /// The cursor shown in the writing pad - custom-drawn.
+        /// </summary>
+        private Cursor myCursor;
+        /// <summary>
+        /// The cursor I received when the mouse entered the writing pad.
+        /// </summary>
+        private Cursor receivedCursor = Cursors.Arrow;
+
         private readonly List<PointF> currentPoints = new List<PointF>();
         const float canvasScale = 250.0F;
         const float strokeThicknessLogical = 5.0F;
@@ -76,6 +85,64 @@ namespace DND.Gui
         public WritingPad(ZenControl owner)
             : base(owner)
         {
+            createMyCursor();
+        }
+
+        private void createMyCursor()
+        {
+            int dia = (int)(strokeThicknessLogical * Scale);
+            if ((dia / 2) * 2 != dia) dia += 1;
+            Rectangle rect = new Rectangle(0, 0, 5 * dia + 1, 5 * dia + 1);
+
+            using (Bitmap bmp = new Bitmap(rect.Width, rect.Height))
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                Color bgCol = Color.FromArgb(0, 255, 255, 255);
+                using (Brush b = new SolidBrush(bgCol))
+                {
+                    g.FillRectangle(b, 0, 0, bmp.Width, bmp.Height);
+                }
+                g.SmoothingMode = SmoothingMode.HighQuality;
+                Color col = Color.Gray;
+                using (Brush b = new SolidBrush(col))
+                {
+                    Rectangle dotRect = new Rectangle(2 * dia, 2 * dia, dia, dia);
+                    g.FillEllipse(b, dotRect);
+                }
+                using (Pen p = new Pen(col))
+                {
+                    g.DrawEllipse(p, dia + dia / 2, dia + dia / 2, 2 * dia, 2 * dia);
+                    //g.DrawLine(p, dia, 2 * dia + dia / 2, 4 * dia, 2 * dia + dia / 2);
+                    //g.DrawLine(p, 2 * dia + dia / 2, dia, 2 * dia + dia / 2, 4 * dia);
+                    //g.DrawLine(p,
+                    //    0,
+                    //    2 * dia + dia / 2,
+                    //    dia + dia / 2,
+                    //    2 * dia + dia / 2);
+                    //g.DrawLine(p,
+                    //    3 * dia + dia / 2,
+                    //    2 * dia + dia / 2,
+                    //    5 * dia,
+                    //    2 * dia + dia / 2);
+                    //g.DrawLine(p,
+                    //    2 * dia + dia / 2,
+                    //    0,
+                    //    2 * dia + dia / 2,
+                    //    dia + dia / 2);
+                    //g.DrawLine(p,
+                    //    2 * dia + dia / 2,
+                    //    3 * dia + dia / 2,
+                    //    2 * dia + dia / 2,
+                    //    5 * dia);
+                }
+                myCursor = CustomCursor.CreateCursor(bmp, 2 * dia + dia / 2, 2 * dia + dia / 2);
+            }
+        }
+
+        public override void Dispose()
+        {
+            if (myCursor != null) myCursor.Dispose();
+            base.Dispose();
         }
         
         protected override void OnSizeChanged()
@@ -365,8 +432,16 @@ namespace DND.Gui
             return true;
         }
 
+        public override void DoMouseEnter()
+        {
+            base.DoMouseEnter();
+            receivedCursor = Cursor;
+            Cursor = myCursor;
+        }
+
         public override void DoMouseLeave()
         {
+            Cursor = receivedCursor;
             doStrokeOver();
         }
     }
