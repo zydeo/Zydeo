@@ -18,8 +18,8 @@ namespace DND.Gui
 
         private readonly TextBox txtInput;
         private readonly int padding;
-        private readonly ZenButton btnSearch;
-        private readonly ZenButton btnCancel;
+        private readonly ZenImageButton btnSearch;
+        private readonly ZenImageButton btnCancel;
         private bool blockSizeChanged = false;
 
         public SearchInputControl(ZenControl owner)
@@ -42,19 +42,17 @@ namespace DND.Gui
 
             Assembly a = Assembly.GetExecutingAssembly();
             var imgSearch = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.search.png"));
-            btnSearch = new ZenButton(this);
+            btnSearch = new ZenImageButton(this);
             btnSearch.RelLocation = new Point(padding, padding);
             btnSearch.Size = new Size(Height - 2 * padding, Height - 2 * padding);
             btnSearch.Image = imgSearch;
-            btnSearch.HasBorder = false;
             btnSearch.MouseClick += onClickSearch;
 
             var imgCancel = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.cancel.png"));
-            btnCancel = new ZenButton(this);
+            btnCancel = new ZenImageButton(this);
             btnCancel.Size = new Size(Height - 2 * padding, Height - 2 * padding);
             btnCancel.RelLocation = new Point(Width - padding - btnCancel.Width, padding);
             btnCancel.Image = imgCancel;
-            btnCancel.HasBorder = false;
             btnCancel.Visible = false;
             btnCancel.MouseClick += onClickCancel;
 

@@ -34,7 +34,7 @@ namespace DND.Gui
         private ResultsControl resCtrl;
         private CharPicker cpCtrl;
         private SearchInputControl siCtrl;
-        private ZenButton simpTradCtrl;
+        private ZenGradientButton btnSimpTrad;
 
         private readonly HashSet<StrokesMatcher> runningMatchers = new HashSet<StrokesMatcher>();
 
@@ -66,13 +66,13 @@ namespace DND.Gui
             siCtrl.RelLocation = new Point(writingPad.RelRight + padding, padding);
             siCtrl.StartSearch += siCtrl_StartSearch;
 
-            simpTradCtrl = new ZenButton(this);
-            simpTradCtrl.RelTop = padding;
-            simpTradCtrl.Height = siCtrl.Height;
-            simpTradCtrl.Width = getSimpTradWidth();
-            simpTradCtrl.MouseClick += simpTradCtrl_MouseClick;
-            simpTradCtrl.HoverBackColor = Color.PaleTurquoise;
-            simpTradCtrl.PressedBackColor = Color.LightCoral;
+            btnSimpTrad = new ZenGradientButton(this);
+            btnSimpTrad.RelTop = padding;
+            btnSimpTrad.Height = siCtrl.Height;
+            btnSimpTrad.SetFont(ZenParams.ZhoFontFamily, ZenParams.ZhoButtonFontSize);
+            btnSimpTrad.Width = getSimpTradWidth();
+            btnSimpTrad.ForcedCharHeight = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoButtonFontSize).RealRect.Height;
+            btnSimpTrad.MouseClick += simpTradCtrl_MouseClick;
             setSimpTradText();
 
             resCtrl = new ResultsControl(this, tprov);
@@ -178,9 +178,9 @@ namespace DND.Gui
 
         private int getSimpTradWidth()
         {
-            int w = simpTradCtrl.GetPreferredWidth(false, "mm" + Texts.SearchSimp);
-            w = Math.Max(w, simpTradCtrl.GetPreferredWidth(false, "mm" + Texts.SearchTrad));
-            w = Math.Max(w, simpTradCtrl.GetPreferredWidth(false, "mm" + Texts.SearchBoth));
+            int w = btnSimpTrad.GetPreferredWidth(false, "m" + Texts.SearchSimp);
+            w = Math.Max(w, btnSimpTrad.GetPreferredWidth(false, "m" + Texts.SearchTrad));
+            w = Math.Max(w, btnSimpTrad.GetPreferredWidth(false, "m" + Texts.SearchBoth));
             return w;
         }
 
@@ -192,8 +192,8 @@ namespace DND.Gui
             else if (searchScript == SearchScript.Traditional)
                 text = Texts.SearchTrad;
             else text = Texts.SearchBoth;
-            simpTradCtrl.Text = text;
-            simpTradCtrl.Invalidate();
+            btnSimpTrad.Text = text;
+            btnSimpTrad.Invalidate();
         }
 
         private void simpTradCtrl_MouseClick(ZenControlBase sender)
@@ -231,9 +231,9 @@ namespace DND.Gui
         protected override void OnSizeChanged()
         {
             siCtrl.RelLocation = new Point(writingPad.RelRight + padding, padding);
-            siCtrl.Width = Width - resCtrl.RelLeft - simpTradCtrl.Width - 2 * padding;
-            simpTradCtrl.RelLeft = Width - padding - simpTradCtrl.Width;
-            simpTradCtrl.Height = siCtrl.Height;
+            siCtrl.Width = Width - resCtrl.RelLeft - btnSimpTrad.Width - 2 * padding;
+            btnSimpTrad.RelLeft = Width - padding - btnSimpTrad.Width;
+            btnSimpTrad.Height = siCtrl.Height;
             resCtrl.Size = new Size(Width - resCtrl.RelLeft - padding, Height - resCtrl.RelTop - padding);
         }
     }

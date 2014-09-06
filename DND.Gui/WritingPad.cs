@@ -271,7 +271,7 @@ namespace DND.Gui
                 }
             }
             // Border
-            using (Pen p = new Pen(SystemColors.ControlDarkDark))
+            using (Pen p = new Pen(ZenParams.BorderColor))
             {
                 g.DrawLine(p, 0, 0, Width, 0);
                 g.DrawLine(p, Width - 1, 0, Width - 1, Height);

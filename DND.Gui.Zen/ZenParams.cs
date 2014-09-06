@@ -9,7 +9,7 @@ namespace DND.Gui.Zen
     {
         public static readonly float HeaderHeight = 40;
         public static readonly float InnerPadding = 8;
-        public static readonly Color BorderColor = Color.FromArgb(13, 32, 45);
+        public static readonly Color BorderColor = Color.FromArgb(128, 128, 128);
         public static readonly Color PaddingBackColor = Color.Honeydew;
         public static readonly Color HeaderBackColor = Color.YellowGreen;
         public static readonly string HeaderTabFontFamily = "Segoe UI";
@@ -20,7 +20,13 @@ namespace DND.Gui.Zen
         public static readonly Color CloseColorBase = Color.FromArgb(199, 80, 80);
         public static readonly Color CloseColorHover = Color.FromArgb(224, 67, 67);
         public static readonly string GenericFontFamily = "Segoe UI";
-        
+        public static readonly float StandardFontSize = 12.0F;
+
+        public static readonly Color BtnGradLightColor = Color.White;
+        public static readonly Color BtnGradDarkColorBase = Color.FromArgb(175, 238, 238);
+        public static readonly Color BtnGradDarkColorHover = Color.YellowGreen;
+        public static readonly Color BtnPressColor = Color.FromArgb(240, 128, 128);
+
         //public static readonly string ZhoFontFamily = "DFKai-SB";
         //public static readonly string ZhoFontFamily = "䡡湄楮札䍓ⵆ潮瑳";
         public static readonly string ZhoFontFamily = "Noto Sans S Chinese Regular";
@@ -32,5 +38,6 @@ namespace DND.Gui.Zen
         public static readonly float ResultsCountFontSize = 9.0F;
         public static readonly Color PinyinHiliteColor = Color.FromArgb(255, 232, 189);
         public static readonly Color HanziHiliteColor = Color.FromArgb(255, 232, 189);
+        public static readonly float ZhoButtonFontSize = 18.0F;
     }
 }

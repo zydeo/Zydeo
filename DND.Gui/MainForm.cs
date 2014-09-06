@@ -24,7 +24,6 @@ namespace DND.Gui
             lc = new LookupControl(this, dictFact, tprov);
             stgs = new SettingsControl(this);
             MainTab = new ZenTab(stgs, Texts.TabMain);
-            //MainTabHeader = "Zydeo";
             Tabs.Add(new ZenTab(lc, Texts.TabLookup));
         }
     }
