@@ -57,6 +57,7 @@
     <Compile Include="ZenTabbedForm.cs" />
     <Compile Include="ZenTabCollection.cs" />
     <Compile Include="ZenTabControl.cs" />
+    <Compile Include="ZenTimer.cs" />
     <Compile Include="ZenWinForm.cs">
       <SubType>Form</SubType>
     </Compile>

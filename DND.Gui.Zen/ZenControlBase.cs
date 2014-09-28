@@ -18,6 +18,7 @@ namespace DND.Gui.Zen
         private readonly List<Control> winFormsControls = new List<Control>();
         private Rectangle absRect = new Rectangle(0, 0, 0, 0);
         private ZenControlBase ctrlWithMouse = null;
+        private bool isDisposed = false;
 
         internal ZenControlBase(ZenControlBase parent)
         {
@@ -28,6 +29,12 @@ namespace DND.Gui.Zen
         public virtual void Dispose()
         {
             foreach (ZenControlBase ctrl in zenChildren) ctrl.Dispose();
+            isDisposed = true;
+        }
+
+        public bool IsDisposed
+        {
+            get { return isDisposed; }
         }
 
         public virtual float Scale
@@ -345,39 +352,44 @@ namespace DND.Gui.Zen
             return res;
         }
 
-        internal virtual void SubscribeToTimer(ZenControlBase ctrl)
-        {
-            Parent.SubscribeToTimer(ctrl);
-        }
-
+        /// <summary>
+        /// Subscribes current control to timer events, so control receives callbacks to <see cref="DoTimer"/>.
+        /// </summary>
         protected void SubscribeToTimer()
         {
-            SubscribeToTimer(this);
+            ZenTimer.SubscribeToTimer(this);
         }
 
-        internal virtual void UnsubscribeFromTimer(ZenControlBase ctrl)
-        {
-            Parent.UnsubscribeFromTimer(ctrl);
-        }
-
+        /// <summary>
+        /// Unsubscribes from timer events, so <see cref="DoTimer"/> stops getting called.
+        /// </summary>
         protected void UnsubscribeFromTimer()
         {
-            UnsubscribeFromTimer(this);
+            ZenTimer.UnsubscribeFromTimer(this);
         }
 
+        /// <summary>
+        /// Called periodically after control has subscribed to timer events via <see cref="SubscribeToTimer"/>.
+        /// </summary>
         public virtual void DoTimer()
         {
         }
 
+        /// <summary>
+        /// Returns true if point is inside control, as expressed in parent's coordinate system.
+        /// </summary>
         public bool Contains(Point pParent)
         {
             return RelRect.Contains(pParent);
         }
 
-        protected ZenControlBase GetControl(Point pParent)
+        /// <summary>
+        /// Gets the child control that contains point, as expressed in this control's coordinate system.
+        /// </summary>
+        protected ZenControlBase GetControl(Point p)
         {
             foreach (ZenControlBase ctrl in zenChildren)
-                if (ctrl.Contains(pParent)) return ctrl;
+                if (ctrl.Contains(p)) return ctrl;
             return null;
         }
 
