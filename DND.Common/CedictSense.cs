@@ -13,24 +13,24 @@ namespace DND.Common
         /// <summary>
         /// Domain: text in parentheses at start.
         /// </summary>
-        public readonly string Domain;
+        public readonly HybridText Domain;
         /// <summary>
         /// Target-language equivalents ("translations").
         /// </summary>
-        public readonly string Equiv;
+        public readonly HybridText Equiv;
         /// <summary>
         /// Note: text in parentheses at end.
         /// </summary>
-        public readonly string Note;
+        public readonly HybridText Note;
 
         /// <summary>
         /// Ctor: init immutable instance.
         /// </summary>
-        public CedictSense(string domain, string equiv, string note)
+        public CedictSense(HybridText domain, HybridText equiv, HybridText note)
         {
-            Domain = domain == null ? string.Empty : domain;
-            Equiv = equiv == null ? string.Empty : equiv;
-            Note = note == null ? string.Empty : note;
+            Domain = domain;
+            Equiv = equiv;
+            Note = note;
 
         }
 
@@ -39,9 +39,9 @@ namespace DND.Common
         /// </summary>
         public CedictSense(BinReader br)
         {
-            Domain = br.ReadString();
-            Equiv = br.ReadString();
-            Note = br.ReadString();
+            Domain = HybridText.Deserialize(br);
+            Equiv = HybridText.Deserialize(br);
+            Note = HybridText.Deserialize(br);
         }
 
         /// <summary>
@@ -49,9 +49,9 @@ namespace DND.Common
         /// </summary>
         public void Serialize(BinWriter bw)
         {
-            bw.WriteString(Domain);
-            bw.WriteString(Equiv);
-            bw.WriteString(Note);
+            Domain.Serialize(bw);
+            Equiv.Serialize(bw);
+            Note.Serialize(bw);
         }
     }
 }

@@ -43,6 +43,7 @@
     <Compile Include="BinReader.cs" />
     <Compile Include="BinWriter.cs" />
     <Compile Include="CedictEntry.cs" />
+    <Compile Include="HybridText.cs" />
     <Compile Include="CedictLookupResult.cs" />
     <Compile Include="CedictPinyinSyllable.cs" />
     <Compile Include="CedictPinyinSyllable.DisplayString.cs" />

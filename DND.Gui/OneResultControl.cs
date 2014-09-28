@@ -192,13 +192,13 @@ namespace DND.Gui
                 };
                 measuredBlocks.Add(sidBlock);
                 // Each word of the domain, split by spaces is a block
-                string[] domParts = cm.Domain.Split(new char[] { ' ' });
+                string[] domParts = cm.Domain.GetPlainText().Split(new char[] { ' ' });
                 doMeasureWords(g, sf, fntMeta, domParts, measuredBlocks);
                 // Each word of the meaning (equiv), split by spaces
-                string[] equivParts = cm.Equiv.Split(new char[] { ' ' });
+                string[] equivParts = cm.Equiv.GetPlainText().Split(new char[] { ' ' });
                 doMeasureWords(g, sf, fntEquiv, equivParts, measuredBlocks);
                 // Each word of the note
-                string[] noteParts = cm.Note.Split(new char[] { ' ' });
+                string[] noteParts = cm.Note.GetPlainText().Split(new char[] { ' ' });
                 doMeasureWords(g, sf, fntMeta, noteParts, measuredBlocks);
             }
         }

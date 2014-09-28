@@ -112,8 +112,7 @@ namespace DND.CedictEngine
             foreach (string s in meanings)
             {
                 string domain, equiv, note;
-                parseSense(s, out domain, out equiv, out note);
-                cedictSenses.Add(new CedictSense(domain, equiv, note));
+                trimSense(s, out domain, out equiv, out note);
                 // Equiv is empty: merits at least a warning
                 if (equiv == "")
                 {
@@ -121,6 +120,12 @@ namespace DND.CedictEngine
                     msg = string.Format(msg, lineNum, s);
                     logStream.WriteLine(msg);
                 }
+                // Convert all parts of sense to hybrid text
+                HybridText hDomain = plainTextToHybrid(domain);
+                HybridText hEquiv = plainTextToHybrid(equiv);
+                HybridText hNote = plainTextToHybrid(note);
+                // Store new sense
+                cedictSenses.Add(new CedictSense(hDomain, hEquiv, hNote));
             }
             // Done with entry
             CedictEntry res = new CedictEntry(hm.Groups[2].Value, hm.Groups[1].Value,
@@ -128,6 +133,26 @@ namespace DND.CedictEngine
                 new ReadOnlyCollection<CedictSense>(cedictSenses),
                 hanziToPinyin);
             return res;
+        }
+
+        /// <summary>
+        /// Returns true if character is ideographic (Hanzi).
+        /// </summary>
+        private static bool isIdeo(char c)
+        {
+            // VERY rough "definition" but if works for out purpose
+            int cval = (int)c;
+            return cval >= 0x2e80;
+        }
+
+        /// <summary>
+        /// Returns true if string has ideographic (Hanzi) characters.
+        /// </summary>
+        private static bool hasIdeo(string str)
+        {
+            foreach (char c in str)
+                if (isIdeo(c)) return true;
+            return false;
         }
 
         /// <summary>
@@ -147,9 +172,7 @@ namespace DND.CedictEngine
             {
                 char c = hanzi[i];
                 // Character is not ideographic: no corresponding pinyin
-                // VERY rough "definition" but if works for out purpose
-                int cval = (int)c;
-                if (cval < 0x2e80)
+                if (!isIdeo(c))
                 {
                     res[i] = -1;
                     continue;

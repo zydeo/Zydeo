@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+
+using DND.Common;
 
 namespace DND.CedictEngine
 {
@@ -12,7 +15,7 @@ namespace DND.CedictEngine
         /// <para>In input, sense comes like this, with domain/note optional:</para>
         /// <para>(domain) (domain) equiv, equiv, equiv (note) (note)</para>
         /// </summary>
-        private void parseSense(string sense, out string domain, out string equiv, out string note)
+        private void trimSense(string sense, out string domain, out string equiv, out string note)
         {
             sense = sense.Trim();
             // Array with parenthesis depths and content/non-content flags for chars in sense
@@ -74,6 +77,20 @@ namespace DND.CedictEngine
             }
             equiv = sense.Substring(equivStart, equivEnd - equivStart + 1);
             note = sense.Substring(equivEnd + 1);
+        }
+
+        /// <summary>
+        /// <para>Parses embedded Chinese ranges in string to create hybrid text with mixed runs.</para>
+        /// </summary>
+        /// <param name="str">String to parse. Can be null or empty.</param>
+        /// <returns>The input's hybrid text representation.</returns>
+        private HybridText plainTextToHybrid(string str)
+        {
+            if (string.IsNullOrEmpty(str)) return HybridText.Empty;
+
+            List<TextRun> runs = new List<TextRun>();
+            runs.Add(new TextRunLatin(str));
+            return new HybridText(new ReadOnlyCollection<TextRun>(runs));
         }
     }
 }
