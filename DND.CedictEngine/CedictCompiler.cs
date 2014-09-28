@@ -33,14 +33,39 @@ namespace DND.CedictEngine
         private readonly List<CedictEntry> entries = new List<CedictEntry>();
 
         /// <summary>
+        /// Tokenized senses; all kept in memory during parse.
+        /// </summary>
+        private readonly List<TokenizedSense> tsenses = new List<TokenizedSense>();
+
+        /// <summary>
         /// Index created during parse.
         /// </summary>
         private readonly Index index = new Index();
 
         /// <summary>
+        /// Entry statistics collected during parsing.
+        /// </summary>
+        private readonly Stats stats = new Stats();
+
+        /// <summary>
         /// Decomposes headword: hanzi and pinyin.
         /// </summary>
         private Regex reHead = new Regex(@"^([^ ]+) ([^ ]+) \[([^\]]+)\]$");
+
+        /// <summary>
+        /// My tokenizer;
+        /// </summary>
+        private readonly Tokenizer tokenizer;
+
+        /// <summary>
+        /// Ctor: initialize.
+        /// </summary>
+        public CedictCompiler()
+        {
+            // At this stage, index will have been initialized in-line.
+            // I can refer to its word holder to initialize my tokenizer.
+            tokenizer = new Tokenizer(index.WordHolder);
+        }
 
         /// <summary>
         /// Parses an entry (line) that has been separated into headword and rest.
@@ -243,7 +268,11 @@ namespace DND.CedictEngine
             if (resultsWritten) throw new Exception("WriteResults already called, cannot parse additional lines.");
 
             ++lineNum;
-            // Comments, empty lines
+            // Comments, empty lines, some basic normalization
+            line = line.Replace(' ', ' '); // NBSP
+            line = line.Replace('“', '"'); // Curly quote
+            line = line.Replace('”', '"'); // Curly quote
+
             if (line.Trim() == "" || line.StartsWith("#")) return;
             // Initial split: header vs body
             int firstSlash = line.IndexOf('/');
@@ -256,6 +285,8 @@ namespace DND.CedictEngine
             int id = entries.Count;
             entries.Add(entry);
             indexEntry(entry, id);
+            // Update statistics
+            stats.CalculateEntryStats(entry);
         }
 
         /// <summary>
@@ -318,6 +349,58 @@ namespace DND.CedictEngine
                 if (entryList.Count == 0 || entryList[entryList.Count - 1] != id)
                     entryList.Add(id);
             }
+            // Index equiv of each sense
+            int senseIx = -1;
+            foreach (CedictSense sense in entry.Senses)
+            {
+                ++senseIx;
+                // Empty equiv: nothing to index
+                if (sense.Equiv.IsEmpty) continue;
+                // Tokenize
+                ReadOnlyCollection<EquivToken> tokens = tokenizer.Tokenize(sense.Equiv);
+                // Index sense
+                indexSense(tokens, id, senseIx);
+            }
+        }
+
+        private void indexSense(ReadOnlyCollection<EquivToken> tokens, int entryId, int senseIx)
+        {
+            // If there are no non-Chinese, non-number tokens: nothing to save, nothing to index
+            bool relevant = false;
+            foreach (EquivToken eqt in tokens)
+            {
+                if (eqt.TokenId != index.WordHolder.IdZho && eqt.TokenId != index.WordHolder.IdNum)
+                { relevant = true; break; }
+            }
+            if (!relevant) return;
+
+            // Keep tokenized sense in memory
+            int senseId = tsenses.Count;
+            TokenizedSense ts = new TokenizedSense(entryId, senseIx, tokens);
+            tsenses.Add(ts);
+            // Add to instance list of each token in list
+            // First get set of different token IDs - we don't index dupes
+            HashSet<int> tokenIdSet = new HashSet<int>();
+            foreach (EquivToken eqt in tokens) tokenIdSet.Add(eqt.TokenId);
+            // Now, index each distinct ID
+            foreach (int tokenId in tokenIdSet)
+            {
+                SenseIndexItem sii;
+                if (!index.SenseIndex.ContainsKey(tokenId))
+                {
+                    sii = new SenseIndexItem();
+                    index.SenseIndex[tokenId] = sii;
+                }
+                else sii = index.SenseIndex[tokenId];
+                if (tokenIdSet.Count > byte.MaxValue)
+                    throw new Exception("Sense's token count out of byte range: " + tokenIdSet.Count.ToString());
+                SenseInfo senseInfo = new SenseInfo
+                {
+                    TokenizedSenseId = tokenId,
+                    TokensInSense = (byte)tokenIdSet.Count,
+                };
+                sii.Instances.Add(senseInfo);
+            }
         }
 
         /// <summary>
@@ -342,8 +425,12 @@ namespace DND.CedictEngine
             if (resultsWritten) throw new InvalidOperationException("WriteResults already called.");
             resultsWritten = true;
 
+            // First, statistics
+            stats.WriteStats(statsFolder);
+
             // ID to file position
-            Dictionary<int, int> idToPos = new Dictionary<int, int>();
+            Dictionary<int, int> entryIdToPos = new Dictionary<int, int>();
+            Dictionary<int, int> senseIdToPos = new Dictionary<int, int>();
             using (BinWriter bw = new BinWriter(dictFileName))
             {
                 // Placeholder: will return here to save start position of index at end
@@ -351,8 +438,14 @@ namespace DND.CedictEngine
                 // Serialize all entries; fill entry ID -> file pos map
                 for (int i = 0; i != entries.Count; ++i)
                 {
-                    idToPos[i] = bw.Position;
+                    entryIdToPos[i] = bw.Position;
                     entries[i].Serialize(bw);
+                }
+                // Serialize all tokenized senses; fill sense ID -> file pos map
+                for (int i = 0; i != tsenses.Count; ++i)
+                {
+                    senseIdToPos[i] = bw.Position;
+                    tsenses[i].Serialize(bw);
                 }
                 // Fill in index start position
                 int idxPos = bw.Position;
@@ -362,18 +455,28 @@ namespace DND.CedictEngine
                 // Replace IDs with file positions across index
                 foreach (var x in index.IdeoIndex)
                 {
-                    replaceIdsWithPositions(x.Value.EntriesHeadwordSimp, idToPos);
-                    replaceIdsWithPositions(x.Value.EntriesHeadwordTrad, idToPos);
-                    replaceIdsWithPositions(x.Value.EntriesSense, idToPos);
+                    replaceIdsWithPositions(x.Value.EntriesHeadwordSimp, entryIdToPos);
+                    replaceIdsWithPositions(x.Value.EntriesHeadwordTrad, entryIdToPos);
+                    replaceIdsWithPositions(x.Value.EntriesSense, entryIdToPos);
                 }
                 foreach (var x in index.PinyinIndex)
                 {
-                    replaceIdsWithPositions(x.Value.EntriesNT, idToPos);
-                    replaceIdsWithPositions(x.Value.Entries0, idToPos);
-                    replaceIdsWithPositions(x.Value.Entries1, idToPos);
-                    replaceIdsWithPositions(x.Value.Entries2, idToPos);
-                    replaceIdsWithPositions(x.Value.Entries3, idToPos);
-                    replaceIdsWithPositions(x.Value.Entries4, idToPos);
+                    replaceIdsWithPositions(x.Value.EntriesNT, entryIdToPos);
+                    replaceIdsWithPositions(x.Value.Entries0, entryIdToPos);
+                    replaceIdsWithPositions(x.Value.Entries1, entryIdToPos);
+                    replaceIdsWithPositions(x.Value.Entries2, entryIdToPos);
+                    replaceIdsWithPositions(x.Value.Entries3, entryIdToPos);
+                    replaceIdsWithPositions(x.Value.Entries4, entryIdToPos);
+                }
+                foreach (var x in index.SenseIndex)
+                {
+                    List<SenseInfo> instances = x.Value.Instances;
+                    for (int i = 0; i != instances.Count; ++i)
+                    {
+                        SenseInfo senseInfo = instances[i];
+                        senseInfo.TokenizedSenseId = senseIdToPos[senseInfo.TokenizedSenseId];
+                        instances[i] = senseInfo;
+                    }
                 }
                 // Serialize index
                 index.Serialize(bw);

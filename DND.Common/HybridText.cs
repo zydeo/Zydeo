@@ -38,6 +38,14 @@ namespace DND.Common
         }
 
         /// <summary>
+        /// Returns true if this is an empty text.
+        /// </summary>
+        public bool IsEmpty
+        {
+            get { return runs.Count == 0; }
+        }
+
+        /// <summary>
         /// Static ctor: initializes empty hybrid text object.
         /// </summary>
         static HybridText()
@@ -263,7 +271,7 @@ namespace DND.Common
         /// <param name="text"></param>
         public TextRunLatin(string text)
         {
-            if (text == null) throw new ArgumentNullException("text");
+            if (string.IsNullOrEmpty(text)) throw new ArgumentException("Must not be null or empty.", "text");
             Text = text;
         }
 

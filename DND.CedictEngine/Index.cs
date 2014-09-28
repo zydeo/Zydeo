@@ -23,10 +23,22 @@ namespace DND.CedictEngine
         public readonly Dictionary<string, PinyinIndexItem> PinyinIndex;
 
         /// <summary>
+        /// Token-to-index map.
+        /// </summary>
+        public readonly WordHolder WordHolder;
+
+        /// <summary>
+        /// Maps word IDs to tokenized senses where they occur.
+        /// </summary>
+        public readonly Dictionary<int, SenseIndexItem> SenseIndex;
+
+        /// <summary>
         /// Ctor: creates an empty instance (used while compiling index).
         /// </summary>
         public Index()
         {
+            WordHolder = new WordHolder();
+            SenseIndex = new Dictionary<int, SenseIndexItem>();
             IdeoIndex = new Dictionary<char, IdeoIndexItem>();
             PinyinIndex = new Dictionary<string, PinyinIndexItem>();
         }
@@ -36,6 +48,16 @@ namespace DND.CedictEngine
         /// </summary>
         public Index(BinReader br)
         {
+            WordHolder = new CedictEngine.WordHolder(br);
+            SenseIndex = new Dictionary<int, SenseIndexItem>();
+            int senseIndexKeyCount = br.ReadInt();
+            for (int i = 0; i != senseIndexKeyCount; ++i)
+            {
+                int tokenId = br.ReadInt();
+                SenseIndexItem sii = new SenseIndexItem(br);
+                SenseIndex[tokenId] = sii;
+            }
+
             IdeoIndex = new Dictionary<char, IdeoIndexItem>();
             PinyinIndex = new Dictionary<string, PinyinIndexItem>();
 
@@ -61,6 +83,16 @@ namespace DND.CedictEngine
         /// </summary>
         public void Serialize(BinWriter bw)
         {
+            WordHolder.Serialize(bw);
+
+            int senseIndexKeyCount = SenseIndex.Count;
+            bw.WriteInt(senseIndexKeyCount);
+            foreach (var x in SenseIndex)
+            {
+                bw.WriteInt(x.Key);
+                x.Value.Serialize(bw);
+            }
+
             int ideoIndexKeyCount = IdeoIndex.Count;
             bw.WriteInt(ideoIndexKeyCount);
             foreach (var x in IdeoIndex)
