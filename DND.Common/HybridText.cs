@@ -164,16 +164,19 @@ namespace DND.Common
         /// </summary>
         public override string GetPlainText()
         {
+            if (Simp == null) return Pinyin;
+
             string py = Pinyin;
             if (py == null) py = "";
             else py = " [" + py + "]";
+            
             if (Simp == Trad)
                 return Simp + py;
-            else return Simp + " | " + Trad + py;
+            else return Simp + "｜" + Trad + py;
         }
 
         /// <summary>
-        /// Ctor: take all data.
+        /// Ctor: Hanzi, plus optional pinyin.
         /// </summary>
         /// <param name="simp">Simplified Hanzi. Must not be null.</param>
         /// <param name="trad">Traditional Hanzi. Null means simplified is the same as traditional.</param>
@@ -188,6 +191,16 @@ namespace DND.Common
         }
 
         /// <summary>
+        /// Ctor: only pinyin.
+        /// </summary>
+        public TextRunZho(string pinyin)
+        {
+            if (pinyin == null) throw new ArgumentNullException("pinyin");
+            Simp = Trad = null;
+            Pinyin = pinyin;
+        }
+
+        /// <summary>
         /// Ctor: read from binary stream.
         /// </summary>
         public TextRunZho(BinReader br)
@@ -197,12 +210,12 @@ namespace DND.Common
             // 2: Pinyin present
             byte flags = br.ReadByte();
             // Read simplified
-            Simp = br.ReadString();
+            if ((flags & 1) == 1) Simp = br.ReadString();
             // Is traditional different?
-            if ((flags & 1) == 1) Trad = br.ReadString();
+            if ((flags & 2) == 2) Trad = br.ReadString();
             else Trad = Simp;
             // Is pinyin present?
-            if ((flags & 2) == 2) Pinyin = br.ReadString();
+            if ((flags & 4) == 4) Pinyin = br.ReadString();
             else Pinyin = null;
         }
 
@@ -213,11 +226,12 @@ namespace DND.Common
         {
             // Write flags
             byte flags = 0;
-            if (Trad != Simp) flags |= 1;
-            if (Pinyin != null) flags |= 2;
+            if (Simp != null) flags |= 1;
+            if (Trad != Simp) flags |= 2;
+            if (Pinyin != null) flags |= 4;
             bw.WriteByte(flags);
             // Write simplified
-            bw.WriteString(Simp);
+            if (Simp != null) bw.WriteString(Simp);
             // Write traditional, if different
             if (Trad != Simp) bw.WriteString(Trad);
             // Write pinyin, if present

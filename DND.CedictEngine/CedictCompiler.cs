@@ -121,12 +121,17 @@ namespace DND.CedictEngine
                     logStream.WriteLine(msg);
                 }
                 // Convert all parts of sense to hybrid text
-                HybridText hDomain = plainTextToHybrid(domain);
-                HybridText hEquiv = plainTextToHybrid(equiv);
-                HybridText hNote = plainTextToHybrid(note);
-                // Store new sense
-                cedictSenses.Add(new CedictSense(hDomain, hEquiv, hNote));
+                HybridText hDomain = plainTextToHybrid(domain, lineNum, logStream);
+                HybridText hEquiv = plainTextToHybrid(equiv, lineNum, logStream);
+                HybridText hNote = plainTextToHybrid(note, lineNum, logStream);
+                // Store new sense - unless we failed to parse anything properly
+                if (hDomain != null && hEquiv != null && hNote != null)
+                {
+                    cedictSenses.Add(new CedictSense(hDomain, hEquiv, hNote));
+                }
             }
+            // If there are no senses, we failed. But that will have been logged before, so just return null.
+            if (cedictSenses.Count == 0) return null;
             // Done with entry
             CedictEntry res = new CedictEntry(hm.Groups[2].Value, hm.Groups[1].Value,
                 new ReadOnlyCollection<CedictPinyinSyllable>(pinyinSylls),
