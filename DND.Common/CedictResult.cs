@@ -58,6 +58,19 @@ namespace DND.Common
         public readonly int PinyinHiliteLength;
 
         /// <summary>
+        /// Ctor: init immutable instance - result of target lookup.
+        /// </summary>
+        public CedictResult(CedictEntry entry)
+        {
+            HanziWarning = SimpTradWarning.None;
+            Entry = entry;
+            HanziHiliteStart = -1;
+            HanziHiliteLength = 0;
+            PinyinHiliteStart = -1;
+            PinyinHiliteLength = 0;
+        }
+
+        /// <summary>
         /// Ctor: init immutable instance - result of hanzi lookup.
         /// </summary>
         public CedictResult(SimpTradWarning hanziWarning, CedictEntry entry,

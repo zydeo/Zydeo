@@ -42,7 +42,7 @@ namespace DND.CedictEngine
         /// <summary>
         /// Index of entry to which this tokenized sense belongs. (ID during parse; file position in finalized data.)
         /// </summary>
-        public readonly int EntryId;
+        public int EntryId;
         /// <summary>
         /// Index of sense within entry.
         /// </summary>

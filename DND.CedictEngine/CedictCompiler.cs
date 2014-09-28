@@ -396,7 +396,7 @@ namespace DND.CedictEngine
                     throw new Exception("Sense's token count out of byte range: " + tokenIdSet.Count.ToString());
                 SenseInfo senseInfo = new SenseInfo
                 {
-                    TokenizedSenseId = tokenId,
+                    TokenizedSenseId = senseId,
                     TokensInSense = (byte)tokenIdSet.Count,
                 };
                 sii.Instances.Add(senseInfo);
@@ -440,6 +440,11 @@ namespace DND.CedictEngine
                 {
                     entryIdToPos[i] = bw.Position;
                     entries[i].Serialize(bw);
+                }
+                // Replace entry IDs with file positions in all tokenized senses
+                for (int i = 0; i != tsenses.Count; ++i)
+                {
+                    tsenses[i].EntryId = entryIdToPos[tsenses[i].EntryId];
                 }
                 // Serialize all tokenized senses; fill sense ID -> file pos map
                 for (int i = 0; i != tsenses.Count; ++i)
