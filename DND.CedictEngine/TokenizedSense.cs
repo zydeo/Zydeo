@@ -19,19 +19,19 @@ namespace DND.CedictEngine
         public int TokenId;
 
         /// <summary>
-        /// Index of range in sense's equiv in which this token is found.
+        /// Index of run in sense's equiv in which this token is found.
         /// </summary>
-        public int RangeIx;
+        public int RunIx;
 
         /// <summary>
-        /// Start of corresponding text in range, or 0 if token is placeholder for a Chinese range.
+        /// Start of corresponding text in run, or 0 if token is placeholder for a Chinese run.
         /// </summary>
-        public int StartInRange;
+        public int StartInRun;
 
         /// <summary>
-        /// Length of corresponding text in range, or 0 if token is placeholder for a Chinese range (full range).
+        /// Length of corresponding text in run, or 0 if token is placeholder for a Chinese run (full run).
         /// </summary>
-        public int LengthInRange;
+        public int LengthInRun;
     }
 
     /// <summary>
@@ -75,9 +75,9 @@ namespace DND.CedictEngine
             {
                 EquivToken eqt = new EquivToken();
                 eqt.TokenId = br.ReadInt();
-                eqt.RangeIx = (int)br.ReadByte();
-                eqt.StartInRange = (int)br.ReadByte();
-                eqt.LengthInRange = (int)br.ReadByte();
+                eqt.RunIx = (int)br.ReadByte();
+                eqt.StartInRun = (int)br.ReadShort();
+                eqt.LengthInRun = (int)br.ReadShort();
                 EquivTokens.Add(eqt);
             }
         }
@@ -94,19 +94,19 @@ namespace DND.CedictEngine
             for (int i = 0; i != equivTokenCount; ++i)
             {
                 EquivToken eqt = EquivTokens[i];
-                if (eqt.RangeIx < byte.MinValue || eqt.RangeIx > byte.MaxValue)
-                    throw new Exception("RangeIx value out of byte range: " + eqt.StartInRange.ToString());
-                if (eqt.StartInRange < byte.MinValue || eqt.StartInRange > byte.MaxValue)
-                    throw new Exception("StartInSense value out of byte range: " + eqt.StartInRange.ToString());
-                if (eqt.LengthInRange < byte.MinValue || eqt.LengthInRange > byte.MaxValue)
-                    throw new Exception("LengthInSense value out of byte range: " + eqt.LengthInRange.ToString());
-                byte rangeIx = (byte)eqt.RangeIx;
-                byte startInSense = (byte)eqt.StartInRange;
-                byte lengthInSense = (byte)eqt.LengthInRange;
+                if (eqt.RunIx < byte.MinValue || eqt.RunIx > byte.MaxValue)
+                    throw new Exception("RangeIx value out of byte range: " + eqt.StartInRun.ToString());
+                if (eqt.StartInRun < short.MinValue || eqt.StartInRun > short.MaxValue)
+                    throw new Exception("StartInSense value out of short range: " + eqt.StartInRun.ToString());
+                if (eqt.LengthInRun < short.MinValue || eqt.LengthInRun > short.MaxValue)
+                    throw new Exception("LengthInSense value out of short range: " + eqt.LengthInRun.ToString());
+                byte rangeIx = (byte)eqt.RunIx;
+                short startInSense = (short)eqt.StartInRun;
+                short lengthInSense = (short)eqt.LengthInRun;
                 bw.WriteInt(eqt.TokenId);
                 bw.WriteByte(rangeIx);
-                bw.WriteByte(startInSense);
-                bw.WriteByte(lengthInSense);
+                bw.WriteShort(startInSense);
+                bw.WriteShort(lengthInSense);
             }
         }
     }
