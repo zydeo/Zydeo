@@ -58,10 +58,32 @@ namespace DND.Common
         public readonly int PinyinHiliteLength;
 
         /// <summary>
+        /// See <see cref="TargetHilites"/>.
+        /// </summary>
+        private readonly CedictTargetHighlight[] targetHilites;
+
+        /// <summary>
+        /// Highlights in target text. Never null; can be empty.
+        /// </summary>
+        private IEnumerable<CedictTargetHighlight> TargetHilites
+        {
+            get { return targetHilites; }
+        }
+
+        /// <summary>
         /// Ctor: init immutable instance - result of target lookup.
         /// </summary>
-        public CedictResult(CedictEntry entry)
+        public CedictResult(CedictEntry entry, ReadOnlyCollection<CedictTargetHighlight> targetHilites)
         {
+            if (entry == null) throw new ArgumentNullException("entry");
+            if (targetHilites == null) throw new ArgumentNullException("targetHilites");
+
+            this.targetHilites = new CedictTargetHighlight[targetHilites.Count];
+            for (int i = 0; i != targetHilites.Count; ++i)
+            {
+                if (targetHilites[i] == null) throw new ArgumentException("Null element in highlights array.");
+                this.targetHilites[i] = targetHilites[i];
+            }
             HanziWarning = SimpTradWarning.None;
             Entry = entry;
             HanziHiliteStart = -1;
@@ -76,6 +98,9 @@ namespace DND.Common
         public CedictResult(SimpTradWarning hanziWarning, CedictEntry entry,
             int hanziHiliteStart, int hanziHiliteLength)
         {
+            if (entry == null) throw new ArgumentNullException("entry");
+
+            targetHilites = new CedictTargetHighlight[0];
             HanziWarning = hanziWarning;
             Entry = entry;
             HanziHiliteStart = hanziHiliteStart;
@@ -89,6 +114,9 @@ namespace DND.Common
         public CedictResult(CedictEntry entry,
             int pinyinHiliteStart, int pinyinHiliteLength)
         {
+            if (entry == null) throw new ArgumentNullException("entry");
+
+            targetHilites = new CedictTargetHighlight[0];
             HanziWarning = SimpTradWarning.None;
             Entry = entry;
             PinyinHiliteStart = pinyinHiliteStart;

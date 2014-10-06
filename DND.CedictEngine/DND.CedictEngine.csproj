@@ -43,6 +43,7 @@
     <Compile Include="CedictCompiler.Stats.cs" />
     <Compile Include="DictEngine.cs" />
     <Compile Include="DictEngine.Pinyin.cs" />
+    <Compile Include="DictEngine.TargetLookup.cs" />
     <Compile Include="SenseIndexItem.cs" />
     <Compile Include="TokenizedSense.cs" />
     <Compile Include="IdeoIndexItem.cs" />
