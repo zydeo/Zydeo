@@ -12,7 +12,7 @@ namespace DND.CedictEngine
         /// <summary>
         /// Info about a single pinyin syllable for splitting words written w/o spaces
         /// </summary>
-        private class PinyinSyllable
+        private class PinyinParseSyllable
         {
             /// <summary>
             /// Syllable text (no tone mark, but may include trailing r)
@@ -25,7 +25,7 @@ namespace DND.CedictEngine
             /// <summary>
             /// Ctor: initialize immutable instance.
             /// </summary>
-            public PinyinSyllable(string text, bool vowelStart)
+            public PinyinParseSyllable(string text, bool vowelStart)
             {
                 Text = text;
                 VowelStart = vowelStart;
@@ -35,7 +35,7 @@ namespace DND.CedictEngine
         /// <summary>
         /// List of known pinyin syllables; longer first.
         /// </summary>
-        private static List<PinyinSyllable> syllList = new List<PinyinSyllable>();
+        private static List<PinyinParseSyllable> syllList = new List<PinyinParseSyllable>();
 
         /// <summary>
         /// Loads known pinyin syllables from embedded resource.
@@ -51,7 +51,7 @@ namespace DND.CedictEngine
                 {
                     if (line == string.Empty) continue;
                     string[] parts = line.Split(new char[] { '\t' });
-                    PinyinSyllable ps = new PinyinSyllable(parts[0], parts[1] == "v");
+                    PinyinParseSyllable ps = new PinyinParseSyllable(parts[0], parts[1] == "v");
                     syllList.Add(ps);
                 }
             }
@@ -67,7 +67,7 @@ namespace DND.CedictEngine
             // Get rest of string to match
             string rest = pos == 0 ? str : str.Substring(pos);
             // Try all syllables in syllabary
-            foreach (PinyinSyllable ps in syllList)
+            foreach (PinyinParseSyllable ps in syllList)
             {
                 // Syllables starting with a vowel not allowed inside text
                 if (pos != 0 && ps.VowelStart) continue;

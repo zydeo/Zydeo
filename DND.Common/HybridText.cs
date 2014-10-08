@@ -38,6 +38,22 @@ namespace DND.Common
         }
 
         /// <summary>
+        /// Gets number of runs in hybrid text.
+        /// </summary>
+        public int RunCount
+        {
+            get { return runs.Count; }
+        }
+
+        /// <summary>
+        /// Returns text runs at the provided index in array of runs.
+        /// </summary>
+        public TextRun GetRunAt(int ix)
+        {
+            return runs[ix];
+        }
+
+        /// <summary>
         /// Returns true if this is an empty text.
         /// </summary>
         public bool IsEmpty
@@ -165,22 +181,39 @@ namespace DND.Common
         /// <summary>
         /// Pinyin transcription (may be null).
         /// </summary>
-        public readonly string Pinyin;
+        public readonly PinyinSyllable[] Pinyin;
 
         /// <summary>
         /// See <see cref="TextRun.GetPlainText"/>.
         /// </summary>
         public override string GetPlainText()
         {
-            if (Simp == null) return Pinyin;
+            if (Simp == null) return GetPinyinInOne(true);
 
-            string py = Pinyin;
+            string py = GetPinyinInOne(true);
             if (py == null) py = "";
             else py = " [" + py + "]";
             
             if (Simp == Trad)
                 return Simp + py;
-            else return Simp + "｜" + Trad + py;
+            else return Simp + " • " + Trad + py;
+        }
+
+        /// <summary>
+        /// Returns concatenated pinyin syllables.
+        /// </summary>
+        /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>
+        public string GetPinyinInOne(bool diacritics)
+        {
+            if (Pinyin.Length == 0) return string.Empty;
+            if (Pinyin.Length == 1) return Pinyin[0].GetDisplayString(diacritics);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i != Pinyin.Length; ++i)
+            {
+                if (i != 0) sb.Append(' ');
+                sb.Append(Pinyin[i].GetDisplayString(diacritics));
+            }
+            return sb.ToString();
         }
 
         /// <summary>
@@ -188,10 +221,11 @@ namespace DND.Common
         /// </summary>
         /// <param name="simp">Simplified Hanzi. Must not be null.</param>
         /// <param name="trad">Traditional Hanzi. Null means simplified is the same as traditional.</param>
-        /// <param name="pinyin">Pinyin. Can be null.</param>
-        public TextRunZho(string simp, string trad, string pinyin)
+        /// <param name="pinyin">Pinyin. Can be null, but not empty array if present.</param>
+        public TextRunZho(string simp, string trad, PinyinSyllable[] pinyin)
         {
             if (simp == null) throw new ArgumentNullException("simp");
+            if (pinyin != null && pinyin.Length == 0) throw new ArgumentException("Pinyin syllables must not be an empty array.");
             Simp = simp;
             if (trad == null || trad == simp) Trad = simp;
             else Trad = trad;
@@ -201,9 +235,10 @@ namespace DND.Common
         /// <summary>
         /// Ctor: only pinyin.
         /// </summary>
-        public TextRunZho(string pinyin)
+        public TextRunZho(PinyinSyllable[] pinyin)
         {
             if (pinyin == null) throw new ArgumentNullException("pinyin");
+            if (pinyin.Length == 0) throw new ArgumentException("Pinyin syllables must not be an empty array.");
             Simp = Trad = null;
             Pinyin = pinyin;
         }
@@ -223,7 +258,12 @@ namespace DND.Common
             if ((flags & 2) == 2) Trad = br.ReadString();
             else Trad = Simp;
             // Is pinyin present?
-            if ((flags & 4) == 4) Pinyin = br.ReadString();
+            if ((flags & 4) == 4)
+            {
+                int pinyinCount = (int)br.ReadByte();
+                Pinyin = new PinyinSyllable[pinyinCount];
+                for (int i = 0; i != pinyinCount; ++i) Pinyin[i] = new PinyinSyllable(br);
+            }
             else Pinyin = null;
         }
 
@@ -243,7 +283,13 @@ namespace DND.Common
             // Write traditional, if different
             if (Trad != Simp) bw.WriteString(Trad);
             // Write pinyin, if present
-            if (Pinyin != null) bw.WriteString(Pinyin);
+            if (Pinyin != null)
+            {
+                if (Pinyin.Length > byte.MaxValue) throw new Exception("Pinyin syllable count exceeds maximum byte value: " + Pinyin.Length.ToString());
+                byte pinyinCount = (byte)Pinyin.Length;
+                bw.WriteByte(pinyinCount);
+                foreach (PinyinSyllable py in Pinyin) py.Serialize(bw);
+            }
         }
     }
 

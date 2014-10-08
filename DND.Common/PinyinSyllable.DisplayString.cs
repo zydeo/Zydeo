@@ -7,14 +7,14 @@ using System.IO;
 
 namespace DND.Common
 {
-    partial class CedictPinyinSyllable
+    partial class PinyinSyllable
     {
         static Dictionary<string, List<string>> toneMap = new Dictionary<string, List<string>>();
 
         /// <summary>
         /// Static ctor: initializes tone mark map of pinyin syllables from embedded resource.
         /// </summary>
-        static CedictPinyinSyllable()
+        static PinyinSyllable()
         {
             Assembly a = Assembly.GetExecutingAssembly();
             using (Stream s = a.GetManifestResourceStream("DND.Common.Resources.pinyin.txt"))

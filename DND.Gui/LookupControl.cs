@@ -216,7 +216,7 @@ namespace DND.Gui
         private void onStartSearch(object sender, string text)
         {
             if (dict == null) return;
-            CedictLookupResult res = dict.Lookup(text, searchScript, SearchLang.Target);
+            CedictLookupResult res = dict.Lookup(text, searchScript, SearchLang.Chinese);
             if (sender == siCtrl) siCtrl.SelectAll();
             resCtrl.SetResults(res.Results, searchScript);
         }

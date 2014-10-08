@@ -117,10 +117,12 @@ namespace DND.Gui
         // Graphics resources: static, singleton, never disposed.
         // When we're quitting it doesn't matter anymore, anyway.
         // TO-DO: double-check for thread safety when control starts drawing animations in worker thread!
-        private static Font fntZho;
-        private static Font fntPinyin;
-        private static Font fntEquiv;
-        private static Font fntMeta;
+        private static Font fntZhoHead;
+        private static Font fntPinyinHead;
+        private static Font fntSenseLatin;
+        private static Font fntSenseHanzi;
+        private static Font fntMetaLatin;
+        private static Font fntMetaHanzi;
         private static Font fntSenseId;
 
         /// <summary>
@@ -128,36 +130,13 @@ namespace DND.Gui
         /// </summary>
         static OneResultControl()
         {
-            fntZho = new Font(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
-            fntPinyin = new Font(ZenParams.PinyinFontFamily, ZenParams.PinyinFontSize, FontStyle.Bold);
-            fntEquiv = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize);
-            fntMeta = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize, FontStyle.Italic);
+            fntZhoHead = new Font(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
+            fntPinyinHead = new Font(ZenParams.PinyinFontFamily, ZenParams.PinyinFontSize, FontStyle.Bold);
+            fntSenseLatin = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize);
+            fntSenseHanzi = new Font(ZenParams.ZhoFontFamily, ZenParams.LemmaFontSize * 1.2F);
+            fntMetaLatin = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize, FontStyle.Italic);
+            fntMetaHanzi = new Font(ZenParams.ZhoFontFamily, ZenParams.LemmaFontSize * 1.2F, FontStyle.Italic);
             fntSenseId = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize * 0.8F);
-        }
-
-        /// <summary>
-        /// Measures an array of alphabetic words, which are all typographic display blocks.
-        /// </summary>
-        /// <param name="g">A Graphics object used for measurements.</param>
-        /// <param name="sf">StringFormat used for measurements.</param>
-        /// <param name="font">Display font for block.</param>
-        /// <param name="words">Array of words to measure.</param>
-        /// <param name="blocks">List of measured blocks to APPEND to.</param>
-        private static void doMeasureWords(Graphics g, StringFormat sf, Font font,
-            string[] words, List<Block> blocks)
-        {
-            foreach (string wd in words)
-            {
-                if (wd.Trim() == "") continue;
-                TextBlock tb = new TextBlock
-                {
-                    Size = g.MeasureString(wd, fntEquiv, 65535, sf),
-                    StickRight = false,
-                    Font = font,
-                    Text = wd,
-                };
-                blocks.Add(tb);
-            }
         }
 
         /// <summary>
@@ -174,8 +153,13 @@ namespace DND.Gui
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
 
             // Decide about size of sense ID up front: that's always a square, letter-height
-            SizeF xSize = g.MeasureString("x", fntEquiv, 65535, sf);
+            SizeF xSize = g.MeasureString("x", fntSenseLatin, 65535, sf);
             SizeF senseIdxSize = new SizeF(xSize.Height, xSize.Height);
+
+            // Create array with as many items as senses
+            // Each item is null, or highlight in sense's equiv
+            CedictTargetHighlight[] hlArr = new CedictTargetHighlight[Res.Entry.SenseCount];
+            foreach (CedictTargetHighlight hl in Res.TargetHilites) hlArr[hl.SenseIx] = hl;
 
             // Recreate list of blocks
             measuredBlocks = new List<Block>();
@@ -191,16 +175,171 @@ namespace DND.Gui
                     Idx = senseIdx
                 };
                 measuredBlocks.Add(sidBlock);
-                // Each word of the domain, split by spaces is a block
-                string[] domParts = cm.Domain.GetPlainText().Split(new char[] { ' ' });
-                doMeasureWords(g, sf, fntMeta, domParts, measuredBlocks);
-                // Each word of the meaning (equiv), split by spaces
-                string[] equivParts = cm.Equiv.GetPlainText().Split(new char[] { ' ' });
-                doMeasureWords(g, sf, fntEquiv, equivParts, measuredBlocks);
-                // Each word of the note
-                string[] noteParts = cm.Note.GetPlainText().Split(new char[] { ' ' });
-                doMeasureWords(g, sf, fntMeta, noteParts, measuredBlocks);
+                // Split domain, equiv and note into typographic parts
+                // Splits along spaces and dashes
+                // Unpacks Chinese ranges
+                List<TextBlock> senseBlocks = new List<TextBlock>();
+                getBlocks(cm.Domain, true, null, senseBlocks);
+                getBlocks(cm.Equiv, false, hlArr[senseIdx], senseBlocks);
+                getBlocks(cm.Note, true, null, senseBlocks);
+                // Measure each block, and add to full list of blocks
+                measuredBlocks.Capacity += senseBlocks.Count;
+                foreach (TextBlock tb in senseBlocks)
+                {
+                    tb.Size = g.MeasureString(tb.Text, tb.Font, 65535, sf);
+                    measuredBlocks.Add(tb);
+                }
             }
+        }
+
+        /// <summary>
+        /// <para>Produces unmeasured display blocks from a single hybrid text. Marks highlights, if any.</para>
+        /// <para>Does not fill in blocks' size, but fills in everything else.</para>
+        /// </summary>
+        /// <param name="htxt">Hybrid text to break down into blocks and measure.</param>
+        /// <param name="isMeta">True if this is a domain or note (displayed in italics).</param>
+        /// <param name="hl">Highlight to show in hybrid text, or null.</param>
+        /// <param name="blocks">List of blocks to append to.</param>
+        private void getBlocks(HybridText htxt, bool isMeta, CedictTargetHighlight hl, List<TextBlock> blocks)
+        {
+            Font fntLatin = isMeta ? fntMetaLatin : fntSenseLatin;
+            Font fntZho = isMeta ? fntMetaHanzi : fntSenseHanzi;
+            // Go run by run
+            for (int runIX = 0; runIX != htxt.RunCount; ++runIX)
+            {
+                TextRun run = htxt.GetRunAt(runIX);
+                // Latin run: split by spaces first
+                if (run is TextRunLatin)
+                {
+                    string[] bySpaces = run.GetPlainText().Split(new char[] { ' ' });
+                    // Each word: also by dash
+                    foreach (string str in bySpaces)
+                    {
+                        string[] byDashes = splitByDash(str);
+                        // Add block for each
+                        foreach (string blockStr in byDashes)
+                        {
+                            TextBlock tb = new TextBlock
+                            {
+                                StickRight = false,
+                                Text = blockStr,
+                                Font = fntLatin,
+                                SpaceAfter = false, // will set this true for last block in "byDashes"
+                            };
+                            blocks.Add(tb);
+                        }
+                        // Make sure last one is followed by space
+                        blocks[blocks.Count - 1].SpaceAfter = true;
+                    }
+                }
+                // Chinese: depends on T/S/Both display mode, and on available info
+                else
+                {
+                    TextRunZho zhoRun = run as TextRunZho;
+                    // Chinese range is made up of:
+                    // Simplified (empty string if only traditional requested)
+                    // Separator (if both simplified and traditional are requested)
+                    // Traditional (empty string if only simplified requested)
+                    // Pinyin with accents as tone marks, in brackets (if present)
+                    string strSimp = string.Empty;
+                    if (analyzedScript != SearchScript.Traditional) strSimp = zhoRun.Simp;
+                    string strTrad = string.Empty;
+                    if (analyzedScript != SearchScript.Simplified) strTrad = zhoRun.Trad;
+                    string strPy = string.Empty;
+                    // Convert pinyin to display format (tone marks as diacritics; r5 glued)
+                    if (zhoRun.Pinyin != null) strPy = "[" + zhoRun.GetPinyinInOne(true) + "]";
+                    // Block for simplified, if present
+                    if (strSimp != string.Empty)
+                    {
+                        TextBlock tb = new TextBlock
+                        {
+                            StickRight = false,
+                            Text = strSimp,
+                            Font = fntZho,
+                            SpaceAfter = true,
+                        };
+                        blocks.Add(tb);
+                    }
+                    // Separator if both simplified and traditional are there
+                    if (strSimp != string.Empty && strTrad != string.Empty)
+                    {
+                        blocks[blocks.Count - 1].StickRight = true;
+                        TextBlock tb = new TextBlock
+                        {
+                            StickRight = false,
+                            Text = "•",
+                            Font = fntLatin,
+                            SpaceAfter = true,
+                        };
+                        blocks.Add(tb);
+                    }
+                    // Traditional, if present
+                    if (strTrad != string.Empty)
+                    {
+                        TextBlock tb = new TextBlock
+                        {
+                            StickRight = false,
+                            Text = strTrad,
+                            Font = fntZho,
+                            SpaceAfter = true,
+                        };
+                        blocks.Add(tb);
+                    }
+                    // Pinyin, if present
+                    if (strPy != string.Empty)
+                    {
+                        // Split by spaces
+                        string[] pyParts = strPy.Split(new char[] { ' ' });
+                        foreach (string pyPart in pyParts)
+                        {
+                            TextBlock tb = new TextBlock
+                            {
+                                StickRight = false,
+                                Text = pyPart,
+                                Font = fntLatin,
+                                SpaceAfter = true,
+                            };
+                            blocks.Add(tb);
+                        }
+                    }
+                    // Last part will have requested a space after.
+                    // Look ahead and if next text run is Latin and starts with punctuation, make it stick
+                    TextRunLatin nextLatinRun = null;
+                    if (runIX + 1 < htxt.RunCount) nextLatinRun = htxt.GetRunAt(runIX + 1) as TextRunLatin;
+                    if (nextLatinRun != null && char.IsPunctuation(nextLatinRun.GetPlainText()[0]))
+                        blocks[blocks.Count - 1].SpaceAfter = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Splits text along dashes (words end in dashes).
+        /// </summary>
+        private string[] splitByDash(string str)
+        {
+            // No dash at all inside word: return in one
+            bool dashInside = false;
+            for (int i = 1; i < str.Length - 2; ++i)
+            { if (str[i] == '-') { dashInside = true; break; } }
+            if (!dashInside)
+            {
+                string[] res = new string[1];
+                res[0] = str;
+                return res;
+            }
+            List<string> wdList = new List<string>();
+            StringBuilder sbWord = new StringBuilder();
+            sbWord.Append(str[0]);
+            for (int i = 1; i != str.Length; ++i)
+            {
+                char c = str[i];
+                sbWord.Append(c);
+                if (c != '-') continue;
+                wdList.Add(sbWord.ToString());
+                sbWord.Clear();
+            }
+            if (sbWord.Length != 0) wdList.Add(sbWord.ToString());
+            return wdList.ToArray();
         }
 
         /// <summary>
@@ -252,19 +391,19 @@ namespace DND.Gui
                     {
                         // Last block breaks onto this line
                         lastPB.Loc = new PointF(blockX, blockY);
-                        // We move on by last block's width plus space
-                        blockX += lastPB.Block.Size.Width + spaceWidth;
-                        // Sorry, no/less space after sense ID
-                        if (lastPB.Block is SenseIdBlock) blockX -= spaceWidth;
+                        // We move on by last block's width plus (optional) space
+                        blockX += lastPB.Block.Size.Width;
+                        if (lastPB.Block is TextBlock && (lastPB.Block as TextBlock).SpaceAfter)
+                            blockX += spaceWidth;
                         // So.
                         pb.Loc = new PointF(blockX, blockY);
                     }
                 }
                 positionedBlocks.Add(pb);
-                // Move right by block's width plus space
-                blockX += block.Size.Width + spaceWidth;
-                // Sorry, no/less space after sense ID
-                if (block is SenseIdBlock) blockX -= spaceWidth;
+                // Move right by block's width; space optional
+                blockX += block.Size.Width;
+                if (block is TextBlock && (block as TextBlock).SpaceAfter)
+                    blockX += spaceWidth;
                 // This is last block
                 lastPB = pb;
             }
@@ -309,7 +448,7 @@ namespace DND.Gui
                 HeadBlock hb = new HeadBlock
                 {
                     Char = cstr,
-                    Size = g.MeasureString(cstr, fntZho, 65535, sf),
+                    Size = g.MeasureString(cstr, fntZhoHead, 65535, sf),
                     Loc = loc,
                     Faded = false,
                 };
@@ -354,7 +493,7 @@ namespace DND.Gui
             // On-demand: measure a single ideograph's dimensions
             if (ideoSize.Width == 0)
             {
-                ideoSize = g.MeasureString(ideoTestStr, fntZho, 65535, sf);
+                ideoSize = g.MeasureString(ideoTestStr, fntZhoHead, 65535, sf);
                 var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
                 float hanziLinePad = 6.0F;
                 hanziLinePad *= Scale;
@@ -429,13 +568,13 @@ namespace DND.Gui
             float ctop = padTop;
             for (int i = 0; i != pcoll.Count; ++i)
             {
-                CedictPinyinSyllable ps = pcoll[i];
+                PinyinSyllable ps = pcoll[i];
                 // New pinyin block
                 PinyinBlock pb = new PinyinBlock();
                 // Text: syllable's display text
                 pb.Text = ps.GetDisplayString(true);
                 // Block's size and relative location
-                SizeF sz = g.MeasureString(pb.Text, fntPinyin, 65535, sf);
+                SizeF sz = g.MeasureString(pb.Text, fntPinyinHead, 65535, sf);
                 pb.Rect = new RectangleF(cx, ctop, sz.Width, sz.Height);
                 cx += sz.Width + pinyinSpaceWidth;
                 // Add block
@@ -473,10 +612,10 @@ namespace DND.Gui
             // Also line height in entry text
             if (spaceWidth == 0)
             {
-                SizeF sz = g.MeasureString(spaceTestStr, fntEquiv, 65535, sf);
+                SizeF sz = g.MeasureString(spaceTestStr, fntSenseLatin, 65535, sf);
                 spaceWidth = (int)sz.Width;
                 lemmaLineHeight = sz.Height * 1.1F;
-                sz = g.MeasureString(spaceTestStr, fntPinyin, 65535, sf);
+                sz = g.MeasureString(spaceTestStr, fntPinyinHead, 65535, sf);
                 pinyinSpaceWidth = sz.Width;
             }
 

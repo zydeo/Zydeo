@@ -65,7 +65,7 @@ namespace DND.Common
         /// <summary>
         /// Highlights in target text. Never null; can be empty.
         /// </summary>
-        private IEnumerable<CedictTargetHighlight> TargetHilites
+        public IEnumerable<CedictTargetHighlight> TargetHilites
         {
             get { return targetHilites; }
         }

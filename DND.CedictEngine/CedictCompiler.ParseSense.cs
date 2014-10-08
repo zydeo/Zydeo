@@ -91,7 +91,7 @@ namespace DND.CedictEngine
             /// </summary>
             /// <param name="groups">The associated regex's groups.</param>
             /// <returns>The resolved Chinese text run.</returns>
-            public abstract TextRunZho Translate(GroupCollection groups);
+            public abstract TextRunZho Translate(GroupCollection groups, NormalizePinyinDelegate npd);
         }
 
         /// <summary>
@@ -104,11 +104,14 @@ namespace DND.CedictEngine
         /// </summary>
         private class MatchTranslatorSTP : MatchTranslator
         {
-            public override TextRunZho Translate(GroupCollection groups)
+            public override TextRunZho Translate(GroupCollection groups, NormalizePinyinDelegate npd)
             {
                 string trad = groups[1].Value;
                 string simp = groups[2].Value;
-                string pinyin = groups[3].Value;
+                string[] pinyinParts = groups[3].Value.Trim().Split(new char[] { ' ' });
+                PinyinSyllable[] pinyin;
+                List<int> pinyinMap;
+                npd(pinyinParts, out pinyin, out pinyinMap);
                 return new TextRunZho(simp, trad, pinyin);
             }
         }
@@ -123,11 +126,14 @@ namespace DND.CedictEngine
         /// </summary>
         private class MatchTranslatorSP : MatchTranslator
         {
-            public override TextRunZho Translate(GroupCollection groups)
+            public override TextRunZho Translate(GroupCollection groups, NormalizePinyinDelegate npd)
             {
                 string trad = groups[1].Value;
                 string simp = groups[1].Value;
-                string pinyin = groups[2].Value;
+                string[] pinyinParts = groups[2].Value.Trim().Split(new char[] { ' ' });
+                PinyinSyllable[] pinyin;
+                List<int> pinyinMap;
+                npd(pinyinParts, out pinyin, out pinyinMap);
                 return new TextRunZho(simp, trad, pinyin);
             }
         }
@@ -142,12 +148,11 @@ namespace DND.CedictEngine
         /// </summary>
         private class MatchTranslatorST : MatchTranslator
         {
-            public override TextRunZho Translate(GroupCollection groups)
+            public override TextRunZho Translate(GroupCollection groups, NormalizePinyinDelegate npd)
             {
                 string trad = groups[1].Value;
                 string simp = groups[2].Value;
-                string pinyin = null;
-                return new TextRunZho(simp, trad, pinyin);
+                return new TextRunZho(simp, trad, null);
             }
         }
 
@@ -161,12 +166,11 @@ namespace DND.CedictEngine
         /// </summary>
         private class MatchTranslatorS : MatchTranslator
         {
-            public override TextRunZho Translate(GroupCollection groups)
+            public override TextRunZho Translate(GroupCollection groups, NormalizePinyinDelegate npd)
             {
                 string trad = groups[1].Value;
                 string simp = groups[1].Value;
-                string pinyin = null;
-                return new TextRunZho(simp, trad, pinyin);
+                return new TextRunZho(simp, trad, null);
             }
         }
 
@@ -180,11 +184,14 @@ namespace DND.CedictEngine
         /// </summary>
         private class MatchTranslatorP : MatchTranslator
         {
-            public override TextRunZho Translate(GroupCollection groups)
+            public override TextRunZho Translate(GroupCollection groups, NormalizePinyinDelegate npd)
             {
                 string trad = null;
                 string simp = null;
-                string pinyin = groups[1].Value;
+                string[] pinyinParts = groups[1].Value.Trim().Split(new char[] { ' ' });
+                PinyinSyllable[] pinyin;
+                List<int> pinyinMap;
+                npd(pinyinParts, out pinyin, out pinyinMap);
                 return new TextRunZho(simp, trad, pinyin);
             }
         }
@@ -196,7 +203,7 @@ namespace DND.CedictEngine
         /// <param name="re">The regex to use.</param>
         /// <param name="mtr">An object matching the regex, used to translate into correct Chinese run.</param>
         /// <returns>The new runs that shall replace the one whose text we parsed.</returns>
-        private static List<TextRun> parseRun(string strRun, Regex re, MatchTranslator mtr)
+        private List<TextRun> parseRun(string strRun, Regex re, MatchTranslator mtr)
         {
             List<TextRun> res = new List<TextRun>();
             // Find regex's matches in inpout
@@ -209,7 +216,7 @@ namespace DND.CedictEngine
                 string textBefore = strRun.Substring(start, m.Index - start).Trim();
                 if (textBefore != string.Empty) res.Add(new TextRunLatin(textBefore));
                 // Translate match into a Chinese run
-                res.Add(mtr.Translate(m.Groups));
+                res.Add(mtr.Translate(m.Groups, normalizePinyin));
                 // Move finger
                 start = m.Index + m.Length;
             }

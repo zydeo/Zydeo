@@ -218,7 +218,7 @@ namespace DND.Gui
                 PointF loc = pb.Rect.Location;
                 loc.Y += (float)AbsTop;
                 // Draw string
-                g.DrawString(pb.Text, fntPinyin, bfont, loc, sf);
+                g.DrawString(pb.Text, fntPinyinHead, bfont, loc, sf);
 
             }
         }
@@ -254,13 +254,13 @@ namespace DND.Gui
                 foreach (HeadBlock hb in headInfo.SimpBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X + (float)AbsLeft, hb.Loc.Y + (float)AbsTop);
-                    g.DrawString(hb.Char, fntZho, bnorm, loc, sf);
+                    g.DrawString(hb.Char, fntZhoHead, bnorm, loc, sf);
                 }
                 foreach (HeadBlock hb in headInfo.TradBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X + (float)AbsLeft, hb.Loc.Y + (float)AbsTop);
                     Brush b = hb.Faded ? bfade : bnorm;
-                    g.DrawString(hb.Char, fntZho, b, loc, sf);
+                    g.DrawString(hb.Char, fntZhoHead, b, loc, sf);
                 }
                 // Pinyin
                 using (SolidBrush bhilite = new SolidBrush(ZenParams.PinyinHiliteColor))

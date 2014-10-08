@@ -11,6 +11,33 @@ namespace DND.Gui
     partial class OneResultControl
     {
         /// <summary>
+        /// Types of highlight an analyzed text block can have
+        /// </summary>
+        private enum BlockHilite
+        {
+            /// <summary>
+            /// Block has no highlight.
+            /// </summary>
+            None,
+            /// <summary>
+            /// First block of a multi-block highlight (fade in).
+            /// </summary>
+            Start,
+            /// <summary>
+            /// Last block of a multi-block highlight (fade out).
+            /// </summary>
+            End,
+            /// <summary>
+            /// Single block highlight (fade in+out).
+            /// </summary>
+            StartEnd,
+            /// <summary>
+            /// In the middle of a range of at least three highlighted blocks.
+            /// </summary>
+            Mid,
+        }
+
+        /// <summary>
         /// Base class for an analyzed typographical block in entry body.
         /// </summary>
         private class Block
@@ -38,6 +65,14 @@ namespace DND.Gui
             /// The display font to use.
             /// </summary>
             public Font Font;
+            /// <summary>
+            /// True if block is followed by a space. If false, contiguous to next block, but can break.
+            /// </summary>
+            public bool SpaceAfter;
+            /// <summary>
+            /// Type of highlight behind this text block.
+            /// </summary>
+            public BlockHilite Hilite;
         }
 
         /// <summary>

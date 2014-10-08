@@ -14,7 +14,7 @@ namespace DND.Common
         /// <summary>
         /// <para>The entry's pinyin syllables. Retroflexed "r5" is not a separate syllable.</para>
         /// </summary>
-        private readonly CedictPinyinSyllable[] pinyin;
+        private readonly PinyinSyllable[] pinyin;
 
         /// <summary>
         /// The Chinese headword's senses in the target language.
@@ -39,9 +39,9 @@ namespace DND.Common
         /// <summary>
         /// Gets the headword's pinyin syllables.
         /// </summary>
-        public ReadOnlyCollection<CedictPinyinSyllable> Pinyin
+        public ReadOnlyCollection<PinyinSyllable> Pinyin
         {
-            get { return new ReadOnlyCollection<CedictPinyinSyllable>(pinyin); }
+            get { return new ReadOnlyCollection<PinyinSyllable>(pinyin); }
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace DND.Common
         /// <summary>
         /// Returns (unnormalized, "raw") pinyin syllable at specific index.
         /// </summary>
-        public CedictPinyinSyllable GetPinyinAt(int pos)
+        public PinyinSyllable GetPinyinAt(int pos)
         {
             return pinyin[pos];
         }
@@ -77,7 +77,7 @@ namespace DND.Common
         /// <param name="hiliteStart">Start of pinyin hilight in returned collection, or -1.</param>
         /// <param name="hiliteLength">Length of pinyin hilight in returned collection, or 0.</param>
         /// <returns>String representation to show in UI.</returns>
-        public ReadOnlyCollection<CedictPinyinSyllable> GetPinyinForDisplay(bool diacritics,
+        public ReadOnlyCollection<PinyinSyllable> GetPinyinForDisplay(bool diacritics,
             int origHiliteStart, int origHiliteLength,
             out int hiliteStart, out int hiliteLength)
         {
@@ -92,14 +92,14 @@ namespace DND.Common
             // Map decomposed positions to merged positions
             int[] posMap = new int[pinyin.Length];
             for (int i = 0; i != posMap.Length; ++i) posMap[i] = i;
-            List<CedictPinyinSyllable> res = new List<CedictPinyinSyllable>(pinyin);
+            List<PinyinSyllable> res = new List<PinyinSyllable>(pinyin);
             int mi = 0;
             for (int i = 0; i < res.Count; ++i, ++mi)
             {
-                CedictPinyinSyllable ps = res[i];
+                PinyinSyllable ps = res[i];
                 if (i >= 0 && ps.Text == "r" && ps.Tone == 0)
                 {
-                    res[i - 1] = new CedictPinyinSyllable(res[i - 1].Text + "r", res[i - 1].Tone);
+                    res[i - 1] = new PinyinSyllable(res[i - 1].Text + "r", res[i - 1].Tone);
                     res.RemoveAt(i);
                     for (int j = mi; j != posMap.Length; ++j) --posMap[j];
                 }
@@ -113,7 +113,7 @@ namespace DND.Common
                 hiliteEnd = posMap[hiliteEnd];
                 hiliteLength = hiliteEnd - hiliteStart + 1;
             }
-            return new ReadOnlyCollection<CedictPinyinSyllable>(res);
+            return new ReadOnlyCollection<PinyinSyllable>(res);
         }
 
         /// <summary>
@@ -122,6 +122,14 @@ namespace DND.Common
         public IEnumerable<CedictSense> Senses
         {
             get { return senses; }
+        }
+
+        /// <summary>
+        /// Gets number of senses in entry.
+        /// </summary>
+        public int SenseCount
+        {
+            get { return senses.Length; }
         }
 
         /// <summary>
@@ -144,7 +152,7 @@ namespace DND.Common
         /// Ctor: init immutable instance.
         /// </summary>
         public CedictEntry(string chSimpl, string chTrad,
-            ReadOnlyCollection<CedictPinyinSyllable> pinyin,
+            ReadOnlyCollection<PinyinSyllable> pinyin,
             ReadOnlyCollection<CedictSense> senses,
             short[] hanziPinyinMap)
         {
@@ -153,7 +161,7 @@ namespace DND.Common
 
             ChSimpl = chSimpl;
             ChTrad = chTrad;
-            this.pinyin = new CedictPinyinSyllable[pinyin.Count];
+            this.pinyin = new PinyinSyllable[pinyin.Count];
             for (int i = 0; i != pinyin.Count; ++i) this.pinyin[i] = pinyin[i];
             this.senses = new CedictSense[senses.Count];
             for (int i = 0; i != senses.Count; ++i) this.senses[i] = senses[i];
@@ -176,7 +184,7 @@ namespace DND.Common
         /// </summary>
         public CedictEntry(BinReader br)
         {
-            pinyin = br.ReadArray(brr => new CedictPinyinSyllable(brr));
+            pinyin = br.ReadArray(brr => new PinyinSyllable(brr));
             ChSimpl = br.ReadString();
             ChTrad = br.ReadString();
             senses = br.ReadArray(brr => new CedictSense(brr));

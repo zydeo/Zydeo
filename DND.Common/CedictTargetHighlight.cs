@@ -11,12 +11,12 @@ namespace DND.Common
     public class CedictTargetHighlight
     {
         /// <summary>
-        /// Index of sense in entry that contains the highlight.
+        /// Index of sense in entry that contains the highlight in its equiv.
         /// </summary>
         public readonly int SenseIx;
 
         /// <summary>
-        /// Index of (Latin) text run in sense that contains the highlight.
+        /// Index of (Latin) text run in equiv of sense that contains the highlight.
         /// </summary>
         public readonly int RunIx;
 

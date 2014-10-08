@@ -85,7 +85,7 @@ namespace DND.CedictEngine
             string[] pinyinParts = hm.Groups[3].Value.Split(new char[] { ' ' });
 
             // Convert pinyin to our normalized format
-            CedictPinyinSyllable[] pinyinSylls;
+            PinyinSyllable[] pinyinSylls;
             List<int> pinyinMap;
             normalizePinyin(pinyinParts, out pinyinSylls, out pinyinMap);
             // Weird syllables found > warning
@@ -159,7 +159,7 @@ namespace DND.CedictEngine
             if (cedictSenses.Count == 0) return null;
             // Done with entry
             CedictEntry res = new CedictEntry(hm.Groups[2].Value, hm.Groups[1].Value,
-                new ReadOnlyCollection<CedictPinyinSyllable>(pinyinSylls),
+                new ReadOnlyCollection<PinyinSyllable>(pinyinSylls),
                 new ReadOnlyCollection<CedictSense>(cedictSenses),
                 hanziToPinyin);
             return res;
@@ -220,9 +220,14 @@ namespace DND.CedictEngine
         }
 
         /// <summary>
+        /// Delegate so we can access <see cref="normalizePinyin"/> in embedded classes.
+        /// </summary>
+        private delegate void NormalizePinyinDelegate(string[] parts, out PinyinSyllable[] syllsArr, out List<int> pinyinMap);
+
+        /// <summary>
         /// Normalizes array of Cedict-style pinyin syllables into our format.
         /// </summary>
-        private void normalizePinyin(string[] parts, out CedictPinyinSyllable[] syllsArr, out List<int> pinyinMap)
+        private void normalizePinyin(string[] parts, out PinyinSyllable[] syllsArr, out List<int> pinyinMap)
         {
             // What this function does:
             // - Separates tone mark from text (unless it's a "weird" syllable
@@ -232,14 +237,14 @@ namespace DND.CedictEngine
             //   Values in list point into "sylls" output array
             //   Up to two positions can have same value (for r5 appending)
             pinyinMap = new List<int>();
-            List<CedictPinyinSyllable> sylls = new List<CedictPinyinSyllable>();
+            List<PinyinSyllable> sylls = new List<PinyinSyllable>();
             foreach (string ps in parts)
             {
                 // Does not end with a tone mark (1 thru 5): weird
                 char chrLast = ps[ps.Length - 1];
                 if (chrLast < '1' || chrLast > '5')
                 {
-                    sylls.Add(new CedictPinyinSyllable(ps, -1));
+                    sylls.Add(new PinyinSyllable(ps, -1));
                     continue;
                 }
                 // Separate tone and text
@@ -251,7 +256,7 @@ namespace DND.CedictEngine
                 text = text.Replace("u:", "v");
                 text = text.Replace("U:", "V");
                 // Store new syllable
-                sylls.Add(new CedictPinyinSyllable(text, tone));
+                sylls.Add(new PinyinSyllable(text, tone));
                 // Add to map
                 pinyinMap.Add(sylls.Count - 1);
             }
@@ -325,7 +330,7 @@ namespace DND.CedictEngine
                     ii.EntriesHeadwordTrad.Add(id);
             }
             // Index pinyin syllables
-            foreach (CedictPinyinSyllable pys in entry.Pinyin)
+            foreach (PinyinSyllable pys in entry.Pinyin)
             {
                 PinyinIndexItem pi;
                 // Index contains lower-case syllables

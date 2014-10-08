@@ -8,7 +8,7 @@ namespace DND.Common
     /// <summary>
     /// One pinyin syllable, normalized into text and tone.
     /// </summary>
-    public partial class CedictPinyinSyllable : IBinSerializable, IComparable<CedictPinyinSyllable>
+    public partial class PinyinSyllable : IBinSerializable, IComparable<PinyinSyllable>
     {
         /// <summary>
         /// The syllable text, without tone. Can be a "weird" syllable, e.g., a Latin letter.
@@ -26,7 +26,7 @@ namespace DND.Common
         /// <summary>
         /// Ctor: init immutable instance.
         /// </summary>
-        public CedictPinyinSyllable(string text, int tone)
+        public PinyinSyllable(string text, int tone)
         {
             if (string.IsNullOrEmpty(text)) throw new ArgumentException("text");
             if (tone < -1 || tone > 4) throw new ArgumentException("tone");
@@ -37,7 +37,7 @@ namespace DND.Common
         /// <summary>
         /// Ctor: deserialize from binary stream.
         /// </summary>
-        public CedictPinyinSyllable(BinReader br)
+        public PinyinSyllable(BinReader br)
         {
             Text = br.ReadString();
             byte b = br.ReadByte();
@@ -56,7 +56,7 @@ namespace DND.Common
         /// <summary>
         /// Compares syllable to other, for lexicographical ordering.
         /// </summary>
-        public int CompareTo(CedictPinyinSyllable other)
+        public int CompareTo(PinyinSyllable other)
         {
             // First, text without tone, case-insensitive
             int i = string.Compare(Text, other.Text, StringComparison.InvariantCultureIgnoreCase);
