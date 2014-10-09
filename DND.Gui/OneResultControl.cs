@@ -93,6 +93,10 @@ namespace DND.Gui
         /// Body text laid out for current width.
         /// </summary>
         private List<PositionedBlock> positionedBlocks = null;
+        /// <summary>
+        /// Vertical offset of Hanzi in a target line, to make it look better aligned in Latin text.
+        /// </summary>
+        private float targetHanziOfs = 0;
 
         /// <summary>
         /// Ctor: takes data to display.

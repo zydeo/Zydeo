@@ -184,6 +184,20 @@ namespace DND.Gui
         }
 
         /// <summary>
+        /// Returns vertical offset of target Hanzi; retrieves Hanzi measures on demand.
+        /// </summary>
+        private float getTargetHanziOfs()
+        {
+            if (targetHanziOfs != 0) return targetHanziOfs;
+            // Calculate on demand
+            var sizeInfo = HanziMeasure.Instance.GetMeasures(fntSenseHanzi.FontFamily.Name, fntSenseHanzi.Size);
+            float hanziMidY = sizeInfo.RealRect.Top + sizeInfo.RealRect.Height / 2.0F;
+            float latinMidY = fntSenseLatin.Height * 0.55F;
+            targetHanziOfs = latinMidY - hanziMidY;
+            return targetHanziOfs;
+        }
+
+        /// <summary>
         /// Paints full control. Analyzes on demand, but meant to be called after analysis up front.
         /// </summary>
         public override void DoPaint(Graphics g)
@@ -251,7 +265,11 @@ namespace DND.Gui
                     else if (pb.Block is TextBlock)
                     {
                         TextBlock tb = pb.Block as TextBlock;
-                        g.DrawString(tb.Text, tb.Font, bnorm, pb.Loc.X + fLeft, pb.Loc.Y + fTop, sf);
+                        // Extra vertical offset on Hanzi blocks
+                        float vOfs = 0;
+                        if (tb.Font == fntMetaHanzi || tb.Font == fntSenseHanzi)
+                            vOfs += getTargetHanziOfs();
+                        g.DrawString(tb.Text, tb.Font, bnorm, pb.Loc.X + fLeft, pb.Loc.Y + fTop + vOfs, sf);
                     }
                 }
             }
