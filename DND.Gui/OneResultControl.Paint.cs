@@ -98,46 +98,6 @@ namespace DND.Gui
                     }
                 }
             }
-
-            //using (Brush b = new SolidBrush(ZenParams.HanziHiliteColor))
-            //{
-            //    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            //    // Only a single line, or both simplified and traditional are multi-line
-            //    // Highlight each character individually
-            //    if (headInfo.HeadMode != HeadMode.BothSingleLine)
-            //    {
-            //        // In simplified
-            //        if (headInfo.SimpBlocks.Count != 0)
-            //        {
-            //            var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
-            //            for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
-            //            {
-            //                HeadBlock hb = headInfo.SimpBlocks[ix];
-            //                float hlHeight = 3.0F;
-            //                hlHeight *= Scale;
-            //                float hlTop = hb.Loc.Y + si.RealRect.Height;
-            //                hlTop += ((float)AbsTop);
-            //                RectangleF rect = new RectangleF(((float)AbsLeft) + hb.Loc.X, hlTop, hb.Size.Width, hlHeight);
-            //                g.FillRectangle(b, rect);
-            //            }
-            //        }
-            //        // In traditional
-            //        if (headInfo.TradBlocks.Count != 0)
-            //        {
-            //            var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
-            //            for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
-            //            {
-            //                HeadBlock hb = headInfo.TradBlocks[ix];
-            //                float hlHeight = 3.0F;
-            //                hlHeight *= Scale;
-            //                float hlTop = hb.Loc.Y + si.RealRect.Height;
-            //                hlTop += ((float)AbsTop);
-            //                RectangleF rect = new RectangleF(((float)AbsLeft) + hb.Loc.X, hlTop, hb.Size.Width, hlHeight);
-            //                g.FillRectangle(b, rect);
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         /// <summary>
