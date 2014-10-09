@@ -199,9 +199,9 @@ namespace DND.Gui
                     // Traditional (empty string if only simplified requested)
                     // Pinyin with accents as tone marks, in brackets (if present)
                     string strSimp = string.Empty;
-                    if (analyzedScript != SearchScript.Traditional) strSimp = zhoRun.Simp;
+                    if (analyzedScript != SearchScript.Traditional && zhoRun.Simp != null) strSimp = zhoRun.Simp;
                     string strTrad = string.Empty;
-                    if (analyzedScript != SearchScript.Simplified) strTrad = zhoRun.Trad;
+                    if (analyzedScript != SearchScript.Simplified && zhoRun.Trad != null) strTrad = zhoRun.Trad;
                     // Remember if we have any target Hanzi
                     if (strSimp != string.Empty || strTrad != string.Empty) anyTargetHanzi = true;
                     string strPy = string.Empty;

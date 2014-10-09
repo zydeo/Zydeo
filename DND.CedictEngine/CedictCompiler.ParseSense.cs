@@ -192,7 +192,7 @@ namespace DND.CedictEngine
                 PinyinSyllable[] pinyin;
                 List<int> pinyinMap;
                 npd(pinyinParts, out pinyin, out pinyinMap);
-                return new TextRunZho(simp, trad, pinyin);
+                return new TextRunZho(pinyin);
             }
         }
 
@@ -264,7 +264,7 @@ namespace DND.CedictEngine
             runs = splitRuns(runs, reSP, new MatchTranslatorSP());
             runs = splitRuns(runs, reST, new MatchTranslatorST());
             runs = splitRuns(runs, reS, new MatchTranslatorS());
-            runs = splitRuns(runs, reP, new MatchTranslatorS());
+            runs = splitRuns(runs, reP, new MatchTranslatorP());
 
             // Sanity checks
             foreach (TextRun tr in runs)
