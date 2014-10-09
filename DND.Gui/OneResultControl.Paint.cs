@@ -198,6 +198,67 @@ namespace DND.Gui
         }
 
         /// <summary>
+        /// Paints target (entry body).
+        /// </summary>
+        private void doPaintTarget(Graphics g, Pen pnorm, Brush bnorm, StringFormat sf)
+        {
+            // All the measured and positioned blocks in entry body
+            float fLeft = (float)AbsLeft;
+            float fTop = (float)AbsTop;
+            foreach (PositionedBlock pb in positionedBlocks)
+            {
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                // Sense ID
+                if (pb.Block is SenseIdBlock)
+                {
+                    SenseIdBlock sib = pb.Block as SenseIdBlock;
+                    float pad = lemmaLineHeight * 0.1F;
+                    g.DrawEllipse(pnorm,
+                        pb.Loc.X + fLeft,
+                        pb.Loc.Y + fTop + Scale * pad,
+                        sib.Size.Width - 2.0F * pad,
+                        sib.Size.Height - 2.0F * pad);
+                    g.DrawString(sib.Text, fntSenseId, bnorm,
+                        pb.Loc.X + fLeft + 2.0F * pad,
+                        pb.Loc.Y + fTop + 1.5F * pad, sf);
+                }
+                // Text
+                else if (pb.Block is TextBlock)
+                {
+                    TextBlock tb = pb.Block as TextBlock;
+                    // Extra vertical offset on Hanzi blocks
+                    float vOfs = 0;
+                    if (tb.Font == fntMetaHanzi || tb.Font == fntSenseHanzi)
+                        vOfs += getTargetHanziOfs();
+                    g.DrawString(tb.Text, tb.Font, bnorm, pb.Loc.X + fLeft, pb.Loc.Y + fTop + vOfs, sf);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Paints highlights behind target text blocks.
+        /// </summary>
+        private void doPaintTargetHilites(Graphics g, Color bgcol)
+        {
+            g.SmoothingMode = SmoothingMode.None;
+            // All the measured and positioned blocks in entry body
+            float fLeft = (float)AbsLeft;
+            float fTop = (float)AbsTop;
+            using (Brush b = new SolidBrush(ZenParams.HanziHiliteColor))
+            {
+                foreach (PositionedBlock pb in positionedBlocks)
+                {
+                    TextBlock tb = pb.Block as TextBlock;
+                    if (tb == null || !tb.Hilite) continue;
+                    RectangleF rect = new RectangleF(pb.Loc, tb.Size);
+                    rect.X += fLeft;
+                    rect.Y += fTop;
+                    g.FillRectangle(b, rect);
+                }
+            }
+        }
+
+        /// <summary>
         /// Paints full control. Analyzes on demand, but meant to be called after analysis up front.
         /// </summary>
         public override void DoPaint(Graphics g)
@@ -215,6 +276,8 @@ namespace DND.Gui
 
             // Hanzi highlights. May draw on top, so must come before actual characters are drawn.
             doPaintHanziHilites(g, bgcol);
+            // Target text highlights (characters will come on top).
+            doPaintTargetHilites(g, bgcol);
 
             // This is how we draw text
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
@@ -241,37 +304,8 @@ namespace DND.Gui
                 {
                     doPaintPinyin(g, bnorm, bhilite, sf, bgcol);
                 }
-                // All the measured and positioned blocks in entry body
-                float fLeft = (float)AbsLeft;
-                float fTop = (float)AbsTop;
-                foreach (PositionedBlock pb in positionedBlocks)
-                {
-                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                    // Sense ID
-                    if (pb.Block is SenseIdBlock)
-                    {
-                        SenseIdBlock sib = pb.Block as SenseIdBlock;
-                        float pad = lemmaLineHeight * 0.1F;
-                        g.DrawEllipse(pnorm,
-                            pb.Loc.X + fLeft,
-                            pb.Loc.Y + fTop + Scale * pad,
-                            sib.Size.Width - 2.0F * pad,
-                            sib.Size.Height - 2.0F * pad);
-                        g.DrawString(sib.Text, fntSenseId, bnorm,
-                            pb.Loc.X + fLeft + 2.0F * pad,
-                            pb.Loc.Y + fTop + 1.5F * pad, sf);
-                    }
-                    // Text
-                    else if (pb.Block is TextBlock)
-                    {
-                        TextBlock tb = pb.Block as TextBlock;
-                        // Extra vertical offset on Hanzi blocks
-                        float vOfs = 0;
-                        if (tb.Font == fntMetaHanzi || tb.Font == fntSenseHanzi)
-                            vOfs += getTargetHanziOfs();
-                        g.DrawString(tb.Text, tb.Font, bnorm, pb.Loc.X + fLeft, pb.Loc.Y + fTop + vOfs, sf);
-                    }
-                }
+                // Target (body) highlights
+                doPaintTarget(g, pnorm, bnorm, sf);
             }
         }
     }

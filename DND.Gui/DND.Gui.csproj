@@ -46,6 +46,7 @@
     <Compile Include="HanziMeasure.cs" />
     <Compile Include="LookupControl.cs" />
     <Compile Include="MainForm.cs" />
+    <Compile Include="OneResultControl.Analysis.cs" />
     <Compile Include="OneResultControl.Paint.cs" />
     <Compile Include="ResultsControl.cs" />
     <Compile Include="SearchInputControl.cs" />
@@ -76,7 +77,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OneResultControl.Analysis.cs" />
+    <Compile Include="OneResultControl.Entities.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\search.png" />

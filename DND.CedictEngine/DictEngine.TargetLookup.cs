@@ -102,8 +102,8 @@ namespace DND.CedictEngine
 
                 // Sort entry IDs by their best score
                 List<EntryMatchInfo> entryInfoList = new List<EntryMatchInfo>();
-                foreach (var x in entryIdToInfo)
-                    entryInfoList.Add(new EntryMatchInfo { EntryId = x.Key, BestSenseScore = x.Value.BestSenseScore });
+                foreach (var x in entryIdToInfo) entryInfoList.Add(x.Value);
+                    //entryInfoList.Add(new EntryMatchInfo { EntryId = x.Key, BestSenseScore = x.Value.BestSenseScore });
                 entryInfoList.Sort((a, b) => b.BestSenseScore.CompareTo(a.BestSenseScore));
                 // Load entries, wrap into results
                 foreach (EntryMatchInfo emi in entryInfoList)
