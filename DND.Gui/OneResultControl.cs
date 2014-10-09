@@ -86,6 +86,10 @@ namespace DND.Gui
         /// </summary>
         private List<Block> measuredBlocks = null;
         /// <summary>
+        /// True if target contains Hanzi > need to re-measure when script changes.
+        /// </summary>
+        private bool anyTargetHanzi = false;
+        /// <summary>
         /// Body text laid out for current width.
         /// </summary>
         private List<PositionedBlock> positionedBlocks = null;
@@ -245,6 +249,8 @@ namespace DND.Gui
                     if (analyzedScript != SearchScript.Traditional) strSimp = zhoRun.Simp;
                     string strTrad = string.Empty;
                     if (analyzedScript != SearchScript.Simplified) strTrad = zhoRun.Trad;
+                    // Remember if we have any target Hanzi
+                    if (strSimp != string.Empty || strTrad != string.Empty) anyTargetHanzi = true;
                     string strPy = string.Empty;
                     // Convert pinyin to display format (tone marks as diacritics; r5 glued)
                     if (zhoRun.Pinyin != null) strPy = "[" + zhoRun.GetPinyinInOne(true) + "]";
@@ -261,7 +267,8 @@ namespace DND.Gui
                         blocks.Add(tb);
                     }
                     // Separator if both simplified and traditional are there
-                    if (strSimp != string.Empty && strTrad != string.Empty)
+                    // AND they are different...
+                    if (strSimp != string.Empty && strTrad != string.Empty && strSimp != strTrad)
                     {
                         blocks[blocks.Count - 1].StickRight = true;
                         TextBlock tb = new TextBlock
@@ -274,7 +281,7 @@ namespace DND.Gui
                         blocks.Add(tb);
                     }
                     // Traditional, if present
-                    if (strTrad != string.Empty)
+                    if (strTrad != string.Empty && strTrad != strSimp)
                     {
                         TextBlock tb = new TextBlock
                         {
@@ -602,6 +609,12 @@ namespace DND.Gui
             {
                 analyzedScript = script;
                 headInfo = null;
+                // Make me re-render completely if target contains Hanzi and script has changed.
+                if (anyTargetHanzi)
+                {
+                    measuredBlocks = null;
+                    positionedBlocks = null;
+                }
             }
 
             // This is how we measure
