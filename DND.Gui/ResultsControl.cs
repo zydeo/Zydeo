@@ -300,6 +300,76 @@ namespace DND.Gui
             // Done.
         }
 
+        private ZenControlBase ctrlWithMouse = null;
+
+        private OneResultControl getOneResultControl(Point p)
+        {
+            foreach (OneResultControl ctrl in resCtrls)
+                if (ctrl.AbsRect.Contains(p)) return ctrl;
+            return null;
+        }
+
+        private Point parentToOneResultControl(OneResultControl ctrl, Point pParent)
+        {
+            int x = pParent.X - ctrl.AbsRect.X;
+            int y = pParent.Y - ctrl.AbsRect.Y;
+            return new Point(x, y);
+        }
+
+        public override bool DoMouseMove(Point p, MouseButtons button)
+        {
+            bool res = false;
+            OneResultControl ctrl = getOneResultControl(p);
+            if (ctrl != null)
+            {
+                if (ctrlWithMouse != ctrl)
+                {
+                    if (ctrlWithMouse != null) ctrlWithMouse.DoMouseLeave();
+                    ctrl.DoMouseEnter();
+                    ctrlWithMouse = ctrl;
+                }
+                ctrl.DoMouseMove(parentToOneResultControl(ctrl, p), button);
+                res = true;
+            }
+            else if (ctrlWithMouse != null)
+            {
+                ctrlWithMouse.DoMouseLeave();
+                ctrlWithMouse = null;
+            }
+            return res;
+        }
+
+        public override void DoMouseEnter()
+        {
+            Point pAbs = MousePositionAbs;
+            Point pRel = new Point(pAbs.X - AbsLeft, pAbs.Y - AbsTop);
+            ZenControlBase ctrl = getOneResultControl(pRel);
+            if (ctrl != null)
+            {
+                if (ctrlWithMouse != ctrl)
+                {
+                    if (ctrlWithMouse != null) ctrlWithMouse.DoMouseLeave();
+                    ctrl.DoMouseEnter();
+                    ctrlWithMouse = ctrl;
+                }
+            }
+        }
+
+        public override void DoMouseLeave()
+        {
+            if (ctrlWithMouse != null)
+            {
+                ctrlWithMouse.DoMouseLeave();
+                ctrlWithMouse = null;
+            }
+        }
+
+        // TO-DO: use proper coordinates and eliminate this
+        internal void RepaintBlah()
+        {
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
         /// <summary>
         /// Changes the display script, keeping existing results on screen.
         /// </summary>

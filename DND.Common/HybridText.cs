@@ -221,6 +221,22 @@ namespace DND.Common
         }
 
         /// <summary>
+        /// Gets raw pinyin string: all syllables concatenated, with numbers for tone marks.
+        /// </summary>
+        public string GetPinyinRaw()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (PinyinSyllable syll in Pinyin)
+            {
+                sb.Append(syll.Text);
+                int tone = syll.Tone;
+                if (tone == 0) tone = 5;
+                if (tone != -1) sb.Append(tone.ToString());
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Returns concatenated pinyin syllables.
         /// </summary>
         /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>

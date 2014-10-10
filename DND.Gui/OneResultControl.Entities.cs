@@ -6,10 +6,56 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
+using DND.Common;
+
 namespace DND.Gui
 {
     partial class OneResultControl
     {
+        /// <summary>
+        /// <para>Represents one hyperlink in the control, made up of multiple blocks.</para>
+        /// <para>Hyperlinks have active hover behavior, and trigger a new query when clicked.</para>
+        /// </summary>
+        private class LinkArea
+        {
+            /// <summary>
+            /// The string to query when the link is clicked.
+            /// </summary>
+            public readonly string QueryString;
+            /// <summary>
+            /// The link's active areas (hover/click). Expressed in the control's relative coordinates.
+            /// </summary>
+            public readonly List<Rectangle> ActiveAreas = new List<Rectangle>();
+            /// <summary>
+            /// The blocks that make up the link area. Unchanged once blocks have been measured.
+            /// </summary>
+            public readonly HashSet<Block> Blocks = new HashSet<Block>();
+            /// <summary>
+            /// <para>The positioned blocks that make up the link (they all change display state together on hover).</para>
+            /// <para>Re-calculated on the basis of <see cref="Blocks"/> when recreating positioned blocks.</para>
+            /// </summary>
+            public readonly List<PositionedBlock> PositionedBlocks = new List<PositionedBlock>();
+
+            /// <summary>
+            /// Ctor: sets the link's query string based on available information.
+            /// </summary>
+            /// <param name="simp">Simplified Hanzi, or empty string.</param>
+            /// <param name="trad">Traditional Hanzi, or empty string.</param>
+            /// <param name="pinyin">Pinyin, or empty string.</param>
+            /// <param name="script">Search script (to choose simp/trad Hanzi, if available).</param>
+            public LinkArea(string simp, string trad, string pinyin, SearchScript script)
+            {
+                if (simp == string.Empty && trad != string.Empty) trad = simp;
+                else if (trad == string.Empty && simp != string.Empty) simp = trad;
+                // We have hanzi. Use that.
+                if (simp != string.Empty)
+                    QueryString = script == SearchScript.Traditional ? trad : simp;
+                // No hanzi. Must have pinyin, use that.
+                else
+                    QueryString = pinyin;
+            }
+        }
+
         /// <summary>
         /// Base class for an analyzed typographical block in entry body.
         /// </summary>

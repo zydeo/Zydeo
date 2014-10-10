@@ -202,36 +202,55 @@ namespace DND.Gui
         /// </summary>
         private void doPaintTarget(Graphics g, Pen pnorm, Brush bnorm, StringFormat sf)
         {
-            // All the measured and positioned blocks in entry body
-            float fLeft = (float)AbsLeft;
-            float fTop = (float)AbsTop;
-            foreach (PositionedBlock pb in positionedBlocks)
+            Brush bhover = null;
+            try
             {
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                // Sense ID
-                if (pb.Block is SenseIdBlock)
+                // All the measured and positioned blocks in entry body
+                float fLeft = (float)AbsLeft;
+                float fTop = (float)AbsTop;
+                foreach (PositionedBlock pb in positionedBlocks)
                 {
-                    SenseIdBlock sib = pb.Block as SenseIdBlock;
-                    float pad = lemmaLineHeight * 0.1F;
-                    g.DrawEllipse(pnorm,
-                        pb.Loc.X + fLeft,
-                        pb.Loc.Y + fTop + Scale * pad,
-                        sib.Size.Width - 2.0F * pad,
-                        sib.Size.Height - 2.0F * pad);
-                    g.DrawString(sib.Text, fntSenseId, bnorm,
-                        pb.Loc.X + fLeft + 2.0F * pad,
-                        pb.Loc.Y + fTop + 1.5F * pad, sf);
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                    // Sense ID
+                    if (pb.Block is SenseIdBlock)
+                    {
+                        SenseIdBlock sib = pb.Block as SenseIdBlock;
+                        float pad = lemmaLineHeight * 0.1F;
+                        g.DrawEllipse(pnorm,
+                            pb.Loc.X + fLeft,
+                            pb.Loc.Y + fTop + Scale * pad,
+                            sib.Size.Width - 2.0F * pad,
+                            sib.Size.Height - 2.0F * pad);
+                        g.DrawString(sib.Text, fntSenseId, bnorm,
+                            pb.Loc.X + fLeft + 2.0F * pad,
+                            pb.Loc.Y + fTop + 1.5F * pad, sf);
+                    }
+                    // Text
+                    else if (pb.Block is TextBlock)
+                    {
+                        TextBlock tb = pb.Block as TextBlock;
+                        // Extra vertical offset on Hanzi blocks
+                        float vOfs = 0;
+                        if (tb.Font == fntMetaHanzi || tb.Font == fntSenseHanzi)
+                            vOfs += getTargetHanziOfs();
+                        // No hover: draw with normal brush
+                        Brush brush = bnorm;
+                        // Hover: create hover brush on demand; draw with that
+                        if (hoverLink != null)
+                        {
+                            if (hoverLink.Blocks.Contains(tb))
+                            {
+                                if (bhover == null) bhover = new SolidBrush(ZenParams.LinkHoverColor);
+                                brush = bhover;
+                            }
+                        }
+                        g.DrawString(tb.Text, tb.Font, brush, pb.Loc.X + fLeft, pb.Loc.Y + fTop + vOfs, sf);
+                    }
                 }
-                // Text
-                else if (pb.Block is TextBlock)
-                {
-                    TextBlock tb = pb.Block as TextBlock;
-                    // Extra vertical offset on Hanzi blocks
-                    float vOfs = 0;
-                    if (tb.Font == fntMetaHanzi || tb.Font == fntSenseHanzi)
-                        vOfs += getTargetHanziOfs();
-                    g.DrawString(tb.Text, tb.Font, bnorm, pb.Loc.X + fLeft, pb.Loc.Y + fTop + vOfs, sf);
-                }
+            }
+            finally
+            {
+                if (bhover != null) bhover.Dispose();
             }
         }
         

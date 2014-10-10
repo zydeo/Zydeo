@@ -107,6 +107,15 @@ namespace DND.Gui
         /// Vertical offset of Hanzi in a target line, to make it look better aligned in Latin text.
         /// </summary>
         private float targetHanziOfs = 0;
+        /// <summary>
+        /// Link areas in the entry body, or null.
+        /// </summary>
+        private List<LinkArea> targetLinks = null;
+
+        /// <summary>
+        /// Link area above which the cursor currently hovers, or null.
+        /// </summary>
+        private LinkArea hoverLink = null;
 
         /// <summary>
         /// Ctor: takes data to display.
@@ -156,6 +165,48 @@ namespace DND.Gui
             fntMetaLatin = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize, FontStyle.Italic);
             fntMetaHanzi = new Font(ZenParams.ZhoFontFamily, ZenParams.LemmaFontSize * 1.2F, FontStyle.Italic);
             fntSenseId = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize * 0.8F);
+        }
+
+        public override void DoMouseLeave()
+        {
+            Cursor = Cursors.Arrow;
+            // Cursor hovered over a link: request a repaint
+            if (hoverLink != null)
+            {
+                hoverLink = null;
+                (Parent as ResultsControl).RepaintBlah();
+            }
+        }
+
+        public override bool DoMouseMove(Point p, MouseButtons button)
+        {
+            // If we have no links, nothing to do
+            if (targetLinks == null) return true;
+            // Are we over a link area?
+            LinkArea overWhat = null;
+            foreach (LinkArea link in targetLinks)
+            {
+                foreach (Rectangle rect in link.ActiveAreas)
+                {
+                    if (rect.Contains(p))
+                    {
+                        overWhat = link;
+                        break;
+                    }
+                }
+            }
+            // We're over a link
+            if (overWhat != null) Cursor = Cursors.Hand;
+            // Nop, not over a link
+            else Cursor = Cursors.Arrow;
+            // Hover state changed: request a repaint
+            if (overWhat != hoverLink)
+            {
+                hoverLink = overWhat;
+                (Parent as ResultsControl).RepaintBlah();
+            }
+            // We're done. No child controls, just return true.
+            return true;
         }
     }
 }

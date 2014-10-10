@@ -39,6 +39,7 @@ namespace DND.Gui
                     measuredBlocks = null;
                     positionedBlocks = null;
                     targetHiliteIndexes = null;
+                    targetLinks = null;
                 }
             }
 
@@ -105,6 +106,9 @@ namespace DND.Gui
 
             // Recreate list of blocks
             measuredBlocks = new List<Block>();
+            // Collect links here. Will only keep at end if not empty.
+            List<LinkArea> newLinks = new List<LinkArea>();
+
             int senseIdx = -1;
             int displaySenseIdx = -1;
             bool lastWasClassifier = false;
@@ -131,16 +135,16 @@ namespace DND.Gui
                 // Unpacks Chinese ranges
                 List<TextBlock> senseBlocks = new List<TextBlock>();
                 // Domain is localized text for "Classifier:" if, well, this is a classifier sense
-                if (!classifier) getBlocks(cm.Domain, true, null, senseBlocks);
+                if (!classifier) getBlocks(cm.Domain, true, null, senseBlocks, newLinks);
                 else
                 {
                     string strClassifier = tprov.GetString("ResultCtrlClassifier");
                     HybridText htClassifier = new HybridText(strClassifier);
-                    getBlocks(htClassifier, true, null, senseBlocks);
+                    getBlocks(htClassifier, true, null, senseBlocks, newLinks);
                     senseBlocks[0].NewLine = true;
                 }
-                getBlocks(cm.Equiv, false, hlArr[senseIdx], senseBlocks);
-                getBlocks(cm.Note, true, null, senseBlocks);
+                getBlocks(cm.Equiv, false, hlArr[senseIdx], senseBlocks, newLinks);
+                getBlocks(cm.Note, true, null, senseBlocks, newLinks);
                 // Measure each block, and add to full list of blocks
                 measuredBlocks.Capacity += senseBlocks.Count;
                 foreach (TextBlock tb in senseBlocks)
@@ -150,6 +154,7 @@ namespace DND.Gui
                 }
                 lastWasClassifier = classifier;
             }
+            if (newLinks.Count != 0) targetLinks = newLinks;
         }
 
         /// <summary>
@@ -160,8 +165,9 @@ namespace DND.Gui
         /// <param name="isMeta">True if this is a domain or note (displayed in italics).</param>
         /// <param name="hl">Highlight to show in hybrid text, or null.</param>
         /// <param name="blocks">List of blocks to append to.</param>
-        /// <param name="hlSet">Hashset with blocks that have a highight. Created on demand.</param>
-        private void getBlocks(HybridText htxt, bool isMeta, CedictTargetHighlight hl, List<TextBlock> blocks)
+        /// <param name="links">List to gather links (appending to list).</param>
+        private void getBlocks(HybridText htxt, bool isMeta, CedictTargetHighlight hl,
+            List<TextBlock> blocks, List<LinkArea> links)
         {
             Font fntLatin = isMeta ? fntMetaLatin : fntSenseLatin;
             Font fntZho = isMeta ? fntMetaHanzi : fntSenseHanzi;
@@ -230,6 +236,12 @@ namespace DND.Gui
                     string strPy = string.Empty;
                     // Convert pinyin to display format (tone marks as diacritics; r5 glued)
                     if (zhoRun.Pinyin != null) strPy = "[" + zhoRun.GetPinyinInOne(true) + "]";
+
+                    // Create link area, with query string
+                    string strPyNumbers = string.Empty; // Pinyin with numbers as tone marks
+                    if (zhoRun.Pinyin != null) strPyNumbers = zhoRun.GetPinyinRaw();
+                    LinkArea linkArea = new LinkArea(strSimp, strTrad, strPyNumbers, analyzedScript);
+
                     // Block for simplified, if present
                     if (strSimp != string.Empty)
                     {
@@ -242,6 +254,7 @@ namespace DND.Gui
                             SpaceAfter = true,
                         };
                         blocks.Add(tb);
+                        linkArea.Blocks.Add(tb);
                     }
                     // Separator if both simplified and traditional are there
                     // AND they are different...
@@ -257,6 +270,7 @@ namespace DND.Gui
                             SpaceAfter = true,
                         };
                         blocks.Add(tb);
+                        linkArea.Blocks.Add(tb);
                     }
                     // Traditional, if present
                     if (strTrad != string.Empty && strTrad != strSimp)
@@ -270,6 +284,7 @@ namespace DND.Gui
                             SpaceAfter = true,
                         };
                         blocks.Add(tb);
+                        linkArea.Blocks.Add(tb);
                     }
                     // Pinyin, if present
                     if (strPy != string.Empty)
@@ -287,6 +302,7 @@ namespace DND.Gui
                                 SpaceAfter = true,
                             };
                             blocks.Add(tb);
+                            linkArea.Blocks.Add(tb);
                         }
                     }
                     // Last part will have requested a space after.
@@ -295,6 +311,8 @@ namespace DND.Gui
                     if (runIX + 1 < htxt.RunCount) nextLatinRun = htxt.GetRunAt(runIX + 1) as TextRunLatin;
                     if (nextLatinRun != null && char.IsPunctuation(nextLatinRun.GetPlainText()[0]))
                         blocks[blocks.Count - 1].SpaceAfter = false;
+                    // Collect link area
+                    links.Add(linkArea);
                 }
             }
         }
@@ -419,8 +437,82 @@ namespace DND.Gui
             }
             // Collect any last highlights
             doCollectHighlightRange(ref currHiliteIndexes);
+            // In link areas, fill in positioned blocks and calculate actual link areas.
+            doCalculateLinkAreas();
             // Return bottom of content area.
             return measuredBlocks.Count == 0 ? blockY : blockY + lemmaLineHeight;
+        }
+
+        /// <summary>
+        /// Fills in positioned blocks for links, and calculates links' active areas.
+        /// </summary>
+        private void doCalculateLinkAreas()
+        {
+            // No links: nothing to do.
+            if (targetLinks == null) return;
+            // Clear old positioned blocks and active areas in links
+            foreach (LinkArea link in targetLinks)
+            {
+                link.ActiveAreas.Clear();
+                link.PositionedBlocks.Clear();
+            }
+            // Look at each positioned block, add to correct link that has its block.
+            // Positioned blocks will be in their correct order in each link's list.
+            foreach (PositionedBlock pb in positionedBlocks)
+                foreach (LinkArea link in targetLinks)
+                    if (link.Blocks.Contains(pb.Block)) link.PositionedBlocks.Add(pb);
+            // Calculate links' active areas. That means encapsulating rectangles
+            // of positioned blocks that are on the same line.
+            foreach (LinkArea link in targetLinks)
+            {
+                // There is a single block
+                if (link.PositionedBlocks.Count == 1)
+                {
+                    PositionedBlock pb = link.PositionedBlocks[0];
+                    Rectangle rect = new Rectangle(
+                        (int)pb.Loc.X,
+                        (int)pb.Loc.Y,
+                        (int)pb.Block.Size.Width,
+                        (int)pb.Block.Size.Height);
+                    link.ActiveAreas.Add(rect);
+                }
+                // There are multiple blocks
+                else
+                {
+                    float lastY = float.MinValue;
+                    float currLeft = float.MinValue;
+                    for (int i = 0; i != link.PositionedBlocks.Count; ++i)
+                    {
+                        PositionedBlock pb = link.PositionedBlocks[i];
+                        // Block on a new line
+                        if (pb.Loc.Y != lastY)
+                        {
+                            // We had a previous block, which completed an area
+                            if (lastY != float.MinValue)
+                            {
+                                PositionedBlock previousPB = link.PositionedBlocks[i - 1];
+                                Rectangle rect = new Rectangle(
+                                    (int)currLeft,
+                                    (int)lastY,
+                                    (int)(previousPB.Loc.X + previousPB.Block.Size.Width - currLeft),
+                                    (int)(pb.Block.Size.Height));
+                                link.ActiveAreas.Add(rect);
+                            }
+                            // This block's left is merged area's left.
+                            currLeft = pb.Loc.X;
+                        }
+                        lastY = pb.Loc.Y;
+                    }
+                    // Last block completes last area
+                    PositionedBlock lastPB = link.PositionedBlocks[link.PositionedBlocks.Count - 1];
+                    Rectangle lastRect = new Rectangle(
+                        (int)currLeft,
+                        (int)lastY,
+                        (int)(lastPB.Loc.X + lastPB.Block.Size.Width - currLeft),
+                        (int)(lastPB.Block.Size.Height));
+                    link.ActiveAreas.Add(lastRect);
+                }
+            }
         }
 
         /// <summary>

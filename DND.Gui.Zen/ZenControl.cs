@@ -81,7 +81,7 @@ namespace DND.Gui.Zen
         public override sealed Cursor Cursor
         {
             get { return Parent.Cursor; }
-            set { Parent.Cursor = value; }
+            set { if (Parent != null) Parent.Cursor = value; }
         }
     }
 }

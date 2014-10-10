@@ -41,5 +41,6 @@ namespace DND.Gui.Zen
         public static readonly float ResultsCountFontSize = 9.0F;
         public static readonly Color HiliteColor = Color.FromArgb(255, 232, 189);
         public static readonly float ZhoButtonFontSize = 18.0F;
+        public static readonly Color LinkHoverColor = Color.Maroon;
     }
 }
