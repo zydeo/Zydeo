@@ -26,6 +26,7 @@ namespace DND.Gui
             {
                 analyzedWidth = Width;
                 positionedBlocks = null;
+                targetHiliteIndexes = null;
             }
             if (analyzedScript != script)
             {
@@ -36,6 +37,7 @@ namespace DND.Gui
                 {
                     measuredBlocks = null;
                     positionedBlocks = null;
+                    targetHiliteIndexes = null;
                 }
             }
 
@@ -139,6 +141,7 @@ namespace DND.Gui
         /// <param name="isMeta">True if this is a domain or note (displayed in italics).</param>
         /// <param name="hl">Highlight to show in hybrid text, or null.</param>
         /// <param name="blocks">List of blocks to append to.</param>
+        /// <param name="hlSet">Hashset with blocks that have a highight. Created on demand.</param>
         private void getBlocks(HybridText htxt, bool isMeta, CedictTargetHighlight hl, List<TextBlock> blocks)
         {
             Font fntLatin = isMeta ? fntMetaLatin : fntSenseLatin;
@@ -303,6 +306,18 @@ namespace DND.Gui
         }
 
         /// <summary>
+        /// <para>Adds current list of highlight indexes (into <see cref="positionedBlocks"/> list)</para>
+        /// <para>to <see cref="targetHiliteIndexes"/>, unless current list is empty.</para>
+        /// </summary>
+        private void doCollectHighlightRange(ref List<int> currIndexes)
+        {
+            if (currIndexes.Count == 0) return;
+            if (targetHiliteIndexes == null) targetHiliteIndexes = new List<List<int>>();
+            targetHiliteIndexes.Add(currIndexes);
+            currIndexes = new List<int>();
+        }
+
+        /// <summary>
         /// Calculates layout of content in entry body, taking current width into account for line breaks.
         /// </summary>
         /// <param name="lemmaL">Left position of body content area.</param>
@@ -322,6 +337,7 @@ namespace DND.Gui
             // This is always re-done when function is called
             // We only get here when width has changed, so we do need to rearrange
             positionedBlocks = new List<PositionedBlock>();
+            List<int> currHiliteIndexes = new List<int>();
             float blockX = lemmaL;
             float blockY = lemmaTop;
             PositionedBlock lastPB = null;
@@ -359,7 +375,16 @@ namespace DND.Gui
                         pb.Loc = new PointF(blockX, blockY);
                     }
                 }
+                // Add to list of positioned blocks
                 positionedBlocks.Add(pb);
+                // This is a text block with a highlight? Collect it too!
+                if (pb.Block is TextBlock && (pb.Block as TextBlock).Hilite)
+                {
+                    int ix = positionedBlocks.Count - 1;
+                    if (currHiliteIndexes.Count != 0 && currHiliteIndexes[currHiliteIndexes.Count - 1] != ix - 1)
+                        doCollectHighlightRange(ref currHiliteIndexes);
+                    currHiliteIndexes.Add(ix);
+                }
                 // Move right by block's width; space optional
                 blockX += block.Size.Width;
                 if (block is TextBlock && (block as TextBlock).SpaceAfter)
@@ -367,6 +392,9 @@ namespace DND.Gui
                 // This is last block
                 lastPB = pb;
             }
+            // Collect any last highlights
+            doCollectHighlightRange(ref currHiliteIndexes);
+            // Return bottom of content area.
             return measuredBlocks.Count == 0 ? blockY : blockY + lemmaLineHeight;
         }
 

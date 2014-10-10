@@ -29,7 +29,7 @@ namespace DND.Gui
             float gradw = ideoSize.Width / 2.0F;
             // Extent of gradient outside character
             float gradext = 0;
-            using (Brush b = new SolidBrush(ZenParams.HanziHiliteColor))
+            using (Brush b = new SolidBrush(ZenParams.HiliteColor))
             {
                 // In simplified
                 if (headInfo.SimpBlocks.Count != 0)
@@ -49,7 +49,7 @@ namespace DND.Gui
                     rect.X += (float)AbsLeft;
                     rect.X -= gradext;
                     rect.Y += (float)AbsTop;
-                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, ZenParams.HanziHiliteColor, LinearGradientMode.Horizontal))
+                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, ZenParams.HiliteColor, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lgb, rect);
                     }
@@ -59,7 +59,7 @@ namespace DND.Gui
                     rect.X += gradext;
                     rect.X -= gradw;
                     rect.Y += (float)AbsTop;
-                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, ZenParams.HanziHiliteColor, bgcol, LinearGradientMode.Horizontal))
+                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, ZenParams.HiliteColor, bgcol, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lgb, rect);
                     }
@@ -82,7 +82,7 @@ namespace DND.Gui
                     rect.X += (float)AbsLeft;
                     rect.X -= gradext;
                     rect.Y += (float)AbsTop;
-                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, ZenParams.HanziHiliteColor, LinearGradientMode.Horizontal))
+                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, ZenParams.HiliteColor, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lgb, rect);
                     }
@@ -92,7 +92,7 @@ namespace DND.Gui
                     rect.X += gradext;
                     rect.X -= gradw;
                     rect.Y += (float)AbsTop;
-                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, ZenParams.HanziHiliteColor, bgcol, LinearGradientMode.Horizontal))
+                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, ZenParams.HiliteColor, bgcol, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lgb, rect);
                     }
@@ -156,7 +156,7 @@ namespace DND.Gui
                         rleft = new RectangleF(edgeLeft - w, y, w + whalf, pinyinInfo.PinyinHeight);
                     else
                         rleft = new RectangleF(edgeLeft - w, y, w * 3.0F, pinyinInfo.PinyinHeight);
-                    using (LinearGradientBrush lbr = new LinearGradientBrush(rleft, bgcol, ZenParams.PinyinHiliteColor, LinearGradientMode.Horizontal))
+                    using (LinearGradientBrush lbr = new LinearGradientBrush(rleft, bgcol, ZenParams.HiliteColor, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lbr, rleft);
                     }
@@ -165,7 +165,7 @@ namespace DND.Gui
                         rright = new RectangleF(midPoint, y, w + whalf, pinyinInfo.PinyinHeight);
                     else
                         rright = new RectangleF(edgeRight - 2.0F * w, y, w * 3.0F, pinyinInfo.PinyinHeight);
-                    using (LinearGradientBrush lbr = new LinearGradientBrush(rright, ZenParams.PinyinHiliteColor, bgcol, LinearGradientMode.Horizontal))
+                    using (LinearGradientBrush lbr = new LinearGradientBrush(rright, ZenParams.HiliteColor, bgcol, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lbr, rright);
                     }
@@ -240,20 +240,75 @@ namespace DND.Gui
         /// </summary>
         private void doPaintTargetHilites(Graphics g, Color bgcol)
         {
+            // No highlights - done here
+            if (targetHiliteIndexes == null) return;
+
+            // Needed to make gradient work
             g.SmoothingMode = SmoothingMode.None;
-            // All the measured and positioned blocks in entry body
             float fLeft = (float)AbsLeft;
             float fTop = (float)AbsTop;
-            using (Brush b = new SolidBrush(ZenParams.HanziHiliteColor))
+            // We offset highlight vertically for more pleasing aesthetics (lots of empty space at top in text)
+            float topOfs = positionedBlocks[targetHiliteIndexes[0][0]].Block.Size.Height / 10.0F;
+            // All the measured and positioned blocks in entry body
+            using (Brush b = new SolidBrush(ZenParams.HiliteColor))
             {
-                foreach (PositionedBlock pb in positionedBlocks)
+                // Every adjacent range
+                foreach (List<int> idxList in targetHiliteIndexes)
                 {
-                    TextBlock tb = pb.Block as TextBlock;
-                    if (tb == null || !tb.Hilite) continue;
-                    RectangleF rect = new RectangleF(pb.Loc, tb.Size);
-                    rect.X += fLeft;
-                    rect.Y += fTop;
-                    g.FillRectangle(b, rect);
+                    float lastY = float.MinValue;
+                    float lastRight = float.MinValue;
+                    for (int i = 0; i != idxList.Count; ++i)
+                    {
+                        PositionedBlock pb = positionedBlocks[idxList[i]];
+                        TextBlock tb = pb.Block as TextBlock;
+                        // !! Paint gradients first.
+                        // Linear gradient brush has ugly bug where white line (1px or less) is drawn right at the darkest edge
+                        // If we draw a bit bigger gradient, then overdraw with solid, this will be covered up.
+                        // Thank you, Microsoft. Beer's on me.
+                        // EXtending gradient on left
+                        if (i == 0)
+                        {
+                            RectangleF rleft = new RectangleF(
+                                pb.Loc.X - 2.0F * spaceWidth + 1.0F, pb.Loc.Y,
+                                2.0F * spaceWidth, pb.Block.Size.Height);
+                            rleft.X += fLeft;
+                            rleft.Y += fTop + topOfs;
+                            using (LinearGradientBrush lbr = new LinearGradientBrush(rleft, bgcol, ZenParams.HiliteColor, LinearGradientMode.Horizontal))
+                            {
+                                g.FillRectangle(lbr, rleft);
+                            }
+                        }
+                        // EXtending gradient on right
+                        if (i == idxList.Count - 1)
+                        {
+                            RectangleF rright = new RectangleF(
+                                pb.Loc.X + pb.Block.Size.Width - 1.0F, pb.Loc.Y,
+                                2.0F * spaceWidth, pb.Block.Size.Height);
+                            rright.X += fLeft;
+                            rright.Y += fTop + topOfs;
+                            using (LinearGradientBrush lbr = new LinearGradientBrush(rright, ZenParams.HiliteColor, bgcol, LinearGradientMode.Horizontal))
+                            {
+                                g.FillRectangle(lbr, rright);
+                            }
+                        }
+                        // Rectangle behind this specific block
+                        RectangleF rect = new RectangleF(pb.Loc, tb.Size);
+                        rect.X += fLeft - 1.0F; // Extend solid area to cover up buggy gradient edge
+                        rect.Y += fTop + topOfs;
+                        rect.Width += 2.0F; // Extend solid area to cover up buggy gradient edge
+                        g.FillRectangle(b, rect);
+                        // If this block is on the same line as before, fill space between blocks
+                        if (pb.Loc.Y == lastY)
+                        {
+                            rect.X = lastRight;
+                            rect.Width = pb.Loc.X - lastRight;
+                            rect.X += fLeft;
+                            g.FillRectangle(b, rect);
+                        }
+                        // Remember Y of block so we can fill empty areas between blocks on the same line
+                        lastY = pb.Loc.Y;
+                        lastRight = pb.Loc.X + pb.Block.Size.Width;
+                    }
                 }
             }
         }
@@ -300,7 +355,7 @@ namespace DND.Gui
                     g.DrawString(hb.Char, fntZhoHead, b, loc, sf);
                 }
                 // Pinyin
-                using (SolidBrush bhilite = new SolidBrush(ZenParams.PinyinHiliteColor))
+                using (SolidBrush bhilite = new SolidBrush(ZenParams.HiliteColor))
                 {
                     doPaintPinyin(g, bnorm, bhilite, sf, bgcol);
                 }

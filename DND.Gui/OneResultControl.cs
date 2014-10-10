@@ -94,6 +94,11 @@ namespace DND.Gui
         /// </summary>
         private List<PositionedBlock> positionedBlocks = null;
         /// <summary>
+        /// <para>Indexes in <see cref="positionedBlocks"/> that have a match highlight.</para>
+        /// <para>Each inner list contains adjacent blocks (range from a single sense).</para>
+        /// </summary>
+        private List<List<int>> targetHiliteIndexes = null;
+        /// <summary>
         /// Vertical offset of Hanzi in a target line, to make it look better aligned in Latin text.
         /// </summary>
         private float targetHanziOfs = 0;
