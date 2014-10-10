@@ -45,8 +45,8 @@ namespace DND.Gui
             /// <param name="script">Search script (to choose simp/trad Hanzi, if available).</param>
             public LinkArea(string simp, string trad, string pinyin, SearchScript script)
             {
-                if (simp == string.Empty && trad != string.Empty) trad = simp;
-                else if (trad == string.Empty && simp != string.Empty) simp = trad;
+                if (simp == string.Empty && trad != string.Empty) simp = trad;
+                else if (trad == string.Empty && simp != string.Empty) trad = simp;
                 // We have hanzi. Use that.
                 if (simp != string.Empty)
                     QueryString = script == SearchScript.Traditional ? trad : simp;

@@ -105,7 +105,7 @@ namespace DND.Gui
             btnSimpTrad.MouseClick += simpTradCtrl_MouseClick;
             setSimpTradText();
 
-            resCtrl = new ResultsControl(this, tprov);
+            resCtrl = new ResultsControl(this, tprov, lookupThroughLink);
             resCtrl.RelLocation = new Point(writingPad.RelRight + padding, siCtrl.RelBottom + padding);
         }
 
@@ -261,6 +261,13 @@ namespace DND.Gui
             writingPad.Clear();
             cpCtrl.SetItems(null);
             siCtrl.InsertCharacter(c);
+            onStartSearch(this, siCtrl.Text);
+        }
+
+        private void lookupThroughLink(string queryString)
+        {
+            siCtrl.Text = queryString;
+            siCtrl.SelectAll();
             onStartSearch(this, siCtrl.Text);
         }
 

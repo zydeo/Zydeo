@@ -18,9 +18,20 @@ namespace DND.Gui
     public class ResultsControl : ZenControl, IMessageFilter
     {
         /// <summary>
+        /// Delegate for handling lookup requests through clicking on target link.
+        /// </summary>
+        /// <param name="queryString"></param>
+        public delegate void LookupThroughLinkDelegate(string queryString);
+
+        /// <summary>
         /// UI text provider.
         /// </summary>
         private readonly ITextProvider tprov;
+
+        /// <summary>
+        /// Called when user clicks a link (Chinese text) in an entry target;
+        /// </summary>
+        private LookupThroughLinkDelegate lookupThroughLink;
 
         // TEMP standard scroll bar
         private VScrollBar sb;
@@ -49,10 +60,11 @@ namespace DND.Gui
         /// <summary>
         /// Ctor.
         /// </summary>
-        public ResultsControl(ZenControl owner, ITextProvider tprov)
+        public ResultsControl(ZenControl owner, ITextProvider tprov, LookupThroughLinkDelegate lookupThroughLink)
             : base(owner)
         {
             this.tprov = tprov;
+            this.lookupThroughLink = lookupThroughLink;
             Application.AddMessageFilter(this);
 
             sb = new VScrollBar();
@@ -364,6 +376,14 @@ namespace DND.Gui
             }
         }
 
+        public override bool DoMouseClick(Point p, MouseButtons button)
+        {
+            OneResultControl ctrl = getOneResultControl(p);
+            if (ctrl != null)
+                return ctrl.DoMouseClick(parentToOneResultControl(ctrl, p), button);
+            return true;
+        }
+
         // TO-DO: use proper coordinates and eliminate this
         internal void RepaintBlah()
         {
@@ -428,7 +448,7 @@ namespace DND.Gui
                 bool odd = true;
                 foreach (CedictResult cr in results)
                 {
-                    OneResultControl orc = new OneResultControl(this, tprov, cr, maxHeadLength, script, odd);
+                    OneResultControl orc = new OneResultControl(this, tprov, lookupFromCtrl, cr, maxHeadLength, script, odd);
                     orc.Analyze(g, cw, script);
                     orc.AbsLocation = new Point(1, y + 1);
                     y += orc.Height;
@@ -449,6 +469,11 @@ namespace DND.Gui
 
             // Render
             MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        private void lookupFromCtrl(string queryString)
+        {
+            lookupThroughLink(queryString);
         }
 
         private void doPaintBottomOverlay(Graphics g)

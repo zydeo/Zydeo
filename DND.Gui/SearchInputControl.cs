@@ -82,6 +82,7 @@ namespace DND.Gui
         public string Text
         {
             get { return txtInput.Text; }
+            set { txtInput.Text = value; }
         }
 
         protected override void OnSizeChanged()

@@ -17,9 +17,20 @@ namespace DND.Gui
     internal partial class OneResultControl : ZenControl
     {
         /// <summary>
+        /// Delegate for handling lookup requests through clicking on target link.
+        /// </summary>
+        /// <param name="queryString"></param>
+        public delegate void LookupThroughLinkDelegate(string queryString);
+
+        /// <summary>
         /// Source of localized texts.
         /// </summary>
         private readonly ITextProvider tprov;
+
+        /// <summary>
+        /// Called when user clicks a link (Chinese text) in an entry target;
+        /// </summary>
+        private LookupThroughLinkDelegate lookupThroughLink;
 
         /// <summary>
         /// The entry this control displays.
@@ -125,11 +136,14 @@ namespace DND.Gui
         /// <param name="maxHeadLength">Longest headword in full results list.</param>
         /// <param name="script">Scripts to show in headword.</param>
         /// <param name="odd">Odd/even position in list, for alternating BG color.</param>
-        public OneResultControl(ZenControl owner, ITextProvider tprov, CedictResult cr, int maxHeadLength,
+        public OneResultControl(ZenControl owner, ITextProvider tprov,
+            LookupThroughLinkDelegate lookupThroughLink,
+            CedictResult cr, int maxHeadLength,
             SearchScript script, bool odd)
             : base(owner)
         {
             this.tprov = tprov;
+            this.lookupThroughLink = lookupThroughLink;
             this.Res = cr;
             this.maxHeadLength = maxHeadLength;
             this.analyzedScript = script;
@@ -169,6 +183,7 @@ namespace DND.Gui
 
         public override void DoMouseLeave()
         {
+            if (Parent == null) return;
             Cursor = Cursors.Arrow;
             // Cursor hovered over a link: request a repaint
             if (hoverLink != null)
@@ -206,6 +221,27 @@ namespace DND.Gui
                 (Parent as ResultsControl).RepaintBlah();
             }
             // We're done. No child controls, just return true.
+            return true;
+        }
+
+        public override bool DoMouseClick(Point p, MouseButtons button)
+        {
+            // Are we over a link area?
+            LinkArea overWhat = null;
+            foreach (LinkArea link in targetLinks)
+            {
+                foreach (Rectangle rect in link.ActiveAreas)
+                {
+                    if (rect.Contains(p))
+                    {
+                        overWhat = link;
+                        break;
+                    }
+                }
+            }
+            // Yes: trigger lookup
+            if (overWhat != null)
+                lookupThroughLink(overWhat.QueryString);
             return true;
         }
     }
