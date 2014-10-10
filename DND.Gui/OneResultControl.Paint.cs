@@ -275,10 +275,12 @@ namespace DND.Gui
                             rleft.Y += fTop + topOfs;
                             using (LinearGradientBrush lbr = new LinearGradientBrush(rleft, bgcol, ZenParams.HiliteColor, LinearGradientMode.Horizontal))
                             {
+                                rleft.X += 1.0F;
+                                rleft.Width -= 1.0F;
                                 g.FillRectangle(lbr, rleft);
                             }
                         }
-                        // EXtending gradient on right
+                        // Extending gradient on right
                         if (i == idxList.Count - 1)
                         {
                             RectangleF rright = new RectangleF(
