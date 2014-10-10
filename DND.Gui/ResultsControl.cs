@@ -358,7 +358,7 @@ namespace DND.Gui
                 bool odd = true;
                 foreach (CedictResult cr in results)
                 {
-                    OneResultControl orc = new OneResultControl(this, cr, maxHeadLength, script, odd);
+                    OneResultControl orc = new OneResultControl(this, tprov, cr, maxHeadLength, script, odd);
                     orc.Analyze(g, cw, script);
                     orc.AbsLocation = new Point(1, y + 1);
                     y += orc.Height;

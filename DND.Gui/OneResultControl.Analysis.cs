@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -105,22 +106,39 @@ namespace DND.Gui
             // Recreate list of blocks
             measuredBlocks = new List<Block>();
             int senseIdx = -1;
+            int displaySenseIdx = -1;
+            bool lastWasClassifier = false;
             foreach (CedictSense cm in Res.Entry.Senses)
             {
                 ++senseIdx;
-                // Add one block for sense ID
-                SenseIdBlock sidBlock = new SenseIdBlock
+                // Is this sense a classifier?
+                bool classifier = cm.Domain.EqualsPlainText("CL:");
+                if (!classifier) ++displaySenseIdx;
+                // Add one block for sense ID, unless this is a classifier "sense"
+                if (!classifier)
                 {
-                    Size = senseIdxSize,
-                    StickRight = true,
-                    Idx = senseIdx
-                };
-                measuredBlocks.Add(sidBlock);
+                    SenseIdBlock sidBlock = new SenseIdBlock
+                    {
+                        Size = senseIdxSize,
+                        StickRight = true,
+                        Idx = displaySenseIdx,
+                        NewLine = lastWasClassifier,
+                    };
+                    measuredBlocks.Add(sidBlock);
+                }
                 // Split domain, equiv and note into typographic parts
                 // Splits along spaces and dashes
                 // Unpacks Chinese ranges
                 List<TextBlock> senseBlocks = new List<TextBlock>();
-                getBlocks(cm.Domain, true, null, senseBlocks);
+                // Domain is localized text for "Classifier:" if, well, this is a classifier sense
+                if (!classifier) getBlocks(cm.Domain, true, null, senseBlocks);
+                else
+                {
+                    string strClassifier = tprov.GetString("ResultCtrlClassifier");
+                    HybridText htClassifier = new HybridText(strClassifier);
+                    getBlocks(htClassifier, true, null, senseBlocks);
+                    senseBlocks[0].NewLine = true;
+                }
                 getBlocks(cm.Equiv, false, hlArr[senseIdx], senseBlocks);
                 getBlocks(cm.Note, true, null, senseBlocks);
                 // Measure each block, and add to full list of blocks
@@ -130,6 +148,7 @@ namespace DND.Gui
                     tb.Size = g.MeasureString(tb.Text, tb.Font, 65535, sf);
                     measuredBlocks.Add(tb);
                 }
+                lastWasClassifier = classifier;
             }
         }
 
@@ -165,6 +184,7 @@ namespace DND.Gui
                         {
                             TextBlock tb = new TextBlock
                             {
+                                NewLine = false,
                                 StickRight = false,
                                 Text = blockStr,
                                 Font = fntLatin,
@@ -215,6 +235,7 @@ namespace DND.Gui
                     {
                         TextBlock tb = new TextBlock
                         {
+                            NewLine = false,
                             StickRight = false,
                             Text = strSimp,
                             Font = fntZho,
@@ -229,6 +250,7 @@ namespace DND.Gui
                         blocks[blocks.Count - 1].StickRight = true;
                         TextBlock tb = new TextBlock
                         {
+                            NewLine = false,
                             StickRight = false,
                             Text = "•",
                             Font = fntLatin,
@@ -241,6 +263,7 @@ namespace DND.Gui
                     {
                         TextBlock tb = new TextBlock
                         {
+                            NewLine = false,
                             StickRight = false,
                             Text = strTrad,
                             Font = fntZho,
@@ -257,6 +280,7 @@ namespace DND.Gui
                         {
                             TextBlock tb = new TextBlock
                             {
+                                NewLine = false,
                                 StickRight = false,
                                 Text = pyPart,
                                 Font = fntLatin,
@@ -355,8 +379,9 @@ namespace DND.Gui
                     Loc = new PointF(blockX, blockY),
                 };
                 // New block extends beyond available width: break to next line
+                // Also break if block explicitly requests it
                 // But, if last block is "stick right", break together
-                if (pb.Loc.X + block.Size.Width - lemmaL > lemmaW)
+                if (pb.Loc.X + block.Size.Width - lemmaL > lemmaW || pb.Block.NewLine)
                 {
                     blockY += lemmaLineHeight;
                     blockX = lemmaL;

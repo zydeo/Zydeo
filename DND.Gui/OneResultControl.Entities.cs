@@ -23,6 +23,10 @@ namespace DND.Gui
             /// If true, must keep with block on the right (i.e., non-breaking space after me).
             /// </summary>
             public bool StickRight;
+            /// <summary>
+            /// If true, block must come at start of line, inducing line break
+            /// </summary>
+            public bool NewLine;
         }
 
         /// <summary>

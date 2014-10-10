@@ -20,6 +20,15 @@ namespace DND.CedictEngine
         private void trimSense(string sense, out string domain, out string equiv, out string note)
         {
             sense = sense.Trim();
+            // Special case: sense starts with "CL:"
+            // --> This is a classifier. Put "CL:" in domain and leave only Chinese in equiv
+            if (sense.StartsWith("CL:"))
+            {
+                equiv = sense.Substring(3);
+                domain = "CL:";
+                note = "";
+                return;
+            }
             // Array with parenthesis depths and content/non-content flags for chars in sense
             // -1: WS or parenthesis
             // 0 or greater: parenthesis depth
@@ -186,8 +195,6 @@ namespace DND.CedictEngine
         {
             public override TextRunZho Translate(GroupCollection groups, NormalizePinyinDelegate npd)
             {
-                string trad = null;
-                string simp = null;
                 string[] pinyinParts = groups[1].Value.Trim().Split(new char[] { ' ' });
                 PinyinSyllable[] pinyin;
                 List<int> pinyinMap;

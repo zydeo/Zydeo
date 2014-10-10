@@ -14,3 +14,7 @@ ResultsCountN				{0} results
 WritingPadClear				Clear
 WritingPadUndo				Undo
 
+# Displayed in one entry's body text to announce classifiers
+ResultCtrlClassifier		Classifier:
+
+

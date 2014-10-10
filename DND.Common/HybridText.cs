@@ -62,6 +62,17 @@ namespace DND.Common
         }
 
         /// <summary>
+        /// Returns true if object is a single plain text run that equals provided string.
+        /// </summary>
+        public bool EqualsPlainText(string what)
+        {
+            if (runs.Count != 1) return false;
+            TextRunLatin trl = runs[0] as TextRunLatin;
+            if (trl == null) return false;
+            return trl.GetPlainText() == what;
+        }
+
+        /// <summary>
         /// Static ctor: initializes empty hybrid text object.
         /// </summary>
         static HybridText()
@@ -84,6 +95,16 @@ namespace DND.Common
                 sb.Append(runs[i].GetPlainText());
             }
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Initializes a pure plain-text instance.
+        /// </summary>
+        public HybridText(string plain)
+        {
+            runs = new List<TextRun>(1);
+            TextRunLatin run = new TextRunLatin(plain);
+            runs.Add(run);
         }
 
         /// <summary>

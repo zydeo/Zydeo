@@ -17,6 +17,11 @@ namespace DND.Gui
     internal partial class OneResultControl : ZenControl
     {
         /// <summary>
+        /// Source of localized texts.
+        /// </summary>
+        private readonly ITextProvider tprov;
+
+        /// <summary>
         /// The entry this control displays.
         /// </summary>
         public readonly CedictResult Res;
@@ -111,10 +116,11 @@ namespace DND.Gui
         /// <param name="maxHeadLength">Longest headword in full results list.</param>
         /// <param name="script">Scripts to show in headword.</param>
         /// <param name="odd">Odd/even position in list, for alternating BG color.</param>
-        public OneResultControl(ZenControl owner, CedictResult cr, int maxHeadLength,
+        public OneResultControl(ZenControl owner, ITextProvider tprov, CedictResult cr, int maxHeadLength,
             SearchScript script, bool odd)
             : base(owner)
         {
+            this.tprov = tprov;
             this.Res = cr;
             this.maxHeadLength = maxHeadLength;
             this.analyzedScript = script;
