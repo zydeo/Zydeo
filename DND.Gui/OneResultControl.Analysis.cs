@@ -586,6 +586,8 @@ namespace DND.Gui
                 PinyinBlock pb = new PinyinBlock();
                 // Text: syllable's display text
                 pb.Text = ps.GetDisplayString(true);
+                // If text is punctuation, glue it to previous syllable
+                if (pb.Text.Length == 1 && char.IsPunctuation(pb.Text[0]) && i > 0) cx -= pinyinSpaceWidth;
                 // Block's size and relative location
                 SizeF sz = g.MeasureString(pb.Text, fntPinyinHead, 65535, sf);
                 pb.Rect = new RectangleF(cx, ctop, sz.Width, sz.Height);
