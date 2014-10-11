@@ -438,10 +438,9 @@ namespace DND.Gui
                 // This is a text block with a highlight? Collect it too!
                 if (!block.SenseId && block.Hilite)
                 {
-                    int ix = positionedBlocks.Length - 1;
-                    if (currHiliteIndexes.Count != 0 && currHiliteIndexes[currHiliteIndexes.Count - 1] != ix - 1)
+                    if (currHiliteIndexes.Count != 0 && currHiliteIndexes[currHiliteIndexes.Count - 1] != i - 1)
                         doCollectHighlightRange(ref currHiliteIndexes);
-                    currHiliteIndexes.Add(ix);
+                    currHiliteIndexes.Add(i);
                 }
                 // Move right by block's width; space optional
                 blockX += ((float)block.Width);
