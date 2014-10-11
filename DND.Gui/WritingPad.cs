@@ -38,10 +38,6 @@ namespace DND.Gui
         /// The cursor shown in the writing pad - custom-drawn.
         /// </summary>
         private Cursor myCursor;
-        /// <summary>
-        /// The cursor I received when the mouse entered the writing pad.
-        /// </summary>
-        private Cursor receivedCursor = Cursors.Arrow;
 
         private readonly List<PointF> currentPoints = new List<PointF>();
         const float canvasScale = 250.0F;
@@ -112,28 +108,6 @@ namespace DND.Gui
                 using (Pen p = new Pen(col))
                 {
                     g.DrawEllipse(p, dia + dia / 2, dia + dia / 2, 2 * dia, 2 * dia);
-                    //g.DrawLine(p, dia, 2 * dia + dia / 2, 4 * dia, 2 * dia + dia / 2);
-                    //g.DrawLine(p, 2 * dia + dia / 2, dia, 2 * dia + dia / 2, 4 * dia);
-                    //g.DrawLine(p,
-                    //    0,
-                    //    2 * dia + dia / 2,
-                    //    dia + dia / 2,
-                    //    2 * dia + dia / 2);
-                    //g.DrawLine(p,
-                    //    3 * dia + dia / 2,
-                    //    2 * dia + dia / 2,
-                    //    5 * dia,
-                    //    2 * dia + dia / 2);
-                    //g.DrawLine(p,
-                    //    2 * dia + dia / 2,
-                    //    0,
-                    //    2 * dia + dia / 2,
-                    //    dia + dia / 2);
-                    //g.DrawLine(p,
-                    //    2 * dia + dia / 2,
-                    //    3 * dia + dia / 2,
-                    //    2 * dia + dia / 2,
-                    //    5 * dia);
                 }
                 myCursor = CustomCursor.CreateCursor(bmp, 2 * dia + dia / 2, 2 * dia + dia / 2);
             }
@@ -435,13 +409,12 @@ namespace DND.Gui
         public override void DoMouseEnter()
         {
             base.DoMouseEnter();
-            receivedCursor = Cursor;
             Cursor = myCursor;
         }
 
         public override void DoMouseLeave()
         {
-            Cursor = receivedCursor;
+            Cursor = Cursors.Arrow;
             doStrokeOver();
         }
     }
