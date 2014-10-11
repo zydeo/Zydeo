@@ -202,7 +202,7 @@ namespace DND.Gui
                                 SpaceAfter = false, // will set this true for last block in "byDashes"
                             };
                             // Does block's text intersect with highlight?
-                            if (hl != null)
+                            if (hl != null && hl.RunIx == runIX)
                             {
                                 int blockStart = latnPos + ofsPos;
                                 int blockEnd = blockStart + blockStr.Length;
