@@ -669,7 +669,7 @@ namespace DND.Gui
             var pcoll = Res.Entry.GetPinyinForDisplay(diacritics,
                 Res.PinyinHiliteStart, Res.PinyinHiliteLength,
                 out pinyinInfo.HiliteStart, out pinyinInfo.HiliteLength);
-            float cx = (float)AbsLeft + headInfo.HeadwordRight + (float)padMid;
+            float cx = headInfo.HeadwordRight + (float)padMid;
             float ctop = padTop;
             for (int i = 0; i != pcoll.Count; ++i)
             {

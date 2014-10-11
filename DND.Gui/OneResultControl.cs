@@ -189,7 +189,7 @@ namespace DND.Gui
             if (hoverLink != null)
             {
                 hoverLink = null;
-                (Parent as ResultsControl).RepaintBlah();
+                MakeMePaint(false, RenderMode.Invalidate);
             }
         }
 
@@ -218,7 +218,7 @@ namespace DND.Gui
             if (overWhat != hoverLink)
             {
                 hoverLink = overWhat;
-                (Parent as ResultsControl).RepaintBlah();
+                MakeMePaint(false, RenderMode.Invalidate);
             }
             // We're done. No child controls, just return true.
             return true;

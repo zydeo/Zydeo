@@ -88,7 +88,7 @@ namespace DND.Gui
             int y = 1 - sb.Value;
             foreach (OneResultControl orc in resCtrls)
             {
-                orc.AbsTop = y;
+                orc.RelTop = y;
                 y += orc.Height;
             }
             MakeMePaint(false, RenderMode.Invalidate);
@@ -198,8 +198,8 @@ namespace DND.Gui
         {
             int cw, ch;
             getContentSize(out cw, out ch);
-            if (sb.Visible && resCtrls[resCtrls.Count - 1].AbsBottom < Height - 1 ||
-                !sb.Visible && resCtrls[resCtrls.Count - 1].AbsBottom >= Height - 1)
+            if (sb.Visible && resCtrls[resCtrls.Count - 1].RelBottom < Height - 1 ||
+                !sb.Visible && resCtrls[resCtrls.Count - 1].RelBottom >= Height - 1)
             {
                 sb.Visible = !sb.Visible;
                 sb.Enabled = sb.Visible;
@@ -214,7 +214,7 @@ namespace DND.Gui
                     foreach (OneResultControl orc in resCtrls)
                     {
                         orc.Analyze(g, cw, currScript);
-                        orc.AbsLocation = new Point(1, y + 1);
+                        orc.RelLocation = new Point(1, y + 1);
                         y += orc.Height;
                         odd = !odd;
                     }
@@ -224,9 +224,9 @@ namespace DND.Gui
             if (sb.Visible)
             {
                 suppressScrollChanged = true;
-                sb.Maximum = resCtrls[resCtrls.Count - 1].AbsBottom - resCtrls[0].AbsTop;
+                sb.Maximum = resCtrls[resCtrls.Count - 1].RelBottom - resCtrls[0].RelTop;
                 sb.LargeChange = ch;
-                sb.Value = 1 - resCtrls[0].AbsTop;
+                sb.Value = 1 - resCtrls[0].RelTop;
                 suppressScrollChanged = false;
             }
             return cw;
@@ -255,9 +255,9 @@ namespace DND.Gui
                 OneResultControl orc = resCtrls[i];
                 // Results controls' absolute locations are within my full canvas
                 // First visible one is the guy whose bottom is greater than 1
-                if (orc.AbsBottom > pivotY)
+                if (orc.RelBottom > pivotY)
                 {
-                    pivotY = orc.AbsBottom;
+                    pivotY = orc.RelBottom;
                     pivotCtrl = orc;
                     pivotIX = i;
                     break;
@@ -274,31 +274,31 @@ namespace DND.Gui
             }
             // Move pivot control back in place so bottom stays where it was
             // But: if pivot was first shown control at top, keep top in place
-            int diff = pivotY - pivotCtrl.AbsBottom;
-            if (pivotIX == 0 && pivotCtrl.AbsTop == 1) diff = 0;
-            pivotCtrl.AbsTop += diff;
+            int diff = pivotY - pivotCtrl.RelBottom;
+            if (pivotIX == 0 && pivotCtrl.RelTop == 1) diff = 0;
+            pivotCtrl.RelTop += diff;
             // Lay out remaining controls up and down
             for (int i = pivotIX + 1; i < resCtrls.Count; ++i)
-                resCtrls[i].AbsTop = resCtrls[i - 1].AbsBottom;
+                resCtrls[i].RelTop = resCtrls[i - 1].RelBottom;
             for (int i = pivotIX - 1; i >= 0; --i)
-                resCtrls[i].AbsTop = resCtrls[i + 1].AbsTop - resCtrls[i].Height;
+                resCtrls[i].RelTop = resCtrls[i + 1].RelTop - resCtrls[i].Height;
             // Edge case: very first control's top must not be greater than 1
-            if (resCtrls[0].AbsTop > 1)
+            if (resCtrls[0].RelTop > 1)
             {
-                diff = resCtrls[0].AbsTop - 1;
-                foreach (OneResultControl orc in resCtrls) orc.AbsTop -= diff;
+                diff = resCtrls[0].RelTop - 1;
+                foreach (OneResultControl orc in resCtrls) orc.RelTop -= diff;
             }
             // If there is space below very last control's bottom, but first control is above window edge
             // > Move down, but without detaching creating empty space at top
-            int emptyAtBottom = Height - 1 - resCtrls[resCtrls.Count - 1].AbsBottom;
+            int emptyAtBottom = Height - 1 - resCtrls[resCtrls.Count - 1].RelBottom;
             if (emptyAtBottom > 0)
             {
-                int outsideAtTop = 1 - resCtrls[0].AbsTop;
+                int outsideAtTop = 1 - resCtrls[0].RelTop;
                 diff = Math.Min(outsideAtTop, emptyAtBottom);
                 if (diff > 0)
                 {
                     foreach (OneResultControl orc in resCtrls)
-                        orc.AbsTop += diff;
+                        orc.RelTop += diff;
                 }
             }
             // Change our mind about scrollbar control?
@@ -310,84 +310,6 @@ namespace DND.Gui
             reAnalyzeResultsDisplay();
             // No need to invalidate here. Form will redraw evertyhing from top down.
             // Done.
-        }
-
-        private ZenControlBase ctrlWithMouse = null;
-
-        private OneResultControl getOneResultControl(Point p)
-        {
-            foreach (OneResultControl ctrl in resCtrls)
-                if (ctrl.AbsRect.Contains(p)) return ctrl;
-            return null;
-        }
-
-        private Point parentToOneResultControl(OneResultControl ctrl, Point pParent)
-        {
-            int x = pParent.X - ctrl.AbsRect.X;
-            int y = pParent.Y - ctrl.AbsRect.Y;
-            return new Point(x, y);
-        }
-
-        public override bool DoMouseMove(Point p, MouseButtons button)
-        {
-            bool res = false;
-            OneResultControl ctrl = getOneResultControl(p);
-            if (ctrl != null)
-            {
-                if (ctrlWithMouse != ctrl)
-                {
-                    if (ctrlWithMouse != null) ctrlWithMouse.DoMouseLeave();
-                    ctrl.DoMouseEnter();
-                    ctrlWithMouse = ctrl;
-                }
-                ctrl.DoMouseMove(parentToOneResultControl(ctrl, p), button);
-                res = true;
-            }
-            else if (ctrlWithMouse != null)
-            {
-                ctrlWithMouse.DoMouseLeave();
-                ctrlWithMouse = null;
-            }
-            return res;
-        }
-
-        public override void DoMouseEnter()
-        {
-            Point pAbs = MousePositionAbs;
-            Point pRel = new Point(pAbs.X - AbsLeft, pAbs.Y - AbsTop);
-            ZenControlBase ctrl = getOneResultControl(pRel);
-            if (ctrl != null)
-            {
-                if (ctrlWithMouse != ctrl)
-                {
-                    if (ctrlWithMouse != null) ctrlWithMouse.DoMouseLeave();
-                    ctrl.DoMouseEnter();
-                    ctrlWithMouse = ctrl;
-                }
-            }
-        }
-
-        public override void DoMouseLeave()
-        {
-            if (ctrlWithMouse != null)
-            {
-                ctrlWithMouse.DoMouseLeave();
-                ctrlWithMouse = null;
-            }
-        }
-
-        public override bool DoMouseClick(Point p, MouseButtons button)
-        {
-            OneResultControl ctrl = getOneResultControl(p);
-            if (ctrl != null)
-                return ctrl.DoMouseClick(parentToOneResultControl(ctrl, p), button);
-            return true;
-        }
-
-        // TO-DO: use proper coordinates and eliminate this
-        internal void RepaintBlah()
-        {
-            MakeMePaint(false, RenderMode.Invalidate);
         }
 
         /// <summary>
@@ -450,7 +372,7 @@ namespace DND.Gui
                 {
                     OneResultControl orc = new OneResultControl(this, tprov, lookupFromCtrl, cr, maxHeadLength, script, odd);
                     orc.Analyze(g, cw, script);
-                    orc.AbsLocation = new Point(1, y + 1);
+                    orc.RelLocation = new Point(1, y + 1);
                     y += orc.Height;
                     resCtrls.Add(orc);
                     odd = !odd;
@@ -542,16 +464,23 @@ namespace DND.Gui
                 g.DrawLine(p, 0, Height - 1, 0, 0);
             }
             // Results
+            g.ResetTransform();
+            g.TranslateTransform(AbsLeft, AbsTop);
             g.Clip = new Region(new Rectangle(1, 1, cw, ch));
             foreach (OneResultControl orc in resCtrls)
             {
-                if ((orc.AbsBottom < ch && orc.AbsBottom >= 0) ||
-                    (orc.AbsTop < ch && orc.AbsTop >= 0))
+                if ((orc.RelBottom < ch && orc.RelBottom >= 0) ||
+                    (orc.RelTop < ch && orc.RelTop >= 0))
                 {
+                    g.ResetTransform();
+                    g.TranslateTransform(orc.AbsLeft, orc.AbsTop);
                     orc.DoPaint(g);
                 }
             }
             // Bottom overlay (results count, zoom, settings)
+            g.ResetTransform();
+            g.TranslateTransform(AbsLeft, AbsTop);
+            g.Clip = new Region(new Rectangle(1, 1, cw, ch));
             doPaintBottomOverlay(g);
         }
 
