@@ -51,10 +51,11 @@ namespace DND.Gui
             // Also line height in entry text
             if (spaceWidth == 0)
             {
-                SizeF sz = g.MeasureString(spaceTestStr, fntSenseLatin, 65535, sf);
+                SizeF sz = g.MeasureString(spaceTestStr, getFont(fntSenseLatin), 65535, sf);
                 spaceWidth = (int)sz.Width;
+                lemmaCharHeight = sz.Height;
                 lemmaLineHeight = sz.Height * 1.1F;
-                sz = g.MeasureString(spaceTestStr, fntPinyinHead, 65535, sf);
+                sz = g.MeasureString(spaceTestStr, getFont(fntPinyinHead), 65535, sf);
                 pinyinSpaceWidth = sz.Width;
             }
 
@@ -96,8 +97,8 @@ namespace DND.Gui
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
 
             // Decide about size of sense ID up front: that's always a square, letter-height
-            SizeF xSize = g.MeasureString("x", fntSenseLatin, 65535, sf);
-            SizeF senseIdxSize = new SizeF(xSize.Height, xSize.Height);
+            SizeF xSize = g.MeasureString("x", getFont(fntSenseLatin), 65535, sf);
+            ushort senseIdxWidth = (ushort)Math.Ceiling(xSize.Height);
 
             // Create array with as many items as senses
             // Each item is null, or highlight in sense's equiv
@@ -105,7 +106,7 @@ namespace DND.Gui
             foreach (CedictTargetHighlight hl in Res.TargetHilites) hlArr[hl.SenseIx] = hl;
 
             // Recreate list of blocks
-            measuredBlocks = new List<Block>();
+            List<Block> newBlocks = new List<Block>();
             // Collect links here. Will only keep at end if not empty.
             List<LinkArea> newLinks = new List<LinkArea>();
 
@@ -121,40 +122,46 @@ namespace DND.Gui
                 // Add one block for sense ID, unless this is a classifier "sense"
                 if (!classifier)
                 {
-                    SenseIdBlock sidBlock = new SenseIdBlock
+                    Block sidBlock = new Block
                     {
-                        Size = senseIdxSize,
+                        Width = senseIdxWidth,
                         StickRight = true,
-                        Idx = displaySenseIdx,
+                        Text = getSenseIdString(displaySenseIdx),
                         NewLine = lastWasClassifier,
+                        SenseId = true
                     };
-                    measuredBlocks.Add(sidBlock);
+                    newBlocks.Add(sidBlock);
                 }
                 // Split domain, equiv and note into typographic parts
                 // Splits along spaces and dashes
                 // Unpacks Chinese ranges
-                List<TextBlock> senseBlocks = new List<TextBlock>();
                 // Domain is localized text for "Classifier:" if, well, this is a classifier sense
-                if (!classifier) getBlocks(cm.Domain, true, null, senseBlocks, newLinks);
+                int startIX = newBlocks.Count;
+                if (!classifier) getBlocks(cm.Domain, true, null, newBlocks, newLinks);
                 else
                 {
                     string strClassifier = tprov.GetString("ResultCtrlClassifier");
                     HybridText htClassifier = new HybridText(strClassifier);
-                    getBlocks(htClassifier, true, null, senseBlocks, newLinks);
-                    senseBlocks[0].NewLine = true;
+                    int ix = newBlocks.Count;
+                    getBlocks(htClassifier, true, null, newBlocks, newLinks);
+                    Block xb = newBlocks[ix];
+                    xb.NewLine = true;
+                    newBlocks[ix] = xb;
                 }
-                getBlocks(cm.Equiv, false, hlArr[senseIdx], senseBlocks, newLinks);
-                getBlocks(cm.Note, true, null, senseBlocks, newLinks);
-                // Measure each block, and add to full list of blocks
-                measuredBlocks.Capacity += senseBlocks.Count;
-                foreach (TextBlock tb in senseBlocks)
+                getBlocks(cm.Equiv, false, hlArr[senseIdx], newBlocks, newLinks);
+                getBlocks(cm.Note, true, null, newBlocks, newLinks);
+                // Measure each block
+                for (int i = startIX; i != newBlocks.Count; ++i)
                 {
-                    tb.Size = g.MeasureString(tb.Text, tb.Font, 65535, sf);
-                    measuredBlocks.Add(tb);
+                    Block tb = newBlocks[i];
+                    SizeF sz = g.MeasureString(tb.Text, getFont(tb.FontIdx), 65535, sf);
+                    tb.Width = (ushort)Math.Round(sz.Width);
+                    newBlocks[i] = tb;
                 }
                 lastWasClassifier = classifier;
             }
             if (newLinks.Count != 0) targetLinks = newLinks;
+            measuredBlocks = newBlocks.ToArray();
         }
 
         /// <summary>
@@ -167,10 +174,10 @@ namespace DND.Gui
         /// <param name="blocks">List of blocks to append to.</param>
         /// <param name="links">List to gather links (appending to list).</param>
         private void getBlocks(HybridText htxt, bool isMeta, CedictTargetHighlight hl,
-            List<TextBlock> blocks, List<LinkArea> links)
+            List<Block> blocks, List<LinkArea> links)
         {
-            Font fntLatin = isMeta ? fntMetaLatin : fntSenseLatin;
-            Font fntZho = isMeta ? fntMetaHanzi : fntSenseHanzi;
+            byte fntIdxLatin = isMeta ? fntMetaLatin : fntSenseLatin;
+            byte fntIdxZho = isMeta ? fntMetaHanzi : fntSenseHanzi;
             // Go run by run
             for (int runIX = 0; runIX != htxt.RunCount; ++runIX)
             {
@@ -188,12 +195,10 @@ namespace DND.Gui
                         int ofsPos = 0;
                         foreach (string blockStr in byDashes)
                         {
-                            TextBlock tb = new TextBlock
+                            Block tb = new Block
                             {
-                                NewLine = false,
-                                StickRight = false,
                                 Text = blockStr,
-                                Font = fntLatin,
+                                FontIdx = fntIdxLatin,
                                 SpaceAfter = false, // will set this true for last block in "byDashes"
                             };
                             // Does block's text intersect with highlight?
@@ -213,7 +218,9 @@ namespace DND.Gui
                             ofsPos += blockStr.Length;
                         }
                         // Make sure last one is followed by space
-                        blocks[blocks.Count - 1].SpaceAfter = true;
+                        Block xb = blocks[blocks.Count - 1];
+                        xb.SpaceAfter = true;
+                        blocks[blocks.Count - 1] = xb;
                         // Keep track of position in text - for highlights
                         latnPos += str.Length + 1;
                     }
@@ -245,46 +252,42 @@ namespace DND.Gui
                     // Block for simplified, if present
                     if (strSimp != string.Empty)
                     {
-                        TextBlock tb = new TextBlock
+                        Block tb = new Block
                         {
-                            NewLine = false,
-                            StickRight = false,
                             Text = strSimp,
-                            Font = fntZho,
+                            FontIdx = fntIdxZho,
                             SpaceAfter = true,
                         };
                         blocks.Add(tb);
-                        linkArea.Blocks.Add(tb);
+                        linkArea.BlockIds.Add(blocks.Count - 1);
                     }
                     // Separator if both simplified and traditional are there
                     // AND they are different...
                     if (strSimp != string.Empty && strTrad != string.Empty && strSimp != strTrad)
                     {
-                        blocks[blocks.Count - 1].StickRight = true;
-                        TextBlock tb = new TextBlock
+                        Block xb = blocks[blocks.Count - 1];
+                        xb.StickRight = true;
+                        blocks[blocks.Count - 1] = xb;
+                        Block tb = new Block
                         {
-                            NewLine = false,
-                            StickRight = false,
                             Text = "•",
-                            Font = fntLatin,
+                            FontIdx = fntIdxLatin,
                             SpaceAfter = true,
                         };
                         blocks.Add(tb);
-                        linkArea.Blocks.Add(tb);
+                        linkArea.BlockIds.Add(blocks.Count - 1);
                     }
                     // Traditional, if present
                     if (strTrad != string.Empty && strTrad != strSimp)
                     {
-                        TextBlock tb = new TextBlock
+                        Block tb = new Block
                         {
-                            NewLine = false,
-                            StickRight = false,
                             Text = strTrad,
-                            Font = fntZho,
+                            FontIdx = fntIdxZho,
                             SpaceAfter = true,
                         };
                         blocks.Add(tb);
-                        linkArea.Blocks.Add(tb);
+                        linkArea.BlockIds.Add(blocks.Count - 1);
                     }
                     // Pinyin, if present
                     if (strPy != string.Empty)
@@ -293,16 +296,14 @@ namespace DND.Gui
                         string[] pyParts = strPy.Split(new char[] { ' ' });
                         foreach (string pyPart in pyParts)
                         {
-                            TextBlock tb = new TextBlock
+                            Block tb = new Block
                             {
-                                NewLine = false,
-                                StickRight = false,
                                 Text = pyPart,
-                                Font = fntLatin,
+                                FontIdx = fntIdxLatin,
                                 SpaceAfter = true,
                             };
                             blocks.Add(tb);
-                            linkArea.Blocks.Add(tb);
+                            linkArea.BlockIds.Add(blocks.Count - 1);
                         }
                     }
                     // Last part will have requested a space after.
@@ -310,7 +311,11 @@ namespace DND.Gui
                     TextRunLatin nextLatinRun = null;
                     if (runIX + 1 < htxt.RunCount) nextLatinRun = htxt.GetRunAt(runIX + 1) as TextRunLatin;
                     if (nextLatinRun != null && char.IsPunctuation(nextLatinRun.GetPlainText()[0]))
-                        blocks[blocks.Count - 1].SpaceAfter = false;
+                    {
+                        Block xb = blocks[blocks.Count - 1];
+                        xb.SpaceAfter = false;
+                        blocks[blocks.Count - 1] = xb;
+                    }
                     // Collect link area
                     links.Add(linkArea);
                 }
@@ -372,75 +377,87 @@ namespace DND.Gui
             // Will not work reduntantly
             if (positionedBlocks != null)
             {
-                if (positionedBlocks.Count == 0) return lemmaTop;
-                else return positionedBlocks[positionedBlocks.Count - 1].Loc.Y + lemmaLineHeight;
+                if (positionedBlocks.Length == 0) return lemmaTop;
+                else return positionedBlocks[positionedBlocks.Length - 1].LocY + lemmaLineHeight;
             }
 
             // This is always re-done when function is called
             // We only get here when width has changed, so we do need to rearrange
-            positionedBlocks = new List<PositionedBlock>();
+            positionedBlocks = new PositionedBlock[measuredBlocks.Length];
             List<int> currHiliteIndexes = new List<int>();
             float blockX = lemmaL;
             float blockY = lemmaTop;
-            PositionedBlock lastPB = null;
-            foreach (Block block in measuredBlocks)
+            bool firstBlock = true;
+            PositionedBlock lastPB = new PositionedBlock();
+            Block lastBlock = new Block();
+            for (int i = 0; i != measuredBlocks.Length; ++i)
             {
+                Block block = measuredBlocks[i];
                 // If current block is a sense ID, and we've had block before:
                 // Add extra space on left
-                if (block is SenseIdBlock && lastPB != null)
+                if (block.SenseId && !firstBlock)
                     blockX += spaceWidth;
 
                 // Use current position
                 PositionedBlock pb = new PositionedBlock
                 {
-                    Block = block,
-                    Loc = new PointF(blockX, blockY),
+                    BlockIdx = (ushort)i,
+                    LocX = (short)Math.Round(blockX),
+                    LocY = (short)Math.Round(blockY),
                 };
                 // New block extends beyond available width: break to next line
                 // Also break if block explicitly requests it
                 // But, if last block is "stick right", break together
-                if (pb.Loc.X + block.Size.Width - lemmaL > lemmaW || pb.Block.NewLine)
+                if (pb.LocX + ((float)block.Width) - lemmaL > lemmaW || block.NewLine)
                 {
                     blockY += lemmaLineHeight;
                     blockX = lemmaL;
                     // No stick
-                    if (lastPB == null || !lastPB.Block.StickRight) pb.Loc = new PointF(blockX, blockY);
+                    if (firstBlock || !lastBlock.StickRight)
+                    {
+                        pb.LocX = (short)Math.Round(blockX);
+                        pb.LocY = (short)Math.Round(blockY);
+                    }
                     // We break together
                     else
                     {
                         // Last block breaks onto this line
-                        lastPB.Loc = new PointF(blockX, blockY);
+                        lastPB.LocX = (short)Math.Round(blockX);
+                        lastPB.LocY = (short)Math.Round(blockY);
                         // We move on by last block's width plus (optional) space
-                        blockX += lastPB.Block.Size.Width;
-                        if (lastPB.Block is TextBlock && (lastPB.Block as TextBlock).SpaceAfter)
+                        blockX += ((float)lastBlock.Width);
+                        if (!lastBlock.SenseId && lastBlock.SpaceAfter)
                             blockX += spaceWidth;
                         // So.
-                        pb.Loc = new PointF(blockX, blockY);
+                        pb.LocX = (short)Math.Round(blockX);
+                        pb.LocY = (short)Math.Round(blockY);
                     }
                 }
                 // Add to list of positioned blocks
-                positionedBlocks.Add(pb);
+                positionedBlocks[i] = pb;
                 // This is a text block with a highlight? Collect it too!
-                if (pb.Block is TextBlock && (pb.Block as TextBlock).Hilite)
+                if (!block.SenseId && block.Hilite)
                 {
-                    int ix = positionedBlocks.Count - 1;
+                    int ix = positionedBlocks.Length - 1;
                     if (currHiliteIndexes.Count != 0 && currHiliteIndexes[currHiliteIndexes.Count - 1] != ix - 1)
                         doCollectHighlightRange(ref currHiliteIndexes);
                     currHiliteIndexes.Add(ix);
                 }
                 // Move right by block's width; space optional
-                blockX += block.Size.Width;
-                if (block is TextBlock && (block as TextBlock).SpaceAfter)
+                blockX += ((float)block.Width);
+                if (!block.SenseId && block.SpaceAfter)
                     blockX += spaceWidth;
-                // This is last block
+                // Remeber "last block" for next round
                 lastPB = pb;
+                lastBlock = measuredBlocks[lastPB.BlockIdx];
+                firstBlock = false;
             }
             // Collect any last highlights
             doCollectHighlightRange(ref currHiliteIndexes);
             // In link areas, fill in positioned blocks and calculate actual link areas.
             doCalculateLinkAreas();
             // Return bottom of content area.
-            return measuredBlocks.Count == 0 ? blockY : blockY + lemmaLineHeight;
+            return measuredBlocks.Length == 0 ? blockY : blockY + lemmaLineHeight;
         }
 
         /// <summary>
@@ -460,7 +477,7 @@ namespace DND.Gui
             // Positioned blocks will be in their correct order in each link's list.
             foreach (PositionedBlock pb in positionedBlocks)
                 foreach (LinkArea link in targetLinks)
-                    if (link.Blocks.Contains(pb.Block)) link.PositionedBlocks.Add(pb);
+                    if (link.BlockIds.Contains(pb.BlockIdx)) link.PositionedBlocks.Add(pb);
             // Calculate links' active areas. That means encapsulating rectangles
             // of positioned blocks that are on the same line.
             foreach (LinkArea link in targetLinks)
@@ -469,47 +486,50 @@ namespace DND.Gui
                 if (link.PositionedBlocks.Count == 1)
                 {
                     PositionedBlock pb = link.PositionedBlocks[0];
+                    ushort width = measuredBlocks[pb.BlockIdx].Width;
                     Rectangle rect = new Rectangle(
-                        (int)pb.Loc.X,
-                        (int)pb.Loc.Y,
-                        (int)pb.Block.Size.Width,
-                        (int)pb.Block.Size.Height);
+                        (int)pb.LocX,
+                        (int)pb.LocY,
+                        (int)width,
+                        (int)lemmaCharHeight);
                     link.ActiveAreas.Add(rect);
                 }
                 // There are multiple blocks
                 else
                 {
-                    float lastY = float.MinValue;
-                    float currLeft = float.MinValue;
+                    short lastY = short.MinValue;
+                    short currLeft = short.MinValue;
                     for (int i = 0; i != link.PositionedBlocks.Count; ++i)
                     {
                         PositionedBlock pb = link.PositionedBlocks[i];
                         // Block on a new line
-                        if (pb.Loc.Y != lastY)
+                        if (pb.LocY != lastY)
                         {
                             // We had a previous block, which completed an area
-                            if (lastY != float.MinValue)
+                            if (lastY != short.MinValue)
                             {
                                 PositionedBlock previousPB = link.PositionedBlocks[i - 1];
+                                ushort previousWidth = measuredBlocks[previousPB.BlockIdx].Width;
                                 Rectangle rect = new Rectangle(
                                     (int)currLeft,
                                     (int)lastY,
-                                    (int)(previousPB.Loc.X + previousPB.Block.Size.Width - currLeft),
-                                    (int)(pb.Block.Size.Height));
+                                    (int)(previousPB.LocX + ((float)previousWidth) - currLeft),
+                                    (int)(lemmaCharHeight));
                                 link.ActiveAreas.Add(rect);
                             }
                             // This block's left is merged area's left.
-                            currLeft = pb.Loc.X;
+                            currLeft = pb.LocX;
                         }
-                        lastY = pb.Loc.Y;
+                        lastY = pb.LocY;
                     }
                     // Last block completes last area
                     PositionedBlock lastPB = link.PositionedBlocks[link.PositionedBlocks.Count - 1];
+                    ushort lastWidth = measuredBlocks[lastPB.BlockIdx].Width;
                     Rectangle lastRect = new Rectangle(
                         (int)currLeft,
                         (int)lastY,
-                        (int)(lastPB.Loc.X + lastPB.Block.Size.Width - currLeft),
-                        (int)(lastPB.Block.Size.Height));
+                        (int)(lastPB.LocX + ((float)lastWidth) - currLeft),
+                        (int)(lemmaCharHeight));
                     link.ActiveAreas.Add(lastRect);
                 }
             }
@@ -553,7 +573,7 @@ namespace DND.Gui
                 HeadBlock hb = new HeadBlock
                 {
                     Char = cstr,
-                    Size = g.MeasureString(cstr, fntZhoHead, 65535, sf),
+                    Size = g.MeasureString(cstr, getFont(fntZhoHead), 65535, sf),
                     Loc = loc,
                     Faded = false,
                 };
@@ -598,7 +618,7 @@ namespace DND.Gui
             // On-demand: measure a single ideograph's dimensions
             if (ideoSize.Width == 0)
             {
-                ideoSize = g.MeasureString(ideoTestStr, fntZhoHead, 65535, sf);
+                ideoSize = g.MeasureString(ideoTestStr, getFont(fntZhoHead), 65535, sf);
                 var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
                 float hanziLinePad = 6.0F;
                 hanziLinePad *= Scale;
@@ -681,7 +701,7 @@ namespace DND.Gui
                 // If text is punctuation, glue it to previous syllable
                 if (pb.Text.Length == 1 && char.IsPunctuation(pb.Text[0]) && i > 0) cx -= pinyinSpaceWidth;
                 // Block's size and relative location
-                SizeF sz = g.MeasureString(pb.Text, fntPinyinHead, 65535, sf);
+                SizeF sz = g.MeasureString(pb.Text, getFont(fntPinyinHead), 65535, sf);
                 pb.Rect = new RectangleF(cx, ctop, sz.Width, sz.Height);
                 cx += sz.Width + pinyinSpaceWidth;
                 // Add block

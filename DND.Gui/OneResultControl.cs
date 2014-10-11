@@ -77,7 +77,11 @@ namespace DND.Gui
         /// </summary>
         private static float pinyinSpaceWidth = 0;
         /// <summary>
-        /// Line height in the entry body.
+        /// Character height in entry body.
+        /// </summary>
+        private static float lemmaCharHeight = 0;
+        /// <summary>
+        /// Line height in the entry body: greater than character height for line spacing.
         /// </summary>
         private static float lemmaLineHeight = 0;
         
@@ -100,7 +104,7 @@ namespace DND.Gui
         /// <summary>
         /// Typographically analyzed body text.
         /// </summary>
-        private List<Block> measuredBlocks = null;
+        private Block[] measuredBlocks = null;
         /// <summary>
         /// True if target contains Hanzi > need to re-measure when script changes.
         /// </summary>
@@ -108,7 +112,7 @@ namespace DND.Gui
         /// <summary>
         /// Body text laid out for current width.
         /// </summary>
-        private List<PositionedBlock> positionedBlocks = null;
+        private PositionedBlock[] positionedBlocks = null;
         /// <summary>
         /// <para>Indexes in <see cref="positionedBlocks"/> that have a match highlight.</para>
         /// <para>Each inner list contains adjacent blocks (range from a single sense).</para>
@@ -158,27 +162,60 @@ namespace DND.Gui
 
         // Graphics resources: static, singleton, never disposed.
         // When we're quitting it doesn't matter anymore, anyway.
-        // TO-DO: double-check for thread safety when control starts drawing animations in worker thread!
-        private static Font fntZhoHead;
-        private static Font fntPinyinHead;
-        private static Font fntSenseLatin;
-        private static Font fntSenseHanzi;
-        private static Font fntMetaLatin;
-        private static Font fntMetaHanzi;
-        private static Font fntSenseId;
+        private static Font[] fntArr = new Font[7];
+        private const byte fntZhoHead = 0;
+        private const byte fntPinyinHead = 1;
+        private const byte fntSenseLatin = 2;
+        private const byte fntSenseHanzi = 3;
+        private const byte fntMetaLatin = 4;
+        private const byte fntMetaHanzi = 5;
+        private const byte fntSenseId = 6;
+
+        private static string[] senseIdxStrings = new string[36];
 
         /// <summary>
         /// Static ctor: initializes static graphics resources.
         /// </summary>
         static OneResultControl()
         {
-            fntZhoHead = new Font(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
-            fntPinyinHead = new Font(ZenParams.PinyinFontFamily, ZenParams.PinyinFontSize, FontStyle.Bold);
-            fntSenseLatin = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize);
-            fntSenseHanzi = new Font(ZenParams.ZhoFontFamily, ZenParams.LemmaFontSize * 1.2F);
-            fntMetaLatin = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize, FontStyle.Italic);
-            fntMetaHanzi = new Font(ZenParams.ZhoFontFamily, ZenParams.LemmaFontSize * 1.2F, FontStyle.Italic);
-            fntSenseId = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize * 0.8F);
+            fntArr[fntZhoHead] = new Font(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
+            fntArr[fntPinyinHead] = new Font(ZenParams.PinyinFontFamily, ZenParams.PinyinFontSize, FontStyle.Bold);
+            fntArr[fntSenseLatin] = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize);
+            fntArr[fntSenseHanzi] = new Font(ZenParams.ZhoFontFamily, ZenParams.LemmaFontSize * 1.2F);
+            fntArr[fntMetaLatin] = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize, FontStyle.Italic);
+            fntArr[fntMetaHanzi] = new Font(ZenParams.ZhoFontFamily, ZenParams.LemmaFontSize * 1.2F, FontStyle.Italic);
+            fntArr[fntSenseId] = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize * 0.8F);
+
+            // Sense ID strings
+            for (int i = 0; i != senseIdxStrings.Length; ++i)
+            {
+                string str = "?";
+                if (i >= 0 && i < 9) str = (i + 1).ToString();
+                else
+                {
+                    int resInt = (int)'a';
+                    resInt += i - 9;
+                    str = "";
+                    str += (char)resInt;
+                }
+                senseIdxStrings[i] = str;
+            }
+        }
+
+        /// <summary>
+        /// Gets a static display font by its index.
+        /// </summary>
+        private static Font getFont(byte idx)
+        {
+            return fntArr[idx];
+        }
+
+        /// <summary>
+        /// Gets the one-character display string representing a zero-based sense index.
+        /// </summary>
+        private static string getSenseIdString(int idx)
+        {
+            return senseIdxStrings[idx % senseIdxStrings.Length];
         }
 
         public override void DoMouseLeave()

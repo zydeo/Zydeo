@@ -164,7 +164,7 @@ namespace DND.Gui
             {
                 PointF loc = pb.Rect.Location;
                 // Draw string
-                g.DrawString(pb.Text, fntPinyinHead, bfont, loc, sf);
+                g.DrawString(pb.Text, getFont(fntPinyinHead), bfont, loc, sf);
 
             }
         }
@@ -176,9 +176,10 @@ namespace DND.Gui
         {
             if (targetHanziOfs != 0) return targetHanziOfs;
             // Calculate on demand
-            var sizeInfo = HanziMeasure.Instance.GetMeasures(fntSenseHanzi.FontFamily.Name, fntSenseHanzi.Size);
+            Font myFontZho = getFont(fntSenseHanzi);
+            var sizeInfo = HanziMeasure.Instance.GetMeasures(myFontZho.Name, myFontZho.Size);
             float hanziMidY = sizeInfo.RealRect.Top + sizeInfo.RealRect.Height / 2.0F;
-            float latinMidY = fntSenseLatin.Height * 0.55F;
+            float latinMidY = getFont(fntSenseLatin).Height * 0.55F;
             targetHanziOfs = latinMidY - hanziMidY;
             return targetHanziOfs;
         }
@@ -195,40 +196,39 @@ namespace DND.Gui
                 foreach (PositionedBlock pb in positionedBlocks)
                 {
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                    Block block = measuredBlocks[pb.BlockIdx];
                     // Sense ID
-                    if (pb.Block is SenseIdBlock)
+                    if (block.SenseId)
                     {
-                        SenseIdBlock sib = pb.Block as SenseIdBlock;
                         float pad = lemmaLineHeight * 0.1F;
                         g.DrawEllipse(pnorm,
-                            pb.Loc.X,
-                            pb.Loc.Y + Scale * pad,
-                            sib.Size.Width - 2.0F * pad,
-                            sib.Size.Height - 2.0F * pad);
-                        g.DrawString(sib.Text, fntSenseId, bnorm,
-                            pb.Loc.X + 2.0F * pad,
-                            pb.Loc.Y + 1.5F * pad, sf);
+                            pb.LocX,
+                            pb.LocY + Scale * pad,
+                            ((float)block.Width) - 2.0F * pad,
+                            lemmaCharHeight - 2.0F * pad);
+                        g.DrawString(block.Text, getFont(fntSenseId), bnorm,
+                            pb.LocX + 2.0F * pad,
+                            pb.LocY + 1.5F * pad, sf);
                     }
                     // Text
-                    else if (pb.Block is TextBlock)
+                    else
                     {
-                        TextBlock tb = pb.Block as TextBlock;
                         // Extra vertical offset on Hanzi blocks
                         float vOfs = 0;
-                        if (tb.Font == fntMetaHanzi || tb.Font == fntSenseHanzi)
+                        if (block.FontIdx == fntMetaHanzi || block.FontIdx == fntSenseHanzi)
                             vOfs += getTargetHanziOfs();
                         // No hover: draw with normal brush
                         Brush brush = bnorm;
                         // Hover: create hover brush on demand; draw with that
                         if (hoverLink != null)
                         {
-                            if (hoverLink.Blocks.Contains(tb))
+                            if (hoverLink.BlockIds.Contains(pb.BlockIdx))
                             {
                                 if (bhover == null) bhover = new SolidBrush(ZenParams.LinkHoverColor);
                                 brush = bhover;
                             }
                         }
-                        g.DrawString(tb.Text, tb.Font, brush, pb.Loc.X, pb.Loc.Y + vOfs, sf);
+                        g.DrawString(block.Text, getFont(block.FontIdx), brush, pb.LocX, pb.LocY + vOfs, sf);
                     }
                 }
             }
@@ -249,19 +249,19 @@ namespace DND.Gui
             // Needed to make gradient work
             g.SmoothingMode = SmoothingMode.None;
             // We offset highlight vertically for more pleasing aesthetics (lots of empty space at top in text)
-            float topOfs = positionedBlocks[targetHiliteIndexes[0][0]].Block.Size.Height / 10.0F;
+            float topOfs = lemmaCharHeight / 10.0F;
             // All the measured and positioned blocks in entry body
             using (Brush b = new SolidBrush(ZenParams.HiliteColor))
             {
                 // Every adjacent range
                 foreach (List<int> idxList in targetHiliteIndexes)
                 {
-                    float lastY = float.MinValue;
-                    float lastRight = float.MinValue;
+                    int lastY = int.MinValue;
+                    int lastRight = int.MinValue;
                     for (int i = 0; i != idxList.Count; ++i)
                     {
                         PositionedBlock pb = positionedBlocks[idxList[i]];
-                        TextBlock tb = pb.Block as TextBlock;
+                        Block tb = measuredBlocks[pb.BlockIdx];
                         // !! Paint gradients first.
                         // Linear gradient brush has ugly bug where white line (1px or less) is drawn right at the darkest edge
                         // If we draw a bit bigger gradient, then overdraw with solid, this will be covered up.
@@ -270,8 +270,8 @@ namespace DND.Gui
                         if (i == 0)
                         {
                             RectangleF rleft = new RectangleF(
-                                pb.Loc.X - 2.0F * spaceWidth + 1.0F, pb.Loc.Y,
-                                2.0F * spaceWidth, pb.Block.Size.Height);
+                                pb.LocX - 2.0F * spaceWidth + 1.0F, pb.LocY,
+                                2.0F * spaceWidth, lemmaCharHeight);
                             rleft.Y += topOfs;
                             using (LinearGradientBrush lbr = new LinearGradientBrush(rleft, bgcol, ZenParams.HiliteColor, LinearGradientMode.Horizontal))
                             {
@@ -284,8 +284,8 @@ namespace DND.Gui
                         if (i == idxList.Count - 1)
                         {
                             RectangleF rright = new RectangleF(
-                                pb.Loc.X + pb.Block.Size.Width - 1.0F, pb.Loc.Y,
-                                2.0F * spaceWidth, pb.Block.Size.Height);
+                                pb.LocX + ((float)tb.Width) - 1.0F, pb.LocY,
+                                2.0F * spaceWidth, lemmaCharHeight);
                             rright.Y += topOfs;
                             using (LinearGradientBrush lbr = new LinearGradientBrush(rright, ZenParams.HiliteColor, bgcol, LinearGradientMode.Horizontal))
                             {
@@ -293,21 +293,23 @@ namespace DND.Gui
                             }
                         }
                         // Rectangle behind this specific block
-                        RectangleF rect = new RectangleF(pb.Loc, tb.Size);
+                        RectangleF rect = new RectangleF(
+                            new PointF(pb.LocX, pb.LocY),
+                            new SizeF((float)tb.Width, lemmaCharHeight));
                         rect.X -= 1.0F; // Extend solid area to cover up buggy gradient edge
                         rect.Y += topOfs;
                         rect.Width += 2.0F; // Extend solid area to cover up buggy gradient edge
                         g.FillRectangle(b, rect);
                         // If this block is on the same line as before, fill space between blocks
-                        if (pb.Loc.Y == lastY)
+                        if (pb.LocY == lastY)
                         {
                             rect.X = lastRight;
-                            rect.Width = pb.Loc.X - lastRight;
+                            rect.Width = pb.LocX - lastRight;
                             g.FillRectangle(b, rect);
                         }
                         // Remember Y of block so we can fill empty areas between blocks on the same line
-                        lastY = pb.Loc.Y;
-                        lastRight = pb.Loc.X + pb.Block.Size.Width;
+                        lastY = pb.LocY;
+                        lastRight = pb.LocX + tb.Width;
                     }
                 }
             }
@@ -346,13 +348,13 @@ namespace DND.Gui
                 foreach (HeadBlock hb in headInfo.SimpBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X, hb.Loc.Y);
-                    g.DrawString(hb.Char, fntZhoHead, bnorm, loc, sf);
+                    g.DrawString(hb.Char, getFont(fntZhoHead), bnorm, loc, sf);
                 }
                 foreach (HeadBlock hb in headInfo.TradBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X, hb.Loc.Y);
                     Brush b = hb.Faded ? bfade : bnorm;
-                    g.DrawString(hb.Char, fntZhoHead, b, loc, sf);
+                    g.DrawString(hb.Char, getFont(fntZhoHead), b, loc, sf);
                 }
                 // Pinyin
                 using (SolidBrush bhilite = new SolidBrush(ZenParams.HiliteColor))

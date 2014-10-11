@@ -29,7 +29,7 @@ namespace DND.Gui
             /// <summary>
             /// The blocks that make up the link area. Unchanged once blocks have been measured.
             /// </summary>
-            public readonly HashSet<Block> Blocks = new HashSet<Block>();
+            public readonly HashSet<int> BlockIds = new HashSet<int>();
             /// <summary>
             /// <para>The positioned blocks that make up the link (they all change display state together on hover).</para>
             /// <para>Re-calculated on the basis of <see cref="Blocks"/> when recreating positioned blocks.</para>
@@ -57,87 +57,85 @@ namespace DND.Gui
         }
 
         /// <summary>
-        /// Base class for an analyzed typographical block in entry body.
+        /// One measured text block in entry body (target text).
         /// </summary>
-        private class Block
-        {
-            /// <summary>
-            /// The block's size.
-            /// </summary>
-            public SizeF Size;
-            /// <summary>
-            /// If true, must keep with block on the right (i.e., non-breaking space after me).
-            /// </summary>
-            public bool StickRight;
-            /// <summary>
-            /// If true, block must come at start of line, inducing line break
-            /// </summary>
-            public bool NewLine;
-        }
-
-        /// <summary>
-        /// A single "word," i.e., a sequence of characters and punctuation
-        /// </summary>
-        private class TextBlock : Block
+        private struct Block
         {
             /// <summary>
             /// The text to display.
             /// </summary>
             public string Text;
             /// <summary>
-            /// The display font to use.
+            /// The block's width: rounded up to next integer
             /// </summary>
-            public Font Font;
+            public ushort Width;
+            /// <summary>
+            /// Index of this block's display font.
+            /// </summary>
+            public byte FontIdx;
+            /// <summary>
+            /// Compact representation of boolean flags. Do not access directly; use properties.
+            /// </summary>
+            public byte Flags;
+            /// <summary>
+            /// True if this block represents a sense ID.
+            /// </summary>
+            public bool SenseId
+            {
+                get { return (Flags & 1) == 1; }
+                set { Flags &= (byte.MaxValue ^ 1); if (value) Flags |= 1; }
+            }
+            /// <summary>
+            /// If true, must keep with block on the right (i.e., non-breaking space after me).
+            /// </summary>
+            public bool StickRight
+            {
+                get { return (Flags & 2) == 2; }
+                set { Flags &= (byte.MaxValue ^ 2); if (value) Flags |= 2; }
+            }
+            /// <summary>
+            /// If true, block must come at start of line, inducing line break
+            /// </summary>
+            public bool NewLine
+            {
+                get { return (Flags & 4) == 4; }
+                set { Flags &= (byte.MaxValue ^ 4); if (value) Flags |= 4; }
+            }
             /// <summary>
             /// True if block is followed by a space. If false, contiguous to next block, but can break.
             /// </summary>
-            public bool SpaceAfter;
+            public bool SpaceAfter
+            {
+                get { return (Flags & 8) == 8; }
+                set { Flags &= (byte.MaxValue ^ 8); if (value) Flags |= 8; }
+            }
             /// <summary>
             /// True if block is to be highlighted (match).
             /// </summary>
-            public bool Hilite;
-        }
-
-        /// <summary>
-        /// A block representing a sense ID, i.e., a circled number or letter.
-        /// </summary>
-        private class SenseIdBlock : Block
-        {
-            /// <summary>
-            /// The index (number) of this sense.
-            /// </summary>
-            public int Idx;
-
-            /// <summary>
-            /// Gets the text to show. Idx + 1 up to 8, then a through z.
-            /// </summary>
-            public string Text
+            public bool Hilite
             {
-                get
-                {
-                    if (Idx >= 0 && Idx < 9) return (Idx + 1).ToString();
-                    int resInt = (int)'a';
-                    resInt += Idx - 9;
-                    string res = "";
-                    res += (char)resInt;
-                    return res;
-                }
+                get { return (Flags & 16) == 16; }
+                set { Flags &= (byte.MaxValue ^ 16); if (value) Flags |= 16; }
             }
         }
 
         /// <summary>
         /// A positioned typographical block, ready for painting within the control's current width.
         /// </summary>
-        private class PositionedBlock
+        private struct PositionedBlock
         {
             /// <summary>
-            /// The measured block.
+            /// The block's X coordinate
             /// </summary>
-            public Block Block;
+            public short LocX;
             /// <summary>
-            /// The block's location in client coordinates.
+            /// The block's Y coordinate
             /// </summary>
-            public PointF Loc;
+            public short LocY;
+            /// <summary>
+            /// The measured block - index in the array of measued blocks.
+            /// </summary>
+            public ushort BlockIdx;
         }
 
         /// <summary>
