@@ -34,10 +34,12 @@ namespace DND.CedictEngine
         /// </summary>
         private List<CedictResult> doTargetLookup(string query)
         {
+            // Empty query string: no results
+            query = query.Trim();
+            if (query == string.Empty) return new List<CedictResult>();
+
             // Tokenize query string
-            List<TextRun> trs = new List<TextRun>();
-            trs.Add(new TextRunLatin(query));
-            HybridText txtQuery = new HybridText(new ReadOnlyCollection<TextRun>(trs));
+            HybridText txtQuery = new HybridText(query);
             ReadOnlyCollection<EquivToken> txtTokenized = tokenizer.Tokenize(txtQuery);
             // Get query string's token IDs
             bool anyUnknown = false;

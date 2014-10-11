@@ -42,6 +42,11 @@ namespace DND.Gui
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
 
         /// <summary>
+        /// Index of the first results control that is at least partially visible.
+        /// </summary>
+        private int firstVisibleIdx = -1;
+
+        /// <summary>
         /// Text shown in bottom right: N results found. Or empty, if no search yet.
         /// </summary>
         private string txtResCount = string.Empty;
@@ -91,6 +96,7 @@ namespace DND.Gui
                 orc.RelTop = y;
                 y += orc.Height;
             }
+            updateFirstVisibleIdx();
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
@@ -176,6 +182,8 @@ namespace DND.Gui
         public override void Dispose()
         {
             foreach (OneResultControl orc in resCtrls) orc.Dispose();
+            resCtrls = null;
+            firstVisibleIdx = -1;
             base.Dispose();
         }
 
@@ -219,6 +227,8 @@ namespace DND.Gui
                         odd = !odd;
                     }
                 }
+                // Probably not needed, but doesn't hurt
+                updateFirstVisibleIdx();
             }
             // If scroll bar is now visible, set its large value and position
             if (sb.Visible)
@@ -228,6 +238,8 @@ namespace DND.Gui
                 sb.LargeChange = ch;
                 sb.Value = 1 - resCtrls[0].RelTop;
                 suppressScrollChanged = false;
+                // Probably not needed, but doesn't hurt
+                updateFirstVisibleIdx();
             }
             return cw;
         }
@@ -303,6 +315,38 @@ namespace DND.Gui
             }
             // Change our mind about scrollbar control?
             cw = showOrHideScrollbar();
+            // Update first visible control's index
+            updateFirstVisibleIdx();
+        }
+
+        /// <summary>
+        /// Updates the cached index of the first visible control.
+        /// </summary>
+        private void updateFirstVisibleIdx()
+        {
+            // This should never happen, just being defensive.
+            if (resCtrls == null || resCtrls.Count == 0)
+            {
+                firstVisibleIdx = -1;
+                return;
+            }
+            // OK, check if what we used to call the first visible control is now scrolled out at top
+            // Then: search down
+            // Or, if it's been scolled down, search up
+            // No previous first visible: start from 0
+            if (firstVisibleIdx == -1) firstVisibleIdx = 0;
+            if (resCtrls[firstVisibleIdx].RelBottom <= 1)
+            {
+                if (firstVisibleIdx < resCtrls.Count) ++firstVisibleIdx;
+                while (resCtrls[firstVisibleIdx].RelBottom <= 1 && firstVisibleIdx < resCtrls.Count)
+                    ++firstVisibleIdx;
+            }
+            else if (resCtrls[firstVisibleIdx].RelTop > 1)
+            {
+                if (firstVisibleIdx > 0) --firstVisibleIdx;
+                while (resCtrls[firstVisibleIdx].RelTop > 1 && firstVisibleIdx > 0)
+                    --firstVisibleIdx;
+            }
         }
 
         protected override void OnSizeChanged()
@@ -347,6 +391,7 @@ namespace DND.Gui
                 orc.Dispose();
             }
             resCtrls.Clear();
+            firstVisibleIdx = -1;
             currScript = script;
 
             // No results
@@ -388,6 +433,9 @@ namespace DND.Gui
                 txtResCount = tprov.GetString("ResultsCountN");
                 txtResCount = string.Format(txtResCount, resCtrls.Count);
             }
+
+            // Update first visible control's index
+            updateFirstVisibleIdx();
 
             // Render
             MakeMePaint(false, RenderMode.Invalidate);
@@ -467,14 +515,17 @@ namespace DND.Gui
             g.ResetTransform();
             g.TranslateTransform(AbsLeft, AbsTop);
             g.Clip = new Region(new Rectangle(1, 1, cw, ch));
-            foreach (OneResultControl orc in resCtrls)
+            if (firstVisibleIdx != -1)
             {
-                if ((orc.RelBottom < ch && orc.RelBottom >= 0) ||
-                    (orc.RelTop < ch && orc.RelTop >= 0))
+                int ix = firstVisibleIdx;
+                while (true)
                 {
+                    OneResultControl orc = resCtrls[ix];
+                    if (orc.RelTop >= ch + 1) break;
                     g.ResetTransform();
                     g.TranslateTransform(orc.AbsLeft, orc.AbsTop);
                     orc.DoPaint(g);
+                    ++ix;
                 }
             }
             // Bottom overlay (results count, zoom, settings)
