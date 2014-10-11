@@ -186,7 +186,7 @@ long	long	lōng	lóng	lǒng	lòng
 lou	lou	lōu	lóu	lǒu	lòu
 lu	lu	lū	lú	lǔ	lù
 lv	lü	lǖ	lǘ	lǚ	lǜ
-lve	lüe	lvē	lvé	lvě	lvè
+lve	lüe	lüē	lüé	lüě	lüè
 luan	luan	luān	luán	luǎn	luàn
 lun	lun	lūn	lún	lǔn	lùn
 luo	luo	luō	luó	luǒ	luò
@@ -231,7 +231,7 @@ nong	nong	nōng	nóng	nǒng	nòng
 nou	nou	nōu	nóu	nǒu	nòu
 nu	nu	nū	nú	nǔ	nù
 nv	nü	nǖ	nǘ	nǚ	nǜ
-nve	nüe	nvē	nvé	nvě	nvè
+nve	nüe	nüē	nüé	nüě	nüè
 nuan	nuan	nuān	nuán	nuǎn	nuàn
 nun	nun	nūn	nún	nǔn	nùn
 nuo	nuo	nuō	nuó	nuǒ	nuò
