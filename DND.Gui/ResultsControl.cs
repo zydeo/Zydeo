@@ -367,9 +367,6 @@ namespace DND.Gui
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
-        //DBG
-        private ReadOnlyCollection<CedictResult> xxx;
-
         /// <summary>
         /// Displays the received results, discarding existing data.
         /// </summary>
@@ -377,10 +374,6 @@ namespace DND.Gui
         /// <param name="script">Defines which script(s) to show.</param>
         public void SetResults(ReadOnlyCollection<CedictResult> results, SearchScript script)
         {
-            // DBG
-            xxx = results;
-            return;
-
             // Decide if we first try with scrollbar visible or not
             // This is a very rough heuristics (10 results or more), but doesn't matter
             // Recalc costs much if there are many results, and the number covers that safely
