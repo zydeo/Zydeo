@@ -94,6 +94,10 @@ namespace DND.Gui
         /// </summary>
         private SearchScript analyzedScript;
         /// <summary>
+        /// Text pool for optimal storage of all text chunks displayed typographically in this control.
+        /// </summary>
+        private TextPool textPool = null;
+        /// <summary>
         /// Typographically analyzed headword.
         /// </summary>
         private HeadInfo headInfo = null;

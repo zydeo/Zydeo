@@ -164,7 +164,7 @@ namespace DND.Gui
             {
                 PointF loc = pb.Rect.Location;
                 // Draw string
-                g.DrawString(pb.Text, getFont(fntPinyinHead), bfont, loc, sf);
+                g.DrawString(textPool.GetString(pb.TextPos), getFont(fntPinyinHead), bfont, loc, sf);
 
             }
         }
@@ -206,7 +206,7 @@ namespace DND.Gui
                             pb.LocY + Scale * pad,
                             ((float)block.Width) - 2.0F * pad,
                             lemmaCharHeight - 2.0F * pad);
-                        g.DrawString(block.Text, getFont(fntSenseId), bnorm,
+                        g.DrawString(textPool.GetString(block.TextPos), getFont(fntSenseId), bnorm,
                             pb.LocX + 2.0F * pad,
                             pb.LocY + 1.5F * pad, sf);
                     }
@@ -228,7 +228,8 @@ namespace DND.Gui
                                 brush = bhover;
                             }
                         }
-                        g.DrawString(block.Text, getFont(block.FontIdx), brush, pb.LocX, pb.LocY + vOfs, sf);
+                        g.DrawString(textPool.GetString(block.TextPos), getFont(block.FontIdx),
+                            brush, pb.LocX, pb.LocY + vOfs, sf);
                     }
                 }
             }
@@ -348,13 +349,13 @@ namespace DND.Gui
                 foreach (HeadBlock hb in headInfo.SimpBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X, hb.Loc.Y);
-                    g.DrawString(hb.Char, getFont(fntZhoHead), bnorm, loc, sf);
+                    g.DrawString(hb.Char.ToString(), getFont(fntZhoHead), bnorm, loc, sf);
                 }
                 foreach (HeadBlock hb in headInfo.TradBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X, hb.Loc.Y);
                     Brush b = hb.Faded ? bfade : bnorm;
-                    g.DrawString(hb.Char, getFont(fntZhoHead), b, loc, sf);
+                    g.DrawString(hb.Char.ToString(), getFont(fntZhoHead), b, loc, sf);
                 }
                 // Pinyin
                 using (SolidBrush bhilite = new SolidBrush(ZenParams.HiliteColor))

@@ -219,6 +219,9 @@ namespace DND.Gui
             CedictLookupResult res = dict.Lookup(text, searchScript, SearchLang.Chinese);
             if (sender == siCtrl) siCtrl.SelectAll();
             resCtrl.SetResults(res.Results, searchScript);
+            // DBG
+            GC.Collect();
+            GC.Collect();
         }
 
         private int getSimpTradWidth()

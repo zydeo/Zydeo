@@ -21,6 +21,8 @@ namespace DND.Gui
         /// <param name="width">Control's width.</param>
         public void Analyze(Graphics g, int width, SearchScript script)
         {
+            bool isTextPoolNew = textPool == null;
+
             // If width or script has not changed, nothing to do.
             if (analyzedWidth == width && script == analyzedScript) return;
             if (analyzedWidth != width)
@@ -36,6 +38,8 @@ namespace DND.Gui
                 // Make me re-render completely if target contains Hanzi and script has changed.
                 if (anyTargetHanzi)
                 {
+                    textPool = null;
+                    isTextPoolNew = true;
                     measuredBlocks = null;
                     positionedBlocks = null;
                     targetHiliteIndexes = null;
@@ -59,6 +63,9 @@ namespace DND.Gui
                 pinyinSpaceWidth = sz.Width;
             }
 
+            // Create text pool if needed
+            if (textPool == null) textPool = new TextPool();
+
             // Headword and pinyin
             // Will not measure redundantly
             doAnalyzeHeadword(g);
@@ -68,6 +75,9 @@ namespace DND.Gui
             // Measure blocks in themselves on demand
             // Will not measure redundantly
             doMeasureBlocks(g);
+
+            // Finalize text pool - compact in memory
+            if (isTextPoolNew) textPool.FinishBuilding();
 
             // Arrange blocks
             float lemmaW = ((float)width) - headInfo.HeadwordRight - padMid - padRight;
@@ -126,7 +136,7 @@ namespace DND.Gui
                     {
                         Width = senseIdxWidth,
                         StickRight = true,
-                        Text = getSenseIdString(displaySenseIdx),
+                        TextPos = textPool.PoolString(getSenseIdString(displaySenseIdx)),
                         NewLine = lastWasClassifier,
                         SenseId = true
                     };
@@ -154,7 +164,7 @@ namespace DND.Gui
                 for (int i = startIX; i != newBlocks.Count; ++i)
                 {
                     Block tb = newBlocks[i];
-                    SizeF sz = g.MeasureString(tb.Text, getFont(tb.FontIdx), 65535, sf);
+                    SizeF sz = g.MeasureString(textPool.GetString(tb.TextPos), getFont(tb.FontIdx), 65535, sf);
                     tb.Width = (ushort)Math.Round(sz.Width);
                     newBlocks[i] = tb;
                 }
@@ -197,7 +207,7 @@ namespace DND.Gui
                         {
                             Block tb = new Block
                             {
-                                Text = blockStr,
+                                TextPos = textPool.PoolString(blockStr),
                                 FontIdx = fntIdxLatin,
                                 SpaceAfter = false, // will set this true for last block in "byDashes"
                             };
@@ -254,7 +264,7 @@ namespace DND.Gui
                     {
                         Block tb = new Block
                         {
-                            Text = strSimp,
+                            TextPos = textPool.PoolString(strSimp),
                             FontIdx = fntIdxZho,
                             SpaceAfter = true,
                         };
@@ -270,7 +280,7 @@ namespace DND.Gui
                         blocks[blocks.Count - 1] = xb;
                         Block tb = new Block
                         {
-                            Text = "•",
+                            TextPos = textPool.PoolString("•"),
                             FontIdx = fntIdxLatin,
                             SpaceAfter = true,
                         };
@@ -282,7 +292,7 @@ namespace DND.Gui
                     {
                         Block tb = new Block
                         {
-                            Text = strTrad,
+                            TextPos = textPool.PoolString(strTrad),
                             FontIdx = fntIdxZho,
                             SpaceAfter = true,
                         };
@@ -298,7 +308,7 @@ namespace DND.Gui
                         {
                             Block tb = new Block
                             {
-                                Text = pyPart,
+                                TextPos = textPool.PoolString(pyPart),
                                 FontIdx = fntIdxLatin,
                                 SpaceAfter = true,
                             };
@@ -571,7 +581,7 @@ namespace DND.Gui
                 // Measure each character. They may not all be hanzi: there are latin letters in some HWS
                 HeadBlock hb = new HeadBlock
                 {
-                    Char = cstr,
+                    Char = str[i],
                     Size = g.MeasureString(cstr, getFont(fntZhoHead), 65535, sf),
                     Loc = loc,
                     Faded = false,
@@ -696,11 +706,12 @@ namespace DND.Gui
                 // New pinyin block
                 PinyinBlock pb = new PinyinBlock();
                 // Text: syllable's display text
-                pb.Text = ps.GetDisplayString(true);
+                string text = ps.GetDisplayString(true);
+                pb.TextPos = textPool.PoolString(text);
                 // If text is punctuation, glue it to previous syllable
-                if (pb.Text.Length == 1 && char.IsPunctuation(pb.Text[0]) && i > 0) cx -= pinyinSpaceWidth;
+                if (text.Length == 1 && char.IsPunctuation(text[0]) && i > 0) cx -= pinyinSpaceWidth;
                 // Block's size and relative location
-                SizeF sz = g.MeasureString(pb.Text, getFont(fntPinyinHead), 65535, sf);
+                SizeF sz = g.MeasureString(text, getFont(fntPinyinHead), 65535, sf);
                 pb.Rect = new RectangleF(cx, ctop, sz.Width, sz.Height);
                 cx += sz.Width + pinyinSpaceWidth;
                 // Add block

@@ -48,6 +48,7 @@
     <Compile Include="MainForm.cs" />
     <Compile Include="OneResultControl.Analysis.cs" />
     <Compile Include="OneResultControl.Paint.cs" />
+    <Compile Include="OneResultControl.TextPool.cs" />
     <Compile Include="ResultsControl.cs" />
     <Compile Include="SearchInputControl.cs" />
     <Compile Include="SettingsControl.cs" />

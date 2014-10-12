@@ -62,11 +62,11 @@ namespace DND.Gui
         private struct Block
         {
             /// <summary>
-            /// The text to display.
+            /// Display text's position in text pool.
             /// </summary>
-            public string Text;
+            public ushort TextPos;
             /// <summary>
-            /// The block's width: rounded up to next integer
+            /// The block's width in pixels: rounded up to next integer
             /// </summary>
             public ushort Width;
             /// <summary>
@@ -144,10 +144,6 @@ namespace DND.Gui
         private class HeadBlock
         {
             /// <summary>
-            /// The hanzi character.
-            /// </summary>
-            public string Char;
-            /// <summary>
             /// The character's location in client coordinates.
             /// </summary>
             public PointF Loc;
@@ -155,6 +151,10 @@ namespace DND.Gui
             /// The character's side. Typically the standard ideographic rectangle, but can be smaller for Latn letters.
             /// </summary>
             public SizeF Size;
+            /// <summary>
+            /// The hanzi character.
+            /// </summary>
+            public char Char;
             /// <summary>
             /// If true, it's a traditional character identical to the simplified form: to be displayed in grey.
             /// </summary>
@@ -221,9 +221,9 @@ namespace DND.Gui
             /// </summary>
             public RectangleF Rect;
             /// <summary>
-            /// The syllable's display text.
+            /// Position of the syllable's display text in the text pool.
             /// </summary>
-            public string Text;
+            public ushort TextPos;
         }
 
         /// <summary>
