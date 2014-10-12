@@ -33,13 +33,13 @@ namespace DND.Gui
         private LookupThroughLinkDelegate lookupThroughLink;
 
         /// <summary>
-        /// The entry this control displays.
+        /// Actual dictionary entry. Retrieved in ctor; nulled out once analyzed for rendering.
         /// </summary>
-        public readonly CedictResult Res;
+        private CedictEntry entry;
         /// <summary>
-        /// The maximum hanzi length in the entire result set. Affects width of my headword area.
+        /// The result this control displays.
         /// </summary>
-        private readonly int maxHeadLength;
+        private readonly CedictResult res;
         /// <summary>
         /// True if my position in the results list is odd; false for even. Drives alternating BG color.
         /// </summary>
@@ -90,9 +90,9 @@ namespace DND.Gui
         /// </summary>
         private int analyzedWidth = int.MinValue;
         /// <summary>
-        /// Scripts to display (simp/trad/both). If this changes, I must re-analyze: height may grow or shrink.
+        /// Scripts to display (simp/trad/both).
         /// </summary>
-        private SearchScript analyzedScript;
+        private readonly SearchScript analyzedScript;
         /// <summary>
         /// Text pool for optimal storage of all text chunks displayed typographically in this control.
         /// </summary>
@@ -140,20 +140,23 @@ namespace DND.Gui
         /// Ctor: takes data to display.
         /// </summary>
         /// <param name="owner">Zen control that owns me.</param>
+        /// <param name="tprov">Localized display text provider.</param>
+        /// <param name="lookupThroughLink">Delegate to call when user initiates lookup by clicking on a link.</param>
+        /// <param name="entryProvider">Dictionary entry provider.</param>
         /// <param name="cr">The lookup result this control will show.</param>
         /// <param name="maxHeadLength">Longest headword in full results list.</param>
         /// <param name="script">Scripts to show in headword.</param>
         /// <param name="odd">Odd/even position in list, for alternating BG color.</param>
         public OneResultControl(ZenControl owner, ITextProvider tprov,
             LookupThroughLinkDelegate lookupThroughLink,
-            CedictResult cr, int maxHeadLength,
+            ICedictEntryProvider entryProvider, CedictResult cr,
             SearchScript script, bool odd)
             : base(owner)
         {
             this.tprov = tprov;
             this.lookupThroughLink = lookupThroughLink;
-            this.Res = cr;
-            this.maxHeadLength = maxHeadLength;
+            this.entry = entryProvider.GetEntry(cr.EntryId);
+            this.res = cr;
             this.analyzedScript = script;
             this.odd = odd;
 

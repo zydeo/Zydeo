@@ -19,34 +19,16 @@ namespace DND.Gui
         /// </summary>
         /// <param name="g">A Graphics object used for measurements.</param>
         /// <param name="width">Control's width.</param>
-        public void Analyze(Graphics g, int width, SearchScript script)
+        public void Analyze(Graphics g, int width)
         {
             bool isTextPoolNew = textPool == null;
 
             // If width or script has not changed, nothing to do.
-            if (analyzedWidth == width && script == analyzedScript) return;
-            if (analyzedWidth != width)
-            {
-                analyzedWidth = Width;
-                positionedBlocks = null;
-                targetHiliteIndexes = null;
-            }
-            if (analyzedScript != script)
-            {
-                analyzedScript = script;
-                headInfo = null;
-                // Make me re-render completely if target contains Hanzi and script has changed.
-                if (anyTargetHanzi)
-                {
-                    textPool = null;
-                    isTextPoolNew = true;
-                    measuredBlocks = null;
-                    positionedBlocks = null;
-                    targetHiliteIndexes = null;
-                    targetLinks = null;
-                }
-            }
-
+            if (analyzedWidth == width) return;
+            analyzedWidth = Width;
+            positionedBlocks = null;
+            targetHiliteIndexes = null;
+            
             // This is how we measure
             StringFormat sf = StringFormat.GenericTypographic;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
@@ -78,6 +60,8 @@ namespace DND.Gui
 
             // Finalize text pool - compact in memory
             if (isTextPoolNew) textPool.FinishBuilding();
+            // Get rid of entry. Not keeping it in memory once we're done analyzing.
+            entry = null;
 
             // Arrange blocks
             float lemmaW = ((float)width) - headInfo.HeadwordRight - padMid - padRight;
@@ -112,8 +96,8 @@ namespace DND.Gui
 
             // Create array with as many items as senses
             // Each item is null, or highlight in sense's equiv
-            CedictTargetHighlight[] hlArr = new CedictTargetHighlight[Res.Entry.SenseCount];
-            foreach (CedictTargetHighlight hl in Res.TargetHilites) hlArr[hl.SenseIx] = hl;
+            CedictTargetHighlight[] hlArr = new CedictTargetHighlight[entry.SenseCount];
+            foreach (CedictTargetHighlight hl in res.TargetHilites) hlArr[hl.SenseIx] = hl;
 
             // Recreate list of blocks
             List<Block> newBlocks = new List<Block>();
@@ -123,7 +107,7 @@ namespace DND.Gui
             int senseIdx = -1;
             int displaySenseIdx = -1;
             bool lastWasClassifier = false;
-            foreach (CedictSense cm in Res.Entry.Senses)
+            foreach (CedictSense cm in entry.Senses)
             {
                 ++senseIdx;
                 // Is this sense a classifier?
@@ -654,14 +638,14 @@ namespace DND.Gui
             bool lbrk = false;
             if (analyzedScript == SearchScript.Simplified || analyzedScript == SearchScript.Both)
             {
-                lbrk |= doAnalyzeHanzi(g, Res.Entry.ChSimpl, sf, headInfo.SimpBlocks, ref loc, headInfo.HeadwordRight);
+                lbrk |= doAnalyzeHanzi(g, entry.ChSimpl, sf, headInfo.SimpBlocks, ref loc, headInfo.HeadwordRight);
             }
             if (analyzedScript == SearchScript.Traditional || analyzedScript == SearchScript.Both)
             {
                 //loc.X = padLeft;
                 loc.X = ((float)padLeft) + ideoSize.Width;
                 if (analyzedScript == SearchScript.Both) loc.Y += ideoLineHeight;
-                lbrk |= doAnalyzeHanzi(g, Res.Entry.ChTrad, sf, headInfo.TradBlocks, ref loc, headInfo.HeadwordRight);
+                lbrk |= doAnalyzeHanzi(g, entry.ChTrad, sf, headInfo.TradBlocks, ref loc, headInfo.HeadwordRight);
             }
             // If we're displaying both simplified and traditional, fade out
             // traditional chars that are same as simplified, right above them
@@ -695,8 +679,8 @@ namespace DND.Gui
             pinyinInfo = new PinyinInfo();
             // Measure each pinyin syllable
             bool diacritics = true;
-            var pcoll = Res.Entry.GetPinyinForDisplay(diacritics,
-                Res.PinyinHiliteStart, Res.PinyinHiliteLength,
+            var pcoll = entry.GetPinyinForDisplay(diacritics,
+                res.PinyinHiliteStart, res.PinyinHiliteLength,
                 out pinyinInfo.HiliteStart, out pinyinInfo.HiliteLength);
             float cx = headInfo.HeadwordRight + (float)padMid;
             float ctop = padTop;

@@ -52,11 +52,6 @@ namespace DND.Gui
         private string txtResCount = string.Empty;
 
         /// <summary>
-        /// Currently shown scripts (simp/trad/both).
-        /// </summary>
-        private SearchScript currScript;
-
-        /// <summary>
         /// <para>Suppresses scroll changed event handler.</para>
         /// <para>Needed to avoid recursion when we set to scroll thumb upon re-layout on resize.</para>
         /// </summary>
@@ -221,7 +216,7 @@ namespace DND.Gui
                     bool odd = true;
                     foreach (OneResultControl orc in resCtrls)
                     {
-                        orc.Analyze(g, cw, currScript);
+                        orc.Analyze(g, cw);
                         orc.RelLocation = new Point(1, y + 1);
                         y += orc.Height;
                         odd = !odd;
@@ -281,7 +276,7 @@ namespace DND.Gui
             {
                 foreach (OneResultControl orc in resCtrls)
                 {
-                    orc.Analyze(g, cw, currScript);
+                    orc.Analyze(g, cw);
                 }
             }
             // Move pivot control back in place so bottom stays where it was
@@ -357,22 +352,31 @@ namespace DND.Gui
         }
 
         /// <summary>
-        /// Changes the display script, keeping existing results on screen.
+        /// Displays the received results, discarding existing data.
         /// </summary>
-        /// <param name="script">The new script(s) to show.</param>
-        public void ChangeScript(SearchScript script)
+        /// <param name="entryProvider">The entry provider; ownership passed by caller to me.</param>
+        /// <param name="results">Cedict lookup results to show.</param>
+        /// <param name="script">Defines which script(s) to show.</param>
+        public void SetResults(ICedictEntryProvider entryProvider,
+            ReadOnlyCollection<CedictResult> results,
+            SearchScript script)
         {
-            currScript = script;
-            reAnalyzeResultsDisplay();
-            MakeMePaint(false, RenderMode.Invalidate);
+            try
+            {
+                doSetResults(entryProvider, results, script);
+            }
+            finally
+            {
+                entryProvider.Dispose();
+            }
         }
 
         /// <summary>
-        /// Displays the received results, discarding existing data.
+        /// See <see cref="SetResults"/>.
         /// </summary>
-        /// <param name="results">Cedict lookup results to show.</param>
-        /// <param name="script">Defines which script(s) to show.</param>
-        public void SetResults(ReadOnlyCollection<CedictResult> results, SearchScript script)
+        private void doSetResults(ICedictEntryProvider entryProvider,
+            ReadOnlyCollection<CedictResult> results,
+            SearchScript script)
         {
             // Decide if we first try with scrollbar visible or not
             // This is a very rough heuristics (10 results or more), but doesn't matter
@@ -383,7 +387,7 @@ namespace DND.Gui
             // Content rectangle height and width
             int cw, ch;
             getContentSize(out cw, out ch);
-            
+
             // Dispose old results controls
             foreach (OneResultControl orc in resCtrls)
             {
@@ -392,7 +396,6 @@ namespace DND.Gui
             }
             resCtrls.Clear();
             firstVisibleIdx = -1;
-            currScript = script;
 
             // No results
             if (results.Count == 0)
@@ -404,9 +407,6 @@ namespace DND.Gui
                 return;
             }
 
-            // Find longest character count in headwords
-            int maxHeadLength = 0;
-            if (results.Count > 0) maxHeadLength = results.Max(r => r.Entry.ChSimpl.Length);
             // Create new result controls
             int y = 0;
             using (Bitmap bmp = new Bitmap(1, 1))
@@ -415,8 +415,8 @@ namespace DND.Gui
                 bool odd = true;
                 foreach (CedictResult cr in results)
                 {
-                    OneResultControl orc = new OneResultControl(this, tprov, lookupFromCtrl, cr, maxHeadLength, script, odd);
-                    orc.Analyze(g, cw, script);
+                    OneResultControl orc = new OneResultControl(this, tprov, lookupFromCtrl, entryProvider, cr, script, odd);
+                    orc.Analyze(g, cw);
                     orc.RelLocation = new Point(1, y + 1);
                     y += orc.Height;
                     resCtrls.Add(orc);

@@ -32,7 +32,7 @@ namespace DND.CedictEngine
         /// <summary>
         /// Retrieves matching entries for a target-language search expression.
         /// </summary>
-        private List<CedictResult> doTargetLookup(string query)
+        private List<CedictResult> doTargetLookup(BinReader br, string query)
         {
             // Empty query string: no results
             query = query.Trim();
@@ -55,67 +55,62 @@ namespace DND.CedictEngine
             if (anyUnknown) return res;
             // Collect IDs of tokenized senses that contain one or more of our query IDs
             Dictionary<int, SenseLookupInfo> senseTokenCounts = new Dictionary<int, SenseLookupInfo>();
-            using (BinReader br = new BinReader(dictFileName))
+            bool firstToken = true;
+            // For each token...
+            foreach (int tokenId in idSet)
             {
-                bool firstToken = true;
-                // For each token...
-                foreach (int tokenId in idSet)
+                // Get sense instances where it occurs
+                List<SenseInfo> instances = index.SenseIndex[tokenId].GetOrLoadInstances(br);
+                foreach (SenseInfo si in instances)
                 {
-                    // Get sense instances where it occurs
-                    List<SenseInfo> instances = index.SenseIndex[tokenId].GetOrLoadInstances(br);
-                    foreach (SenseInfo si in instances)
+                    SenseLookupInfo sli;
+                    // We already have a count for this token ID
+                    if (senseTokenCounts.ContainsKey(si.TokenizedSenseId))
+                        ++senseTokenCounts[si.TokenizedSenseId].NumOfQueryTokensInSense;
+                    // Or this is the first time we're seeing it
+                    // We only record counts for the first token
+                    // We're looking for senses that contain *all* query tokens
+                    else if (firstToken)
                     {
-                        SenseLookupInfo sli;
-                        // We already have a count for this token ID
-                        if (senseTokenCounts.ContainsKey(si.TokenizedSenseId))
-                            ++senseTokenCounts[si.TokenizedSenseId].NumOfQueryTokensInSense;
-                        // Or this is the first time we're seeing it
-                        // We only record counts for the first token
-                        // We're looking for senses that contain *all* query tokens
-                        else if (firstToken)
+                        sli = new SenseLookupInfo
                         {
-                            sli = new SenseLookupInfo
-                            {
-                                NumOfQueryTokensInSense = 0,
-                                TokensInSense = si.TokensInSense
-                            };
-                            senseTokenCounts[si.TokenizedSenseId] = sli;
-                            ++sli.NumOfQueryTokensInSense;
-                        }
+                            NumOfQueryTokensInSense = 0,
+                            TokensInSense = si.TokensInSense
+                        };
+                        senseTokenCounts[si.TokenizedSenseId] = sli;
+                        ++sli.NumOfQueryTokensInSense;
                     }
-                    firstToken = false;
                 }
-                // Keep those sense IDs (positions) that contain all of our query tokens
-                // We already eliminated some candidates through "firstToken" trick before, but not all
-                List<int> sensePosList = new List<int>();
-                foreach (var x in senseTokenCounts)
-                {
-                    if (x.Value.NumOfQueryTokensInSense == idSet.Count)
-                        sensePosList.Add(x.Key);
-                }
-                // Load each tokenized sense to find out:
-                // - whether entry is a real match
-                // - entry ID
-                // - best score for entry (multiple senses may hold query string)
-                // - highlights
-                Dictionary<int, EntryMatchInfo> entryIdToInfo = new Dictionary<int, EntryMatchInfo>();
-                foreach (int senseId in sensePosList)
-                    doVerifyTarget(txtTokenized, senseId, entryIdToInfo, br);
+                firstToken = false;
+            }
+            // Keep those sense IDs (positions) that contain all of our query tokens
+            // We already eliminated some candidates through "firstToken" trick before, but not all
+            List<int> sensePosList = new List<int>();
+            foreach (var x in senseTokenCounts)
+            {
+                if (x.Value.NumOfQueryTokensInSense == idSet.Count)
+                    sensePosList.Add(x.Key);
+            }
+            // Load each tokenized sense to find out:
+            // - whether entry is a real match
+            // - entry ID
+            // - best score for entry (multiple senses may hold query string)
+            // - highlights
+            Dictionary<int, EntryMatchInfo> entryIdToInfo = new Dictionary<int, EntryMatchInfo>();
+            foreach (int senseId in sensePosList)
+                doVerifyTarget(txtTokenized, senseId, entryIdToInfo, br);
 
-                // Sort entry IDs by their best score
-                List<EntryMatchInfo> entryInfoList = new List<EntryMatchInfo>();
-                foreach (var x in entryIdToInfo) entryInfoList.Add(x.Value);
-                    //entryInfoList.Add(new EntryMatchInfo { EntryId = x.Key, BestSenseScore = x.Value.BestSenseScore });
-                entryInfoList.Sort((a, b) => b.BestSenseScore.CompareTo(a.BestSenseScore));
-                // Load entries, wrap into results
-                foreach (EntryMatchInfo emi in entryInfoList)
-                {
-                    br.Position = emi.EntryId;
-                    CedictEntry entry = new CedictEntry(br);
-                    CedictResult cr = new CedictResult(entry,
-                        new ReadOnlyCollection<CedictTargetHighlight>(emi.TargetHilites));
-                    res.Add(cr);
-                }
+            // Sort entry IDs by their best score
+            List<EntryMatchInfo> entryInfoList = new List<EntryMatchInfo>();
+            foreach (var x in entryIdToInfo) entryInfoList.Add(x.Value);
+            //entryInfoList.Add(new EntryMatchInfo { EntryId = x.Key, BestSenseScore = x.Value.BestSenseScore });
+            entryInfoList.Sort((a, b) => b.BestSenseScore.CompareTo(a.BestSenseScore));
+            // Load entries, wrap into results
+            foreach (EntryMatchInfo emi in entryInfoList)
+            {
+                CedictResult cr = new CedictResult(emi.EntryId,
+                    new ReadOnlyCollection<CedictTargetHighlight>(emi.TargetHilites));
+                res.Add(cr);
             }
             return res;
         }

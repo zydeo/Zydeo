@@ -46,6 +46,7 @@
     <Compile Include="CedictTargetHighlight.cs" />
     <Compile Include="HybridText.cs" />
     <Compile Include="CedictLookupResult.cs" />
+    <Compile Include="ICedictEntryProvider.cs" />
     <Compile Include="PinyinSyllable.cs" />
     <Compile Include="PinyinSyllable.DisplayString.cs" />
     <Compile Include="CedictSense.cs" />

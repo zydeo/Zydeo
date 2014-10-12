@@ -218,10 +218,8 @@ namespace DND.Gui
             if (dict == null) return;
             CedictLookupResult res = dict.Lookup(text, searchScript, SearchLang.Chinese);
             if (sender == siCtrl) siCtrl.SelectAll();
-            resCtrl.SetResults(res.Results, searchScript);
-            // DBG
-            GC.Collect();
-            GC.Collect();
+            // Call below transfers ownership of entry provider to results control.
+            resCtrl.SetResults(res.EntryProvider, res.Results, searchScript);
         }
 
         private int getSimpTradWidth()
@@ -255,8 +253,6 @@ namespace DND.Gui
             setSimpTradText();
             // Re-recognize strokes, if there are any
             startNewCharRecog(writingPad.Strokes);
-            // Re-render results list with desired script(s) shown
-            resCtrl.ChangeScript(searchScript);
         }
 
         private void cpCtrl_CharPicked(char c)

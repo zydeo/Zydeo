@@ -33,9 +33,9 @@ namespace DND.Common
         public readonly SimpTradWarning HanziWarning;
 
         /// <summary>
-        /// The CEDICT entry.
+        /// ID of the CEDICT entry.
         /// </summary>
-        public readonly CedictEntry Entry;
+        public readonly int EntryId;
 
         /// <summary>
         /// Start of search term in entry's headword (Hanzi), or -1.
@@ -73,9 +73,8 @@ namespace DND.Common
         /// <summary>
         /// Ctor: init immutable instance - result of target lookup.
         /// </summary>
-        public CedictResult(CedictEntry entry, ReadOnlyCollection<CedictTargetHighlight> targetHilites)
+        public CedictResult(int entryId, ReadOnlyCollection<CedictTargetHighlight> targetHilites)
         {
-            if (entry == null) throw new ArgumentNullException("entry");
             if (targetHilites == null) throw new ArgumentNullException("targetHilites");
 
             this.targetHilites = new CedictTargetHighlight[targetHilites.Count];
@@ -85,7 +84,7 @@ namespace DND.Common
                 this.targetHilites[i] = targetHilites[i];
             }
             HanziWarning = SimpTradWarning.None;
-            Entry = entry;
+            EntryId = entryId;
             HanziHiliteStart = -1;
             HanziHiliteLength = 0;
             PinyinHiliteStart = -1;
@@ -95,39 +94,35 @@ namespace DND.Common
         /// <summary>
         /// Ctor: init immutable instance - result of hanzi lookup.
         /// </summary>
-        public CedictResult(SimpTradWarning hanziWarning, CedictEntry entry,
+        public CedictResult(SimpTradWarning hanziWarning, int entryId, ReadOnlyCollection<short> hanziPinyinMap,
             int hanziHiliteStart, int hanziHiliteLength)
         {
-            if (entry == null) throw new ArgumentNullException("entry");
-
             targetHilites = new CedictTargetHighlight[0];
             HanziWarning = hanziWarning;
-            Entry = entry;
+            EntryId = entryId;
             HanziHiliteStart = hanziHiliteStart;
             HanziHiliteLength = hanziHiliteLength;
-            calculatePinyinHighlights(out PinyinHiliteStart, out PinyinHiliteLength);
+            calculatePinyinHighlights(hanziPinyinMap, out PinyinHiliteStart, out PinyinHiliteLength);
         }
 
         /// <summary>
         /// Ctor: init immutable instance - result of pinyin lookup.
         /// </summary>
-        public CedictResult(CedictEntry entry,
+        public CedictResult(int entryId, ReadOnlyCollection<short> hanziPinyinMap,
             int pinyinHiliteStart, int pinyinHiliteLength)
         {
-            if (entry == null) throw new ArgumentNullException("entry");
-
             targetHilites = new CedictTargetHighlight[0];
             HanziWarning = SimpTradWarning.None;
-            Entry = entry;
+            EntryId = entryId;
             PinyinHiliteStart = pinyinHiliteStart;
             PinyinHiliteLength = pinyinHiliteLength;
-            calculateHanziHighlights(out HanziHiliteStart, out HanziHiliteLength);
+            calculateHanziHighlights(hanziPinyinMap, out HanziHiliteStart, out HanziHiliteLength);
         }
 
         /// <summary>
         /// Calculates hanzi highlights from pinyin highlights.
         /// </summary>
-        private void calculateHanziHighlights(out int hhStart, out int hhLength)
+        private void calculateHanziHighlights(ReadOnlyCollection<short> hanziPinyinMap, out int hhStart, out int hhLength)
         {
             // No pinyin highlights either.
             if (PinyinHiliteStart == -1)
@@ -138,7 +133,7 @@ namespace DND.Common
             }
             int first = -1;
             int lastResolved = -1;
-            ReadOnlyCollection<short> map = Entry.HanziPinyinMap;
+            ReadOnlyCollection<short> map = hanziPinyinMap;
             for (int i = 0; i != map.Count; ++i)
             {
                 int pix = map[i];
@@ -167,7 +162,7 @@ namespace DND.Common
         /// <summary>
         /// Calculates pinyin highlights from hanzi highlights.
         /// </summary>
-        private void calculatePinyinHighlights(out int phStart, out int phLength)
+        private void calculatePinyinHighlights(ReadOnlyCollection<short> hanziPinyinMap, out int phStart, out int phLength)
         {
             // No hanzi highlights either.
             if (HanziHiliteStart == -1)
@@ -178,7 +173,7 @@ namespace DND.Common
             }
             int first = -1;
             int lastResolved = -1;
-            ReadOnlyCollection<short> map = Entry.HanziPinyinMap;
+            ReadOnlyCollection<short> map = hanziPinyinMap;
             for (int i = HanziHiliteStart; i != HanziHiliteStart + HanziHiliteLength; ++i)
             {
                 int pix = map[i];

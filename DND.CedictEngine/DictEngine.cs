@@ -53,41 +53,77 @@ namespace DND.CedictEngine
         }
 
         /// <summary>
+        /// Entry provider returned to caller after every lookup.
+        /// </summary>
+        private class EntryProvider : ICedictEntryProvider
+        {
+            /// <summary>
+            /// Binary deserializer holding an open stream of dictionary file.
+            /// </summary>
+            private readonly BinReader br;
+
+            /// <summary>
+            /// Ctor: takes ownership of binary deserializer.
+            /// </summary>
+            /// <param name="br"></param>
+            public EntryProvider(BinReader br)
+            {
+                if (br == null) throw new ArgumentNullException("br");
+                this.br = br;
+            }
+
+            /// <summary>
+            /// Closes file stream.
+            /// </summary>
+            public void Dispose()
+            {
+                br.Dispose();
+            }
+
+            /// <summary>
+            /// Returns the dictionary entry identified by the provided file position.
+            /// </summary>
+            public CedictEntry GetEntry(int entryId)
+            {
+                br.Position = entryId;
+                return new CedictEntry(br);
+            }
+        }
+
+        /// <summary>
         /// Retrieves hanzi lookup candidates, verifies actual presence of search expression in headword.
         /// </summary>
-        List<CedictResult> doLoadVerifyHanzi(IEnumerable<int> poss, string query, SearchScript script)
+        List<ResWithEntry> doLoadVerifyHanzi(BinReader br, IEnumerable<int> poss, string query, SearchScript script)
         {
-            List<CedictResult> resList = new List<CedictResult>();
+            List<ResWithEntry> resList = new List<ResWithEntry>();
             // Yes, we only open our file on-demand
             // But we do this within each lookup's scope, so lookup stays thread-safe
-            using (BinReader br = new BinReader(dictFileName))
+            // Look at each entry: load, verify, keep or drop
+            foreach (int pos in poss)
             {
-                // Look at each entry: load, verify, keep or drop
-                foreach (int pos in poss)
+                // Load up entry from file
+                br.Position = pos;
+                CedictEntry entry = new CedictEntry(br);
+                // Figure out position/length of query string in simplified and traditional headwords
+                int hiliteStart = -1;
+                int hiliteLength = 0;
+                hiliteStart = entry.ChSimpl.IndexOf(query);
+                if (hiliteStart != -1) hiliteLength = query.Length;
+                // If not found in simplified, check in traditional
+                if (hiliteLength == 0)
                 {
-                    // Load up entry from file
-                    br.Position = pos;
-                    CedictEntry entry = new CedictEntry(br);
-                    // Figure out position/length of query string in simplified and traditional headwords
-                    int hiliteStart = -1;
-                    int hiliteLength = 0;
-                    hiliteStart = entry.ChSimpl.IndexOf(query);
+                    hiliteStart = entry.ChTrad.IndexOf(query);
                     if (hiliteStart != -1) hiliteLength = query.Length;
-                    // If not found in simplified, check in traditional
-                    if (hiliteLength == 0)
-                    {
-                        hiliteStart = entry.ChTrad.IndexOf(query);
-                        if (hiliteStart != -1) hiliteLength = query.Length;
-                    }
-                    // Entry is a keeper if either source or target headword contains query
-                    if (hiliteLength != 0)
-                    {
-                        // TO-DO: indicate wrong script in result
-                        CedictResult res = new CedictResult(CedictResult.SimpTradWarning.None,
-                            entry,
-                            hiliteStart, hiliteLength);
-                        resList.Add(res);
-                    }
+                }
+                // Entry is a keeper if either source or target headword contains query
+                if (hiliteLength != 0)
+                {
+                    // TO-DO: indicate wrong script in result
+                    CedictResult res = new CedictResult(CedictResult.SimpTradWarning.None,
+                        pos, entry.HanziPinyinMap,
+                        hiliteStart, hiliteLength);
+                    ResWithEntry resWE = new ResWithEntry(res, entry);
+                    resList.Add(resWE);
                 }
             }
             return resList;
@@ -96,13 +132,13 @@ namespace DND.CedictEngine
         /// <summary>
         /// Compares lookup results after hanzi lookup for sorted presentation.
         /// </summary>
-        private static int hrComp(CedictResult a, CedictResult b)
+        private static int hrComp(ResWithEntry a, ResWithEntry b)
         {
             // Shorter entry comes first
             int lengthCmp = a.Entry.ChSimpl.Length.CompareTo(b.Entry.ChSimpl.Length);
             if (lengthCmp != 0) return lengthCmp;
             // Between equally long headwords where match starts sooner comes first
-            int startCmp = a.HanziHiliteStart.CompareTo(b.HanziHiliteStart);
+            int startCmp = a.Res.HanziHiliteStart.CompareTo(b.Res.HanziHiliteStart);
             if (startCmp != 0) return startCmp;
             // Order equally long entries by pinyin lexicographical order
             return a.Entry.PinyinCompare(b.Entry);
@@ -111,7 +147,7 @@ namespace DND.CedictEngine
         /// <summary>
         /// Retrieves entries (sorted) whose headword contains hanzi from search expression.
         /// </summary>
-        List<CedictResult> doHanziLookupHead(string query, SearchScript script)
+        List<CedictResult> doHanziLookupHead(BinReader br, string query, SearchScript script)
         {
             // Get every character once - we ignore repeats
             HashSet<char> queryChars = new HashSet<char>();
@@ -144,54 +180,68 @@ namespace DND.CedictEngine
             foreach (var x in posToCountSimp) if (x.Value == queryChars.Count) matchingPositions.Add(x.Key);
             foreach (var x in posToCountTrad) if (x.Value == queryChars.Count) matchingPositions.Add(x.Key);
             // Now fetch and verify results
-            List<CedictResult> res = doLoadVerifyHanzi(matchingPositions, query, script);
+            List<ResWithEntry> resWE = doLoadVerifyHanzi(br, matchingPositions, query, script);
             // Sort hanzi results
-            res.Sort((a, b) => hrComp(a, b));
+            resWE.Sort((a, b) => hrComp(a, b));
             // Done.
+            List<CedictResult> res = new List<CedictResult>(resWE.Capacity);
+            for (int i = 0; i != resWE.Count; ++i) res.Add(resWE[i].Res);
             return res;
+        }
+
+        /// <summary>
+        /// A lookup result with its loaded entry; needed to be able to sort results before throwing away entry itself.
+        /// </summary>
+        private struct ResWithEntry
+        {
+            public readonly CedictResult Res;
+            public readonly CedictEntry Entry;
+            public ResWithEntry(CedictResult res, CedictEntry entry)
+            {
+                Res = res;
+                Entry = entry;
+            }
         }
 
         /// <summary>
         /// Retrieves pinyin lookup candidates, verifies actual presence of search expression in headword.
         /// </summary>
-        List<CedictResult> doLoadVerifyPinyin(IEnumerable<int> poss, List<PinyinSyllable> sylls)
+        List<ResWithEntry> doLoadVerifyPinyin(BinReader br, IEnumerable<int> poss, List<PinyinSyllable> sylls)
         {
-            List<CedictResult> resList = new List<CedictResult>();
+            List<ResWithEntry> resList = new List<ResWithEntry>();
             // Yes, we only open our file on-demand
             // But we do this within each lookup's scope, so lookup stays thread-safe
-            using (BinReader br = new BinReader(dictFileName))
+            // Look at each entry: load, verify, keep or drop
+            foreach (int pos in poss)
             {
-                // Look at each entry: load, verify, keep or drop
-                foreach (int pos in poss)
-                {
-                    // Load up entry from file
-                    br.Position = pos;
-                    CedictEntry entry = new CedictEntry(br);
+                // Load up entry from file
+                br.Position = pos;
+                CedictEntry entry = new CedictEntry(br);
 
-                    // Find query syllables in entry
-                    int syllStart = -1;
-                    for (int i = 0; i <= entry.PinyinCount - sylls.Count; ++i)
+                // Find query syllables in entry
+                int syllStart = -1;
+                for (int i = 0; i <= entry.PinyinCount - sylls.Count; ++i)
+                {
+                    int j;
+                    for (j = 0; j != sylls.Count; ++j)
                     {
-                        int j;
-                        for (j = 0; j != sylls.Count; ++j)
-                        {
-                            PinyinSyllable syllEntry = entry.GetPinyinAt(i + j);
-                            PinyinSyllable syllQuery = sylls[j];
-                            if (syllEntry.Text.ToLowerInvariant() != syllQuery.Text) break;
-                            if (syllQuery.Tone != -1 && syllEntry.Tone != syllQuery.Tone) break;
-                        }
-                        if (j == sylls.Count)
-                        {
-                            syllStart = i;
-                            break;
-                        }
+                        PinyinSyllable syllEntry = entry.GetPinyinAt(i + j);
+                        PinyinSyllable syllQuery = sylls[j];
+                        if (syllEntry.Text.ToLowerInvariant() != syllQuery.Text) break;
+                        if (syllQuery.Tone != -1 && syllEntry.Tone != syllQuery.Tone) break;
                     }
-                    // Entry is a keeper if query syllables found
-                    if (syllStart == -1) continue;
-                    // Keeper!
-                    CedictResult res = new CedictResult(entry, syllStart, sylls.Count);
-                    resList.Add(res);
+                    if (j == sylls.Count)
+                    {
+                        syllStart = i;
+                        break;
+                    }
                 }
+                // Entry is a keeper if query syllables found
+                if (syllStart == -1) continue;
+                // Keeper!
+                CedictResult res = new CedictResult(pos, entry.HanziPinyinMap, syllStart, sylls.Count);
+                ResWithEntry resWE = new ResWithEntry(res, entry);
+                resList.Add(resWE);
             }
             return resList;
         }
@@ -199,13 +249,13 @@ namespace DND.CedictEngine
         /// <summary>
         /// Compares lookup results after pinyin lookup for sorted presentation.
         /// </summary>
-        private static int pyComp(CedictResult a, CedictResult b)
+        private static int pyComp(ResWithEntry a, ResWithEntry b)
         {
             // Shorter entry comes first
             int lengthCmp = a.Entry.PinyinCount.CompareTo(b.Entry.PinyinCount);
             if (lengthCmp != 0) return lengthCmp;
             // Between equally long headwords where match starts sooner comes first
-            int startCmp = a.PinyinHiliteStart.CompareTo(b.PinyinHiliteStart);
+            int startCmp = a.Res.PinyinHiliteStart.CompareTo(b.Res.PinyinHiliteStart);
             if (startCmp != 0) return startCmp;
             // Order equally long entries by pinyin lexicographical order
             return a.Entry.PinyinCompare(b.Entry);
@@ -214,7 +264,7 @@ namespace DND.CedictEngine
         /// <summary>
         /// Retrieves entries (sorted) whose headword contains pinyin from search expression.
         /// </summary>
-        List<CedictResult> doPinyinLookupHead(List<PinyinSyllable> sylls)
+        List<CedictResult> doPinyinLookupHead(BinReader br, List<PinyinSyllable> sylls)
         {
             // Get every syllable once - we ignore repeats
             // If a syllable occurs with unspecified tone once, or if it occurs with multiple tone marks
@@ -278,10 +328,12 @@ namespace DND.CedictEngine
             HashSet<int> matchingPositions = new HashSet<int>();
             foreach (var x in posToCount) if (x.Value == querySylls.Count) matchingPositions.Add(x.Key);
             // Now fetch and verify results
-            List<CedictResult> res = doLoadVerifyPinyin(matchingPositions, sylls);
+            List<ResWithEntry> resWE = doLoadVerifyPinyin(br, matchingPositions, sylls);
             // Sort pinyin results
-            res.Sort((a, b) => pyComp(a, b));
+            resWE.Sort((a, b) => pyComp(a, b));
             // Done.
+            List<CedictResult> res = new List<CedictResult>(resWE.Capacity);
+            for (int i = 0; i != resWE.Count; ++i) res.Add(resWE[i].Res);
             return res;
         }
 
@@ -385,18 +437,18 @@ namespace DND.CedictEngine
         /// <summary>
         /// Retrieves entries for a Chinese search expression (pinyin vs. hanzi auto-detected)
         /// </summary>
-        private List<CedictResult> doChineseLookup(string query, SearchScript script)
+        private List<CedictResult> doChineseLookup(BinReader br, string query, SearchScript script)
         {
             List<CedictResult> res = new List<CedictResult>();
             // If query string has ideographic characters, do hanzi looup
-            if (hasIdeo(query)) res = doHanziLookupHead(query, script);
+            if (hasIdeo(query)) res = doHanziLookupHead(br, query, script);
             // Otherwise, do pinyin lookup
             else
             {
                 // Parse pinyin query string
                 List<PinyinSyllable> sylls = doParsePinyin(query);
                 // Lookup
-                res = doPinyinLookupHead(sylls);
+                res = doPinyinLookupHead(br, sylls);
             }
             // Done
             return res;
@@ -412,36 +464,47 @@ namespace DND.CedictEngine
         public CedictLookupResult Lookup(string query, SearchScript script, SearchLang lang)
         {
             List<CedictResult> res = new List<CedictResult>();
-            
-            // Try first in language requested by user
-            // If no results that way, try in opposite language
-            // Override if lookup in opposite language is successful
-            if (lang == SearchLang.Chinese)
+            // BinReader: I own it until I successfully return results to caller.
+            BinReader br = new BinReader(dictFileName);
+            EntryProvider ep = new EntryProvider(br);
+
+            try
             {
-                res = doChineseLookup(query, script);
-                // We got fish
-                if (res.Count > 0)
-                    return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), lang);
-                // OK, try opposite (target)
-                res = doTargetLookup(query);
-                // We got fish: override
-                if (res.Count > 0)
-                    return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), SearchLang.Target);
+                // Try first in language requested by user
+                // If no results that way, try in opposite language
+                // Override if lookup in opposite language is successful
+                if (lang == SearchLang.Chinese)
+                {
+                    res = doChineseLookup(br, query, script);
+                    // We got fish
+                    if (res.Count > 0)
+                        return new CedictLookupResult(ep, new ReadOnlyCollection<CedictResult>(res), lang);
+                    // OK, try opposite (target)
+                    res = doTargetLookup(br, query);
+                    // We got fish: override
+                    if (res.Count > 0)
+                        return new CedictLookupResult(ep, new ReadOnlyCollection<CedictResult>(res), SearchLang.Target);
+                }
+                else
+                {
+                    res = doTargetLookup(br, query);
+                    // We got fish
+                    if (res.Count > 0)
+                        return new CedictLookupResult(ep, new ReadOnlyCollection<CedictResult>(res), lang);
+                    // OK, try opposite (target)
+                    res = doChineseLookup(br, query, script);
+                    // We got fish: override
+                    if (res.Count > 0)
+                        return new CedictLookupResult(ep, new ReadOnlyCollection<CedictResult>(res), SearchLang.Chinese);
+                }
+                // Sorry, no results, no override
+                return new CedictLookupResult(ep, new ReadOnlyCollection<CedictResult>(res), lang);
             }
-            else
+            catch
             {
-                res = doTargetLookup(query);
-                // We got fish
-                if (res.Count > 0)
-                    return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), lang);
-                // OK, try opposite (target)
-                res = doChineseLookup(query, script);
-                // We got fish: override
-                if (res.Count > 0)
-                    return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), SearchLang.Chinese);
+                br.Dispose();
+                throw;
             }
-            // Sorry, no results, no override
-            return new CedictLookupResult(new ReadOnlyCollection<CedictResult>(res), lang);
         }
     }
 }

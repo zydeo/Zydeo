@@ -12,7 +12,12 @@ namespace DND.Common
     public class CedictLookupResult
     {
         /// <summary>
-        /// Matching entries retrieved from the dictionary.
+        /// Entry provider for retrieving actual dictionary entries. Caller owns it (must dispose it).
+        /// </summary>
+        public readonly ICedictEntryProvider EntryProvider;
+
+        /// <summary>
+        /// Results of the dictionary query.
         /// </summary>
         public readonly ReadOnlyCollection<CedictResult> Results;
 
@@ -25,9 +30,11 @@ namespace DND.Common
         /// <summary>
         /// Ctor: intialize immutable object.
         /// </summary>
-        public CedictLookupResult(ReadOnlyCollection<CedictResult> results,
+        public CedictLookupResult(ICedictEntryProvider entryProvider,
+            ReadOnlyCollection<CedictResult> results,
             SearchLang actualSearchLang)
         {
+            EntryProvider = entryProvider;
             Results = results;
             ActualSearchLang = actualSearchLang;
         }

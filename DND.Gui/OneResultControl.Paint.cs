@@ -18,7 +18,7 @@ namespace DND.Gui
         /// </summary>
         private void doPaintHanziHilites(Graphics g, Color bgcol)
         {
-            if (Res.HanziHiliteStart == -1)
+            if (res.HanziHiliteStart == -1)
                 return;
 
             g.SmoothingMode = SmoothingMode.None;
@@ -35,21 +35,21 @@ namespace DND.Gui
                 if (headInfo.SimpBlocks.Count != 0)
                 {
                     // Solid highlight on each character
-                    for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
+                    for (int ix = res.HanziHiliteStart; ix != res.HanziHiliteStart + res.HanziHiliteLength; ++ix)
                     {
                         hb = headInfo.SimpBlocks[ix];
                         rect = new RectangleF(hb.Loc.X, hb.Loc.Y, hb.Size.Width, si.RealRect.Height);
                         g.FillRectangle(b, rect);
                     }
                     // First and last chars get gradient on left and right
-                    hb = headInfo.SimpBlocks[Res.HanziHiliteStart];
+                    hb = headInfo.SimpBlocks[res.HanziHiliteStart];
                     rect = new RectangleF(hb.Loc.X, hb.Loc.Y, gradw, si.RealRect.Height);
                     rect.X -= gradext;
                     using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, ZenParams.HiliteColor, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lgb, rect);
                     }
-                    hb = headInfo.SimpBlocks[Res.HanziHiliteStart + Res.HanziHiliteLength - 1];
+                    hb = headInfo.SimpBlocks[res.HanziHiliteStart + res.HanziHiliteLength - 1];
                     rect = new RectangleF(hb.Loc.X + hb.Size.Width, hb.Loc.Y, gradw, si.RealRect.Height);
                     rect.X += gradext;
                     rect.X -= gradw;
@@ -62,21 +62,21 @@ namespace DND.Gui
                 if (headInfo.TradBlocks.Count != 0)
                 {
                     // Solid highlight on each character
-                    for (int ix = Res.HanziHiliteStart; ix != Res.HanziHiliteStart + Res.HanziHiliteLength; ++ix)
+                    for (int ix = res.HanziHiliteStart; ix != res.HanziHiliteStart + res.HanziHiliteLength; ++ix)
                     {
                         hb = headInfo.TradBlocks[ix];
                         rect = new RectangleF(hb.Loc.X, hb.Loc.Y, hb.Size.Width, si.RealRect.Height);
                         g.FillRectangle(b, rect);
                     }
                     // First and last chars get gradient on left and right
-                    hb = headInfo.TradBlocks[Res.HanziHiliteStart];
+                    hb = headInfo.TradBlocks[res.HanziHiliteStart];
                     rect = new RectangleF(hb.Loc.X, hb.Loc.Y, gradw, si.RealRect.Height);
                     rect.X -= gradext;
                     using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, ZenParams.HiliteColor, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lgb, rect);
                     }
-                    hb = headInfo.TradBlocks[Res.HanziHiliteStart + Res.HanziHiliteLength - 1];
+                    hb = headInfo.TradBlocks[res.HanziHiliteStart + res.HanziHiliteLength - 1];
                     rect = new RectangleF(hb.Loc.X + hb.Size.Width, hb.Loc.Y, gradw, si.RealRect.Height);
                     rect.X += gradext;
                     rect.X -= gradw;
@@ -323,7 +323,7 @@ namespace DND.Gui
         {
             // If size changed and we get a pain requested without having re-analized:
             // Analyze now. Not the best time here in paint, but must do.
-            if (analyzedWidth != Width) Analyze(g, Width, analyzedScript);
+            if (analyzedWidth != Width) Analyze(g, Width);
 
             // Background. Alternating at that!
             Color bgcol = odd ? Color.FromArgb(248, 248, 255) : Color.White;
