@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharPicker.cs" />
+    <Compile Include="FontPool.cs" />
     <Compile Include="HanziMeasure.cs" />
     <Compile Include="LookupControl.cs" />
     <Compile Include="Magic.cs" />

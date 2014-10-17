@@ -139,7 +139,7 @@ namespace DND.Gui
             // This character is very tall and pretty wide. Oh beautiful life.
             string testStr = "蠹";
             StringFormat sf = StringFormat.GenericTypographic;
-            using (Font fnt = new Font(fk.Face, fk.Size))
+            using (Font fnt = FontPool.GetFont(fk.Face, fk.Size, FontStyle.Regular))
             {
                 // To measure alleged size, just use a 1px bitmap
                 using (Bitmap bmp = new Bitmap(1, 1))

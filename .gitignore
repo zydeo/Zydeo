@@ -19,9 +19,11 @@ obj/
 _ReSharper*/
 
 # Work folder: include only character and strokes data
+# And font
 _work/*
 !_work/*.txt
 !_work/charstats.xlsx
+!_work/*.ttc
 
 # Bin folder: ignore altogether
 _bin/*
