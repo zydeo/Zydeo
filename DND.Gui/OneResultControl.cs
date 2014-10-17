@@ -185,12 +185,12 @@ namespace DND.Gui
         /// </summary>
         static OneResultControl()
         {
-            fntArr[fntZhoHead] = new Font(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
+            fntArr[fntZhoHead] = new Font(ZenParams.ZhoContentFontFamily, ZenParams.ZhoResultFontSize);
             fntArr[fntPinyinHead] = new Font(ZenParams.PinyinFontFamily, ZenParams.PinyinFontSize, FontStyle.Bold);
             fntArr[fntSenseLatin] = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize);
-            fntArr[fntSenseHanzi] = new Font(ZenParams.ZhoFontFamily, ZenParams.LemmaFontSize * 1.2F);
+            fntArr[fntSenseHanzi] = new Font(ZenParams.ZhoContentFontFamily, ZenParams.LemmaFontSize * 1.2F);
             fntArr[fntMetaLatin] = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize, FontStyle.Italic);
-            fntArr[fntMetaHanzi] = new Font(ZenParams.ZhoFontFamily, ZenParams.LemmaFontSize * 1.2F, FontStyle.Italic);
+            fntArr[fntMetaHanzi] = new Font(ZenParams.ZhoContentFontFamily, ZenParams.LemmaFontSize * 1.2F, FontStyle.Italic);
             fntArr[fntSenseId] = new Font(ZenParams.LemmaFontFamily, ZenParams.LemmaFontSize * 0.8F);
 
             // Sense ID strings

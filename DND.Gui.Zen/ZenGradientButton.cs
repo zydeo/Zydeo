@@ -49,6 +49,11 @@ namespace DND.Gui.Zen
         private float forcedCharHeight = 0;
 
         /// <summary>
+        /// If specified, offset seeingly idealy position of text - needed for Chinese text.
+        /// </summary>
+        private float forcedCharVertOfs = 0;
+
+        /// <summary>
         /// Image to show on button.
         /// </summary>
         private Image image = null;
@@ -136,6 +141,14 @@ namespace DND.Gui.Zen
         }
 
         /// <summary>
+        /// Set vertical offset of text, for correct display of Hanzi.
+        /// </summary>
+        public float ForcedCharVertOfs
+        {
+            set { forcedCharVertOfs = value; }
+        }
+
+        /// <summary>
         /// Gets or sets image. Button takes ownership: will dispose image.
         /// </summary>
         public Image Image
@@ -196,7 +209,15 @@ namespace DND.Gui.Zen
             if (image == null) return w + 2 * padding;
             // Otherwise, image takes up control height on left; plus text; plus pad right
             return Height + w + padding;
+        }
 
+        /// <summary>
+        /// Flashes up button (animation) as if it were clicked.
+        /// </summary>
+        public void Flash()
+        {
+            if (!enabled) return;
+            doStartPressAnim(PressType.Flash);
         }
 
         /// <summary>
@@ -215,7 +236,7 @@ namespace DND.Gui.Zen
         {
             if (!enabled) return;
             doStartHoverAnim(false);
-            doStartPressAnim(false);
+            doStartPressAnim(PressType.NotPressed);
         }
 
         /// <summary>
@@ -233,7 +254,7 @@ namespace DND.Gui.Zen
         public override bool DoMouseDown(Point p, MouseButtons button)
         {
             if (!enabled) return true;
-            doStartPressAnim(true);
+            doStartPressAnim(PressType.Pressed);
             return true;
         }
 
@@ -243,7 +264,7 @@ namespace DND.Gui.Zen
         public override bool DoMouseUp(Point p, MouseButtons button)
         {
             if (!enabled) return true;
-            doStartPressAnim(false);
+            doStartPressAnim(PressType.NotPressed);
             FireClick();
             return true;
         }
@@ -277,20 +298,36 @@ namespace DND.Gui.Zen
         private int pressAnimState = 0;
 
         /// <summary>
+        /// Types of press/release animations.
+        /// </summary>
+        private enum PressType
+        {
+            // Button is pressed (mouse down).
+            Pressed,
+            // Button is released (mouse up).
+            NotPressed,
+            // Button must flash up.
+            Flash,
+        }
+
+        /// <summary>
         /// Starts the button pressed animation.
         /// </summary>
         /// <param name="isPressed">If true, transitions into presesd; if false, transitions out of it.</param>
-        private void doStartPressAnim(bool isPressed)
+        private void doStartPressAnim(PressType pressType)
         {
             lock (animLO)
             {
                 // If invoked but we're fully unpressed: nothing to do.
-                if (!isPressed && pressAnimVal == 0) return;
+                if (pressType == PressType.NotPressed && pressAnimVal == 0) return;
                 // If "not pressed" but we're just transitioning into pressed: make it a return trip.
-                if (!isPressed && pressAnimState == 1)
+                // Also make it a return trip if we're fully unpressed and just need to flash.
+                if (pressType == PressType.NotPressed && pressAnimState == 1)
+                    pressAnimState = 2;
+                else if (pressType == PressType.Flash)
                     pressAnimState = 2;
                 else
-                    pressAnimState = isPressed ? 1 : -1;
+                    pressAnimState = pressType == PressType.Pressed ? 1 : -1;
             }
             SubscribeToTimer();
             MakeMePaint(false, RenderMode.Invalidate);
@@ -521,7 +558,8 @@ namespace DND.Gui.Zen
                 // Aligner to center, both horizontally & vertically
                 int txtTop = (int)(((float)Height) * 0.5F - (textSize.Height / 2.0F));
                 // For Hanzi, need different strategy
-                if (forcedCharHeight != 0) txtTop = (int)(((float)Height) * 0.5F - (forcedCharHeight / 2.0F));
+                if (forcedCharHeight != 0)
+                    txtTop = (int)(((float)Height) * 0.5F - (forcedCharHeight / 2.0F) + forcedCharVertOfs);
                 RectangleF textRect = new RectangleF(txtLeft, txtTop, textSize.Width + 1, textSize.Height + 1);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
                 StringFormat sf = StringFormat.GenericTypographic;

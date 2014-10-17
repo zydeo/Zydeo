@@ -32,7 +32,7 @@ namespace DND.Gui
             txtInput.BorderStyle = BorderStyle.None;
             txtInput.TabIndex = 0;
             RegisterWinFormsControl(txtInput);
-            string fface = ZenParams.ZhoFontFamily;
+            string fface = ZenParams.ZhoButtonFontFamily;
             txtInput.Font = new System.Drawing.Font(fface, 16F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
             txtInput.AutoSize = false;
             txtInput.Height = txtInput.PreferredHeight + padding;
@@ -63,6 +63,28 @@ namespace DND.Gui
             txtInput.MouseLeave += onTxtMouseLeave;
         }
 
+        protected override void OnSizeChanged()
+        {
+            if (blockSizeChanged) return;
+
+            // The height of the text box and icons
+            int ctrlHeight = Height - 2 * padding;
+            // Position and height below is suitable for Noto, but not for Segoe.
+            //int textBoxHeight = Height - 2 * padding;
+            //int textBoxTop = AbsTop + padding;
+            int textBoxHeight = Height - padding;
+            int textBoxTop = AbsTop + 1;
+            // Text field: search icon on left, X icon on right
+            // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
+            // Position below is suitable for Noto, but not for Segoe.
+            //txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + padding);
+            txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + 1);
+            txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, textBoxHeight);
+
+            // Cancel button: right-aligned
+            btnCancel.RelLocation = new Point(Width - padding - btnCancel.Width, 2 * padding / 3);
+        }
+
         public override void Dispose()
         {
             base.Dispose();
@@ -83,21 +105,6 @@ namespace DND.Gui
         {
             get { return txtInput.Text; }
             set { txtInput.Text = value; }
-        }
-
-        protected override void OnSizeChanged()
-        {
-            if (blockSizeChanged) return;
-
-            // The height of the text box and icons
-            int ctrlHeight = Height - 2 * padding;
-            // Text field: search icon on left, X icon on right
-            // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
-            txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + padding);
-            txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, ctrlHeight);
-
-            // Cancel button: right-aligned
-            btnCancel.RelLocation = new Point(Width - padding - btnCancel.Width, 2 * padding / 3);
         }
 
         private void doStartSearch()

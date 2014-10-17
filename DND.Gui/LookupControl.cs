@@ -15,32 +15,82 @@ using DND.Gui.Zen;
 
 namespace DND.Gui
 {
+    /// <summary>
+    /// Tab control that includes writing pad, search text entry field, results etc.
+    /// </summary>
     internal class LookupControl : ZenControl
     {
+        /// <summary>
+        /// Dictionary factory: we use this to create dictionary in worker thread, after startup, when window is already shown.
+        /// </summary>
         private readonly ICedictEngineFactory dictFact;
+        /// <summary>
+        /// Localized UI texts.
+        /// </summary>
         private readonly ITextProvider tprov;
+        /// <summary>
+        /// Padding at our current scaling factor.
+        /// </summary>
         private readonly int padding;
 
+        /// <summary>
+        /// Script: for results display, and filter for character recognition.
+        /// </summary>
         private SearchScript searchScript = SearchScript.Simplified;
 
-        private const double looseness = 0.25;  // the "looseness" of lookup, 0-1, higher == looser, looser more computationally intensive
-        private const int numResults = 15;      // maximum number of results to return with each lookup
+        /// <summary>
+        /// Search language preference.
+        /// </summary>
+        private SearchLang searchLang = SearchLang.Chinese;
+
+        // --- To remove after refactoring HanziLookup
         private FileStream fsStrokes;
         private BinaryReader brStrokes;
         private StrokesDataSource strokesData;
+        private readonly HashSet<StrokesMatcher> runningMatchers = new HashSet<StrokesMatcher>();
+        // --- END To remove after refactoring HanziLookup
 
+        /// <summary>
+        /// My dictionary engine, used for lookup.
+        /// </summary>
         private ICedictEngine dict;
 
+        /// <summary>
+        /// Writing pad control.
+        /// </summary>
         private WritingPad writingPad;
+        /// <summary>
+        /// Clear writing pad button.
+        /// </summary>
         private ZenGradientButton btnClearWritingPad;
+        /// <summary>
+        /// Undo last stroke button.
+        /// </summary>
         private ZenGradientButton btnUndoStroke;
-        private ResultsControl resCtrl;
-        private CharPicker cpCtrl;
-        private SearchInputControl siCtrl;
+        /// <summary>
+        /// Lookup results.
+        /// </summary>
+        private ResultsControl ctrlResults;
+        /// <summary>
+        /// Character picker under writing pad.
+        /// </summary>
+        private CharPicker ctrlCharPicker;
+        /// <summary>
+        /// Search input at top (includes WinForms text box).
+        /// </summary>
+        private SearchInputControl ctrlSearchInput;
+        /// <summary>
+        /// Simplified/traditional script selector next to search input.
+        /// </summary>
         private ZenGradientButton btnSimpTrad;
+        /// <summary>
+        /// English/Chinese search language selector next to search input.
+        /// </summary>
+        private ZenGradientButton btnSearchLang;
 
-        private readonly HashSet<StrokesMatcher> runningMatchers = new HashSet<StrokesMatcher>();
-
+        /// <summary>
+        /// Ctor.
+        /// </summary>
         public LookupControl(ZenControlBase owner, ICedictEngineFactory dictFact, ITextProvider tprov)
             : base(owner)
         {
@@ -48,22 +98,26 @@ namespace DND.Gui
             this.tprov = tprov;
             padding = (int)Math.Round(5.0F * Scale);
 
+            // Init HanziLookup
             fsStrokes = new FileStream("strokes-zydeo.dat", FileMode.Open, FileAccess.Read);
             brStrokes = new BinaryReader(fsStrokes);
             strokesData = new StrokesDataSource(brStrokes);
 
+            // Writing pad
             writingPad = new WritingPad(this);
             writingPad.RelLocation = new Point(padding, padding);
             writingPad.LogicalSize = new Size(200, 200);
             writingPad.StrokesChanged += writingPad_StrokesChanged;
 
+            // Images for buttons under writing pad; will get owned by buttons, not that it matters.
             Assembly a = Assembly.GetExecutingAssembly();
             var imgStrokesClear = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.strokes-clear.png"));
             var imgStrokesUndo = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.strokes-undo.png"));
 
+            // Clear and undo buttons under writing pad.
             float leftBtnWidth = writingPad.Width / 2 + 1;
             float btnHeight = 22.0F * Scale;
-
+            // --
             btnClearWritingPad = new ZenGradientButton(this);
             btnClearWritingPad.RelLocation = new Point(writingPad.RelLeft, writingPad.RelBottom - 1);
             btnClearWritingPad.Size = new Size((int)leftBtnWidth, (int)btnHeight);
@@ -72,8 +126,8 @@ namespace DND.Gui
             btnClearWritingPad.Padding = (int)(3.0F * Scale);
             btnClearWritingPad.Image = imgStrokesClear;
             btnClearWritingPad.Enabled = false;
-            btnClearWritingPad.MouseClick += btnClearWritingPad_MouseClick;
-           
+            btnClearWritingPad.MouseClick += onClearWritingPad;
+            // --
             btnUndoStroke = new ZenGradientButton(this);
             btnUndoStroke.RelLocation = new Point(btnClearWritingPad.RelRight - 1, writingPad.RelBottom - 1);
             btnUndoStroke.Size = new Size(writingPad.RelRight - btnUndoStroke.RelLeft, (int)btnHeight);
@@ -82,33 +136,68 @@ namespace DND.Gui
             btnUndoStroke.Padding = (int)(3.0F * Scale);
             btnUndoStroke.Image = imgStrokesUndo;
             btnUndoStroke.Enabled = false;
-            btnUndoStroke.MouseClick += btnUndoStroke_MouseClick;
+            btnUndoStroke.MouseClick += onUndoStroke;
 
-            cpCtrl = new CharPicker(this);
-            cpCtrl.FontFace = "Noto Sans S Chinese Regular";
-            //cpCtrl.FontFace = "䡡湄楮札䍓ⵆ潮瑳";
-            //cpCtrl.FontFace = "SimSun";
-            cpCtrl.RelLocation = new Point(padding, btnClearWritingPad.RelBottom + padding);
-            cpCtrl.LogicalSize = new Size(200, 80);
-            cpCtrl.CharPicked += cpCtrl_CharPicked;
+            // Character picker control under writing pad.
+            ctrlCharPicker = new CharPicker(this);
+            ctrlCharPicker.FontFace = ZenParams.ZhoContentFontFamily;
+            ctrlCharPicker.RelLocation = new Point(padding, btnClearWritingPad.RelBottom + padding);
+            ctrlCharPicker.LogicalSize = new Size(200, 80);
+            ctrlCharPicker.CharPicked += onCharPicked;
 
-            siCtrl = new SearchInputControl(this);
-            siCtrl.RelLocation = new Point(writingPad.RelRight + padding, padding);
-            siCtrl.StartSearch += onStartSearch;
+            // Search input control at top
+            ctrlSearchInput = new SearchInputControl(this);
+            ctrlSearchInput.RelLocation = new Point(writingPad.RelRight + padding, padding);
+            ctrlSearchInput.StartSearch += onStartSearch;
 
+            // Tweaks for Chinese text on UI buttons
+            var siZho = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoButtonFontFamily, ZenParams.ZhoButtonFontSize);
+            float ofsZho = -siZho.RealRect.Top;
+
+            // Script selector button to the right of search input control
             btnSimpTrad = new ZenGradientButton(this);
             btnSimpTrad.RelTop = padding;
-            btnSimpTrad.Height = siCtrl.Height;
-            btnSimpTrad.SetFont(ZenParams.ZhoFontFamily, ZenParams.ZhoButtonFontSize);
+            btnSimpTrad.Height = ctrlSearchInput.Height;
+            btnSimpTrad.SetFont(ZenParams.ZhoButtonFontFamily, ZenParams.ZhoButtonFontSize);
             btnSimpTrad.Width = getSimpTradWidth();
-            btnSimpTrad.ForcedCharHeight = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoButtonFontSize).RealRect.Height;
-            btnSimpTrad.MouseClick += simpTradCtrl_MouseClick;
+            btnSimpTrad.ForcedCharHeight = siZho.RealRect.Height;
+            btnSimpTrad.ForcedCharVertOfs = ofsZho;
+            btnSimpTrad.MouseClick += onSimpTrad;
             setSimpTradText();
 
-            resCtrl = new ResultsControl(this, tprov, lookupThroughLink);
-            resCtrl.RelLocation = new Point(writingPad.RelRight + padding, siCtrl.RelBottom + padding);
+            // Search language selector to the right of search input control
+            btnSearchLang = new ZenGradientButton(this);
+            btnSearchLang.RelTop = padding;
+            btnSearchLang.Height = ctrlSearchInput.Height;
+            btnSearchLang.SetFont(ZenParams.ZhoButtonFontFamily, ZenParams.ZhoButtonFontSize);
+            btnSearchLang.Width = getSearchLangWidth();
+            btnSearchLang.ForcedCharHeight = siZho.RealRect.Height;
+            btnSearchLang.ForcedCharVertOfs = ofsZho;
+            btnSearchLang.MouseClick += onSearchLang;
+            setSearchLangText();
+
+            // Lookup results control.
+            ctrlResults = new ResultsControl(this, tprov, onLookupThroughLink);
+            ctrlResults.RelLocation = new Point(writingPad.RelRight + padding, ctrlSearchInput.RelBottom + padding);
         }
 
+        /// <summary>
+        /// Size changed event handler: rearrange all constituents.
+        /// </summary>
+        protected override void OnSizeChanged()
+        {
+            ctrlSearchInput.RelLocation = new Point(writingPad.RelRight + padding, padding);
+            ctrlSearchInput.Width = Width - ctrlResults.RelLeft - btnSimpTrad.Width - btnSearchLang.Width - 3 * padding;
+            btnSimpTrad.RelLeft = Width - padding - btnSimpTrad.Width;
+            btnSimpTrad.Height = ctrlSearchInput.Height;
+            btnSearchLang.RelLeft = btnSimpTrad.RelLeft - padding - btnSearchLang.Width;
+            btnSearchLang.Height = ctrlSearchInput.Height;
+            ctrlResults.Size = new Size(Width - ctrlResults.RelLeft - padding, Height - ctrlResults.RelTop - padding);
+        }
+
+        /// <summary>
+        /// Dispose: free acquired resources.
+        /// </summary>
         public override void Dispose()
         {
             if (brStrokes != null) brStrokes.Dispose();
@@ -116,18 +205,28 @@ namespace DND.Gui
             base.Dispose();
         }
 
+        /// <summary>
+        /// After form is loaded - delayed initi, e.g., dictionary and hanzilookup.
+        /// </summary>
         protected override void OnFormLoaded()
         {
             base.OnFormLoaded();
             ThreadPool.QueueUserWorkItem(loadDictionary);
         }
 
+        /// <summary>
+        /// Loads dictionary in worker thread.
+        /// </summary>
+        /// <param name="ctxt"></param>
         private void loadDictionary(object ctxt)
         {
             Thread.Sleep(100);
-            dict = dictFact.Create("cedict-zydeo.bin");
+            dict = dictFact.Create(Magic.DictFileName);
         }
 
+        /// <summary>
+        /// Start recognizing a character in a BG thread after strokes have changed.
+        /// </summary>
         private void startNewCharRecog(IEnumerable<WritingPad.Stroke> strokes)
         {
             // If there are other matchers running, stop them now
@@ -150,13 +249,16 @@ namespace DND.Gui
             if (wc.StrokeList.Count == 0)
             {
                 // Don't bother doing anything if nothing has been input yet (number of strokes == 0).
-                cpCtrl.SetItems(null);
+                ctrlCharPicker.SetItems(null);
                 return;
             }
 
             ThreadPool.QueueUserWorkItem(recognize, wc);
         }
 
+        /// <summary>
+        /// Event handler, called by writing pad when strokes have changed.
+        /// </summary>
         private void writingPad_StrokesChanged(IEnumerable<WritingPad.Stroke> strokes)
         {
             startNewCharRecog(strokes);
@@ -165,6 +267,9 @@ namespace DND.Gui
             btnClearWritingPad.Enabled = btnUndoStroke.Enabled = cnt > 0;
         }
 
+        /// <summary>
+        /// Character recognition worker function (run in worker thread).
+        /// </summary>
         private void recognize(object ctxt)
         {
             WrittenCharacter wc = ctxt as WrittenCharacter;
@@ -173,8 +278,8 @@ namespace DND.Gui
             StrokesMatcher matcher = new StrokesMatcher(id,
                 searchScript != SearchScript.Simplified,
                 searchScript != SearchScript.Traditional,
-                looseness,
-                numResults,
+                Magic.HanziLookupLooseness,
+                Magic.HanziLookupNumResults,
                 strokesData);
             int matcherCount;
             lock (runningMatchers)
@@ -197,52 +302,100 @@ namespace DND.Gui
             if (matches == null) return;
             InvokeOnForm((MethodInvoker)delegate
             {
-                cpCtrl.SetItems(matches);
+                ctrlCharPicker.SetItems(matches);
             });
         }
 
-        void btnUndoStroke_MouseClick(ZenControlBase sender)
+        /// <summary>
+        /// Event handler: "undo last stroke" button clicked.
+        /// </summary>
+        void onUndoStroke(ZenControlBase sender)
         {
             writingPad.UndoLast();
             // Button states will be updated in "strokes changed" event handler.
         }
 
-        void btnClearWritingPad_MouseClick(ZenControlBase sender)
+        /// <summary>
+        /// Event handler: "clear strokes" button clicked.
+        /// </summary>
+        void onClearWritingPad(ZenControlBase sender)
         {
             writingPad.Clear();
             // Button states will be updated in "strokes changed" event handler.
         }
 
+        /// <summary>
+        /// Event handler: search initiated.
+        /// </summary>
         private void onStartSearch(object sender, string text)
         {
+            // TO-DO: Move to worker thread!!
+            // If dictionary is not yet initialized, we just don't search.
             if (dict == null) return;
-            CedictLookupResult res = dict.Lookup(text, searchScript, SearchLang.Chinese);
-            if (sender == siCtrl) siCtrl.SelectAll();
+            CedictLookupResult res = dict.Lookup(text, searchScript, searchLang);
+            // If search request comes from input control: select all text. Easier to overwrite.
+            // Otherwise, user inserted a recognized character. Then we want to allow her to keep writing > no select.
+            if (sender == ctrlSearchInput) ctrlSearchInput.SelectAll();
+            // Did lookup language change?
+            if (res.ActualSearchLang != searchLang)
+            {
+                searchLang = res.ActualSearchLang;
+                setSearchLangText();
+                btnSearchLang.Flash();
+            }
             // Call below transfers ownership of entry provider to results control.
-            resCtrl.SetResults(res.EntryProvider, res.Results, searchScript);
+            ctrlResults.SetResults(res.EntryProvider, res.Results, searchScript);
         }
 
+        /// <summary>
+        /// Gets ideal width of script selector button.
+        /// </summary>
         private int getSimpTradWidth()
         {
-            int w = btnSimpTrad.GetPreferredWidth(false, "m" + Texts.SearchSimp);
-            w = Math.Max(w, btnSimpTrad.GetPreferredWidth(false, "m" + Texts.SearchTrad));
-            w = Math.Max(w, btnSimpTrad.GetPreferredWidth(false, "m" + Texts.SearchBoth));
+            int w = btnSimpTrad.GetPreferredWidth(false, "m" + Magic.SearchSimp);
+            w = Math.Max(w, btnSimpTrad.GetPreferredWidth(false, "m" + Magic.SearchTrad));
+            w = Math.Max(w, btnSimpTrad.GetPreferredWidth(false, "m" + Magic.SearchBoth));
             return w;
         }
 
+        /// <summary>
+        /// Gets ideal width of search language selector button.
+        /// </summary>
+        private int getSearchLangWidth()
+        {
+            int w = btnSearchLang.GetPreferredWidth(false, "m" + Magic.SearchLangEng);
+            return w;
+        }
+
+        /// <summary>
+        /// Updates text of script selector button based on current search script.
+        /// </summary>
         private void setSimpTradText()
         {
             string text;
             if (searchScript == SearchScript.Simplified)
-                text = Texts.SearchSimp;
+                text = Magic.SearchSimp;
             else if (searchScript == SearchScript.Traditional)
-                text = Texts.SearchTrad;
-            else text = Texts.SearchBoth;
+                text = Magic.SearchTrad;
+            else text = Magic.SearchBoth;
             btnSimpTrad.Text = text;
             btnSimpTrad.Invalidate();
         }
 
-        private void simpTradCtrl_MouseClick(ZenControlBase sender)
+        /// <summary>
+        /// Updates text of search language selector based on current setting.
+        /// </summary>
+        private void setSearchLangText()
+        {
+            if (searchLang == SearchLang.Chinese) btnSearchLang.Text = Magic.SearchLangZho;
+            else btnSearchLang.Text = Magic.SearchLangEng;
+            btnSearchLang.Invalidate();
+        }
+
+        /// <summary>
+        /// Event handler: script selector button clicked.
+        /// </summary>
+        private void onSimpTrad(ZenControlBase sender)
         {
             // Next in row
             int scri = (int)searchScript;
@@ -255,21 +408,42 @@ namespace DND.Gui
             startNewCharRecog(writingPad.Strokes);
         }
 
-        private void cpCtrl_CharPicked(char c)
+        /// <summary>
+        /// Event handler: search language button clicked.
+        /// </summary>
+        private void onSearchLang(ZenControlBase sender)
+        {
+            // Toggle between English and Chinese
+            if (searchLang == SearchLang.Chinese) searchLang = SearchLang.Target;
+            else searchLang = SearchLang.Chinese;
+            // Update button
+            setSearchLangText();
+        }
+
+        /// <summary>
+        /// Event handler: recognized character picked.
+        /// </summary>
+        private void onCharPicked(char c)
         {
             writingPad.Clear();
-            cpCtrl.SetItems(null);
-            siCtrl.InsertCharacter(c);
-            onStartSearch(this, siCtrl.Text);
+            ctrlCharPicker.SetItems(null);
+            ctrlSearchInput.InsertCharacter(c);
+            onStartSearch(this, ctrlSearchInput.Text);
         }
 
-        private void lookupThroughLink(string queryString)
+        /// <summary>
+        /// Event handler: looked started by clicking a link in a result control.
+        /// </summary>
+        private void onLookupThroughLink(string queryString)
         {
-            siCtrl.Text = queryString;
-            siCtrl.SelectAll();
-            onStartSearch(this, siCtrl.Text);
+            ctrlSearchInput.Text = queryString;
+            ctrlSearchInput.SelectAll();
+            onStartSearch(this, ctrlSearchInput.Text);
         }
 
+        /// <summary>
+        /// Render.
+        /// </summary>
         public override void DoPaint(Graphics g)
         {
             using (Brush b = new SolidBrush(ZenParams.PaddingBackColor))
@@ -278,15 +452,6 @@ namespace DND.Gui
             }
 
             DoPaintChildren(g);
-        }
-
-        protected override void OnSizeChanged()
-        {
-            siCtrl.RelLocation = new Point(writingPad.RelRight + padding, padding);
-            siCtrl.Width = Width - resCtrl.RelLeft - btnSimpTrad.Width - 2 * padding;
-            btnSimpTrad.RelLeft = Width - padding - btnSimpTrad.Width;
-            btnSimpTrad.Height = siCtrl.Height;
-            resCtrl.Size = new Size(Width - resCtrl.RelLeft - padding, Height - resCtrl.RelTop - padding);
         }
     }
 }

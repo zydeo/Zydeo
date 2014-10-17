@@ -612,7 +612,7 @@ namespace DND.Gui
             if (ideoSize.Width == 0)
             {
                 ideoSize = g.MeasureString(ideoTestStr, getFont(fntZhoHead), 65535, sf);
-                var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
+                var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoContentFontFamily, ZenParams.ZhoResultFontSize);
                 float hanziLinePad = 6.0F;
                 hanziLinePad *= Scale;
                 ideoLineHeight = si.RealRect.Height + hanziLinePad;

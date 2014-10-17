@@ -22,7 +22,7 @@ namespace DND.Gui
                 return;
 
             g.SmoothingMode = SmoothingMode.None;
-            var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoFontFamily, ZenParams.ZhoFontSize);
+            var si = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoContentFontFamily, ZenParams.ZhoResultFontSize);
             HeadBlock hb;
             RectangleF rect;
             // Width of gradient
