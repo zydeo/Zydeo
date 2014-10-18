@@ -45,6 +45,9 @@
     <Compile Include="CharPicker.cs" />
     <Compile Include="FontPool.cs" />
     <Compile Include="HanziMeasure.cs" />
+    <Compile Include="HintedTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="LookupControl.cs" />
     <Compile Include="Magic.cs" />
     <Compile Include="MainForm.cs" />

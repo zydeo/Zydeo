@@ -148,7 +148,7 @@ namespace DND.Gui
             ctrlCharPicker.CharPicked += onCharPicked;
 
             // Search input control at top
-            ctrlSearchInput = new SearchInputControl(this);
+            ctrlSearchInput = new SearchInputControl(this, tprov);
             ctrlSearchInput.RelLocation = new Point(writingPad.RelRight + padding, padding);
             ctrlSearchInput.StartSearch += onStartSearch;
 

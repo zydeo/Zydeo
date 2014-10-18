@@ -11,38 +11,75 @@ using DND.Gui.Zen;
 
 namespace DND.Gui
 {
+    /// <summary>
+    /// Represents the text input field above the results list.
+    /// </summary>
     internal class SearchInputControl : ZenControl
     {
+        /// <summary>
+        /// Delegate for the <see cref="StartSearch"/> event.
+        /// </summary>
         public delegate void StartSearchDelegate(object sender, string text);
+        /// <summary>
+        /// Fired when any user input must trigger a search (e.g., pressing Enter).
+        /// </summary>
         public event StartSearchDelegate StartSearch;
 
-        private readonly TextBox txtInput;
+        /// <summary>
+        /// Localized UI strings provider.
+        /// </summary>
+        private readonly ITextProvider tprov;
+        /// <summary>
+        /// Padding inside at my current scale.
+        /// </summary>
         private readonly int padding;
+        /// <summary>
+        /// The hinted text box for entering queries.
+        /// </summary>
+        private readonly HintedTextBox txtInput;
+        /// <summary>
+        /// The search button.
+        /// </summary>
         private readonly ZenImageButton btnSearch;
+        /// <summary>
+        /// The "clear text" button.
+        /// </summary>
         private readonly ZenImageButton btnCancel;
+        /// <summary>
+        /// Blocks "size changed" event handler when control changes its own size.
+        /// </summary>
         private bool blockSizeChanged = false;
 
-        public SearchInputControl(ZenControl owner)
+        /// <summary>
+        /// Ctor: take parent etc.
+        /// </summary>
+        public SearchInputControl(ZenControl owner, ITextProvider tprov)
             : base(owner)
         {
+            this.tprov = tprov;
             padding = (int)Math.Round(4.0F * Scale);
 
-            txtInput = new TextBox();
+            // The hinted text input control.
+            txtInput = new HintedTextBox();
             txtInput.Name = "txtInput";
-            txtInput.BorderStyle = BorderStyle.None;
             txtInput.TabIndex = 0;
+            txtInput.BorderStyle = BorderStyle.None;
             RegisterWinFormsControl(txtInput);
+            // My font family, and other properties to achieve a borderless inside input field.
             string fface = Magic.ZhoButtonFontFamily;
             txtInput.Font = new System.Drawing.Font(fface, 16F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
             txtInput.AutoSize = false;
             txtInput.Height = txtInput.PreferredHeight + padding;
+            txtInput.HintText = tprov.GetString("SearchTextHint");
             //txtInput.BackColor = Color.Magenta;
 
+            // My height depends on text box's height at current font settings.
             blockSizeChanged = true;
             Height = 2 + txtInput.Height;
             blockSizeChanged = false;
-            txtInput.KeyPress += txtInput_KeyPress;
+            txtInput.KeyPress += onTextBoxKeyPress;
 
+            // Search button
             Assembly a = Assembly.GetExecutingAssembly();
             var imgSearch = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.search.png"));
             btnSearch = new ZenImageButton(this);
@@ -50,7 +87,8 @@ namespace DND.Gui
             btnSearch.Size = new Size(Height - 2 * padding, Height - 2 * padding);
             btnSearch.Image = imgSearch;
             btnSearch.MouseClick += onClickSearch;
-
+            
+            // Clear text button.
             var imgCancel = Image.FromStream(a.GetManifestResourceStream("DND.Gui.Resources.cancel.png"));
             btnCancel = new ZenImageButton(this);
             btnCancel.Size = new Size(Height - 2 * padding, Height - 2 * padding);
@@ -63,6 +101,9 @@ namespace DND.Gui
             txtInput.MouseLeave += onTxtMouseLeave;
         }
 
+        /// <summary>
+        /// Size changed event handler.
+        /// </summary>
         protected override void OnSizeChanged()
         {
             if (blockSizeChanged) return;
@@ -85,34 +126,45 @@ namespace DND.Gui
             btnCancel.RelLocation = new Point(Width - padding - btnCancel.Width, 2 * padding / 3);
         }
 
-        public override void Dispose()
-        {
-            base.Dispose();
-        }
-
+        /// <summary>
+        /// Insert a character, replacing current selection. This is used when character comes from writing pad.
+        /// </summary>
         public void InsertCharacter(char c)
         {
             string str = ""; str += c;
             txtInput.SelectedText = str;
         }
 
+        /// <summary>
+        /// Select all text in input field.
+        /// </summary>
         public void SelectAll()
         {
             txtInput.SelectAll();
         }
 
+        /// <summary>
+        /// Gets or sets the text in the input field.
+        /// </summary>
         public string Text
         {
             get { return txtInput.Text; }
             set { txtInput.Text = value; }
         }
 
+        /// <summary>
+        /// Triggers the <see cref="StartSearch"/> even if there are any subscribers.
+        /// </summary>
         private void doStartSearch()
         {
             if (StartSearch != null)
                 StartSearch(this, txtInput.Text);
         }
 
+        /// <summary>
+        /// Decides if the "clear text" button should be visible, based on mouse position.
+        /// </summary>
+        /// <returns></returns>
         private bool isCancelVisible()
         {
             Point p = MousePosition;
@@ -120,6 +172,9 @@ namespace DND.Gui
             return rect.Contains(p);
         }
 
+        /// <summary>
+        /// Handles the mouse move event to update visibility of "clear text" button.
+        /// </summary>
         public override bool DoMouseMove(Point p, MouseButtons button)
         {
             base.DoMouseMove(p, button);
@@ -127,6 +182,9 @@ namespace DND.Gui
             return true;
         }
 
+        /// <summary>
+        /// Handles the mouse enter event to update visibility of "clear text" button.
+        /// </summary>
         public override void DoMouseEnter()
         {
             base.DoMouseEnter();
@@ -134,6 +192,9 @@ namespace DND.Gui
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
+        /// <summary>
+        /// Handles the mouse leave event to update visibility of "clear text" button.
+        /// </summary>
         public override void DoMouseLeave()
         {
             base.DoMouseLeave();
@@ -141,6 +202,9 @@ namespace DND.Gui
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
+        /// <summary>
+        /// Handles the text box's mouse leave event to update visibility of "clear text" button.
+        /// </summary>
         private void onTxtMouseLeave(object sender, EventArgs e)
         {
             // Pointer may lease text box but still be inside me
@@ -152,6 +216,9 @@ namespace DND.Gui
             DoMouseLeave();
         }
 
+        /// <summary>
+        /// Handles the text box's mouse enter event to update visibility of "clear text" button.
+        /// </summary>
         private void onTxtMouseEnter(object sender, EventArgs e)
         {
             if (btnCancel.Visible) return;
@@ -159,16 +226,25 @@ namespace DND.Gui
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
+        /// <summary>
+        /// Handles click on search button.
+        /// </summary>
         private void onClickSearch(ZenControlBase sender)
         {
             doStartSearch();
         }
 
+        /// <summary>
+        /// Handles click on "clear text" button.
+        /// </summary>
         private void onClickCancel(ZenControlBase sender)
         {
             txtInput.Text = "";
         }
 
+        /// <summary>
+        /// Does any required custom painting.
+        /// </summary>
         public override void DoPaint(Graphics g)
         {
             // Paint my BG
@@ -185,7 +261,10 @@ namespace DND.Gui
             DoPaintChildren(g);
         }
 
-        private void txtInput_KeyPress(object sender, KeyPressEventArgs e)
+        /// <summary>
+        /// Handles text box's key press event to catch "Enter" to trigger search.
+        /// </summary>
+        private void onTextBoxKeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)13)
             {
