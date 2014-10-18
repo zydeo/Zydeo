@@ -13,12 +13,8 @@ namespace ZD
     {
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
-        
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
+
+        static void mainCore()
         {
             CedictEngineFactory cef = new CedictEngineFactory();
             TextProvider tprov = new TextProvider("en");
@@ -28,6 +24,20 @@ namespace ZD
             Application.SetCompatibleTextRenderingDefault(false);
             var mf = new MainForm(cef, tprov);
             Application.Run(mf.WinForm);
+        }
+        
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            AppDomain.CurrentDomain.UnhandledException += onUnhandledException;
+            mainCore();
+        }
+
+        private static void onUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
         }
     }
 }
