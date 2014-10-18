@@ -40,7 +40,7 @@ namespace DND.Gui
                 SizeF sz = g.MeasureString(spaceTestStr, getFont(fntSenseLatin), 65535, sf);
                 spaceWidth = (int)sz.Width;
                 lemmaCharHeight = sz.Height;
-                lemmaLineHeight = sz.Height * 1.1F;
+                lemmaLineHeight = sz.Height * Magic.LemmaLineHeightScale;
                 sz = g.MeasureString(spaceTestStr, getFont(fntPinyinHead), 65535, sf);
                 pinyinSpaceWidth = sz.Width;
             }

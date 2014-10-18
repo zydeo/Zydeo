@@ -179,7 +179,9 @@ namespace DND.Gui
             Font myFontZho = getFont(fntSenseHanziSimp);
             var sizeInfo = HanziMeasure.Instance.GetMeasures(myFontZho.Name, myFontZho.Size);
             float hanziMidY = sizeInfo.RealRect.Top + sizeInfo.RealRect.Height / 2.0F;
-            float latinMidY = getFont(fntSenseLatin).Height * 0.55F;
+            Font myFontLatn = getFont(fntSenseLatin);
+            FontFamily ffLatn = myFontLatn.FontFamily;
+            float latinMidY = getFont(fntSenseLatin).Height * 0.5F;
             targetHanziOfs = latinMidY - hanziMidY;
             return targetHanziOfs;
         }

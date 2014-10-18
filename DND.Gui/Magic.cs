@@ -99,6 +99,21 @@ namespace DND.Gui
         public static readonly float LemmaFontSize = 10.0F;
 
         /// <summary>
+        /// Hanzi in lemma is displayed in font this much bigger than <see cref="LemmaFontSize"/>.
+        /// </summary>
+        /// <remarks>
+        /// <para>Depends on specific Latin and Hanzi font families used.</para>
+        /// <para>Also double-check <see cref="OneResultControl.getTargetHanziOfs"/> when changing.</para>
+        /// </remarks>
+        public static readonly float LemmaHanziScale = 1.3F;
+
+        /// <summary>
+        /// Line height is font size (in pixels) times this.
+        /// </summary>
+        /// <remarks>Depends on specific font family used.</remarks>
+        public static readonly float LemmaLineHeightScale = 1.2F;
+
+        /// <summary>
         /// Font family for Pinyin in heading of displayed entries.
         /// </summary>
         public static readonly string PinyinFontFamily = "Tahoma";
