@@ -101,7 +101,7 @@ namespace ZD.Gui
             // TO-DO: init from user settings here!
 
             // Init HanziLookup
-            fsStrokes = new FileStream("strokes-zydeo.dat", FileMode.Open, FileAccess.Read);
+            fsStrokes = new FileStream("strokes-zydeo.bin", FileMode.Open, FileAccess.Read);
             brStrokes = new BinaryReader(fsStrokes);
             strokesData = new StrokesDataSource(brStrokes);
 

@@ -24,6 +24,7 @@ _work/*
 !_work/*.txt
 !_work/charstats.xlsx
 !_work/*.ttc
+!_work/*.bin
 
 # Bin folder: ignore altogether
 _bin/*
