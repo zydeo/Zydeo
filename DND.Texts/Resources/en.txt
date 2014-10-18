@@ -17,6 +17,6 @@ WritingPadUndo				Undo
 # Displayed in one entry's body text to announce classifiers
 ResultCtrlClassifier		Classifier:
 
-# Gray hint in search input control, when there is no query text from the user there yet.
+# Hints: in text input control, and in writing pad
 SearchTextHint				Search Hanzi, Pinyin or English
-
+WritingPadHint				Draw here, then pick recognized Hanzi below

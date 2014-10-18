@@ -132,17 +132,22 @@ namespace DND.Gui
             }
         }
 
-        private void doPaintHint(Graphics g)
+        private void doPaintHint(Graphics g, float hintState)
         {
+            // If hint is not shown, no draw
+            if (hintState == 0) return;
+
             g.TextRenderingHint = TextRenderingHint.AntiAlias;
-            using (Brush bTxt = new SolidBrush(Color.FromArgb(Magic.WritingPadHintOpacity, ZenParams.StandardTextColor)))
-            using (Brush bBack = new SolidBrush(Color.FromArgb(160, ZenParams.WindowColor)))
+            float backOpacity = 160.0F * hintState;
+            float textOpacity = ((float)Magic.WritingPadHintOpacity) * hintState;
+            using (Brush bTxt = new SolidBrush(Color.FromArgb((int)backOpacity, ZenParams.StandardTextColor)))
+            using (Brush bBack = new SolidBrush(Color.FromArgb((int)textOpacity, ZenParams.WindowColor)))
             using (Font f = new Font(ZenParams.GenericFontFamily, 10.0F))
             {
                 StringFormat sf = new StringFormat();
                 sf.Alignment = StringAlignment.Center;
                 sf.LineAlignment = StringAlignment.Center;
-                string str = "Draw here, then pick recognized character below";
+                string str = tprov.GetString("WritingPadHint");
                 RectangleF rect = new Rectangle(Width / 8, Height / 4, 3 * Width / 4, Height / 2);
                 g.FillRectangle(bBack, rect);
                 g.DrawString(str, f, bTxt, rect, sf);
@@ -164,9 +169,16 @@ namespace DND.Gui
             {
                 g.FillRectangle(b, 0, 0, Width, Height);
             }
-            // Clear animation affects lines
+            // Get animation states
             float clearState;
-            lock (clearAnimLockObj) { clearState = clearAnimState; }
+            float hintState;
+            lock (animLO)
+            {
+                clearState = clearAnimState;
+                hintState = hintAnimState;
+                if (hintState < 0) hintState = 0;
+                else if (hintState > 1.0F) hintState = 1.0F;
+            }
             // If not mid-animation, draw full extent
             if (clearState < 0) clearState = 1;
             // Diagonal lines
@@ -209,10 +221,8 @@ namespace DND.Gui
                 g.DrawLine(p, Width - 1, Height - 1, 0, Height - 1);
                 g.DrawLine(p, 0, Height - 1, 0, 0);
             }
-            // If not in clear animation, and we have no strokes, and mouse is over us, and button is not pressed
             // Draw hint
-            if (clearState == 1 && strokes.Count == 0 && currentPoints.Count == 0 && Cursor != myCursor)
-                doPaintHint(g);
+            doPaintHint(g, hintState);
             // If not in clear animation, paint normal strokes and possibly last,animated stroke
             if (clearState == 1) doPaintStrokesNormal(g, animStates);
             // Otherwise, bloat away last character

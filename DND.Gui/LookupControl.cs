@@ -106,7 +106,7 @@ namespace DND.Gui
             strokesData = new StrokesDataSource(brStrokes);
 
             // Writing pad
-            writingPad = new WritingPad(this);
+            writingPad = new WritingPad(this, tprov);
             writingPad.RelLocation = new Point(padding, padding);
             writingPad.LogicalSize = new Size(200, 200);
             writingPad.StrokesChanged += writingPad_StrokesChanged;
