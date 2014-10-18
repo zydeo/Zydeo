@@ -110,10 +110,6 @@ namespace DND.Gui
         /// </summary>
         private Block[] measuredBlocks = null;
         /// <summary>
-        /// True if target contains Hanzi > need to re-measure when script changes.
-        /// </summary>
-        private bool anyTargetHanzi = false;
-        /// <summary>
         /// Body text laid out for current width.
         /// </summary>
         private PositionedBlock[] positionedBlocks = null;
@@ -169,15 +165,21 @@ namespace DND.Gui
 
         // Graphics resources: static, singleton, never disposed.
         // When we're quitting it doesn't matter anymore, anyway.
-        private static Font[] fntArr = new Font[7];
-        private const byte fntZhoHead = 0;
-        private const byte fntPinyinHead = 1;
-        private const byte fntSenseLatin = 2;
-        private const byte fntSenseHanzi = 3;
-        private const byte fntMetaLatin = 4;
-        private const byte fntMetaHanzi = 5;
-        private const byte fntSenseId = 6;
+        private static Font[] fntArr = new Font[10];
+        private const byte fntZhoHeadSimp = 0;
+        private const byte fntZhoHeadTrad = 1;
+        private const byte fntPinyinHead = 2;
+        private const byte fntSenseLatin = 3;
+        private const byte fntSenseHanziSimp = 4;
+        private const byte fntSenseHanziTrad = 5;
+        private const byte fntMetaLatin = 6;
+        private const byte fntMetaHanziSimp = 7;
+        private const byte fntMetaHanziTrad = 8;
+        private const byte fntSenseId = 9;
 
+        /// <summary>
+        /// Cached display strings for sense IDs, going from 0 to the unimaginable 35 (0-9, a-z)
+        /// </summary>
         private static string[] senseIdxStrings = new string[36];
 
         /// <summary>
@@ -185,12 +187,15 @@ namespace DND.Gui
         /// </summary>
         static OneResultControl()
         {
-            fntArr[fntZhoHead] = FontPool.GetFont(Magic.ZhoContentFontFamily, Magic.ZhoResultFontSize, FontStyle.Regular);
+            fntArr[fntZhoHeadSimp] = FontPool.GetFont(Magic.ZhoSimpContentFontFamily, Magic.ZhoResultFontSize, FontStyle.Regular);
+            fntArr[fntZhoHeadTrad] = FontPool.GetFont(Magic.ZhoTradContentFontFamily, Magic.ZhoResultFontSize, FontStyle.Regular);
             fntArr[fntPinyinHead] = new Font(Magic.PinyinFontFamily, Magic.PinyinFontSize, FontStyle.Bold);
             fntArr[fntSenseLatin] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize);
-            fntArr[fntSenseHanzi] = FontPool.GetFont(Magic.ZhoContentFontFamily, Magic.LemmaFontSize * 1.2F, FontStyle.Regular);
+            fntArr[fntSenseHanziSimp] = FontPool.GetFont(Magic.ZhoSimpContentFontFamily, Magic.LemmaFontSize * 1.2F, FontStyle.Regular);
+            fntArr[fntSenseHanziTrad] = FontPool.GetFont(Magic.ZhoTradContentFontFamily, Magic.LemmaFontSize * 1.2F, FontStyle.Regular);
             fntArr[fntMetaLatin] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize, FontStyle.Italic);
-            fntArr[fntMetaHanzi] = FontPool.GetFont(Magic.ZhoContentFontFamily, Magic.LemmaFontSize * 1.2F, FontStyle.Italic);
+            fntArr[fntMetaHanziSimp] = FontPool.GetFont(Magic.ZhoSimpContentFontFamily, Magic.LemmaFontSize * 1.2F, FontStyle.Italic);
+            fntArr[fntMetaHanziTrad] = FontPool.GetFont(Magic.ZhoTradContentFontFamily, Magic.LemmaFontSize * 1.2F, FontStyle.Italic);
             fntArr[fntSenseId] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize * 0.8F);
 
             // Sense ID strings

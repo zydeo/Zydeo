@@ -98,6 +98,8 @@ namespace DND.Gui
             this.tprov = tprov;
             padding = (int)Math.Round(5.0F * Scale);
 
+            // TO-DO: init from user settings here!
+
             // Init HanziLookup
             fsStrokes = new FileStream("strokes-zydeo.dat", FileMode.Open, FileAccess.Read);
             brStrokes = new BinaryReader(fsStrokes);
@@ -140,7 +142,7 @@ namespace DND.Gui
 
             // Character picker control under writing pad.
             ctrlCharPicker = new CharPicker(this);
-            ctrlCharPicker.FontFace = Magic.ZhoContentFontFamily;
+            ctrlCharPicker.FontFace = searchScript == SearchScript.Traditional ? Magic.ZhoTradContentFontFamily : Magic.ZhoSimpContentFontFamily;
             ctrlCharPicker.RelLocation = new Point(padding, btnClearWritingPad.RelBottom + padding);
             ctrlCharPicker.LogicalSize = new Size(200, 80);
             ctrlCharPicker.CharPicked += onCharPicked;
@@ -404,6 +406,10 @@ namespace DND.Gui
             searchScript = (SearchScript)scri;
             // Update button
             setSimpTradText();
+            // Change character picker's font
+            // Only if it really changes - triggers calibration
+            string newCPFont = searchScript == SearchScript.Traditional ? Magic.ZhoTradContentFontFamily : Magic.ZhoSimpContentFontFamily;
+            if (newCPFont != ctrlCharPicker.FontFace) ctrlCharPicker.FontFace = newCPFont;
             // Re-recognize strokes, if there are any
             startNewCharRecog(writingPad.Strokes);
         }

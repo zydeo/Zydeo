@@ -171,7 +171,8 @@ namespace DND.Gui
             List<Block> blocks, List<LinkArea> links)
         {
             byte fntIdxLatin = isMeta ? fntMetaLatin : fntSenseLatin;
-            byte fntIdxZho = isMeta ? fntMetaHanzi : fntSenseHanzi;
+            byte fntIdxZhoSimp = isMeta ? fntMetaHanziSimp : fntSenseHanziSimp;
+            byte fntIdxZhoTrad = isMeta ? fntMetaHanziTrad : fntSenseHanziTrad;
             // Go run by run
             for (int runIX = 0; runIX != htxt.RunCount; ++runIX)
             {
@@ -232,8 +233,6 @@ namespace DND.Gui
                     if (analyzedScript != SearchScript.Traditional && zhoRun.Simp != null) strSimp = zhoRun.Simp;
                     string strTrad = string.Empty;
                     if (analyzedScript != SearchScript.Simplified && zhoRun.Trad != null) strTrad = zhoRun.Trad;
-                    // Remember if we have any target Hanzi
-                    if (strSimp != string.Empty || strTrad != string.Empty) anyTargetHanzi = true;
                     string strPy = string.Empty;
                     // Convert pinyin to display format (tone marks as diacritics; r5 glued)
                     if (zhoRun.Pinyin != null) strPy = "[" + zhoRun.GetPinyinInOne(true) + "]";
@@ -249,7 +248,7 @@ namespace DND.Gui
                         Block tb = new Block
                         {
                             TextPos = textPool.PoolString(strSimp),
-                            FontIdx = fntIdxZho,
+                            FontIdx = fntIdxZhoSimp,
                             SpaceAfter = true,
                         };
                         blocks.Add(tb);
@@ -277,7 +276,7 @@ namespace DND.Gui
                         Block tb = new Block
                         {
                             TextPos = textPool.PoolString(strTrad),
-                            FontIdx = fntIdxZho,
+                            FontIdx = fntIdxZhoTrad,
                             SpaceAfter = true,
                         };
                         blocks.Add(tb);
@@ -550,9 +549,10 @@ namespace DND.Gui
         /// <summary>
         /// Calculates right-aligned layout in headword area.
         /// </summary>
-        private static bool doAnalyzeHanzi(Graphics g, string str, StringFormat sf,
+        private static bool doAnalyzeHanzi(Graphics g, string str, bool isSimp, StringFormat sf,
             List<HeadBlock> blocks, ref PointF loc, float right)
         {
+            byte fntZhoHead = isSimp ? fntZhoHeadSimp : fntZhoHeadTrad;
             float left = loc.X;
             bool lineBreak = false;
             int firstCharOfLine = 0;
@@ -609,10 +609,11 @@ namespace DND.Gui
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
 
             // On-demand: measure a single ideograph's dimensions
+            // We only measure simplified. Assume simplified and traditional fonts come in matching pairs -> same size.
             if (ideoSize.Width == 0)
             {
-                ideoSize = g.MeasureString(ideoTestStr, getFont(fntZhoHead), 65535, sf);
-                var si = HanziMeasure.Instance.GetMeasures(Magic.ZhoContentFontFamily, Magic.ZhoResultFontSize);
+                ideoSize = g.MeasureString(ideoTestStr, getFont(fntZhoHeadSimp), 65535, sf);
+                var si = HanziMeasure.Instance.GetMeasures(Magic.ZhoSimpContentFontFamily, Magic.ZhoResultFontSize);
                 float hanziLinePad = 6.0F;
                 hanziLinePad *= Scale;
                 ideoLineHeight = si.RealRect.Height + hanziLinePad;
@@ -638,14 +639,14 @@ namespace DND.Gui
             bool lbrk = false;
             if (analyzedScript == SearchScript.Simplified || analyzedScript == SearchScript.Both)
             {
-                lbrk |= doAnalyzeHanzi(g, entry.ChSimpl, sf, headInfo.SimpBlocks, ref loc, headInfo.HeadwordRight);
+                lbrk |= doAnalyzeHanzi(g, entry.ChSimpl, true, sf, headInfo.SimpBlocks, ref loc, headInfo.HeadwordRight);
             }
             if (analyzedScript == SearchScript.Traditional || analyzedScript == SearchScript.Both)
             {
                 //loc.X = padLeft;
                 loc.X = ((float)padLeft) + ideoSize.Width;
                 if (analyzedScript == SearchScript.Both) loc.Y += ideoLineHeight;
-                lbrk |= doAnalyzeHanzi(g, entry.ChTrad, sf, headInfo.TradBlocks, ref loc, headInfo.HeadwordRight);
+                lbrk |= doAnalyzeHanzi(g, entry.ChTrad, false, sf, headInfo.TradBlocks, ref loc, headInfo.HeadwordRight);
             }
             // If we're displaying both simplified and traditional, fade out
             // traditional chars that are same as simplified, right above them

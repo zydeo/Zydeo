@@ -137,7 +137,7 @@ namespace DND.Gui
             int right = 0;
             int bottom = 0;
             // This character is very tall and pretty wide. Oh beautiful life.
-            string testStr = "蠹";
+            string testStr = Magic.HanziMeasureTestChar;
             StringFormat sf = StringFormat.GenericTypographic;
             using (Font fnt = FontPool.GetFont(fk.Face, fk.Size, FontStyle.Regular))
             {

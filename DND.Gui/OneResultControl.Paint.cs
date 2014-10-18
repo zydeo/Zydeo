@@ -22,7 +22,7 @@ namespace DND.Gui
                 return;
 
             g.SmoothingMode = SmoothingMode.None;
-            var si = HanziMeasure.Instance.GetMeasures(Magic.ZhoContentFontFamily, Magic.ZhoResultFontSize);
+            var si = HanziMeasure.Instance.GetMeasures(Magic.ZhoSimpContentFontFamily, Magic.ZhoResultFontSize);
             HeadBlock hb;
             RectangleF rect;
             // Width of gradient
@@ -176,7 +176,7 @@ namespace DND.Gui
         {
             if (targetHanziOfs != 0) return targetHanziOfs;
             // Calculate on demand
-            Font myFontZho = getFont(fntSenseHanzi);
+            Font myFontZho = getFont(fntSenseHanziSimp);
             var sizeInfo = HanziMeasure.Instance.GetMeasures(myFontZho.Name, myFontZho.Size);
             float hanziMidY = sizeInfo.RealRect.Top + sizeInfo.RealRect.Height / 2.0F;
             float latinMidY = getFont(fntSenseLatin).Height * 0.55F;
@@ -215,7 +215,8 @@ namespace DND.Gui
                     {
                         // Extra vertical offset on Hanzi blocks
                         float vOfs = 0;
-                        if (block.FontIdx == fntMetaHanzi || block.FontIdx == fntSenseHanzi)
+                        if (block.FontIdx == fntMetaHanziSimp || block.FontIdx == fntMetaHanziTrad ||
+                            block.FontIdx == fntSenseHanziSimp || block.FontIdx == fntSenseHanziTrad)
                             vOfs += getTargetHanziOfs();
                         // No hover: draw with normal brush
                         Brush brush = bnorm;
@@ -349,13 +350,13 @@ namespace DND.Gui
                 foreach (HeadBlock hb in headInfo.SimpBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X, hb.Loc.Y);
-                    g.DrawString(hb.Char.ToString(), getFont(fntZhoHead), bnorm, loc, sf);
+                    g.DrawString(hb.Char.ToString(), getFont(fntZhoHeadSimp), bnorm, loc, sf);
                 }
                 foreach (HeadBlock hb in headInfo.TradBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X, hb.Loc.Y);
                     Brush b = hb.Faded ? bfade : bnorm;
-                    g.DrawString(hb.Char.ToString(), getFont(fntZhoHead), b, loc, sf);
+                    g.DrawString(hb.Char.ToString(), getFont(fntZhoHeadTrad), b, loc, sf);
                 }
                 // Pinyin
                 using (SolidBrush bhilite = new SolidBrush(Magic.HiliteColor))

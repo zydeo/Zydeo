@@ -52,6 +52,12 @@ namespace DND.Gui
         public readonly static string SearchLangZho = "中";
 
         /// <summary>
+        /// Character used to measure genuine visual rectangle of Hanzi characters in a font.
+        /// </summary>
+        /// <remarks>This character is very tall and pretty wide. Oh beautiful life.</remarks>
+        public readonly static string HanziMeasureTestChar = "蠹";
+
+        /// <summary>
         /// Font family for hard-wired texts on buttons next to search input field.
         /// </summary>
         /// <remars>
@@ -68,9 +74,14 @@ namespace DND.Gui
         public static readonly float ZhoButtonFontSize = 18.0F;
 
         /// <summary>
-        /// Font family for Hanzi in lookup results.
+        /// Font family for Hanzi in lookup results and char picker: simplified.
         /// </summary>
-        public static readonly string ZhoContentFontFamily = "AR PL UKai CN";
+        public static readonly string ZhoSimpContentFontFamily = "AR PL UKai CN";
+
+        /// <summary>
+        /// Font family for Hanzi in lookup results and char picker: traditional.
+        /// </summary>
+        public static readonly string ZhoTradContentFontFamily = "AR PL UKai CN";
 
         /// <summary>
         /// Font size for Hanzi heading in each displayed dictionary entry. Also in character picker.

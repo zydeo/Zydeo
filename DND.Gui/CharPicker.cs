@@ -78,7 +78,7 @@ namespace DND.Gui
         /// <summary>
         /// Font face to draw characters.
         /// </summary>
-        private string fontFace = Magic.ZhoContentFontFamily;
+        private string fontFace = Magic.ZhoSimpContentFontFamily;
 
         /// <summary>
         /// Lock object to access character rectangles.
