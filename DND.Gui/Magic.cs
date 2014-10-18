@@ -137,5 +137,10 @@ namespace DND.Gui
         /// Font size of results count box in bottom right.
         /// </summary>
         public static readonly float ResultsCountFontSize = 9.0F;
+
+        /// <summary>
+        /// Alternating BG color of entries in results list.
+        /// </summary>
+        public static readonly Color ResultsAltBackColor = Color.FromArgb(248, 248, 255);
     }
 }

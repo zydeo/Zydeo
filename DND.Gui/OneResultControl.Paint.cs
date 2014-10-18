@@ -329,7 +329,7 @@ namespace DND.Gui
             if (analyzedWidth != Width) Analyze(g, Width);
 
             // Background. Alternating at that!
-            Color bgcol = odd ? Color.FromArgb(248, 248, 255) : Color.White;
+            Color bgcol = odd ? Magic.ResultsAltBackColor : ZenParams.WindowColor;
             using (Brush b = new SolidBrush(bgcol))
             {
                 g.FillRectangle(b, 0, 0, Width, Height);

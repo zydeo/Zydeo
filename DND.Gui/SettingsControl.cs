@@ -17,7 +17,7 @@ namespace DND.Gui
 
         public override void DoPaint(Graphics g)
         {
-            using (Brush b = new SolidBrush(Color.White))
+            using (Brush b = new SolidBrush(ZenParams.WindowColor))
             {
                 g.FillRectangle(b, 0, 0, Width, Height);
             }

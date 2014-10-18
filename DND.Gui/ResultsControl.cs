@@ -499,7 +499,7 @@ namespace DND.Gui
             getContentSize(out cw, out ch);
 
             // Background
-            using (Brush b = new SolidBrush(Color.White))
+            using (Brush b = new SolidBrush(ZenParams.WindowColor))
             {
                 g.FillRectangle(b, new Rectangle(0, 0, Width, Height));
             }

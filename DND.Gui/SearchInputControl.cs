@@ -270,7 +270,7 @@ namespace DND.Gui
         public override void DoPaint(Graphics g)
         {
             // Paint my BG
-            using (SolidBrush b = new SolidBrush(Color.White))
+            using (SolidBrush b = new SolidBrush(ZenParams.WindowColor))
             {
                 g.FillRectangle(b, new Rectangle(0, 0, Width, Height));
             }
