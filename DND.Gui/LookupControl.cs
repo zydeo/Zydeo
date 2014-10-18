@@ -140,7 +140,7 @@ namespace DND.Gui
 
             // Character picker control under writing pad.
             ctrlCharPicker = new CharPicker(this);
-            ctrlCharPicker.FontFace = ZenParams.ZhoContentFontFamily;
+            ctrlCharPicker.FontFace = Magic.ZhoContentFontFamily;
             ctrlCharPicker.RelLocation = new Point(padding, btnClearWritingPad.RelBottom + padding);
             ctrlCharPicker.LogicalSize = new Size(200, 80);
             ctrlCharPicker.CharPicked += onCharPicked;
@@ -151,14 +151,14 @@ namespace DND.Gui
             ctrlSearchInput.StartSearch += onStartSearch;
 
             // Tweaks for Chinese text on UI buttons
-            var siZho = HanziMeasure.Instance.GetMeasures(ZenParams.ZhoButtonFontFamily, ZenParams.ZhoButtonFontSize);
+            var siZho = HanziMeasure.Instance.GetMeasures(Magic.ZhoButtonFontFamily, Magic.ZhoButtonFontSize);
             float ofsZho = -siZho.RealRect.Top;
 
             // Script selector button to the right of search input control
             btnSimpTrad = new ZenGradientButton(this);
             btnSimpTrad.RelTop = padding;
             btnSimpTrad.Height = ctrlSearchInput.Height;
-            btnSimpTrad.SetFont(ZenParams.ZhoButtonFontFamily, ZenParams.ZhoButtonFontSize);
+            btnSimpTrad.SetFont(Magic.ZhoButtonFontFamily, Magic.ZhoButtonFontSize);
             btnSimpTrad.Width = getSimpTradWidth();
             btnSimpTrad.ForcedCharHeight = siZho.RealRect.Height;
             btnSimpTrad.ForcedCharVertOfs = ofsZho;
@@ -169,7 +169,7 @@ namespace DND.Gui
             btnSearchLang = new ZenGradientButton(this);
             btnSearchLang.RelTop = padding;
             btnSearchLang.Height = ctrlSearchInput.Height;
-            btnSearchLang.SetFont(ZenParams.ZhoButtonFontFamily, ZenParams.ZhoButtonFontSize);
+            btnSearchLang.SetFont(Magic.ZhoButtonFontFamily, Magic.ZhoButtonFontSize);
             btnSearchLang.Width = getSearchLangWidth();
             btnSearchLang.ForcedCharHeight = siZho.RealRect.Height;
             btnSearchLang.ForcedCharVertOfs = ofsZho;

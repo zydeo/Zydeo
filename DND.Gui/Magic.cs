@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 
 namespace DND.Gui
 {
@@ -49,5 +50,66 @@ namespace DND.Gui
         /// Non-localized text of search language button: Chinese.
         /// </summary>
         public readonly static string SearchLangZho = "中";
+
+        /// <summary>
+        /// Font family for hard-wired texts on buttons next to search input field.
+        /// </summary>
+        /// <remars>
+        /// Other fonts tested:
+        /// DFKai-SB
+        /// 䡡湄楮札䍓ⵆ潮瑳
+        /// Noto Sans S Chinese Regular
+        /// </remars>
+        public static readonly string ZhoButtonFontFamily = "Segoe UI";
+
+        /// <summary>
+        /// Font size for hard-wired texts on buttons next to search input field.
+        /// </summary>
+        public static readonly float ZhoButtonFontSize = 18.0F;
+
+        /// <summary>
+        /// Font family for Hanzi in lookup results.
+        /// </summary>
+        public static readonly string ZhoContentFontFamily = "AR PL UKai CN";
+
+        /// <summary>
+        /// Font size for Hanzi heading in each displayed dictionary entry. Also in character picker.
+        /// </summary>
+        public static readonly float ZhoResultFontSize = 22.0F;
+
+        /// <summary>
+        /// Font family for lemma (domain, equiv, note) in displayed entries. Also for Hanzi ranges.
+        /// </summary>
+        public static readonly string LemmaFontFamily = "Tahoma";
+
+        /// <summary>
+        /// Font size for lemma (domain, equiv, note) in displayed entries. Hanzi size derived from this.
+        /// </summary>
+        public static readonly float LemmaFontSize = 10.0F;
+
+        /// <summary>
+        /// Font family for Pinyin in heading of displayed entries.
+        /// </summary>
+        public static readonly string PinyinFontFamily = "Tahoma";
+
+        /// <summary>
+        /// Font size for Pinyin in heading of displayed entries.
+        /// </summary>
+        public static readonly float PinyinFontSize = 11.0F;
+
+        /// <summary>
+        /// Base color of highlights in a result (auto-faded gradient at ends).
+        /// </summary>
+        public static readonly Color HiliteColor = Color.FromArgb(255, 232, 189);
+
+        /// <summary>
+        /// Hover color of text in results that acts as a lookup link.
+        /// </summary>
+        public static readonly Color LinkHoverColor = Color.Maroon;
+
+        /// <summary>
+        /// Font size of results count box in bottom right.
+        /// </summary>
+        public static readonly float ResultsCountFontSize = 9.0F;
     }
 }

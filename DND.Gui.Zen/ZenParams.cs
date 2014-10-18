@@ -29,20 +29,5 @@ namespace DND.Gui.Zen
         public static readonly Color BtnGradDarkColorHover = Color.YellowGreen;
         public static readonly Color BtnGradDarkColorDisabled = Color.FromArgb(240, 240, 240);
         public static readonly Color BtnPressColor = Color.FromArgb(240, 128, 128);
-
-        public static readonly string ZhoButtonFontFamily = "Segoe UI";
-        public static readonly float ZhoButtonFontSize = 18.0F;
-        //public static readonly string ZhoFontFamily = "DFKai-SB";
-        //public static readonly string ZhoFontFamily = "䡡湄楮札䍓ⵆ潮瑳";
-        //public static readonly string ZhoFontFamily = "Noto Sans S Chinese Regular";
-        public static readonly string ZhoContentFontFamily = "AR PL UKai CN";
-        public static readonly float ZhoResultFontSize = 22.0F;
-        public static readonly string PinyinFontFamily = "Tahoma";
-        public static readonly float PinyinFontSize = 11.0F;
-        public static readonly string LemmaFontFamily = "Segoe UI";
-        public static readonly float LemmaFontSize = 10.0F;
-        public static readonly float ResultsCountFontSize = 9.0F;
-        public static readonly Color HiliteColor = Color.FromArgb(255, 232, 189);
-        public static readonly Color LinkHoverColor = Color.Maroon;
     }
 }

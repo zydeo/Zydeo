@@ -32,7 +32,7 @@ namespace DND.Gui
             txtInput.BorderStyle = BorderStyle.None;
             txtInput.TabIndex = 0;
             RegisterWinFormsControl(txtInput);
-            string fface = ZenParams.ZhoButtonFontFamily;
+            string fface = Magic.ZhoButtonFontFamily;
             txtInput.Font = new System.Drawing.Font(fface, 16F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
             txtInput.AutoSize = false;
             txtInput.Height = txtInput.PreferredHeight + padding;
