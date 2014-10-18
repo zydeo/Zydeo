@@ -99,6 +99,8 @@ namespace DND.Gui
 
             txtInput.MouseEnter += onTxtMouseEnter;
             txtInput.MouseLeave += onTxtMouseLeave;
+            txtInput.MouseMove += onTxtMouseMove;
+            txtInput.TextChanged += onTxtTextChanged;
         }
 
         /// <summary>
@@ -116,14 +118,17 @@ namespace DND.Gui
             int textBoxHeight = Height - padding;
             int textBoxTop = AbsTop + 1;
             // Text field: search icon on left, X icon on right
+            // ctrlHeight stands for width of buttons (they're all rectangular)
             // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
             // Position below is suitable for Noto, but not for Segoe.
-            //txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + padding);
-            txtInput.Location = new Point(AbsLeft + padding + ctrlHeight + padding, AbsTop + 1);
+            //txtInput.Location = new Point(AbsLeft + padding, AbsTop + padding);
+            txtInput.Location = new Point(AbsLeft + padding, AbsTop + 1);
             txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, textBoxHeight);
 
-            // Cancel button: right-aligned
-            btnCancel.RelLocation = new Point(Width - padding - btnCancel.Width, 2 * padding / 3);
+            // Search button: right-aligned
+            btnSearch.RelLocation = new Point(Width - padding - btnSearch.Width, padding);
+            // Cancel button: right-aligned, to the left of search button
+            btnCancel.RelLocation = new Point(Width - btnSearch.Width - padding - btnCancel.Width, padding);
         }
 
         /// <summary>
@@ -167,9 +172,11 @@ namespace DND.Gui
         /// <returns></returns>
         private bool isCancelVisible()
         {
+            if (txtInput.Text == string.Empty) return false;
             Point p = MousePosition;
-            Rectangle rect = new Rectangle(txtInput.Left, 1, Width - txtInput.Left - 1, Height - 2);
-            return rect.Contains(p);
+            Rectangle rect = new Rectangle(1, 1, btnCancel.RelRight - 1, Height - 2);
+            bool visible = rect.Contains(p);
+            return visible;
         }
 
         /// <summary>
@@ -178,7 +185,9 @@ namespace DND.Gui
         public override bool DoMouseMove(Point p, MouseButtons button)
         {
             base.DoMouseMove(p, button);
+            bool visibleBefore = btnCancel.Visible;
             btnCancel.Visible = isCancelVisible();
+            if (btnCancel.Visible != visibleBefore) MakeMePaint(false, RenderMode.Invalidate);
             return true;
         }
 
@@ -188,8 +197,9 @@ namespace DND.Gui
         public override void DoMouseEnter()
         {
             base.DoMouseEnter();
+            bool visibleBefore = btnCancel.Visible;
             btnCancel.Visible = isCancelVisible();
-            MakeMePaint(false, RenderMode.Invalidate);
+            if (btnCancel.Visible != visibleBefore) MakeMePaint(false, RenderMode.Invalidate);
         }
 
         /// <summary>
@@ -198,8 +208,9 @@ namespace DND.Gui
         public override void DoMouseLeave()
         {
             base.DoMouseLeave();
+            bool visibleBefore = btnCancel.Visible;
             btnCancel.Visible = false;
-            MakeMePaint(false, RenderMode.Invalidate);
+            if (btnCancel.Visible != visibleBefore) MakeMePaint(false, RenderMode.Invalidate);
         }
 
         /// <summary>
@@ -207,13 +218,12 @@ namespace DND.Gui
         /// </summary>
         private void onTxtMouseLeave(object sender, EventArgs e)
         {
-            // Pointer may lease text box but still be inside me
+            // Pointer may leave text box but still be inside me
             if (sender == txtInput)
             {
-                Point p = MousePositionAbs;
-                if (AbsRect.Contains(p)) return;
+                btnCancel.Visible = isCancelVisible();
+                MakeMePaint(false, RenderMode.Invalidate);
             }
-            DoMouseLeave();
         }
 
         /// <summary>
@@ -221,9 +231,21 @@ namespace DND.Gui
         /// </summary>
         private void onTxtMouseEnter(object sender, EventArgs e)
         {
-            if (btnCancel.Visible) return;
-            btnCancel.Visible = true;
+            btnCancel.Visible = txtInput.Text != string.Empty;
             MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        private void onTxtMouseMove(object sender, MouseEventArgs e)
+        {
+            btnCancel.Visible = txtInput.Text != string.Empty;
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        private void onTxtTextChanged(object sender, EventArgs e)
+        {
+            bool visibleBefore = btnCancel.Visible;
+            btnCancel.Visible = isCancelVisible();
+            if (btnCancel.Visible != visibleBefore) MakeMePaint(false, RenderMode.Invalidate);
         }
 
         /// <summary>
