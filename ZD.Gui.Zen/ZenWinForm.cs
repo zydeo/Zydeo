@@ -139,5 +139,10 @@ namespace ZD.Gui.Zen
             finally { dbufferMutex.ReleaseMutex(); }
         }
 
+        protected override void OnLocationChanged(EventArgs e)
+        {
+            base.OnLocationChanged(e);
+        }
+
     }
 }

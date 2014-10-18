@@ -14,6 +14,7 @@ namespace ZD.Gui.Zen
     public class ZenTabbedForm : ZenControlBase, IDisposable, IZenTabsChangedListener
     {
         private readonly ZenWinForm form;
+        private Size logicalMinimumSize = Size.Empty;
 
         private readonly int headerHeight;
         private readonly int innerPadding;
@@ -132,8 +133,14 @@ namespace ZD.Gui.Zen
             get
             {
                 Rectangle rect = form.DisplayRectangle;
-                return new Size((int)(rect.Width / Scale), (int)(rect.Height / Scale));
+                return new Size((int)Math.Ceiling((rect.Width / Scale)), (int)Math.Ceiling(rect.Height / Scale));
             }
+        }
+
+        public Size LogicalMinimumSize
+        {
+            get { return logicalMinimumSize; }
+            set { logicalMinimumSize = value; }
         }
 
         protected override sealed Point MousePositionAbs
@@ -572,10 +579,36 @@ namespace ZD.Gui.Zen
 
         private void onFormMouseUp(object sender, MouseEventArgs e)
         {
+            // Have been resizing or moving? Indicate it's now done.
+            if (dragMode != DragMode.None) DoMoveResizeFinished();
             // Resize by dragging border ends
             dragMode = DragMode.None;
             // Handle otherwise
             DoMouseUp(e.Location, e.Button);
+        }
+
+        /// <summary>
+        /// Takes a size, and calculates difference from real (scaled) minimum size if smaller.
+        /// In dimension that's OK, returns 0.
+        /// </summary>
+        private Size clipDiffFromMinSize(Size sz)
+        {
+            int w = (int)(((float)logicalMinimumSize.Width) * Scale);
+            int h = (int)(((float)logicalMinimumSize.Height) * Scale);
+            if (sz.Width < w) w = w - sz.Width;
+            else w = 0;
+            if (logicalMinimumSize.Width == 0) w = 0;
+            if (sz.Height < h) h = h - sz.Height;
+            else h = 0;
+            if (logicalMinimumSize.Height == 0) h = 0;
+            return new Size(w, h);
+        }
+
+        /// <summary>
+        /// Called when form has finished moving or resizing.
+        /// </summary>
+        protected virtual void DoMoveResizeFinished()
+        {
         }
 
         public override bool DoMouseMove(Point p, MouseButtons button)
@@ -593,7 +626,9 @@ namespace ZD.Gui.Zen
             else if (dragMode == DragMode.ResizeE)
             {
                 int dx = loc.X - dragStart.X;
-                form.Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height);
+                Size sz = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height);
+                Size dmin = clipDiffFromMinSize(sz);
+                form.Size = sz + dmin;
                 form.Refresh();
                 return true;
             }
@@ -616,7 +651,9 @@ namespace ZD.Gui.Zen
             else if (dragMode == DragMode.ResizeS)
             {
                 int dy = loc.Y - dragStart.Y;
-                form.Size = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height + dy);
+                Size sz = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height + dy);
+                Size dmin = clipDiffFromMinSize(sz);
+                form.Size = sz + dmin;
                 form.Refresh();
                 return true;
             }

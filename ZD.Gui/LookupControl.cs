@@ -98,10 +98,12 @@ namespace ZD.Gui
             this.tprov = tprov;
             padding = (int)Math.Round(5.0F * Scale);
 
-            // TO-DO: init from user settings here!
+            // Init search language and script from user settings
+            searchLang = AppSettings.SearchLang;
+            searchScript = AppSettings.SearchScript;
 
             // Init HanziLookup
-            fsStrokes = new FileStream("strokes-zydeo.bin", FileMode.Open, FileAccess.Read);
+            fsStrokes = new FileStream(Magic.StrokesFileName, FileMode.Open, FileAccess.Read);
             brStrokes = new BinaryReader(fsStrokes);
             strokesData = new StrokesDataSource(brStrokes);
 
@@ -176,7 +178,7 @@ namespace ZD.Gui
             btnSearchLang.ForcedCharHeight = siZho.RealRect.Height;
             btnSearchLang.ForcedCharVertOfs = ofsZho;
             btnSearchLang.MouseClick += onSearchLang;
-            setSearchLangText();
+            searchLangChanged();
 
             // Lookup results control.
             ctrlResults = new ResultsControl(this, tprov, onLookupThroughLink);
@@ -342,7 +344,7 @@ namespace ZD.Gui
             if (res.ActualSearchLang != searchLang)
             {
                 searchLang = res.ActualSearchLang;
-                setSearchLangText();
+                searchLangChanged();
                 btnSearchLang.Flash();
             }
             // Call below transfers ownership of entry provider to results control.
@@ -370,7 +372,7 @@ namespace ZD.Gui
         }
 
         /// <summary>
-        /// Updates text of script selector button based on current search script.
+        /// Updates text of script selector button based on current search script; updates user settings.
         /// </summary>
         private void setSimpTradText()
         {
@@ -382,16 +384,20 @@ namespace ZD.Gui
             else text = Magic.SearchBoth;
             btnSimpTrad.Text = text;
             btnSimpTrad.Invalidate();
+            // Save in user settings
+            AppSettings.SearchScript = searchScript;
         }
 
         /// <summary>
-        /// Updates text of search language selector based on current setting.
+        /// Updates text of search language selector based on current setting; updates user settings.
         /// </summary>
-        private void setSearchLangText()
+        private void searchLangChanged()
         {
             if (searchLang == SearchLang.Chinese) btnSearchLang.Text = Magic.SearchLangZho;
             else btnSearchLang.Text = Magic.SearchLangEng;
             btnSearchLang.Invalidate();
+            // Save in user settings
+            AppSettings.SearchLang = searchLang;
         }
 
         /// <summary>
@@ -423,7 +429,7 @@ namespace ZD.Gui
             if (searchLang == SearchLang.Chinese) searchLang = SearchLang.Target;
             else searchLang = SearchLang.Chinese;
             // Update button
-            setSearchLangText();
+            searchLangChanged();
         }
 
         /// <summary>

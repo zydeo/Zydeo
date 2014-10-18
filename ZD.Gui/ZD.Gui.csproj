@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppSettings.cs" />
     <Compile Include="CharPicker.cs" />
     <Compile Include="FontPool.cs" />
     <Compile Include="HanziMeasure.cs" />

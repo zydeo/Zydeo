@@ -14,17 +14,42 @@ namespace ZD.Gui
         /// <summary>
         /// The "looseness" of lookup, 0-1, higher == looser, looser more computationally intensive.
         /// </summary>
-        public const double HanziLookupLooseness = 0.25;
+        public readonly static double HanziLookupLooseness = 0.25;
 
         /// <summary>
         /// Maximum number of results to return with each lookup.
         /// </summary>
-        public const int HanziLookupNumResults = 15;
+        public readonly static int HanziLookupNumResults = 15;
 
         /// <summary>
         /// Name of compiled, binary dictionary file.
         /// </summary>
-        public const string DictFileName = "cedict-zydeo.bin";
+        public readonly static string DictFileName = "cedict-zydeo.bin";
+
+        /// <summary>
+        /// Name of compiled, binary stroke recognition data.
+        /// </summary>
+        public readonly static string StrokesFileName = "strokes-zydeo.bin";
+
+        /// <summary>
+        /// Subfolder in user's appdata where Zydeo stores its persistent user-specific data.
+        /// </summary>
+        public readonly static string ZydeoUserFolder = "Zydeo";
+
+        /// <summary>
+        /// Name of file where Zydeo's settings are stored in its user data folder.
+        /// </summary>
+        public readonly static string ZydeoSettingsFile = "Settings.xml";
+
+        /// <summary>
+        /// Window's default logical (unscaled) size.
+        /// </summary>
+        public readonly static Size WinDefaultLogicalSize = new Size(800, 500);
+
+        /// <summary>
+        /// Window's minimum logical (unscaled) size.
+        /// </summary>
+        public readonly static Size WinMinimumLogicalSize = new Size(600, 450);
 
         /// <summary>
         /// Non-localized text of script selector button: simplified.
