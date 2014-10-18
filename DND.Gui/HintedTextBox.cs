@@ -69,7 +69,7 @@ namespace DND.Gui
             using (Graphics g = CreateGraphics())
             {
                 using (Font f = new Font(this.Font, FontStyle.Italic))
-                using (Brush b = new SolidBrush(Color.FromArgb(80, this.ForeColor)))
+                using (Brush b = new SolidBrush(Color.FromArgb(Magic.SearchInputHintOpacity, this.ForeColor)))
                 {
                     g.DrawString(hintText, f, b, new PointF(0, 0));
                 }

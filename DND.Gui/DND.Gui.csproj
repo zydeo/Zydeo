@@ -63,6 +63,7 @@
     <Compile Include="WritingPad.Designer.cs">
       <DependentUpon>WritingPad.cs</DependentUpon>
     </Compile>
+    <Compile Include="WritingPad.Paint.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DND.Common\DND.Common.csproj">

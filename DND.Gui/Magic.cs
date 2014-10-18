@@ -142,5 +142,15 @@ namespace DND.Gui
         /// Alternating BG color of entries in results list.
         /// </summary>
         public static readonly Color ResultsAltBackColor = Color.FromArgb(248, 248, 255);
+
+        /// <summary>
+        /// Opacity of text shown as hint in search input field
+        /// </summary>
+        public static readonly int SearchInputHintOpacity = 80;
+
+        /// <summary>
+        /// Opacity of hint text in writing pad.
+        /// </summary>
+        public static readonly int WritingPadHintOpacity = 128;
     }
 }
