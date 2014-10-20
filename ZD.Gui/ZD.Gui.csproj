@@ -50,6 +50,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="LookupControl.cs" />
+    <Compile Include="LookupControl.Tooltip.cs" />
     <Compile Include="Magic.cs" />
     <Compile Include="MainForm.cs" />
     <Compile Include="OneResultControl.Analysis.cs" />

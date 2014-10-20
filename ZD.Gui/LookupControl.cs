@@ -18,7 +18,7 @@ namespace ZD.Gui
     /// <summary>
     /// Tab control that includes writing pad, search text entry field, results etc.
     /// </summary>
-    internal class LookupControl : ZenControl
+    internal partial class LookupControl : ZenControl
     {
         /// <summary>
         /// Dictionary factory: we use this to create dictionary in worker thread, after startup, when window is already shown.
@@ -166,8 +166,9 @@ namespace ZD.Gui
             btnSimpTrad.Width = getSimpTradWidth();
             btnSimpTrad.ForcedCharHeight = siZho.RealRect.Height;
             btnSimpTrad.ForcedCharVertOfs = ofsZho;
+            btnSimpTrad.RelLeft = Width - padding - btnSimpTrad.Width;
+            btnSimpTrad.Height = ctrlSearchInput.Height;
             btnSimpTrad.MouseClick += onSimpTrad;
-            setSimpTradText();
 
             // Search language selector to the right of search input control
             btnSearchLang = new ZenGradientButton(this);
@@ -177,7 +178,12 @@ namespace ZD.Gui
             btnSearchLang.Width = getSearchLangWidth();
             btnSearchLang.ForcedCharHeight = siZho.RealRect.Height;
             btnSearchLang.ForcedCharVertOfs = ofsZho;
+            btnSearchLang.RelLeft = btnSimpTrad.RelLeft - padding - btnSearchLang.Width;
+            btnSearchLang.Height = ctrlSearchInput.Height;
             btnSearchLang.MouseClick += onSearchLang;
+
+            // Update button texts; do it here so tooltip locations will be correct.
+            simpTradChanged();
             searchLangChanged();
 
             // Lookup results control.
@@ -374,8 +380,9 @@ namespace ZD.Gui
         /// <summary>
         /// Updates text of script selector button based on current search script; updates user settings.
         /// </summary>
-        private void setSimpTradText()
+        private void simpTradChanged()
         {
+            // Set button "text"
             string text;
             if (searchScript == SearchScript.Simplified)
                 text = Magic.SearchSimp;
@@ -384,6 +391,9 @@ namespace ZD.Gui
             else text = Magic.SearchBoth;
             btnSimpTrad.Text = text;
             btnSimpTrad.Invalidate();
+            // Set button tooltip
+            btnSimpTrad.Tooltip = new SearchOptionsTooltip(btnSimpTrad, false, tprov, searchScript, searchLang,
+                padding, btnSimpTrad.Width);
             // Save in user settings
             AppSettings.SearchScript = searchScript;
         }
@@ -396,6 +406,9 @@ namespace ZD.Gui
             if (searchLang == SearchLang.Chinese) btnSearchLang.Text = Magic.SearchLangZho;
             else btnSearchLang.Text = Magic.SearchLangEng;
             btnSearchLang.Invalidate();
+            // Set button tooltip
+            btnSearchLang.Tooltip = new SearchOptionsTooltip(btnSearchLang, true, tprov, searchScript, searchLang,
+                padding, btnSimpTrad.RelRight - btnSearchLang.RelLeft);
             // Save in user settings
             AppSettings.SearchLang = searchLang;
         }
@@ -411,7 +424,7 @@ namespace ZD.Gui
             if (scri > 2) scri = 0;
             searchScript = (SearchScript)scri;
             // Update button
-            setSimpTradText();
+            simpTradChanged();
             // Change character picker's font
             // Only if it really changes - triggers calibration
             string newCPFont = searchScript == SearchScript.Traditional ? Magic.ZhoTradContentFontFamily : Magic.ZhoSimpContentFontFamily;

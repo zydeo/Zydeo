@@ -9,6 +9,7 @@ namespace ZD.Gui.Zen
     {
         public static readonly float HeaderHeight = 40;
         public static readonly float InnerPadding = 8;
+        public static readonly float TooltipPadding = 8;
         public static readonly Color BorderColor = Color.FromArgb(128, 128, 128);
         public static readonly Color PaddingBackColor = Color.Honeydew;
         public static readonly Color HeaderBackColor = Color.YellowGreen;
@@ -23,6 +24,10 @@ namespace ZD.Gui.Zen
         public static readonly string GenericFontFamily = "Segoe UI";
         public static readonly float StandardFontSize = 12.0F;
         public static readonly Color StandardTextColor = Color.Black;
+        public static readonly float TooltipFontSize = 10.0F;
+        public static readonly Color TooltipTextColor = Color.White;
+        public static readonly Color TooltipBackColor = Color.FromArgb(76, 76, 76);
+        public static readonly byte TooltipMaxAlfa = 224;
         public static readonly Color DisabledTextColor = Color.FromArgb(128, 128, 128);
 
         public static readonly Color BtnGradLightColor = Color.White;

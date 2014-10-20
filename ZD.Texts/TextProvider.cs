@@ -51,7 +51,9 @@ namespace ZD.Texts
                     if (line.StartsWith("#")) continue;
                     Match m = reStringLine.Match(line);
                     if (!m.Success) continue;
-                    newStrings[m.Groups[1].Value] = m.Groups[2].Value;
+                    string escaped = m.Groups[2].Value.Replace(@"\r\n", "\r\n");
+                    escaped = escaped.Replace(@"\n", "\r\n");
+                    newStrings[m.Groups[1].Value] = escaped;
                 }
             }
             // Replace old strings

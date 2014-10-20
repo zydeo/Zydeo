@@ -20,3 +20,11 @@ ResultCtrlClassifier		Classifier:
 # Hints: in text input control, and in writing pad
 SearchTextHint				Search Hanzi, Pinyin or English
 WritingPadHint				Draw here, then pick recognized Hanzi below
+
+# Tooltips on lookup control's buttons
+LangZhoTooltip				Searching in Hanzi and Pinyin first.\r\nClick to change for next search.
+LangTrgTooltip				Searching in English translations first.\r\nClick to change for next search.
+ScriptSimpTooltip			Showing simplified characters.\r\nClick to change for next search.
+ScriptTradTooltip			Showing traditional characters.\r\nClick to change for next search.
+ScriptBothTooltip			Showing both simplified and traditional characters.\r\nClick to change for next search.
+

@@ -226,6 +226,7 @@ namespace ZD.Gui.Zen
         public override void DoMouseEnter()
         {
             if (!enabled) return;
+            base.DoMouseEnter();
             doStartHoverAnim(true);
         }
 
@@ -235,6 +236,7 @@ namespace ZD.Gui.Zen
         public override void DoMouseLeave()
         {
             if (!enabled) return;
+            base.DoMouseLeave();
             doStartHoverAnim(false);
             doStartPressAnim(PressType.NotPressed);
         }

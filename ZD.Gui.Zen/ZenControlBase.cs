@@ -8,18 +8,53 @@ using System.Windows.Forms;
 
 namespace ZD.Gui.Zen
 {
+    /// <summary>
+    /// Abstract base class for Zen controls as well as Zen tabbed form.
+    /// </summary>
     public abstract class ZenControlBase : IDisposable
     {
+        /// <summary>
+        /// Delegate for <see cref="MouseClick"/> event.
+        /// </summary>
+        /// <param name="sender"></param>
         public delegate void ClickDelegate(ZenControlBase sender);
+        /// <summary>
+        /// Emitted when the control is clicked.
+        /// </summary>
         public event ClickDelegate MouseClick;
-
+        
+        /// <summary>
+        /// The control's parent (owner) control.
+        /// </summary>
         private ZenControlBase parent;
+        /// <summary>
+        /// The control's child controls.
+        /// </summary>
         private readonly List<ZenControlBase> zenChildren = new List<ZenControlBase>();
+        /// <summary>
+        /// The WinForms controls owned by this Zen control.
+        /// </summary>
         private readonly List<Control> winFormsControls = new List<Control>();
+        /// <summary>
+        /// The control's absolute rectangle on top-level window canvas, in real screen pixels at current scale.
+        /// </summary>
         private Rectangle absRect = new Rectangle(0, 0, 0, 0);
+        /// <summary>
+        /// The child control over which the mouse currently hovers.
+        /// </summary>
+        /// <remarks>
+        /// Used to send "mouse leave" and "mouse enter" notifications to child controls.
+        /// </remarks>
         private ZenControlBase ctrlWithMouse = null;
+        /// <summary>
+        /// True if control has already been disposed.
+        /// </summary>
         private bool isDisposed = false;
 
+        /// <summary>
+        /// Ctor: take parent.
+        /// </summary>
+        /// <param name="parent"></param>
         internal ZenControlBase(ZenControlBase parent)
         {
             this.parent = parent;
@@ -249,6 +284,37 @@ namespace ZD.Gui.Zen
             }
         }
 
+        /// <summary>
+        /// Register/unregister chain. Implemented and sealed by <see cref="ZenTabbedForm"/>.
+        /// </summary>
+        /// <param name="ctrl">Control to register for showing tooltips.</param>
+        /// <param name="tt">Tooltip informatio provider. To show not tooltips, pass null.</param>
+        internal virtual void RegisterControlForTooltip(ZenControlBase ctrl, IZenTooltip tt)
+        {
+            ZenControlBase parent = Parent;
+            if (parent != null) parent.RegisterControlForTooltip(ctrl, tt);
+        }
+
+        /// <summary>
+        /// Signal mouse action to form, to start countdown/animation for showing or hiding tooltip.
+        /// </summary>
+        /// <param name="ctrl">The affected control.</param>
+        /// <param name="enter">
+        /// <para>If true, countdown for showing begins. If false, animation to take down tooltip begins</para>
+        /// <para>Can be called multiple times with false: hide animation will continue if already in progress.</para>
+        /// <para>If called with false after tooltip has already expired and been hidden, has no effect.</para>
+        /// </param>
+        internal virtual void TooltipMouseAction(ZenControlBase ctrl, bool show)
+        {
+            ZenControlBase parent = Parent;
+            if (parent != null) parent.TooltipMouseAction(ctrl, show);
+        }
+
+        /// <summary>
+        /// Triggers a callback to control's <see cref="DoPaint"/>, then re-renders canvas.
+        /// </summary>
+        /// <param name="needBackground">If true, full canvas is repainted to control can render over stuff outside it's own rectangle.</param>
+        /// <param name="rm">Determines when canvas is re-rendered after painting.</param>
         protected void MakeMePaint(bool needBackground, RenderMode rm)
         {
             // Request comes from background thread. In the UI thread, parent may just have been removed.
@@ -258,6 +324,9 @@ namespace ZD.Gui.Zen
             if (parent != null) parent.MakeCtrlPaint(this, needBackground, rm);
         }
 
+        /// <summary>
+        /// End of chain; see <see cref="MakeMePaint"/>.
+        /// </summary>
         internal virtual void MakeCtrlPaint(ZenControlBase ctrl, bool needBackground, RenderMode rm)
         {
             // Request comes from background thread. In the UI thread, parent may just have been removed.
@@ -282,12 +351,6 @@ namespace ZD.Gui.Zen
         protected virtual Point MousePositionAbs
         {
             get { return Parent.MousePositionAbs; }
-        }
-
-        protected virtual void RegisterWinFormsControl(Control c)
-        {
-            winFormsControls.Add(c);
-            Parent.RegisterWinFormsControl(c);
         }
 
         protected virtual void InvokeOnForm(Delegate method)
@@ -334,11 +397,26 @@ namespace ZD.Gui.Zen
                 AddWinFormsControl(c);
         }
 
+        /// <summary>
+        /// See <see cref="ZenControl.RegisterWinFormsControl"/>.
+        /// </summary>
+        protected virtual void RegisterWinFormsControl(Control c)
+        {
+            winFormsControls.Add(c);
+            Parent.RegisterWinFormsControl(c);
+        }
+
+        /// <summary>
+        /// Add/remove chain. Implemented by <see cref="ZenTabbedForm"/>.
+        /// </summary>
         internal virtual void AddWinFormsControl(Control c)
         {
             Parent.AddWinFormsControl(c);
         }
 
+        /// <summary>
+        /// Add/remove chain. Implemented by <see cref="ZenTabbedForm"/>.
+        /// </summary>
         internal virtual void RemoveWinFormsControl(Control c)
         {
             Parent.RemoveWinFormsControl(c);
@@ -472,6 +550,9 @@ namespace ZD.Gui.Zen
 
         public virtual void DoMouseEnter()
         {
+            // Let parent form know so it can show tooltips if needed.
+            TooltipMouseAction(this, true);
+            // Forward leave/enter notifiations to any affected child controls.
             Point pAbs = MousePositionAbs;
             Point pRel = new Point(pAbs.X - AbsLeft, pAbs.Y - AbsTop);
             ZenControlBase ctrl = GetControl(pRel);
@@ -488,6 +569,9 @@ namespace ZD.Gui.Zen
 
         public virtual void DoMouseLeave()
         {
+            // Let parent form know so it can hide any visible tooltip.
+            TooltipMouseAction(this, false);
+            // Forward leave notifiation to any affected child control.
             if (ctrlWithMouse != null)
             {
                 ctrlWithMouse.DoMouseLeave();

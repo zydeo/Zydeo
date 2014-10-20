@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 
 namespace ZD.Gui.Zen
 {
-    public class ZenTabbedForm : ZenControlBase, IDisposable, IZenTabsChangedListener
+    public partial class ZenTabbedForm : ZenControlBase, IDisposable, IZenTabsChangedListener
     {
         private readonly ZenWinForm form;
         private Size logicalMinimumSize = Size.Empty;
@@ -27,8 +27,9 @@ namespace ZD.Gui.Zen
         private ZenTab mainTab;
         private readonly ZenTabCollection tabs;
         private int activeTabIdx = 0;
-        private readonly List<ZenControlBase> timerSubscribers = new List<ZenControlBase>();
         private Cursor desiredCursor = Cursors.Arrow;
+        private readonly int tooltipPadding;
+        private readonly Dictionary<ZenControlBase, TooltipInfo> tooltipInfos = new Dictionary<ZenControlBase, TooltipInfo>();
 
         public ZenTabbedForm()
             : base(null)
@@ -37,6 +38,7 @@ namespace ZD.Gui.Zen
 
             headerHeight = (int)(ZenParams.HeaderHeight * Scale);
             innerPadding = (int)(ZenParams.InnerPadding * Scale);
+            tooltipPadding = (int)(ZenParams.TooltipPadding * Scale);
 
             createZenControls();
             tabs = new ZenTabCollection(this);
@@ -313,10 +315,19 @@ namespace ZD.Gui.Zen
             form.Controls.Remove(c);
         }
 
-
         protected override sealed void InvokeOnForm(Delegate method)
         {
             form.Invoke(method);
+        }
+
+        /// <summary>
+        /// Handles the timer event for animations. Unsubscribes when timer no longer needed.
+        /// </summary>
+        public override void DoTimer()
+        {
+            bool timerNeeded = false;
+            timerNeeded |= doTimerTooltip();
+            if (!timerNeeded) UnsubscribeFromTimer();
         }
 
         private void doRepaint()
@@ -344,7 +355,7 @@ namespace ZD.Gui.Zen
                 if (pc == null) return;
                 Graphics g = pc.Graphics;
                 if (needBackground) DoPaint(g);
-                else
+                else if (ctrl != null)
                 {
                     g.TranslateTransform(ctrl.AbsLeft, ctrl.AbsTop);
                     g.Clip = new Region(new Rectangle(0, 0, ctrl.Width, ctrl.Height));
@@ -380,78 +391,6 @@ namespace ZD.Gui.Zen
             }
         }
 
-        private void doPaintBackground(Graphics g)
-        {
-            using (Brush b = new SolidBrush(ZenParams.HeaderBackColor))
-            {
-                g.FillRectangle(b, 0, 0, form.Width, headerHeight);
-            }
-            // For content tab and main tab, pad with different color
-            Color colPad = ZenParams.PaddingBackColor;
-            if (activeTabIdx == -1) colPad = Color.White;
-            using (Brush b = new SolidBrush(colPad))
-            {
-                g.FillRectangle(b, innerPadding, headerHeight, form.Width - 2 * innerPadding, innerPadding);
-                g.FillRectangle(b, 0, headerHeight, innerPadding, form.Height - headerHeight);
-                g.FillRectangle(b, form.Width - innerPadding, headerHeight, innerPadding, form.Height - headerHeight);
-                g.FillRectangle(b, innerPadding, form.Height - innerPadding - 1, form.Width - 2 * innerPadding, innerPadding);
-            }
-            using (Pen p = new Pen(ZenParams.BorderColor))
-            {
-                p.Width = 1;
-                g.DrawRectangle(p, 0, 0, form.Width - 1, form.Height - 1);
-            }
-        }
-
-        private void doPaintHeaderText(Graphics g)
-        {
-            // Text in header: my window title
-            float x = contentTabControls[contentTabControls.Count - 1].AbsRight;
-            x += ZenParams.HeaderTabPadding * 3.0F;
-            float y = 7.0F * Scale;
-            float w = ctrlClose.AbsLeft - x;
-            RectangleF rectHeader = new RectangleF(x, y, ctrlClose.AbsLeft - w, headerHeight - y);
-            using (Brush b = new SolidBrush(ZenParams.StandardTextColor))
-            using (Font f = new Font(new FontFamily(ZenParams.HeaderFontFamily), ZenParams.HeaderFontSize))
-            {
-                SizeF hsz;
-                StringFormat sf = StringFormat.GenericTypographic;
-                // Header is not ellipsed yet. Measure full text. Maybe it just fits.
-                if (headerEllipsed == null)
-                {
-                    hsz = g.MeasureString(header, f, 65535, sf);
-                    if (hsz.Width < w) headerEllipsed = header;
-                }
-                // Our manual ellipsis - or not
-                if (headerEllipsed == null)
-                {
-                    headerEllipsed = header.Substring(0, header.Length - 1) + "…";
-                    while (true)
-                    {
-                        if (headerEllipsed.Length == 1) break;
-                        hsz = g.MeasureString(headerEllipsed, f, 65535, sf);
-                        if (hsz.Width < w) break;
-                        headerEllipsed = headerEllipsed.Substring(0, headerEllipsed.Length - 2) + "…";
-                    }
-                }
-                // Draw ellipsed text - centered
-                hsz = g.MeasureString(headerEllipsed, f, 65535, sf);
-                rectHeader.Width = hsz.Width + 1.0F;
-                if (headerEllipsed == header)
-                    rectHeader.X = x + (w - rectHeader.Width) / 2.0F;
-                g.DrawString(headerEllipsed, f, b, rectHeader, sf);
-            }
-        }
-
-        public override void DoPaint(Graphics g)
-        {
-            // Header, frame, content background...
-            doPaintBackground(g);
-            // Header text
-            doPaintHeaderText(g);
-            // All children
-            DoPaintChildren(g);
-        }
 
         private enum DragMode
         {
