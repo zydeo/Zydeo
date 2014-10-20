@@ -125,8 +125,8 @@ namespace ZD.Gui
                 this.isClear = isClear;
                 this.button = button;
                 this.needleHeight = needleHeight;
-                if (isClear) text = "Clear the writing pad";
-                else text = "Undo last stroke";
+                if (isClear) text = tprov.GetString("WritingPadClearTooltip");
+                else text = tprov.GetString("WritingPadUndoTooltip");
             }
         }
     }

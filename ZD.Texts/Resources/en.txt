@@ -28,3 +28,8 @@ ScriptSimpTooltip			Showing simplified characters.\r\nClick to change for next s
 ScriptTradTooltip			Showing traditional characters.\r\nClick to change for next search.
 ScriptBothTooltip			Showing both simplified and traditional characters.\r\nClick to change for next search.
 
+# Tooltips on the clear/undo buttons under writing pad
+WritingPadClearTooltip		Clear the writing pad
+WritingPadUndoTooltip		Undo last stroke
+
+
