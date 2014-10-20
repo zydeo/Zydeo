@@ -209,6 +209,9 @@ namespace ZD.Gui.Zen
         /// </summary>
         public override bool DoMouseClick(Point p, MouseButtons button)
         {
+            // Hide tooltip if it wants to be hidden on click
+            IZenTooltip tt = Tooltip;
+            if (tt != null && tt.HideOnClick) base.KillTooltip();
             // Make sure control's base does not send click event
             // We already did in MouseUp
             return visible;
@@ -241,6 +244,7 @@ namespace ZD.Gui.Zen
         public override void DoMouseEnter()
         {
             if (!Visible) return;
+            base.DoMouseEnter();
             doAnimGrow();
         }
 
@@ -250,6 +254,7 @@ namespace ZD.Gui.Zen
         public override void DoMouseLeave()
         {
             if (!Visible) return;
+            base.DoMouseLeave();
             doAnimShrink(false);
         }
 

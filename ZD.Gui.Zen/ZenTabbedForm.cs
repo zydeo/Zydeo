@@ -360,6 +360,7 @@ namespace ZD.Gui.Zen
                     g.TranslateTransform(ctrl.AbsLeft, ctrl.AbsTop);
                     g.Clip = new Region(new Rectangle(0, 0, ctrl.Width, ctrl.Height));
                     ctrl.DoPaint(g);
+                    doPaintTooltips(g);
                 }
             }
             finally

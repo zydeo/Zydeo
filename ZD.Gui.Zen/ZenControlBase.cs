@@ -311,6 +311,14 @@ namespace ZD.Gui.Zen
         }
 
         /// <summary>
+        /// Hides tooltip if visible.
+        /// </summary>
+        protected void KillTooltip()
+        {
+            TooltipMouseAction(this, false);
+        }
+
+        /// <summary>
         /// Triggers a callback to control's <see cref="DoPaint"/>, then re-renders canvas.
         /// </summary>
         /// <param name="needBackground">If true, full canvas is repainted to control can render over stuff outside it's own rectangle.</param>

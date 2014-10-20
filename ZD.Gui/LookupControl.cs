@@ -141,6 +141,10 @@ namespace ZD.Gui
             btnUndoStroke.Image = imgStrokesUndo;
             btnUndoStroke.Enabled = false;
             btnUndoStroke.MouseClick += onUndoStroke;
+            // --
+            btnClearWritingPad.Tooltip = new ClearUndoTooltips(btnClearWritingPad, true, tprov, padding);
+            btnUndoStroke.Tooltip = new ClearUndoTooltips(btnUndoStroke, false, tprov, padding);
+            // --
 
             // Character picker control under writing pad.
             ctrlCharPicker = new CharPicker(this);

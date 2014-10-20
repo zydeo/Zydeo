@@ -246,6 +246,9 @@ namespace ZD.Gui.Zen
         /// </summary>
         public override bool DoMouseClick(Point p, MouseButtons button)
         {
+            // Hide tooltip if it wants to be hidden on click
+            IZenTooltip tt = Tooltip;
+            if (tt != null && tt.HideOnClick) base.KillTooltip();
             // Prevent base class from handling click - we already sent Click event from mouse up.
             return true;
         }

@@ -58,6 +58,11 @@ namespace ZD.Gui.Zen
         int TopOrSide { get; }
 
         /// <summary>
+        /// If true, visible tooltip is hidden if control is clicked.
+        /// </summary>
+        bool HideOnClick { get; }
+
+        /// <summary>
         /// Gets the tooltip text to be shown.
         /// </summary>
         string Text { get; }

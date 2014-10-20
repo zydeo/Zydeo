@@ -11,6 +11,9 @@ namespace ZD.Gui
 {
     partial class LookupControl
     {
+        /// <summary>
+        /// Tooltip source for the "search language" and "script" buttons.
+        /// </summary>
         private class SearchOptionsTooltip : IZenTooltip
         {
             private readonly ZenGradientButton button;
@@ -36,6 +39,11 @@ namespace ZD.Gui
             public int TopOrSide
             {
                 get { return topOrSide; }
+            }
+
+            public bool HideOnClick
+            {
+                get { return false; }
             }
 
             public string Text
@@ -70,7 +78,56 @@ namespace ZD.Gui
                     else text = tprov.GetString("ScriptBothTooltip");
                 }
             }
+        }
 
+        /// <summary>
+        /// Tooltip source provider for Clear and Undo buttons under writing pad.
+        /// </summary>
+        private class ClearUndoTooltips : IZenTooltip
+        {
+            private readonly bool isClear;
+            private readonly ZenGradientButton button;
+            private readonly int needleHeight;
+            private readonly string text;
+
+            public int NeedlePos
+            {
+                get { return isClear ? button.Width / 3 : button.Width * 2 / 3; }
+            }
+
+            public TooltipLocation TooltipLocation
+            {
+                get { return Zen.TooltipLocation.North; }
+            }
+
+            public int NeedleHeight
+            {
+                get { return needleHeight; }
+            }
+
+            public int TopOrSide
+            {
+                get { return isClear ? 0 : -button.Width; }
+            }
+
+            public bool HideOnClick
+            {
+                get { return true; }
+            }
+
+            public string Text
+            {
+                get { return text; }
+            }
+
+            public ClearUndoTooltips(ZenGradientButton button, bool isClear, ITextProvider tprov, int needleHeight)
+            {
+                this.isClear = isClear;
+                this.button = button;
+                this.needleHeight = needleHeight;
+                if (isClear) text = "Clear the writing pad";
+                else text = "Undo last stroke";
+            }
         }
     }
 }
