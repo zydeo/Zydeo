@@ -179,14 +179,6 @@ namespace ZD.Gui.Zen
 
         private void doPaintTooltips(Graphics g)
         {
-            List<TooltipToPaint> ttpList = getTooltipsToPaint();
-            if (ttpList.Count != 0)
-            {
-                using (Font f = new Font(ZenParams.GenericFontFamily, ZenParams.TooltipFontSize, FontStyle.Regular))
-                {
-                    foreach (TooltipToPaint ttp in ttpList) doPaintTooltip(g, f, ttp);
-                }
-            }
         }
 
         public override void DoPaint(Graphics g)
@@ -198,7 +190,14 @@ namespace ZD.Gui.Zen
             // All children
             DoPaintChildren(g);
             // Paint tooltips
-            doPaintTooltips(g);
+            List<TooltipToPaint> ttpList = getTooltipsToPaint();
+            if (ttpList.Count != 0)
+            {
+                using (Font f = new Font(ZenParams.GenericFontFamily, ZenParams.TooltipFontSize, FontStyle.Regular))
+                {
+                    foreach (TooltipToPaint ttp in ttpList) doPaintTooltip(g, f, ttp);
+                }
+            }
         }
     }
 }

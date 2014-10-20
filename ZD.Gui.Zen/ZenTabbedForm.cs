@@ -354,13 +354,17 @@ namespace ZD.Gui.Zen
                 pc = form.GetBitmapRenderer();
                 if (pc == null) return;
                 Graphics g = pc.Graphics;
+                // If control requests its own repaint (e.g., from animation), AND there are tooltips
+                // -> We must repaint full canvas and put tooltips on top, to avoid crazy flicker
+                List<TooltipToPaint> ttpList = getTooltipsToPaint();
+                if (ttpList.Count != 0) needBackground = true;
+
                 if (needBackground) DoPaint(g);
                 else if (ctrl != null)
                 {
                     g.TranslateTransform(ctrl.AbsLeft, ctrl.AbsTop);
                     g.Clip = new Region(new Rectangle(0, 0, ctrl.Width, ctrl.Height));
                     ctrl.DoPaint(g);
-                    doPaintTooltips(g);
                 }
             }
             finally
