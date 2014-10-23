@@ -9,7 +9,19 @@ namespace ZD.Gui.Zen
     {
         public static readonly float HeaderHeight = 40;
         public static readonly float InnerPadding = 8;
+        public static readonly float SysBtnPadding = 13;
         public static readonly float TooltipPadding = 8;
+
+        public static readonly Size CloseBtnLogicalSize = new Size(40, 20);
+        public static readonly Color CloseBtnBgColorBase = Color.FromArgb(199, 80, 80);
+        public static readonly Color CloseBtnBgColorHover = Color.FromArgb(224, 67, 67);
+        public static readonly Color CloseBtnForeColor = Color.White;
+        public static readonly Size OtherSysBtnLogicalSize = new Size(25, 20);
+        public static readonly Color OtherSysBtnBgColorBase = Color.YellowGreen;
+        public static readonly Color OtherSysBtnBgColorHover = Color.FromArgb(54, 101, 179);
+        public static readonly Color OtherSysBtnForeColorBase = Color.Black;
+        public static readonly Color OtherSysBtnForeColorHover = Color.White;
+
         public static readonly Color BorderColor = Color.FromArgb(128, 128, 128);
         public static readonly Color PaddingBackColor = Color.Honeydew;
         public static readonly Color HeaderBackColor = Color.YellowGreen;
@@ -18,8 +30,6 @@ namespace ZD.Gui.Zen
         public static readonly float HeaderTabPadding = 12.0F;
         public static readonly string HeaderFontFamily = "Segoe UI";
         public static readonly float HeaderFontSize = 13.0F;
-        public static readonly Color CloseColorBase = Color.FromArgb(199, 80, 80);
-        public static readonly Color CloseColorHover = Color.FromArgb(224, 67, 67);
         public static readonly Color WindowColor = Color.White;
         public static readonly string GenericFontFamily = "Segoe UI";
         public static readonly float StandardFontSize = 12.0F;

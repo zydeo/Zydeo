@@ -20,9 +20,11 @@ namespace ZD.Gui.Zen
 
         private readonly int headerHeight;
         private readonly int innerPadding;
+        private readonly int sysBtnPadding;
         private string header;
         private string headerEllipsed = null;
-        private ZenCloseControl ctrlClose;
+        private ZenSystemButton btnClose;
+        private ZenSystemButton btnMinimize;
         private ZenTabControl mainTabCtrl;
         private readonly List<ZenTabControl> contentTabControls = new List<ZenTabControl>();
         private bool controlsCreated = false;
@@ -41,6 +43,7 @@ namespace ZD.Gui.Zen
 
             headerHeight = (int)(ZenParams.HeaderHeight * Scale);
             innerPadding = (int)(ZenParams.InnerPadding * Scale);
+            sysBtnPadding = (int)(ZenParams.SysBtnPadding * Scale);
             tooltipPadding = (int)(ZenParams.TooltipPadding * Scale);
 
             createZenControls();
@@ -55,6 +58,62 @@ namespace ZD.Gui.Zen
             form.MouseLeave += onFormMouseLeave;
             form.FormClosed += onFormClosed;
             form.Load += onFormLoaded;
+        }
+
+        public override void Dispose()
+        {
+            form.Dispose();
+            base.Dispose();
+        }
+
+        private void createZenControls()
+        {
+            btnClose = new ZenSystemButton(this, SystemButtonType.Close);
+            btnClose.AbsLocation = new Point(form.Width - btnClose.Width - sysBtnPadding, 0);
+            btnClose.MouseClick += btnClose_MouseClick;
+
+            btnMinimize = new ZenSystemButton(this, SystemButtonType.Minimize);
+            btnMinimize.AbsLocation = new Point(btnClose.AbsLeft - btnMinimize.Size.Width, 0);
+            btnMinimize.MouseClick += btnMinimize_MouseClick;
+
+            mainTabCtrl = new ZenTabControl(this, true);
+            mainTabCtrl.Text = "Main";
+            mainTabCtrl.LogicalSize = new Size(80, 30);
+            mainTabCtrl.Size = new Size(mainTabCtrl.PreferredWidth, mainTabCtrl.Height);
+            mainTabCtrl.AbsLocation = new Point(1, headerHeight - mainTabCtrl.Height);
+            mainTabCtrl.MouseClick += tabCtrl_MouseClick;
+
+            controlsCreated = true;
+        }
+
+        private void arrangeControls()
+        {
+            if (!controlsCreated) return;
+
+            headerEllipsed = null;
+
+            // Resize and place active content tab, if any
+            foreach (ZenTab zt in tabs)
+            {
+                if (!form.Created || ZenChildren.Contains(zt.Ctrl))
+                {
+                    zt.Ctrl.AbsLocation = new Point(innerPadding, headerHeight + innerPadding);
+                    zt.Ctrl.Size = new Size(
+                        form.Width - 2 * innerPadding,
+                        form.Height - 2 * innerPadding - headerHeight);
+                }
+            }
+            // Resize main tab, if active
+            if (mainTab != null && (!form.Created || ZenChildren.Contains(mainTab.Ctrl)))
+            {
+                mainTab.Ctrl.AbsLocation = new Point(innerPadding, headerHeight + innerPadding);
+                mainTab.Ctrl.Size = new Size(
+                    form.Width - 2 * innerPadding,
+                    form.Height - 2 * innerPadding - headerHeight);
+            }
+
+            btnClose.AbsLocation = new Point(form.Width - btnClose.Size.Width - sysBtnPadding, 0);
+            btnMinimize.AbsLocation = new Point(btnClose.AbsLeft - btnMinimize.Size.Width, 0);
         }
 
         public Form WinForm
@@ -206,63 +265,15 @@ namespace ZD.Gui.Zen
             Dispose();
         }
 
-        public override void Dispose()
-        {
-            form.Dispose();
-            base.Dispose();
-        }
-
-        private void createZenControls()
-        {
-            ctrlClose = new ZenCloseControl(this);
-            ctrlClose.LogicalSize = new Size(40, 20);
-            ctrlClose.AbsLocation = new Point(form.Width - ctrlClose.Width - innerPadding, 0);
-            ctrlClose.MouseClick += ctrlClose_MouseClick;
-
-            mainTabCtrl = new ZenTabControl(this, true);
-            mainTabCtrl.Text = "Main";
-            mainTabCtrl.LogicalSize = new Size(80, 30);
-            mainTabCtrl.Size = new Size(mainTabCtrl.PreferredWidth, mainTabCtrl.Height);
-            mainTabCtrl.AbsLocation = new Point(1, headerHeight - mainTabCtrl.Height);
-            mainTabCtrl.MouseClick += tabCtrl_MouseClick;
-
-            controlsCreated = true;
-        }
-
-        private void arrangeControls()
-        {
-            if (!controlsCreated) return;
-
-            headerEllipsed = null;
-            
-            // Resize and place active content tab, if any
-            foreach (ZenTab zt in tabs)
-            {
-                if (!form.Created || ZenChildren.Contains(zt.Ctrl))
-                {
-                    zt.Ctrl.AbsLocation = new Point(innerPadding, headerHeight + innerPadding);
-                    zt.Ctrl.Size = new Size(
-                        form.Width - 2 * innerPadding,
-                        form.Height - 2 * innerPadding - headerHeight);
-                }
-            }
-            // Resize main tab, if active
-            if (mainTab != null && (!form.Created || ZenChildren.Contains(mainTab.Ctrl)))
-            {
-                mainTab.Ctrl.AbsLocation = new Point(innerPadding, headerHeight + innerPadding);
-                mainTab.Ctrl.Size = new Size(
-                    form.Width - 2 * innerPadding,
-                    form.Height - 2 * innerPadding - headerHeight);
-            }
-
-            ctrlClose.AbsLocation = new Point(form.Width - ctrlClose.Size.Width - innerPadding, 0);
-        }
-
-        private void ctrlClose_MouseClick(ZenControlBase sender)
+        private void btnClose_MouseClick(ZenControlBase sender)
         {
             form.Close();
         }
 
+        void btnMinimize_MouseClick(ZenControlBase sender)
+        {
+            form.WindowState = FormWindowState.Minimized;
+        }
 
         private void tabCtrl_MouseClick(ZenControlBase sender)
         {

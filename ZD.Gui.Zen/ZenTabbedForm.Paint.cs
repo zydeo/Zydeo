@@ -39,8 +39,8 @@ namespace ZD.Gui.Zen
             float x = contentTabControls[contentTabControls.Count - 1].AbsRight;
             x += ZenParams.HeaderTabPadding * 3.0F;
             float y = 7.0F * Scale;
-            float w = ctrlClose.AbsLeft - x;
-            RectangleF rectHeader = new RectangleF(x, y, ctrlClose.AbsLeft - w, headerHeight - y);
+            float w = btnClose.AbsLeft - x;
+            RectangleF rectHeader = new RectangleF(x, y, btnClose.AbsLeft - w, headerHeight - y);
             using (Brush b = new SolidBrush(ZenParams.StandardTextColor))
             using (Font f = new Font(new FontFamily(ZenParams.HeaderFontFamily), ZenParams.HeaderFontSize))
             {
