@@ -131,19 +131,19 @@ namespace ZD.Gui
                 // Unpacks Chinese ranges
                 // Domain is localized text for "Classifier:" if, well, this is a classifier sense
                 int startIX = newBlocks.Count;
-                if (!classifier) getBlocks(cm.Domain, true, null, newBlocks, newLinks);
+                if (!classifier) makeBlocks(cm.Domain, true, null, newBlocks, newLinks);
                 else
                 {
                     string strClassifier = tprov.GetString("ResultCtrlClassifier");
                     HybridText htClassifier = new HybridText(strClassifier);
                     int ix = newBlocks.Count;
-                    getBlocks(htClassifier, true, null, newBlocks, newLinks);
+                    makeBlocks(htClassifier, true, null, newBlocks, newLinks);
                     Block xb = newBlocks[ix];
                     xb.NewLine = true;
                     newBlocks[ix] = xb;
                 }
-                getBlocks(cm.Equiv, false, hlArr[senseIdx], newBlocks, newLinks);
-                getBlocks(cm.Note, true, null, newBlocks, newLinks);
+                makeBlocks(cm.Equiv, false, hlArr[senseIdx], newBlocks, newLinks);
+                makeBlocks(cm.Note, true, null, newBlocks, newLinks);
                 // Measure each block
                 for (int i = startIX; i != newBlocks.Count; ++i)
                 {
@@ -167,7 +167,7 @@ namespace ZD.Gui
         /// <param name="hl">Highlight to show in hybrid text, or null.</param>
         /// <param name="blocks">List of blocks to append to.</param>
         /// <param name="links">List to gather links (appending to list).</param>
-        private void getBlocks(HybridText htxt, bool isMeta, CedictTargetHighlight hl,
+        private void makeBlocks(HybridText htxt, bool isMeta, CedictTargetHighlight hl,
             List<Block> blocks, List<LinkArea> links)
         {
             byte fntIdxLatin = isMeta ? fntMetaLatin : fntSenseLatin;
@@ -417,6 +417,7 @@ namespace ZD.Gui
                         // Last block breaks onto this line
                         lastPB.LocX = (short)Math.Round(blockX);
                         lastPB.LocY = (short)Math.Round(blockY);
+                        positionedBlocks[i - 1] = lastPB;
                         // We move on by last block's width plus (optional) space
                         blockX += ((float)lastBlock.Width);
                         if (!lastBlock.SenseId && lastBlock.SpaceAfter)
