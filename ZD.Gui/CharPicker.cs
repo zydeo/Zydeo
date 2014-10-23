@@ -285,7 +285,7 @@ namespace ZD.Gui
         /// <summary>
         /// Handles timer even for animations.
         /// </summary>
-        public override void DoTimer()
+        public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
         {
             lock (animLO)
             {
@@ -296,7 +296,8 @@ namespace ZD.Gui
                 }
                 if (!timerNeeded) UnsubscribeFromTimer();
             }
-            MakeMePaint(false, RenderMode.Invalidate);
+            needBackground = false;
+            renderMode = RenderMode.Invalidate;
         }
 
         /// <summary>

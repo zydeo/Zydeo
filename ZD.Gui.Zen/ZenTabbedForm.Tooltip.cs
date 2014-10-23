@@ -162,10 +162,10 @@ namespace ZD.Gui.Zen
         /// Handles tooltip animations.
         /// </summary>
         /// <returns>True if timer is still needed.</returns>
-        private bool doTimerTooltip()
+        private void doTimerTooltip(out bool timerNeeded, out bool paintNeeded)
         {
-            bool paintNeeded = false;
-            bool timerNeeded = false;
+            paintNeeded = false;
+            timerNeeded = false;
             lock (tooltipInfos)
             {
                 List<ZenControlBase> toRemove = new List<ZenControlBase>();
@@ -207,9 +207,6 @@ namespace ZD.Gui.Zen
                 }
                 foreach (var ctrl in toRemove) tooltipInfos.Remove(ctrl);
             }
-            // If paint is needed, ask for it
-            if (paintNeeded) MakeCtrlPaint(null, true, RenderMode.Invalidate);
-            return timerNeeded;
         }
 
         /// <summary>

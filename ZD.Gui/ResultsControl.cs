@@ -143,8 +143,13 @@ namespace ZD.Gui
         /// <summary>
         /// Executes animations (e.g., scrolling with momentum)
         /// </summary>
-        public override void DoTimer()
+        public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
         {
+            // We're not requesting repaint from here. We'll request that from scrollbar's event handler.
+            // TO-DO: do it here! With new Zen scrollbar.
+            needBackground = null;
+            renderMode = null;
+
             float speed = 0;
             lock (scrollTimerLO)
             {

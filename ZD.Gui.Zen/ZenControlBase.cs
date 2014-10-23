@@ -14,6 +14,34 @@ namespace ZD.Gui.Zen
     public abstract class ZenControlBase : IDisposable
     {
         /// <summary>
+        /// Passed by <see cref="ZenTimer"/> to <see cref="MakeControlsPaint"/> after completing timer callback cycle.
+        /// </summary>
+        internal class ControlToPaint
+        {
+            /// <summary>
+            /// Control that requested to be painted.
+            /// </summary>
+            public readonly ZenControlBase Ctrl;
+            /// <summary>
+            /// True if control needs background (forces repaint of entire canvas).
+            /// </summary>
+            public readonly bool NeedBackground;
+            /// <summary>
+            /// Render mode requested by control.
+            /// </summary>
+            public readonly RenderMode RenderMode;
+            /// <summary>
+            /// Ctor: init immutable instance.
+            /// </summary>
+            public ControlToPaint(ZenControlBase ctrl, bool needBackground, RenderMode renderMode)
+            {
+                Ctrl = ctrl;
+                NeedBackground = needBackground;
+                RenderMode = renderMode;
+            }
+        }
+
+        /// <summary>
         /// Delegate for <see cref="MouseClick"/> event.
         /// </summary>
         /// <param name="sender"></param>
@@ -329,19 +357,20 @@ namespace ZD.Gui.Zen
             // If I have no parent, silently do not invoke.
             // Happens when an animation is in progress and user switches to different tab in top form
             ZenControlBase parent = Parent;
-            if (parent != null) parent.MakeCtrlPaint(this, needBackground, rm);
+            if (parent != null)
+            {
+                ControlToPaint[] ctrls = new ControlToPaint[1];
+                ctrls[0] = new ControlToPaint(this, needBackground, rm);
+                parent.MakeControlsPaint(new ReadOnlyCollection<ControlToPaint>(ctrls));
+            }
         }
 
         /// <summary>
-        /// End of chain; see <see cref="MakeMePaint"/>.
+        /// Makes main form repaint a set of controls.
         /// </summary>
-        internal virtual void MakeCtrlPaint(ZenControlBase ctrl, bool needBackground, RenderMode rm)
+        internal virtual void MakeControlsPaint(ReadOnlyCollection<ControlToPaint> ctrls)
         {
-            // Request comes from background thread. In the UI thread, parent may just have been removed.
-            // If I have no parent, silently do not invoke.
-            // Happens when an animation is in progress and user switches to different tab in top form
-            ZenControlBase parent = Parent;
-            if (parent != null) parent.MakeCtrlPaint(ctrl, needBackground, rm);
+            if (parent != null) parent.MakeControlsPaint(ctrls);
         }
 
         /// <summary>
@@ -439,11 +468,19 @@ namespace ZD.Gui.Zen
         }
 
         /// <summary>
+        /// Chain; returns top-level form's timer.
+        /// </summary>
+        internal virtual ZenTimer Timer
+        {
+            get { return parent.Timer; }
+        }
+
+        /// <summary>
         /// Subscribes current control to timer events, so control receives callbacks to <see cref="DoTimer"/>.
         /// </summary>
         protected void SubscribeToTimer()
         {
-            ZenTimer.SubscribeToTimer(this);
+            Timer.Subscribe(this);
         }
 
         /// <summary>
@@ -451,14 +488,18 @@ namespace ZD.Gui.Zen
         /// </summary>
         protected void UnsubscribeFromTimer()
         {
-            ZenTimer.UnsubscribeFromTimer(this);
+            Timer.Unsubscribe(this);
         }
 
         /// <summary>
         /// Called periodically after control has subscribed to timer events via <see cref="SubscribeToTimer"/>.
         /// </summary>
-        public virtual void DoTimer()
+        /// <param name="needBackground">True if BG is needed; pass null if no paint callback requested.</param>
+        /// <param name="renderMode">Render mode after paint callack, or null to indicate no paint callback.</param>
+        public virtual void DoTimer(out bool? needBackground, out RenderMode? renderMode)
         {
+            needBackground = null;
+            renderMode = null;
         }
 
         /// <summary>

@@ -287,14 +287,18 @@ namespace ZD.Gui
         /// <summary>
         /// Handles timer for animations.
         /// </summary>
-        public override void DoTimer()
+        public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
         {
             bool needsPaint = doAnimLastStroke();
             needsPaint |= doAnimClear();
             needsPaint |= doAnimHint();
             // Request a repaint
-            if (needsPaint) MakeMePaint(false, RenderMode.Invalidate);
-            else UnsubscribeFromTimer();
+            if (needsPaint) { needBackground = false; renderMode = RenderMode.Invalidate; }
+            else
+            {
+                needBackground = null; renderMode = null;
+                UnsubscribeFromTimer();
+            }
         }
 
         public override bool DoMouseDown(Point p, MouseButtons button)

@@ -24,7 +24,8 @@ namespace ZD.Gui.Zen
         /// <param name="parent">The control's parent (owner).</param>
         public ZenControl(ZenControlBase parent)
             : base(parent)
-        { }
+        {
+        }
 
         /// <summary>
         /// Releases resources owned by control. Derived control MUST call base.Dispose().
@@ -84,14 +85,6 @@ namespace ZD.Gui.Zen
         public sealed override Rectangle AbsRect
         {
             get { return base.AbsRect; }
-        }
-
-        /// <summary>
-        /// End of chain; see <see cref="MakeMePaint"/>.
-        /// </summary>
-        internal override sealed void MakeCtrlPaint(ZenControlBase ctrl, bool needBackground, RenderMode rm)
-        {
-            base.MakeCtrlPaint(ctrl, needBackground, rm);
         }
 
         /// <summary>

@@ -177,10 +177,6 @@ namespace ZD.Gui.Zen
             }
         }
 
-        private void doPaintTooltips(Graphics g)
-        {
-        }
-
         public override void DoPaint(Graphics g)
         {
             // Header, frame, content background...

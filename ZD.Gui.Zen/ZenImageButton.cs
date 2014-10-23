@@ -150,7 +150,7 @@ namespace ZD.Gui.Zen
         /// <summary>
         /// Handles timer tick: nudges animation on to next state.
         /// </summary>
-        public override void DoTimer()
+        public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
         {
             lock (animLO)
             {
@@ -158,7 +158,8 @@ namespace ZD.Gui.Zen
                 timerNeeded |= doTimerSize();
                 if (!timerNeeded) UnsubscribeFromTimer();
             }
-            MakeMePaint(false, RenderMode.Invalidate);
+            needBackground = false;
+            renderMode = RenderMode.Invalidate;
         }
 
         /// <summary>

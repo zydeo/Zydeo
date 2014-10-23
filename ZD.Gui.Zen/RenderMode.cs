@@ -11,16 +11,16 @@ namespace ZD.Gui.Zen
     public enum RenderMode
     {
         /// <summary>
-        /// Render canvas immediately.
+        /// Does not re-render canvas after paint.
         /// </summary>
-        Update,
+        None = 1,
         /// <summary>
         /// Invalidate main window's canvas; queues up a regular Windows PAINT event.
         /// </summary>
-        Invalidate,
+        Invalidate = 2,
         /// <summary>
-        /// Does not re-render canvas after paint.
+        /// Render canvas immediately.
         /// </summary>
-        None
+        Update = 3,
     }
 }

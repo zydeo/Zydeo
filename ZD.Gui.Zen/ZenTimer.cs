@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Timers;
@@ -9,24 +10,30 @@ namespace ZD.Gui.Zen
     /// <summary>
     /// Provides a timer callback service for animations.
     /// </summary>
-    internal static class ZenTimer
+    internal class ZenTimer
     {
+        /// <summary>
+        /// Owner: provides a way to the form we'll call to request repaint for controls.
+        /// </summary>
+        private readonly ZenControlBase parent;
+
         /// <summary>
         /// The system timer.
         /// </summary>
-        private static readonly System.Timers.Timer timer;
+        private readonly System.Timers.Timer timer;
 
         /// <summary>
         /// List of current subscribers.
         /// </summary>
-        private static List<ZenControlBase> timerSubscribers;
+        private readonly List<ZenControlBase> timerSubscribers = new List<ZenControlBase>();
 
         /// <summary>
         /// Initializes static members and starts system timer.
         /// </summary>
-        static ZenTimer()
+        internal ZenTimer(ZenControlBase parent)
         {
-            timerSubscribers = new List<ZenControlBase>();
+            this.parent = parent;
+
             timer = new System.Timers.Timer(40);
             timer.AutoReset = true;
             timer.Start();
@@ -36,7 +43,7 @@ namespace ZD.Gui.Zen
         /// <summary>
         /// Adds new subscriber to timer callback.
         /// </summary>
-        public static void SubscribeToTimer(ZenControlBase ctrl)
+        public void Subscribe(ZenControlBase ctrl)
         {
             lock (timerSubscribers)
             {
@@ -48,7 +55,7 @@ namespace ZD.Gui.Zen
         /// <summary>
         /// Removes subscriber from timer callback.
         /// </summary>
-        public static void UnsubscribeFromTimer(ZenControlBase ctrl)
+        public void Unsubscribe(ZenControlBase ctrl)
         {
             lock (timerSubscribers)
             {
@@ -60,18 +67,27 @@ namespace ZD.Gui.Zen
         /// <summary>
         /// Invoked by system timer callback. Calls each subscriber's timer function.
         /// </summary>
-        private static void onTimerEvent(object sender, ElapsedEventArgs e)
+        private void onTimerEvent(object sender, ElapsedEventArgs e)
         {
             List<ZenControlBase> subscribers;
             lock (timerSubscribers)
             {
                 subscribers = new List<ZenControlBase>(timerSubscribers);
             }
+            List<ZenControlBase.ControlToPaint> ctrlsToPaint = new List<ZenControlBase.ControlToPaint>();
             foreach (ZenControlBase ctrl in subscribers)
             {
-                ctrl.DoTimer();
+                bool? needBackground;
+                RenderMode? renderMode;
+                ctrl.DoTimer(out needBackground, out renderMode);
+                if (renderMode != null)
+                {
+                    ctrlsToPaint.Add(new ZenControlBase.ControlToPaint(ctrl, needBackground.Value, renderMode.Value));
+                }
             }
+            // If any controls requested a pain callback, do it
+            if (ctrlsToPaint.Count != 0)
+                parent.MakeControlsPaint(new ReadOnlyCollection<ZenControlBase.ControlToPaint>(ctrlsToPaint));
         }
-
     }
 }

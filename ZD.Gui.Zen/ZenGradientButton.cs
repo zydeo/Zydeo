@@ -436,7 +436,7 @@ namespace ZD.Gui.Zen
         /// Handles timer event to update animations and request repaint; unsubscribes if all
         /// animations have completed.
         /// </summary>
-        public override void DoTimer()
+        public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
         {
             lock (animLO)
             {
@@ -445,7 +445,8 @@ namespace ZD.Gui.Zen
                 timerNeeded |= doTimerPress();
                 if (!timerNeeded) UnsubscribeFromTimer();
             }
-            MakeMePaint(false, RenderMode.Invalidate);
+            needBackground = false;
+            renderMode = RenderMode.Invalidate;
         }
 
         /// <summary>

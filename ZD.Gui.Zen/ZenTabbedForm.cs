@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace ZD.Gui.Zen
 {
     public partial class ZenTabbedForm : ZenControlBase, IDisposable, IZenTabsChangedListener
     {
+        private readonly ZenTimer zenTimer;
         private readonly ZenWinForm form;
         private Size logicalMinimumSize = Size.Empty;
 
@@ -34,6 +36,7 @@ namespace ZD.Gui.Zen
         public ZenTabbedForm()
             : base(null)
         {
+            zenTimer = new ZenTimer(this);
             form = new ZenWinForm(DoPaint);
 
             headerHeight = (int)(ZenParams.HeaderHeight * Scale);
@@ -300,6 +303,14 @@ namespace ZD.Gui.Zen
             form.Update();
         }
 
+        /// <summary>
+        /// Seals chain. Returns this form's zen timer.
+        /// </summary>
+        internal sealed override ZenTimer Timer
+        {
+            get { return zenTimer; }
+        }
+
         protected override sealed void RegisterWinFormsControl(Control c)
         {
             AddWinFormsControl(c);
@@ -323,11 +334,19 @@ namespace ZD.Gui.Zen
         /// <summary>
         /// Handles the timer event for animations. Unsubscribes when timer no longer needed.
         /// </summary>
-        public override void DoTimer()
+        public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
         {
             bool timerNeeded = false;
-            timerNeeded |= doTimerTooltip();
+            bool paintNeeded = false;
+            {
+                bool tn, pn;
+                doTimerTooltip(out tn, out pn);
+                timerNeeded |= tn;
+                paintNeeded |= pn;
+            }
             if (!timerNeeded) UnsubscribeFromTimer();
+            if (paintNeeded) { needBackground = false; renderMode = RenderMode.Invalidate; }
+            else { needBackground = null; renderMode = null; }
         }
 
         private void doRepaint()
@@ -346,25 +365,47 @@ namespace ZD.Gui.Zen
             }
         }
 
-        internal override sealed void MakeCtrlPaint(ZenControlBase ctrl, bool needBackground, RenderMode rm)
+        /// <summary>
+        /// Calls each control's paint function. Or repaints entire canvas (all controls) if needed.
+        /// </summary>
+        internal override sealed void MakeControlsPaint(ReadOnlyCollection<ControlToPaint> ctrls)
         {
             ZenWinForm.PaintCanvas pc = null;
+            // Strongest (most immediate) render mode requested
+            RenderMode rm = RenderMode.None;
             try
             {
                 pc = form.GetBitmapRenderer();
                 if (pc == null) return;
                 Graphics g = pc.Graphics;
-                // If control requests its own repaint (e.g., from animation), AND there are tooltips
+                // Paint only individual controls, or full canvas?
+                bool needBackground = false;
+                // If a control requests its own repaint (e.g., from animation), AND there are tooltips
                 // -> We must repaint full canvas and put tooltips on top, to avoid crazy flicker
                 List<TooltipToPaint> ttpList = getTooltipsToPaint();
-                if (ttpList.Count != 0) needBackground = true;
-
-                if (needBackground) DoPaint(g);
-                else if (ctrl != null)
+                if (ttpList.Count != 0)
                 {
-                    g.TranslateTransform(ctrl.AbsLeft, ctrl.AbsTop);
-                    g.Clip = new Region(new Rectangle(0, 0, ctrl.Width, ctrl.Height));
-                    ctrl.DoPaint(g);
+                    needBackground = true;
+                    rm = RenderMode.Invalidate;
+                }
+                // Any control specifically requesting background paint?
+                if (!needBackground)
+                    foreach (ControlToPaint ctp in ctrls)
+                        if (ctp.NeedBackground || ctp.Ctrl == this) { needBackground = true; break; }
+
+                // Do the painting
+                if (needBackground) DoPaint(g);
+                // Collect control's render mode wishes; paint them individually if needed
+                foreach (ControlToPaint ctp in ctrls)
+                {
+                    if (ctp.RenderMode > rm) rm = ctp.RenderMode;
+                    if (!needBackground)
+                    {
+                        g.ResetTransform(); g.ResetClip();
+                        g.TranslateTransform(ctp.Ctrl.AbsLeft, ctp.Ctrl.AbsTop);
+                        g.Clip = new Region(new Rectangle(0, 0, ctp.Ctrl.Width, ctp.Ctrl.Height));
+                        ctp.Ctrl.DoPaint(g);
+                    }
                 }
             }
             finally
