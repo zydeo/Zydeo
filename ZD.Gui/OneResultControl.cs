@@ -276,6 +276,7 @@ namespace ZD.Gui
         public override bool DoMouseClick(Point p, MouseButtons button)
         {
             // Are we over a link area?
+            if (targetLinks == null) return true;
             LinkArea overWhat = null;
             foreach (LinkArea link in targetLinks)
             {
