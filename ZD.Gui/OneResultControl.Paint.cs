@@ -181,7 +181,7 @@ namespace ZD.Gui
             float hanziMidY = sizeInfo.RealRect.Top + sizeInfo.RealRect.Height / 2.0F;
             Font myFontLatn = getFont(fntSenseLatin);
             FontFamily ffLatn = myFontLatn.FontFamily;
-            float latinMidY = getFont(fntSenseLatin).Height * 0.5F;
+            float latinMidY = getFont(fntSenseLatin).Height * 0.55F; // Tweak when Latin font changes
             targetHanziOfs = latinMidY - hanziMidY;
             return targetHanziOfs;
         }

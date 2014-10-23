@@ -116,7 +116,7 @@ namespace ZD.Gui
         /// <summary>
         /// Font family for lemma (domain, equiv, note) in displayed entries. Also for Hanzi ranges.
         /// </summary>
-        public static readonly string LemmaFontFamily = "Tahoma";
+        public static readonly string LemmaFontFamily = "Segoe UI";
 
         /// <summary>
         /// Font size for lemma (domain, equiv, note) in displayed entries. Hanzi size derived from this.
