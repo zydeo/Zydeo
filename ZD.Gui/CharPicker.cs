@@ -9,6 +9,9 @@ using ZD.Gui.Zen;
 
 namespace ZD.Gui
 {
+    /// <summary>
+    /// Displays recognized characters and allows user the pick the correct one by clicking it.
+    /// </summary>
     public class CharPicker : ZenControl
     {
         /// <summary>
@@ -318,7 +321,7 @@ namespace ZD.Gui
                     // Rectangle is not hovered over. Need to turn off?
                     else
                     {
-                        if (cr.AnimVal != 0) cr.AnimState = -1;
+                        if (cr.AnimVal != 0 || ix == -1) cr.AnimState = -1;
                     }
                     // Timer is needed if anything is animating.
                     needTimer |= cr.AnimState != 0;
