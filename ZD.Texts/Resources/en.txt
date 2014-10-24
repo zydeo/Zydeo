@@ -21,6 +21,10 @@ ResultCtrlClassifier		Classifier:
 SearchTextHint				Search Hanzi, Pinyin or English
 WritingPadHint				Draw here, then pick recognized Hanzi below
 
+# Main window tooltips: close and minimize buttons
+MainCloseTooltip			Close (Alt+F4)
+MainMinimizeTooltip			Minimize
+
 # Tooltips on lookup control's buttons
 LangZhoTooltip				Searching in Hanzi and Pinyin first.\r\nClick to change for next search.
 LangTrgTooltip				Searching in English translations first.\r\nClick to change for next search.

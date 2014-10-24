@@ -89,7 +89,7 @@ namespace ZD.Gui.Zen
             Point[] points;
             // This, the text's inside the bubble
             Rectangle trect;
-            // Measure tooltip text as if we had all the space in the world
+            // Measure tooltip text as if we had all the width in the world (well, within canvas at least)
             g.TextRenderingHint = TextRenderingHint.AntiAlias;
             StringFormat sf = StringFormat.GenericDefault;
             SizeF szF = g.MeasureString(ttp.TTI.Tooltip.Text, f, width - 2 * tooltipPadding);
@@ -98,9 +98,10 @@ namespace ZD.Gui.Zen
             // Tooltip is at the north
             if (ttp.TTI.Tooltip.TooltipLocation == TooltipLocation.North)
             {
-                // Look at tooltip's left and right bounds: what control wishes, and how much space we have in window
+                // Look at tooltip's left and right bounds: what control wishes, and how much space we have in window.
+                // We assume control's smart enough to request a bubble that fits vertically. We control for breadth.
                 int left, right;
-                // Center aligned
+                // Center aligned over needle
                 if (ttp.TTI.Tooltip.TopOrSide == int.MinValue)
                 {
                     left = ttp.TTI.Tooltip.NeedlePos + ttp.Ctrl.AbsLeft - sz.Width / 2 - tooltipPadding;
@@ -154,9 +155,57 @@ namespace ZD.Gui.Zen
                     new Point(ttp.Ctrl.AbsLeft + npos, ttp.Ctrl.AbsTop),
                 };
             }
-            // TO-DO: tooltip at east or west
+            // Tooltip is at the west
+            else if (ttp.TTI.Tooltip.TooltipLocation == TooltipLocation.West)
+            {
+                // Look at tooltip's top and bottom bounds: what control wishes, and how much space we have in window.
+                // We assume control's smart enough to request a bubble that fits horizontally. We control for height.
+                int top = 0;
+                int bottom = 0;
+                // Center aligned next to needle
+                if (ttp.TTI.Tooltip.TopOrSide == int.MinValue)
+                {
+                    top = ttp.TTI.Tooltip.NeedlePos + ttp.Ctrl.AbsTop - sz.Height / 2 - tooltipPadding / 2;
+                    bottom = top + sz.Height + tooltipPadding;
+                }
+                // Top aligned
+                else if (ttp.TTI.Tooltip.TopOrSide > 0)
+                {
+                    int y = ttp.TTI.Tooltip.TopOrSide;
+                    top = ttp.Ctrl.AbsTop + y;
+                    bottom = top + sz.Height + tooltipPadding;
+                }
+                // Fix top and bottom so they're never outside canvas
+                if (bottom > height) { bottom = height; top = bottom - sz.Height; }
+                if (top < 0) { top = 0; bottom = top + height; }
+                // So, we got our rectangles
+                brect = new Rectangle(
+                    ttp.Ctrl.AbsLeft - ttp.TTI.Tooltip.NeedleHeight - sz.Width - 2 * tooltipPadding, top,
+                    sz.Width + 2 * tooltipPadding, sz.Height + tooltipPadding);
+                trect = brect;
+                trect.X += tooltipPadding;
+                trect.Y += tooltipPadding / 2;
+                trect.Width -= 2 * tooltipPadding;
+                trect.Height -= tooltipPadding / 2;
+                // Bubble with needle
+                int npos = ttp.TTI.Tooltip.NeedlePos;
+                int nwidth = ttp.TTI.Tooltip.NeedleHeight;
+                points = new Point[]
+                {
+                    new Point(ttp.Ctrl.AbsLeft, ttp.Ctrl.AbsTop + npos),
+                    new Point(ttp.Ctrl.AbsLeft - nwidth, ttp.Ctrl.AbsTop + npos - nwidth),
+                    new Point(brect.Right, brect.Top),
+                    new Point(brect.Left, brect.Top),
+                    new Point(brect.Left, brect.Bottom),
+                    new Point(brect.Right, brect.Bottom),
+                    new Point(brect.Right, ttp.Ctrl.AbsTop + npos + nwidth),
+                    new Point(ttp.Ctrl.AbsLeft, ttp.Ctrl.AbsTop + npos),
+                };
+            }
+            // TO-DO: tooltip at east. Will do when needed.
             else
             {
+                // These rectangles will crash FillPolygon below. Goed zo.
                 brect = new Rectangle(0, 0, 0, 0);
                 trect = new Rectangle(0, 0, 0, 0);
                 points = new Point[0];

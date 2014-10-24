@@ -38,6 +38,7 @@ namespace ZD.Gui
         /// Ctor: initializes main form.
         /// </summary>
         public MainForm(ICedictEngineFactory dictFact, ITextProvider tprov)
+            : base(tprov)
         {
             this.tprov = tprov;
 

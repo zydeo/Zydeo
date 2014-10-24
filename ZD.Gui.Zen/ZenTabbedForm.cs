@@ -9,11 +9,13 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 
+using ZD.Common;
 
 namespace ZD.Gui.Zen
 {
     public partial class ZenTabbedForm : ZenControlBase, IDisposable, IZenTabsChangedListener
     {
+        private readonly ITextProvider tprov;
         private readonly ZenTimer zenTimer;
         private readonly ZenWinForm form;
         private Size logicalMinimumSize = Size.Empty;
@@ -35,11 +37,12 @@ namespace ZD.Gui.Zen
         private readonly int tooltipPadding;
         private readonly Dictionary<ZenControlBase, TooltipInfo> tooltipInfos = new Dictionary<ZenControlBase, TooltipInfo>();
 
-        public ZenTabbedForm()
+        public ZenTabbedForm(ITextProvider tprov)
             : base(null)
         {
-            zenTimer = new ZenTimer(this);
-            form = new ZenWinForm(DoPaint);
+            this.tprov = tprov;
+            this.zenTimer = new ZenTimer(this);
+            this.form = new ZenWinForm(DoPaint);
 
             headerHeight = (int)(ZenParams.HeaderHeight * Scale);
             innerPadding = (int)(ZenParams.InnerPadding * Scale);
@@ -75,6 +78,9 @@ namespace ZD.Gui.Zen
             btnMinimize = new ZenSystemButton(this, SystemButtonType.Minimize);
             btnMinimize.AbsLocation = new Point(btnClose.AbsLeft - btnMinimize.Size.Width, 0);
             btnMinimize.MouseClick += btnMinimize_MouseClick;
+
+            btnClose.Tooltip = new SysBtnTooltips(btnClose, tprov);
+            btnMinimize.Tooltip = new SysBtnTooltips(btnMinimize, tprov);
 
             mainTabCtrl = new ZenTabControl(this, true);
             mainTabCtrl.Text = "Main";

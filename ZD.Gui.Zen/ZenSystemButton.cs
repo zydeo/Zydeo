@@ -54,6 +54,14 @@ namespace ZD.Gui.Zen
         }
 
         /// <summary>
+        /// Gets what type of button this istance is.
+        /// </summary>
+        public SystemButtonType BtnType
+        {
+            get { return btnType; }
+        }
+
+        /// <summary>
         /// Lock for anim state and value.
         /// </summary>
         private object animLO = new object();
@@ -194,12 +202,14 @@ namespace ZD.Gui.Zen
 
         public override void DoMouseEnter()
         {
+            base.DoMouseEnter();
             doAnimate(true);
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
         public override void DoMouseLeave()
         {
+            base.DoMouseLeave();
             doAnimate(false);
             MakeMePaint(false, RenderMode.Invalidate);
         }

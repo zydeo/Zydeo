@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using ZD.Common;
+
 namespace ZD.Gui.Zen
 {
     partial class ZenTabbedForm
@@ -245,5 +247,53 @@ namespace ZD.Gui.Zen
             }
             return res;
         }
+
+        #region My own tooltip source - for system buttons
+
+        private class SysBtnTooltips : IZenTooltip
+        {
+            private readonly ZenSystemButton button;
+            private readonly string text;
+
+            public int NeedlePos
+            {
+                get { return button.Height / 2; }
+            }
+
+            public TooltipLocation TooltipLocation
+            {
+                get { return Zen.TooltipLocation.West; }
+            }
+
+            public int NeedleHeight
+            {
+                get { return button.Height / 4; }
+            }
+
+            public int TopOrSide
+            {
+                get { return 0; }
+            }
+
+            public bool HideOnClick
+            {
+                get { return true; }
+            }
+
+            public string Text
+            {
+                get { return text; }
+            }
+
+            public SysBtnTooltips(ZenSystemButton button, ITextProvider tprov)
+            {
+                this.button = button;
+                if (button.BtnType == SystemButtonType.Close) text = tprov.GetString("MainCloseTooltip");
+                else if (button.BtnType == SystemButtonType.Minimize) text = tprov.GetString("MainMinimizeTooltip");
+            }
+        }
+ 
+
+        #endregion
     }
 }
