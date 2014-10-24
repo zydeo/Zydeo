@@ -630,23 +630,37 @@ namespace ZD.Gui.Zen
                 int dx = loc.X - dragStart.X;
                 Size sz = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height);
                 Size dmin = clipDiffFromMinSize(sz);
-                form.Size = sz + dmin;
+                sz += dmin;
+                if (form.Size == sz) return true;
+                form.Size = sz;
                 form.Refresh();
                 return true;
             }
             else if (dragMode == DragMode.ResizeW)
             {
                 int dx = loc.X - dragStart.X;
-                form.Left = formBeforeDragLocation.X + dx;
-                form.Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height);
+                int left = formBeforeDragLocation.X + dx;
+                Size sz = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height);
+                Size dmin = clipDiffFromMinSize(sz);
+                sz += dmin;
+                left -= dmin.Width;
+                if (form.Left == left) return true;
+                form.Left = left;
+                form.Size = sz;
                 form.Refresh();
                 return true;
             }
             else if (dragMode == DragMode.ResizeN)
             {
                 int dy = loc.Y - dragStart.Y;
-                form.Top = formBeforeDragLocation.Y + dy;
-                form.Size = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height - dy);
+                int top = formBeforeDragLocation.Y + dy;
+                Size sz = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height - dy);
+                Size dmin = clipDiffFromMinSize(sz);
+                top -= dmin.Height;
+                sz += dmin;
+                if (form.Top == top) return true;
+                form.Top = top;
+                form.Size = sz;
                 form.Refresh();
                 return true;
             }
@@ -655,7 +669,9 @@ namespace ZD.Gui.Zen
                 int dy = loc.Y - dragStart.Y;
                 Size sz = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height + dy);
                 Size dmin = clipDiffFromMinSize(sz);
-                form.Size = sz + dmin;
+                sz += dmin;
+                if (form.Size == sz) return true;
+                form.Size = sz;
                 form.Refresh();
                 return true;
             }
@@ -663,8 +679,15 @@ namespace ZD.Gui.Zen
             {
                 int dx = loc.X - dragStart.X;
                 int dy = loc.Y - dragStart.Y;
-                form.Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height - dy);
-                form.Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y + dy);
+                Size sz = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height - dy);
+                Point pt = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y + dy);
+                Size dmin = clipDiffFromMinSize(sz);
+                sz += dmin;
+                pt.X -= dmin.Width;
+                pt.Y -= dmin.Height;
+                if (form.Location == pt) return true;
+                form.Size = sz;
+                form.Location = pt;
                 form.Refresh();
                 return true;
             }
@@ -672,7 +695,11 @@ namespace ZD.Gui.Zen
             {
                 int dx = loc.X - dragStart.X;
                 int dy = loc.Y - dragStart.Y;
-                form.Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height + dy);
+                Size sz = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height + dy);
+                Size dmin = clipDiffFromMinSize(sz);
+                sz += dmin;
+                if (sz == form.Size) return true;
+                form.Size = sz;
                 form.Refresh();
                 return true;
             }
@@ -680,8 +707,14 @@ namespace ZD.Gui.Zen
             {
                 int dx = loc.X - dragStart.X;
                 int dy = loc.Y - dragStart.Y;
-                form.Size = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height - dy);
-                form.Location = new Point(formBeforeDragLocation.X, formBeforeDragLocation.Y + dy);
+                Size sz = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height - dy);
+                Point pt = new Point(formBeforeDragLocation.X, formBeforeDragLocation.Y + dy);
+                Size dmin = clipDiffFromMinSize(sz);
+                sz += dmin;
+                pt.Y -= dmin.Height;
+                if (form.Location == pt) return true;
+                form.Size = sz;
+                form.Location = pt;
                 form.Refresh();
                 return true;
             }
@@ -689,8 +722,14 @@ namespace ZD.Gui.Zen
             {
                 int dx = loc.X - dragStart.X;
                 int dy = loc.Y - dragStart.Y;
-                form.Size = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height + dy);
-                form.Location = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y);
+                Size sz = new Size(formBeforeDragSize.Width - dx, formBeforeDragSize.Height + dy);
+                Point pt = new Point(formBeforeDragLocation.X + dx, formBeforeDragLocation.Y);
+                Size dmin = clipDiffFromMinSize(sz);
+                sz += dmin;
+                pt.X -= dmin.Width;
+                if (form.Location == pt) return true;
+                form.Size = sz;
+                form.Location = pt;
                 form.Refresh();
                 return true;
             }
