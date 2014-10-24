@@ -7,12 +7,10 @@ namespace ZD.Gui.Zen
 {
     public static class ZenParams
     {
+
         public static readonly float HeaderHeight = 40;
         public static readonly float InnerPadding = 8;
         public static readonly float SysBtnPadding = 13;
-        /// <summary>
-        /// Padding around tooltip text in bubble. This amount on left and right; half at top and bottom. Logical pixels.
-        /// </summary>
         public static readonly float TooltipPadding = 8;
 
         public static readonly Size CloseBtnLogicalSize = new Size(40, 20);
