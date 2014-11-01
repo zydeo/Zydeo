@@ -46,5 +46,18 @@ namespace ZD.Gui.Zen
         public static readonly Color BtnGradDarkColorHover = Color.YellowGreen;
         public static readonly Color BtnGradDarkColorDisabled = Color.FromArgb(240, 240, 240);
         public static readonly Color BtnPressColor = Color.FromArgb(240, 128, 128);
+
+        public static readonly int ScrollBarWidth = 20;
+        public static readonly Color ScrollColBg = Color.FromArgb(240, 240, 240);
+        public static readonly Color ScrollColArrowBase = Color.FromArgb(96, 96, 96);
+        public static readonly Color ScrollColBtnHover = Color.FromArgb(218, 218, 218);
+        public static readonly Color ScrollColArrowHover = Color.FromArgb(0, 0, 0);
+        public static readonly Color ScrollColThumbBase = Color.FromArgb(205, 205, 205);
+        public static readonly Color ScrollColThumbSemiHover = Color.FromArgb(166, 166, 166);
+        public static readonly Color ScrollColThumbHover = Color.FromArgb(136, 136, 136);
+        public static readonly Color ScrollColThumbActive = Color.FromArgb(106, 106, 106);
+        public static readonly Color ScrollColArrowActive = Color.FromArgb(96, 96, 96);
+        public static readonly Color ScrollColBtnPress = Color.FromArgb(96, 96, 96);
+        public static readonly Color ScrollColArrowPress = Color.FromArgb(255, 255, 255);
     }
 }

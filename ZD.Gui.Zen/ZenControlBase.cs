@@ -503,6 +503,18 @@ namespace ZD.Gui.Zen
         }
 
         /// <summary>
+        /// Mix two colors based on a float value between 0 and 1.
+        /// </summary>
+        protected static Color MixColors(Color ca, Color cb, float val)
+        {
+            float r = ((float)ca.R) + (((float)cb.R) - ((float)ca.R)) * val;
+            float g = ((float)ca.G) + (((float)cb.G) - ((float)ca.G)) * val;
+            float b = ((float)ca.B) + (((float)cb.B) - ((float)ca.B)) * val;
+            float a = ((float)ca.A) + (((float)cb.A) - ((float)ca.A)) * val;
+            return Color.FromArgb((int)a, (int)r, (int)g, (int)b);
+        }
+
+        /// <summary>
         /// Returns true if point is inside control, as expressed in parent's coordinate system.
         /// </summary>
         public bool Contains(Point pParent)

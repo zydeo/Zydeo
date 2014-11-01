@@ -139,21 +139,9 @@ namespace ZD.Gui.Zen
             }
         }
 
-        /// <summary>
-        /// Mix from color A to B based on val (0-1).
-        /// </summary>
-        private static Color mix(Color ca, Color cb, float val)
-        {
-            float r = ((float)ca.R) + (((float)cb.R) - ((float)ca.R)) * val;
-            float g = ((float)ca.G) + (((float)cb.G) - ((float)ca.G)) * val;
-            float b = ((float)ca.B) + (((float)cb.B) - ((float)ca.B)) * val;
-            float a = ((float)ca.A) + (((float)cb.A) - ((float)ca.A)) * val;
-            return Color.FromArgb((int)a, (int)r, (int)g, (int)b);
-        }
-
         private void doPaintClose(Graphics g, float val)
         {
-            Color bgCol = mix(ZenParams.CloseBtnBgColorBase, ZenParams.CloseBtnBgColorHover, val);
+            Color bgCol = MixColors(ZenParams.CloseBtnBgColorBase, ZenParams.CloseBtnBgColorHover, val);
             Color foreCol = ZenParams.CloseBtnForeColor;
             g.SmoothingMode = SmoothingMode.None;
             using (Brush b = new SolidBrush(bgCol))
@@ -177,8 +165,8 @@ namespace ZD.Gui.Zen
 
         private void doPaintMinimize(Graphics g, float val)
         {
-            Color bgCol = mix(ZenParams.OtherSysBtnBgColorBase, ZenParams.OtherSysBtnBgColorHover, val);
-            Color foreCol = mix(ZenParams.OtherSysBtnForeColorBase, ZenParams.OtherSysBtnForeColorHover, val);
+            Color bgCol = MixColors(ZenParams.OtherSysBtnBgColorBase, ZenParams.OtherSysBtnBgColorHover, val);
+            Color foreCol = MixColors(ZenParams.OtherSysBtnForeColorBase, ZenParams.OtherSysBtnForeColorHover, val);
             g.SmoothingMode = SmoothingMode.None;
             using (Brush b = new SolidBrush(bgCol))
             {

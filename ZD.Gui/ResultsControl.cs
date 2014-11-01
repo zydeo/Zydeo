@@ -15,7 +15,7 @@ using ZD.Gui.Zen;
 
 namespace ZD.Gui
 {
-    public class ResultsControl : ZenControl, IMessageFilter
+    public class ResultsControl : ZenControl
     {
         /// <summary>
         /// Delegate for handling lookup requests through clicking on target link.
@@ -33,8 +33,10 @@ namespace ZD.Gui
         /// </summary>
         private LookupThroughLinkDelegate lookupThroughLink;
 
-        // TEMP standard scroll bar
-        private VScrollBar sb;
+        /// <summary>
+        /// Scroll bar.
+        /// </summary>
+        private ZenScrollBar sbar;
 
         /// <summary>
         /// One result control for each result I'm showin.
@@ -52,12 +54,6 @@ namespace ZD.Gui
         private string txtResCount = string.Empty;
 
         /// <summary>
-        /// <para>Suppresses scroll changed event handler.</para>
-        /// <para>Needed to avoid recursion when we set to scroll thumb upon re-layout on resize.</para>
-        /// </summary>
-        private bool suppressScrollChanged = false;
-
-        /// <summary>
         /// Ctor.
         /// </summary>
         public ResultsControl(ZenControl owner, ITextProvider tprov, LookupThroughLinkDelegate lookupThroughLink)
@@ -65,72 +61,18 @@ namespace ZD.Gui
         {
             this.tprov = tprov;
             this.lookupThroughLink = lookupThroughLink;
-            Application.AddMessageFilter(this);
 
-            sb = new VScrollBar();
-            RegisterWinFormsControl(sb);
-            sb.Height = Height - 2;
-            sb.Top = 1;
-            sb.Left = Width - 1 - sb.Width;
-            sb.ValueChanged += sb_ValueChanged;
-            sb.Visible = false;
+            sbar = new ZenScrollBar(this, onTimerForScrollBar);
+            RemoveChild(sbar); // Instead of setting visible to false
+        }
 
+        /// <summary>
+        /// Handles scroll bar's request for a timer. It's bossy, this inert scrollbar.
+        /// </summary>
+        private void onTimerForScrollBar()
+        {
             SubscribeToTimer();
         }
-
-        /// <summary>
-        /// Called when scroll thumb moves: repositions results list and trigger paint.
-        /// </summary>
-        void sb_ValueChanged(object sender, EventArgs e)
-        {
-            if (suppressScrollChanged) return;
-
-            int y = 1 - sb.Value;
-            foreach (OneResultControl orc in resCtrls)
-            {
-                orc.RelTop = y;
-                y += orc.Height;
-            }
-            updateFirstVisibleIdx();
-            MakeMePaint(false, RenderMode.Invalidate);
-        }
-
-        public static ushort HIWORD(IntPtr l) { return (ushort)((l.ToInt64() >> 16) & 0xFFFF); }
-        public static ushort LOWORD(IntPtr l) { return (ushort)((l.ToInt64()) & 0xFFFF); }
-
-        /// <summary>
-        /// Pre-filters Windows messages to fish out mouse wheel events.
-        /// </summary>
-        public bool PreFilterMessage(ref Message m)
-        {
-            bool r = false;
-            if (m.Msg == 0x020A) //WM_MOUSEWHEEL
-            {
-                Point p = new Point((int)m.LParam);
-                int delta = (Int16)HIWORD(m.WParam);
-                MouseEventArgs e = new MouseEventArgs(MouseButtons.None, 0, p.X, p.Y, delta);
-                m.Result = IntPtr.Zero; //don't pass it to the parent window
-                onMouseWheel(e);
-            }
-            return r;
-        }
-
-        /// <summary>
-        /// Handles the mouse wheel event: adds momentum to animated scrolling.
-        /// </summary>
-        private void onMouseWheel(MouseEventArgs e)
-        {
-            // Don't handle mouse wheel even if we have no scroll bar.
-            if (!sb.Visible || !sb.Enabled) return;
-
-            // Input from the mouse wheel adds momentum to animated scrolling.
-            float extraMomentum = -((float)e.Delta) * ((float)sb.LargeChange) / 1500.0F;
-            lock (scrollTimerLO)
-            {
-                scrollSpeed += extraMomentum;
-            }
-        }
-
         /// <summary>
         /// Current speed of animated scrolling. Lock with <see cref="scrollTimerLO"/>.
         /// </summary>
@@ -145,38 +87,26 @@ namespace ZD.Gui
         /// </summary>
         public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
         {
-            // We're not requesting repaint from here. We'll request that from scrollbar's event handler.
-            // TO-DO: do it here! With new Zen scrollbar.
-            needBackground = null;
-            renderMode = null;
-
-            float speed = 0;
-            lock (scrollTimerLO)
+            bool needTimer, valueChanged;
+            sbar.DoScrollTimer(out needTimer, out valueChanged);
+            if (!needTimer) UnsubscribeFromTimer();
+            if (valueChanged)
             {
-                speed = scrollSpeed;
-                scrollSpeed *= 0.9F;
-                if (scrollSpeed > 3.0F) scrollSpeed -= 3.0F;
-                else if (scrollSpeed < -3.0F) scrollSpeed += 3.0F;
-                if (Math.Abs(scrollSpeed) < 1.0F) scrollSpeed = 0;
+                int y = 1 - sbar.Position;
+                foreach (OneResultControl orc in resCtrls)
+                {
+                    orc.RelTop = y;
+                    y += orc.Height;
+                }
+                updateFirstVisibleIdx();
+                needBackground = false;
+                renderMode = RenderMode.Invalidate;
             }
-            if (speed == 0) return;
-            InvokeOnForm((MethodInvoker)delegate
+            else
             {
-                // Height of content: my height minus 2 for top and bottom border
-                int ch = Height - 2;
-                int scrollVal = sb.Value;
-                scrollVal += (int)speed;
-                if (scrollVal < 0)
-                {
-                    scrollVal = 0;
-                }
-                else if (scrollVal > sb.Maximum - ch)
-                {
-                    scrollVal = sb.Maximum - ch;
-                    if (scrollVal < 0) scrollVal = 0;
-                }
-                sb.Value = scrollVal;
-            });
+                needBackground = null;
+                renderMode = null;
+            }
         }
 
         public override void Dispose()
@@ -194,7 +124,27 @@ namespace ZD.Gui
         {
             ch = Height - 2; // Top and bottom border
             cw = Width - 2; // Left and right borders
-            if (sb.Visible) cw -= sb.Width; // Scrollbar, if visible
+            if (sbar.Parent == this) cw -= sbar.Width; // Scrollbar, if visible
+        }
+
+        /// <summary>
+        /// <para>Effectively shows or hides scrollbar.</para>
+        /// <para>To hide, removes from children.</para>
+        /// <para>To show, adds to children and updates position.</para>
+        /// </summary>
+        private void setScrollbarVisibility(bool visible)
+        {
+            if (visible)
+            {
+                if (sbar.Parent != this) AddChild(sbar);
+                sbar.Height = Height - 2;
+                sbar.RelTop = 1;
+                sbar.RelLeft = Width - 1 - sbar.Width;
+            }
+            else
+            {
+                if (sbar.Parent == this) RemoveChild(sbar);
+            }
         }
 
         /// <summary>
@@ -206,11 +156,12 @@ namespace ZD.Gui
         {
             int cw, ch;
             getContentSize(out cw, out ch);
-            if (sb.Visible && resCtrls[resCtrls.Count - 1].RelBottom < Height - 1 ||
-                !sb.Visible && resCtrls[resCtrls.Count - 1].RelBottom >= Height - 1)
+            bool sbarVisible = sbar.Parent == this;
+            if (sbarVisible && resCtrls[resCtrls.Count - 1].RelBottom < Height - 1 ||
+                !sbarVisible && resCtrls[resCtrls.Count - 1].RelBottom >= Height - 1)
             {
-                sb.Visible = !sb.Visible;
-                sb.Enabled = sb.Visible;
+                sbarVisible = !sbarVisible;
+                setScrollbarVisibility(sbarVisible);
                 // Get content size again - scrollbar visibility affects it
                 getContentSize(out cw, out ch);
                 // Reposition results controls, laying them out from top
@@ -231,13 +182,16 @@ namespace ZD.Gui
                 updateFirstVisibleIdx();
             }
             // If scroll bar is now visible, set its large value and position
-            if (sb.Visible)
+            if (sbarVisible)
             {
-                suppressScrollChanged = true;
-                sb.Maximum = resCtrls[resCtrls.Count - 1].RelBottom - resCtrls[0].RelTop;
-                sb.LargeChange = ch;
-                sb.Value = 1 - resCtrls[0].RelTop;
-                suppressScrollChanged = false;
+                //suppressScrollChanged = true;
+                sbar.Maximum = resCtrls[resCtrls.Count - 1].RelBottom - resCtrls[0].RelTop;
+                sbar.PageSize = ch;
+                int smallChange = (int)(Magic.ZhoResultFontSize * Scale);
+                if (smallChange > ch) smallChange = ch;
+                sbar.SmallChange = smallChange;
+                sbar.Position = 1 - resCtrls[0].RelTop;
+                //suppressScrollChanged = false;
                 // Probably not needed, but doesn't hurt
                 updateFirstVisibleIdx();
             }
@@ -250,10 +204,9 @@ namespace ZD.Gui
             int cw, ch;
             getContentSize(out cw, out ch);
 
-            // Put Windows scroll bar in its place, update its large change (which is always one full screen)
-            sb.Height = Height - 2;
-            sb.Top = AbsTop + 1;
-            sb.Left = AbsLeft + Width - 1 - sb.Width;
+            // Put scroll bar in its place, update its large change (which is always one full screen)
+            // Call below will not change visibility, but update sbar position.
+            setScrollbarVisibility(sbar.Parent == this);
 
             // No results being shown: done here
             if (resCtrls.Count == 0) return;
@@ -386,8 +339,8 @@ namespace ZD.Gui
             // Decide if we first try with scrollbar visible or not
             // This is a very rough heuristics (10 results or more), but doesn't matter
             // Recalc costs much if there are many results, and the number covers that safely
-            sb.Visible = results.Count > 10;
-            sb.Enabled = results.Count > 10;
+            bool sbarVisible = results.Count > 10;
+            setScrollbarVisibility(sbarVisible);
 
             // Content rectangle height and width
             int cw, ch;
@@ -406,8 +359,7 @@ namespace ZD.Gui
             if (results.Count == 0)
             {
                 txtResCount = tprov.GetString("ResultsCountNone");
-                sb.Visible = false;
-                sb.Enabled = false;
+                setScrollbarVisibility(false);
                 MakeMePaint(false, RenderMode.Invalidate);
                 return;
             }
@@ -467,7 +419,7 @@ namespace ZD.Gui
                 int olHeight = (int)(txtSizeF.Height * 1.5F);
                 int lblPad = (int)(txtSizeF.Height * 0.25F);
                 int olRight = Width - 1;
-                if (sb.Visible) olRight -= sb.Width;
+                if (sbar.Parent == this) olRight -= sbar.Width;
                 int lblWidth = ((int)txtSizeF.Width) + lblPad;
 
                 // If we smoothing is on, gradient and normal opaque rectangles will never match up.
@@ -497,6 +449,14 @@ namespace ZD.Gui
             }
         }
 
+        /// <summary>
+        /// Paints control.
+        /// </summary>
+        /// <remarks>
+        /// This paint function is non-standard in that it does not invoke base.DoPaint.
+        /// Base paint would take care of children, BUT: we don't want that: we only paint visible results controls.
+        /// In exchange, we must manually paint or one real child, the scroll bar.
+        /// </remarks>
         public override void DoPaint(Graphics g)
         {
             // Content rectangle height and width
@@ -538,6 +498,14 @@ namespace ZD.Gui
             g.TranslateTransform(AbsLeft, AbsTop);
             g.Clip = new Region(new Rectangle(1, 1, cw, ch));
             doPaintBottomOverlay(g);
+            // Scroll bar, if visible
+            if (sbar.Parent == this)
+            {
+                g.ResetTransform();
+                g.TranslateTransform(sbar.AbsLeft, sbar.AbsTop);
+                g.Clip = new Region(new Rectangle(0, 0, sbar.Width, sbar.Height));
+                sbar.DoPaint(g);
+            }
         }
 
     }

@@ -35,7 +35,7 @@ namespace ZD.Gui.Zen
             this.parent = parent;
 
             timer = new System.Timers.Timer(40);
-            timer.AutoReset = true;
+            timer.AutoReset = false;
             timer.Start();
             timer.Elapsed += onTimerEvent;
         }
@@ -88,6 +88,8 @@ namespace ZD.Gui.Zen
             // If any controls requested a pain callback, do it
             if (ctrlsToPaint.Count != 0)
                 parent.MakeControlsPaint(new ReadOnlyCollection<ZenControlBase.ControlToPaint>(ctrlsToPaint));
+            // Start counting again
+            timer.Start();
         }
     }
 }
