@@ -111,7 +111,7 @@ namespace ZD.Gui
         /// <summary>
         /// Font size for Hanzi heading in each displayed dictionary entry. Also in character picker.
         /// </summary>
-        public static readonly float ZhoResultFontSize = 22.0F;
+        public static readonly float ZhoResultFontSize = 26.0F;
 
         /// <summary>
         /// Font family for lemma (domain, equiv, note) in displayed entries. Also for Hanzi ranges.
@@ -121,7 +121,7 @@ namespace ZD.Gui
         /// <summary>
         /// Font size for lemma (domain, equiv, note) in displayed entries. Hanzi size derived from this.
         /// </summary>
-        public static readonly float LemmaFontSize = 10.0F;
+        public static readonly float LemmaFontSize = 12.0F;
 
         /// <summary>
         /// Hanzi in lemma is displayed in font this much bigger than <see cref="LemmaFontSize"/>.
@@ -146,7 +146,7 @@ namespace ZD.Gui
         /// <summary>
         /// Font size for Pinyin in heading of displayed entries.
         /// </summary>
-        public static readonly float PinyinFontSize = 11.0F;
+        public static readonly float PinyinFontSize = 12.0F;
 
         /// <summary>
         /// Base color of highlights in a result (auto-faded gradient at ends).
