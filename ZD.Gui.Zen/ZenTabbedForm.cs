@@ -316,6 +316,9 @@ namespace ZD.Gui.Zen
 
         private void onFormSizeChanged(object sender, EventArgs e)
         {
+            // We get the weirdest sizes on minimize. Ignore all that - violates even our minimum size.
+            if (form.WindowState == FormWindowState.Minimized) return;
+            // Put everything in place, repaint, render
             arrangeControls();
             doRepaint();
             form.Update();
