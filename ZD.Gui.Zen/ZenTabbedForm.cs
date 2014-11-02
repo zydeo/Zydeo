@@ -36,6 +36,7 @@ namespace ZD.Gui.Zen
         private Cursor desiredCursor = Cursors.Arrow;
         private readonly int tooltipPadding;
         private readonly Dictionary<ZenControlBase, TooltipInfo> tooltipInfos = new Dictionary<ZenControlBase, TooltipInfo>();
+        private ZenControlBase ctrlCapturingMouse = null;
 
         public ZenTabbedForm(ITextProvider tprov)
             : base(null)
@@ -349,6 +350,20 @@ namespace ZD.Gui.Zen
         }
 
         /// <summary>
+        /// Set or clears the control receiving the mouse capture.
+        /// </summary>
+        internal sealed override void SetControlMouseCapture(ZenControlBase ctrl, bool capture)
+        {
+            if (capture)
+            {
+                ctrlCapturingMouse = ctrl;
+                WinForm.Capture = true;
+            }
+            else if (ctrl == ctrlCapturingMouse) ctrlCapturingMouse = null;
+            if (ctrlCapturingMouse == null) WinForm.Capture = false;
+        }
+
+        /// <summary>
         /// Handles the timer event for animations. Unsubscribes when timer no longer needed.
         /// </summary>
         public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
@@ -558,6 +573,15 @@ namespace ZD.Gui.Zen
 
         private void onFormMouseDown(object sender, MouseEventArgs e)
         {
+            // Got capture?
+            if (ctrlCapturingMouse != null)
+            {
+                // Transform to control's coordinates
+                Point pCtrl = new Point(e.Location.X - ctrlCapturingMouse.AbsLeft, e.Location.Y - ctrlCapturingMouse.AbsTop);
+                ctrlCapturingMouse.DoMouseDown(pCtrl, e.Button);
+                return;
+            }
+
             // Over any control? Not our job to handle.
             if (DoMouseDown(e.Location, e.Button))
                 return;
@@ -585,6 +609,15 @@ namespace ZD.Gui.Zen
             if (dragMode != DragMode.None) DoMoveResizeFinished();
             // Resize by dragging border ends
             dragMode = DragMode.None;
+
+            // Got capture?
+            if (ctrlCapturingMouse != null)
+            {
+                // Transform to control's coordinates
+                Point pCtrl = new Point(e.Location.X - ctrlCapturingMouse.AbsLeft, e.Location.Y - ctrlCapturingMouse.AbsTop);
+                ctrlCapturingMouse.DoMouseUp(pCtrl, e.Button);
+                return;
+            }
             // Handle otherwise
             DoMouseUp(e.Location, e.Button);
         }
@@ -731,6 +764,15 @@ namespace ZD.Gui.Zen
                 form.Size = sz;
                 form.Location = pt;
                 form.Refresh();
+                return true;
+            }
+
+            // Got capture?
+            if (ctrlCapturingMouse != null)
+            {
+                // Transform to control's coordinates
+                Point pCtrl = new Point(p.X - ctrlCapturingMouse.AbsLeft, p.Y - ctrlCapturingMouse.AbsTop);
+                ctrlCapturingMouse.DoMouseMove(pCtrl, button);
                 return true;
             }
 

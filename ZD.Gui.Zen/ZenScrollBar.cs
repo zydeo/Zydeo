@@ -160,9 +160,26 @@ namespace ZD.Gui.Zen
         #region Interaction / event handling
 
         /// <summary>
-        /// Gets the thumb's rectangle (depens on position, page size, full control size).
+        /// <para>The mouse Y position, in my coordinates, at the time the thumb was pressed (mouse down).</para>
+        /// <para>Value irrelevant if <see cref="pressedPart"/> is not the thumb.</para>
         /// </summary>
-        private Rectangle getThumbRect()
+        private int thumbHoldStartMouseY = -1;
+
+        /// <summary>
+        /// Top of thumb when dragging started.
+        /// </summary>
+        private int thumbHoldStartThumbTop = -1;
+
+        /// <summary>
+        /// The <see cref="Position"/> when dragging started.
+        /// </summary>
+        private int thumbHoldStartPos = -1;
+
+        /// <summary>
+        /// Gets the thumb's rectangle (depend on position, page size, full control size).
+        /// </summary>
+        /// <param name="pos">Rectangle corresponding to position, and current size and page size.</param>
+        private Rectangle getThumbRect(int pos)
         {
             // Adjust position so it's never out of bounds when we're in spring range
             int adjPos = position;
@@ -200,9 +217,11 @@ namespace ZD.Gui.Zen
 
         public override bool DoMouseDown(Point p, MouseButtons button)
         {
+            // No righties
             if (button != MouseButtons.Left) return true;
 
-            Rectangle thumbRect = getThumbRect();
+            // Figure out what's been pressed
+            Rectangle thumbRect = getThumbRect(position);
             bool overTopBtn = new Rectangle(0, 0, Width, Width).Contains(p);
             bool overThumb = thumbRect.Contains(p);
             bool overBottomBtn = new Rectangle(0, Height - Width, Width, Width).Contains(p);
@@ -213,31 +232,75 @@ namespace ZD.Gui.Zen
             else if (p.Y > thumbRect.Bottom) pressedPart = WorkingPart.BottomJump;
             else pressedPart = WorkingPart.None;
 
+            // UI goodies, ease colors in and out
             doAnimateTo(true, overTopBtn, overThumb, overBottomBtn, pressedPart);
+
+            // Jumpy-holdy parts (buttons and full page scroll), OR thumb now gets dragged around
             if (pressedPart == WorkingPart.TopBtn) doBuyScrollFuel(-smallSchange);
             else if (pressedPart == WorkingPart.BottomBtn) doBuyScrollFuel(smallSchange);
-
+            else if (pressedPart == WorkingPart.Thumb)
+            {
+                // Dragging the thumb means any scrolling in progress stops right now
+                // But: record mandatory scroll position
+                doStopAnyScroll(position);
+                // Remember where we started dragging
+                thumbHoldStartMouseY = p.Y;
+                thumbHoldStartThumbTop = thumbRect.Top;
+                thumbHoldStartPos = position;
+                // Start capturing mouse. We want to keep tracking even if pointer leaves to left or right while
+                // button is pressed.
+                CaptureMouse();
+            }
+            
+            // We're done here.
             return true;
         }
 
         public override bool DoMouseUp(Point p, MouseButtons button)
         {
+            // No righties
             if (button != MouseButtons.Left) return true;
 
+            // If we've been tracking thumb, stoppit.
+            if (pressedPart == WorkingPart.Thumb) StopCapturingMouse();
+
             pressedPart = WorkingPart.None;
+            lock (animLOScroll) { animPosInDrag = int.MinValue; }
             doAnimateTo(true, false, false, false, pressedPart);
             return true;
         }
 
         public override bool DoMouseMove(Point p, MouseButtons button)
         {
+            // If thumb is being dragged, handled that first
+            if (pressedPart == WorkingPart.Thumb)
+            {
+                // How far we've moved vertically since user pressed and held thumb
+                int diff = p.Y - thumbHoldStartMouseY;
+                // How high is thumb
+                int thumbH = getThumbRect(0).Height;
+                // Where thumb's top goes - but only within bounds!
+                // Note: "width" stands for height of up/down buttons
+                int thumbY = thumbHoldStartThumbTop + diff;
+                if (thumbY < Width) thumbY = Width;
+                else if (thumbY + thumbH > Height - Width) thumbY = Height - Width - thumbH;
+                // Calculate new position - thumb's top divides area whose height is my height - thumb height - two buttons
+                float uiRange = (float)(Height - 2 * Width - thumbH);
+                float uiProportion = ((float)(thumbY - Width)) / uiRange;
+                float posRange = (float)(maximum - pageSize);
+                float newPos = posRange * uiProportion;
+                // Let scroll animation thread know about this
+                lock (animLOScroll) { animPosInDrag = (int)newPos; }
+            }
+
+            // Do display niceties
             bool overTopBtn = false;
             bool overThumb = false;
             bool overBottomBtn = false;
             if (pressedPart == WorkingPart.None)
             {
                 overTopBtn = new Rectangle(0, 0, Width, Width).Contains(p);
-                overThumb = getThumbRect().Contains(p);
+                overThumb = getThumbRect(position).Contains(p);
                 overBottomBtn = new Rectangle(0, Height - Width, Width, Width).Contains(p);
             }
             doAnimateTo(true, overTopBtn, overThumb, overBottomBtn, pressedPart);
@@ -246,7 +309,9 @@ namespace ZD.Gui.Zen
 
         public override void DoMouseLeave()
         {
-            pressedPart = WorkingPart.None;
+            // If we're holding on to thumb, pretend we don't leave
+            if (pressedPart != WorkingPart.Thumb) pressedPart = WorkingPart.None;
+            // Update our make-up.
             doAnimateTo(false, false, false, false, pressedPart);
         }
 
@@ -294,7 +359,8 @@ namespace ZD.Gui.Zen
         }
 
         /// <summary>
-        /// Lock object around all anim states and values.
+        /// Lock object around my own anim states and values
+        /// Ie stuff touched in <see cref="DoTimer"/>.
         /// </summary>
         private object animLO = new object();
 
@@ -307,262 +373,6 @@ namespace ZD.Gui.Zen
         /// Current animation state.
         /// </summary>
         private readonly AnimState animState = new AnimState();
-
-        /// <summary>
-        /// Current scrolling speed.
-        /// </summary>
-        private float animScrollSpeed = 0;
-
-        /// <summary>
-        /// Fuel for thruster to burn.
-        /// </summary>
-        private float animFuel = 0;
-
-        /// <summary>
-        /// Inits animated values at creation time.
-        /// </summary>
-        private void doInitAnimVals()
-        {
-            animVals.TopBtnBg = ZenParams.ScrollColBg;
-            animVals.TopBtnArrow = ZenParams.ScrollColArrowBase;
-            animVals.BottomBtnBg = ZenParams.ScrollColBg;
-            animVals.BottomBtnArrow = ZenParams.ScrollColArrowBase;
-            animVals.Thumb = ZenParams.ScrollColThumbBase;
-        }
-
-        /// <summary>
-        /// Updates animations to target new states for our components.
-        /// </summary>
-        private void doAnimateTo(bool mouseIn, bool overTop, bool overThumb, bool overBottom,
-            WorkingPart wp)
-        {
-            // Figure out each component's desired color based on arguments
-            // First, just hover stuff
-            Color topBtnBg = overTop ? ZenParams.ScrollColBtnHover : ZenParams.ScrollColBg;
-            Color topBtnArrow = overTop ? ZenParams.ScrollColArrowHover : ZenParams.ScrollColArrowBase;
-            Color bottomBtnBg = overBottom ? ZenParams.ScrollColBtnHover : ZenParams.ScrollColBg;
-            Color bottomBtnArrow = overBottom ? ZenParams.ScrollColArrowHover : ZenParams.ScrollColArrowBase;
-            Color thumb = mouseIn ? ZenParams.ScrollColThumbSemiHover : ZenParams.ScrollColThumbBase;
-            if (overThumb) thumb = ZenParams.ScrollColThumbHover;
-            // Then, pressed stuff
-            if (wp == WorkingPart.TopBtn)
-            {
-                topBtnBg = ZenParams.ScrollColBtnPress;
-                topBtnArrow = ZenParams.ScrollColArrowPress;
-            }
-            else if (wp == WorkingPart.BottomBtn)
-            {
-                bottomBtnBg = ZenParams.ScrollColBtnPress;
-                bottomBtnArrow = ZenParams.ScrollColArrowPress;
-            }
-            else if (wp == WorkingPart.Thumb) thumb = ZenParams.ScrollColThumbActive;
-            // Go from here to there, if we have to
-            lock (animLO)
-            {
-                // If something is "working", i.e., pressed, we need timer for repeat action fires
-                bool needTimer = wp != WorkingPart.None;
-                // Must change top button colors, or not
-                if (animVals.TopBtnBg == topBtnBg) animState.StateTopBtn = -1;
-                else
-                {
-                    animState.StateTopBtn = (overTop || wp == WorkingPart.TopBtn) ? 2 : 0;
-                    animState.From.TopBtnBg = animVals.TopBtnBg;
-                    animState.From.TopBtnArrow = animVals.TopBtnArrow;
-                    animState.To.TopBtnBg = topBtnBg;
-                    animState.To.TopBtnArrow = topBtnArrow;
-                    needTimer |= true;
-                }
-                // Must change bottom button colors, or not
-                if (animVals.BottomBtnBg == bottomBtnBg) animState.StateBottomBtn = -1;
-                else
-                {
-                    animState.StateBottomBtn = (overBottom || wp == WorkingPart.BottomBtn) ? 2 : 0;
-                    animState.From.BottomBtnBg = animVals.BottomBtnBg;
-                    animState.From.BottomBtnArrow = animVals.BottomBtnArrow;
-                    animState.To.BottomBtnBg = bottomBtnBg;
-                    animState.To.BottomBtnArrow = bottomBtnArrow;
-                    needTimer |= true;
-                }
-                // Must change thumb color, or not
-                if (animVals.Thumb == thumb) animState.StateThumb = -1;
-                else
-                {
-                    animState.StateThumb = (overThumb || wp == WorkingPart.Thumb) ? 2 : 0;
-                    animState.From.Thumb = animVals.Thumb;
-                    animState.To.Thumb = thumb;
-                    needTimer |= true;
-                }
-                // Donee. Make sure we got timer, or not.
-                if (needTimer) SubscribeToTimer();
-                else UnsubscribeFromTimer();
-            }
-        }
-
-        /// <summary>
-        /// Adds fuel to the scrolling momentum tank.
-        /// </summary>
-        private void doBuyScrollFuel(int howMuch)
-        {
-            if (howMuch == 0) return;
-            lock (animLO)
-            {
-                // Reversing course
-                if (howMuch < 0 && animScrollSpeed > 0 || howMuch > 0 && animScrollSpeed < 0)
-                {
-                    animFuel = (float)howMuch;
-                    animScrollSpeed = 0;
-                }
-                // Speeding more
-                else animFuel += (float)howMuch;
-                subscribeScrollTimer();
-            }
-        }
-
-        /// <summary>
-        /// Stops *any* scrolling in progress; leaves flexible band if we're in it.
-        /// </summary>
-        private void doStopAnyScroll()
-        {
-            lock (animLO)
-            {
-                animFuel = 0;
-                animScrollSpeed = 0;
-                if (position < 0) position = 0;
-                else if (position + pageSize > maximum) position = maximum - pageSize;
-            }
-        }
-
-        public static ushort HIWORD(IntPtr l) { return (ushort)((l.ToInt64() >> 16) & 0xFFFF); }
-        public static ushort LOWORD(IntPtr l) { return (ushort)((l.ToInt64()) & 0xFFFF); }
-
-        /// <summary>
-        /// Pre-filters Windows messages to fish out mouse wheel events.
-        /// </summary>
-        public bool PreFilterMessage(ref Message m)
-        {
-            bool r = false;
-            if (m.Msg == 0x020A) //WM_MOUSEWHEEL
-            {
-                Point p = new Point((int)m.LParam);
-                int delta = (Int16)HIWORD(m.WParam);
-                MouseEventArgs e = new MouseEventArgs(MouseButtons.None, 0, p.X, p.Y, delta);
-                m.Result = IntPtr.Zero; //don't pass it to the parent window
-                onMouseWheel(e);
-            }
-            return r;
-        }
-
-        /// <summary>
-        /// Handles the mouse wheel event: adds momentum to animated scrolling.
-        /// </summary>
-        private void onMouseWheel(MouseEventArgs e)
-        {
-            // Input from the mouse wheel adds momentum to animated scrolling.
-            float extraMomentum = -((float)e.Delta) * ((float)PageSize) / 1500.0F;
-            doBuyScrollFuel((int)extraMomentum);
-        }
-
-        /// <summary>
-        /// Called in host control's timer event handler to animate inertia-based scrolling.
-        /// </summary>
-        /// <param name="needTimer">True if timer is still needed.</param>
-        /// <param name="valueChanged">True if scroll value changed (host timer must repositing content).</param>
-        public void DoScrollTimer(out bool needTimer, out bool valueChanged)
-        {
-            needTimer = false;
-            valueChanged = false;
-            bool inSpringZoneBefore = position < 0 || position + pageSize > maximum;
-
-            // If we have fuel, keep accelerating until hitting speed limit
-            // Burn fuel equivalent to our speed
-            if (animFuel > 0)
-            {
-                float speedToAdd = 0;
-                if (animScrollSpeed < maxSpeed)
-                {
-                    speedToAdd = Math.Min(animFuel, acceleration);
-                    if (animScrollSpeed + speedToAdd > maxSpeed) speedToAdd = maxSpeed - animScrollSpeed;
-                }
-                animScrollSpeed += speedToAdd;
-                animFuel -= animScrollSpeed;
-                if (animFuel < 0) animFuel = 0;
-            }
-            // If we have negative fuel, keep accelerating the other way
-            else if (animFuel < 0)
-            {
-                float speedToAdd = 0;
-                if (-animScrollSpeed < maxSpeed)
-                {
-                    speedToAdd = -Math.Min(-animFuel, acceleration);
-                    if (-(animScrollSpeed + speedToAdd) > maxSpeed) speedToAdd = -(maxSpeed - animScrollSpeed);
-                }
-                animScrollSpeed += speedToAdd;
-                animFuel -= animScrollSpeed;
-                if (animFuel > 0) animFuel = 0;
-            }
-            // If we have no fuel, decelerate
-            else
-            {
-                if (animScrollSpeed < 0)
-                {
-                    animScrollSpeed += deceleration;
-                    if (animScrollSpeed > 0) animScrollSpeed = 0;
-                }
-                else if (animScrollSpeed > 0)
-                {
-                    animScrollSpeed -= deceleration;
-                    if (animScrollSpeed < 0) animScrollSpeed = 0;
-                }
-            }
-            
-            // So, if speed is not null here, move by that much.
-            int iScrollSpeed = (int)animScrollSpeed;
-            if (iScrollSpeed != 0 || inSpringZoneBefore)
-            {
-                needTimer = true;
-                // Update position; see if that takes us into spring zone
-                valueChanged = true;
-                position = position + iScrollSpeed;
-                bool inSpringZoneAfter = position < 0 || position + pageSize > maximum;
-                // If springiness is not tolerated at all: stop at edge; stop all this scrolling business
-                if (inSpringZoneAfter && springSize == 0)
-                {
-                    if (position < 0) position = 0;
-                    else if (position + pageSize > maximum) position = maximum - pageSize;
-                    animFuel = 0;
-                    animScrollSpeed = 0;
-                    // Timer not needed - scrolling's over
-                    needTimer = false;
-                }
-                // Handle bounceback
-                else if (inSpringZoneBefore)
-                {
-                    // Stop at spring's edge
-                    if (position < -springSize) position = -springSize;
-                    else if (position > maximum - pageSize + springSize) position = maximum - pageSize + springSize;
-                    // Normal speed is over; empty tank
-                    if (animFuel > 0) animFuel = Math.Min(maxSpeed, animFuel);
-                    else animFuel = Math.Max(-maxSpeed, animFuel);
-                    animFuel = 0;
-                    animScrollSpeed /= 2F;
-                    // If we were already in spring zone, move back towards real edge
-                    if (inSpringZoneBefore)
-                    {
-                        int inSpring = position < 0 ? -position : position - maximum + pageSize;
-                        int proportionalBack = inSpring / 4;
-                        // We move towards real edge with a combination of proportional force plus deceleration
-                        int pushBack = proportionalBack + (int)(deceleration);
-                        // But never cross over to real territory because of pushback
-                        int inSpringAfter = inSpring - pushBack;
-                        if (inSpringAfter < 0) inSpringAfter = 0;
-                        if (position < 0) position = -inSpringAfter;
-                        else position = maximum - pageSize + inSpringAfter;
-                    }
-                    // Timer still needed to bounce back
-                    needTimer = true;
-                }
-            }
-        }
 
         /// <summary>
         /// Handles timer to nudge around scrollbar's own animations (everything except inertia scrolling).
@@ -648,6 +458,296 @@ namespace ZD.Gui.Zen
             }
         }
 
+        /// <summary>
+        /// Inits animated values at creation time.
+        /// </summary>
+        private void doInitAnimVals()
+        {
+            animVals.TopBtnBg = ZenParams.ScrollColBg;
+            animVals.TopBtnArrow = ZenParams.ScrollColArrowBase;
+            animVals.BottomBtnBg = ZenParams.ScrollColBg;
+            animVals.BottomBtnArrow = ZenParams.ScrollColArrowBase;
+            animVals.Thumb = ZenParams.ScrollColThumbBase;
+        }
+
+        /// <summary>
+        /// Updates animations to target new states for our components.
+        /// </summary>
+        private void doAnimateTo(bool mouseIn, bool overTop, bool overThumb, bool overBottom,
+            WorkingPart wp)
+        {
+            // Figure out each component's desired color based on arguments
+            // First, just hover stuff
+            Color topBtnBg = overTop ? ZenParams.ScrollColBtnHover : ZenParams.ScrollColBg;
+            Color topBtnArrow = overTop ? ZenParams.ScrollColArrowHover : ZenParams.ScrollColArrowBase;
+            Color bottomBtnBg = overBottom ? ZenParams.ScrollColBtnHover : ZenParams.ScrollColBg;
+            Color bottomBtnArrow = overBottom ? ZenParams.ScrollColArrowHover : ZenParams.ScrollColArrowBase;
+            Color thumb = mouseIn ? ZenParams.ScrollColThumbSemiHover : ZenParams.ScrollColThumbBase;
+            if (overThumb) thumb = ZenParams.ScrollColThumbHover;
+            // Then, pressed stuff
+            if (wp == WorkingPart.TopBtn)
+            {
+                topBtnBg = ZenParams.ScrollColBtnPress;
+                topBtnArrow = ZenParams.ScrollColArrowPress;
+            }
+            else if (wp == WorkingPart.BottomBtn)
+            {
+                bottomBtnBg = ZenParams.ScrollColBtnPress;
+                bottomBtnArrow = ZenParams.ScrollColArrowPress;
+            }
+            else if (wp == WorkingPart.Thumb) thumb = ZenParams.ScrollColThumbActive;
+            // Go from here to there, if we have to
+            lock (animLO)
+            {
+                // If something is "working", i.e., pressed, we need timer for repeat action fires
+                bool needTimer = wp != WorkingPart.None;
+                // Must change top button colors, or not
+                if (animVals.TopBtnBg == topBtnBg) animState.StateTopBtn = -1;
+                else
+                {
+                    animState.StateTopBtn = (overTop || wp == WorkingPart.TopBtn) ? 2 : 0;
+                    animState.From.TopBtnBg = animVals.TopBtnBg;
+                    animState.From.TopBtnArrow = animVals.TopBtnArrow;
+                    animState.To.TopBtnBg = topBtnBg;
+                    animState.To.TopBtnArrow = topBtnArrow;
+                    needTimer |= true;
+                }
+                // Must change bottom button colors, or not
+                if (animVals.BottomBtnBg == bottomBtnBg) animState.StateBottomBtn = -1;
+                else
+                {
+                    animState.StateBottomBtn = (overBottom || wp == WorkingPart.BottomBtn) ? 2 : 0;
+                    animState.From.BottomBtnBg = animVals.BottomBtnBg;
+                    animState.From.BottomBtnArrow = animVals.BottomBtnArrow;
+                    animState.To.BottomBtnBg = bottomBtnBg;
+                    animState.To.BottomBtnArrow = bottomBtnArrow;
+                    needTimer |= true;
+                }
+                // Must change thumb color, or not
+                if (animVals.Thumb == thumb) animState.StateThumb = -1;
+                else
+                {
+                    animState.StateThumb = (overThumb || wp == WorkingPart.Thumb) ? 2 : 0;
+                    animState.From.Thumb = animVals.Thumb;
+                    animState.To.Thumb = thumb;
+                    needTimer |= true;
+                }
+                // Donee. Make sure we got timer, or not.
+                if (needTimer) SubscribeToTimer();
+                else UnsubscribeFromTimer();
+            }
+        }
+
+        /// <summary>
+        /// Lock object around inertia and thumb drag scroll's members
+        /// Ie stuff touched in <see cref="DoScrollTimer"/>, that is, my parent's timer handler
+        /// </summary>
+        private object animLOScroll = new object();
+
+        /// <summary>
+        /// Current scrolling speed.
+        /// </summary>
+        private float animScrollSpeed = 0;
+
+        /// <summary>
+        /// Fuel for thruster to burn.
+        /// </summary>
+        private float animFuel = 0;
+
+        /// <summary>
+        /// <para>Authoritative, no-animation scroll position to be signaled in timer.</para>
+        /// <para>Used when scroll thumb is being dragged around. int.MinValue if thumb is not being dragged.</para>
+        /// </summary>
+        private int animPosInDrag = int.MinValue;
+
+        /// <summary>
+        /// Called in host control's timer event handler to animate inertia-based scrolling.
+        /// </summary>
+        /// <param name="needTimer">True if timer is still needed.</param>
+        /// <param name="valueChanged">True if scroll value changed (host timer must repositing content).</param>
+        public void DoScrollTimer(out bool needTimer, out bool valueChanged)
+        {
+            needTimer = false;
+            valueChanged = false;
+
+            lock (animLOScroll)
+            {
+                // Thumb is pressed, held and dragged around - no inertia
+                if (animPosInDrag != int.MinValue)
+                {
+                    // We sure need timer
+                    needTimer = true;
+                    // Handle dragging and return
+                    if (animPosInDrag != position)
+                    {
+                        position = animPosInDrag;
+                        valueChanged = true;
+                    }
+                    return;
+                }
+
+                // Animated, inertia scrolling from here on
+                bool inSpringZoneBefore = position < 0 || position + pageSize > maximum;
+                // If we have fuel, keep accelerating until hitting speed limit
+                // Burn fuel equivalent to our speed
+                if (animFuel > 0)
+                {
+                    float speedToAdd = 0;
+                    if (animScrollSpeed < maxSpeed)
+                    {
+                        speedToAdd = Math.Min(animFuel, acceleration);
+                        if (animScrollSpeed + speedToAdd > maxSpeed) speedToAdd = maxSpeed - animScrollSpeed;
+                    }
+                    animScrollSpeed += speedToAdd;
+                    animFuel -= animScrollSpeed;
+                    if (animFuel < 0) animFuel = 0;
+                }
+                // If we have negative fuel, keep accelerating the other way
+                else if (animFuel < 0)
+                {
+                    float speedToAdd = 0;
+                    if (-animScrollSpeed < maxSpeed)
+                    {
+                        speedToAdd = -Math.Min(-animFuel, acceleration);
+                        if (-(animScrollSpeed + speedToAdd) > maxSpeed) speedToAdd = -(maxSpeed - animScrollSpeed);
+                    }
+                    animScrollSpeed += speedToAdd;
+                    animFuel -= animScrollSpeed;
+                    if (animFuel > 0) animFuel = 0;
+                }
+                // If we have no fuel, decelerate
+                else
+                {
+                    if (animScrollSpeed < 0)
+                    {
+                        animScrollSpeed += deceleration;
+                        if (animScrollSpeed > 0) animScrollSpeed = 0;
+                    }
+                    else if (animScrollSpeed > 0)
+                    {
+                        animScrollSpeed -= deceleration;
+                        if (animScrollSpeed < 0) animScrollSpeed = 0;
+                    }
+                }
+
+                // So, if speed is not null here, move by that much.
+                int iScrollSpeed = (int)animScrollSpeed;
+                if (iScrollSpeed != 0 || inSpringZoneBefore)
+                {
+                    needTimer = true;
+                    // Update position; see if that takes us into spring zone
+                    valueChanged = true;
+                    position = position + iScrollSpeed;
+                    bool inSpringZoneAfter = position < 0 || position + pageSize > maximum;
+                    // If springiness is not tolerated at all: stop at edge; stop all this scrolling business
+                    if (inSpringZoneAfter && springSize == 0)
+                    {
+                        if (position < 0) position = 0;
+                        else if (position + pageSize > maximum) position = maximum - pageSize;
+                        animFuel = 0;
+                        animScrollSpeed = 0;
+                        // Timer not needed - scrolling's over
+                        needTimer = false;
+                    }
+                    // Handle bounceback
+                    else if (inSpringZoneBefore)
+                    {
+                        // Stop at spring's edge
+                        if (position < -springSize) position = -springSize;
+                        else if (position > maximum - pageSize + springSize) position = maximum - pageSize + springSize;
+                        // Normal speed is over; empty tank
+                        if (animFuel > 0) animFuel = Math.Min(maxSpeed, animFuel);
+                        else animFuel = Math.Max(-maxSpeed, animFuel);
+                        animFuel = 0;
+                        animScrollSpeed /= 2F;
+                        // If we were already in spring zone, move back towards real edge
+                        if (inSpringZoneBefore)
+                        {
+                            int inSpring = position < 0 ? -position : position - maximum + pageSize;
+                            int proportionalBack = inSpring / 4;
+                            // We move towards real edge with a combination of proportional force plus deceleration
+                            int pushBack = proportionalBack + (int)(deceleration);
+                            // But never cross over to real territory because of pushback
+                            int inSpringAfter = inSpring - pushBack;
+                            if (inSpringAfter < 0) inSpringAfter = 0;
+                            if (position < 0) position = -inSpringAfter;
+                            else position = maximum - pageSize + inSpringAfter;
+                        }
+                        // Timer still needed to bounce back
+                        needTimer = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds fuel to the scrolling momentum tank.
+        /// </summary>
+        private void doBuyScrollFuel(int howMuch)
+        {
+            if (howMuch == 0) return;
+            lock (animLO)
+            {
+                // Reversing course
+                if (howMuch < 0 && animScrollSpeed > 0 || howMuch > 0 && animScrollSpeed < 0)
+                {
+                    animFuel = (float)howMuch;
+                    animScrollSpeed = 0;
+                }
+                // Speeding more
+                else animFuel += (float)howMuch;
+                subscribeScrollTimer();
+            }
+        }
+
+        /// <summary>
+        /// Stops *any* scrolling in progress; leaves flexible band if we're in it.
+        /// </summary>
+        /// <param name="posInDrag">Mandatory position, or int.MinValue if no position is mandated.</param>
+        private void doStopAnyScroll(int posInDrag = int.MinValue)
+        {
+            lock (animLO)
+            {
+                animFuel = 0;
+                animScrollSpeed = 0;
+                if (position < 0) position = 0;
+                else if (position + pageSize > maximum) position = maximum - pageSize;
+                // Any mandatory position? Used when scroll thumb starts getting dragged.
+                animPosInDrag = position;
+                if (animPosInDrag != int.MinValue) subscribeScrollTimer();
+            }
+        }
+
+        public static ushort HIWORD(IntPtr l) { return (ushort)((l.ToInt64() >> 16) & 0xFFFF); }
+        public static ushort LOWORD(IntPtr l) { return (ushort)((l.ToInt64()) & 0xFFFF); }
+
+        /// <summary>
+        /// Pre-filters Windows messages to fish out mouse wheel events.
+        /// </summary>
+        public bool PreFilterMessage(ref Message m)
+        {
+            bool r = false;
+            if (m.Msg == 0x020A) //WM_MOUSEWHEEL
+            {
+                Point p = new Point((int)m.LParam);
+                int delta = (Int16)HIWORD(m.WParam);
+                MouseEventArgs e = new MouseEventArgs(MouseButtons.None, 0, p.X, p.Y, delta);
+                m.Result = IntPtr.Zero; //don't pass it to the parent window
+                onMouseWheel(e);
+            }
+            return r;
+        }
+
+        /// <summary>
+        /// Handles the mouse wheel event: adds momentum to animated scrolling.
+        /// </summary>
+        private void onMouseWheel(MouseEventArgs e)
+        {
+            // Input from the mouse wheel adds momentum to animated scrolling.
+            float extraMomentum = -((float)e.Delta) * ((float)PageSize) / 1500.0F;
+            doBuyScrollFuel((int)extraMomentum);
+        }
+
         public override void DoPaint(Graphics g)
         {
             // Get current animation values
@@ -697,7 +797,7 @@ namespace ZD.Gui.Zen
                 g.SmoothingMode = SmoothingMode.None;
             }
             // Scroll thumb
-            Rectangle thRect = getThumbRect();
+            Rectangle thRect = getThumbRect(position);
             using (Brush b = new SolidBrush(av.Thumb))
             {
                 g.FillRectangle(b, pad, thRect.Top + pad / 2, Width - 2 * pad, thRect.Height - pad);

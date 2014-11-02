@@ -347,6 +347,33 @@ namespace ZD.Gui.Zen
         }
 
         /// <summary>
+        /// Relays a control's request to start or stop capturing the mouse, up the chain to top form.
+        /// </summary>
+        /// <param name="ctrl">The control where the request come from.</param>
+        /// <param name="capture">True to start capturing, false to stop.</param>
+        internal virtual void SetControlMouseCapture(ZenControlBase ctrl, bool capture)
+        {
+            if (Parent != null) Parent.SetControlMouseCapture(ctrl, capture);
+        }
+
+        /// <summary>
+        /// <para>Derived controls can call this to start capturing the mouse.</para>
+        /// <para>Only mouse move and mouse up and mouse down are captured. Mouse leave/enter is still called.</para>
+        /// </summary>
+        protected void CaptureMouse()
+        {
+            SetControlMouseCapture(this, true);
+        }
+
+        /// <summary>
+        /// Derive controls can call this to stop capturing the mouse.
+        /// </summary>
+        protected void StopCapturingMouse()
+        {
+            SetControlMouseCapture(this, false);
+        }
+
+        /// <summary>
         /// Triggers a callback to control's <see cref="DoPaint"/>, then re-renders canvas.
         /// </summary>
         /// <param name="needBackground">If true, full canvas is repainted to control can render over stuff outside it's own rectangle.</param>
