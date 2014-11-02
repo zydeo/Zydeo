@@ -805,7 +805,9 @@ namespace ZD.Gui.Zen
         /// </summary>
         public bool PreFilterMessage(ref Message m)
         {
-            bool r = false;
+            // If we're not even on screen, don't.
+            if (Parent == null) return false;
+            // Look for mouse wheel event
             if (m.Msg == 0x020A) //WM_MOUSEWHEEL
             {
                 Point p = new Point((int)m.LParam);
@@ -814,7 +816,7 @@ namespace ZD.Gui.Zen
                 m.Result = IntPtr.Zero; //don't pass it to the parent window
                 onMouseWheel(e);
             }
-            return r;
+            return false;
         }
 
         /// <summary>
