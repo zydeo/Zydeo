@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 
 using ZD.Common;
 using ZD.Gui.Zen;
@@ -163,6 +164,7 @@ namespace ZD.Gui
             foreach (PinyinBlock pb in pinyinInfo.Blocks)
             {
                 PointF loc = pb.Rect.Location;
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 // Draw string
                 g.DrawString(textPool.GetString(pb.TextPos), getFont(fntPinyinHead), bfont, loc, sf);
 
@@ -217,9 +219,13 @@ namespace ZD.Gui
                     {
                         // Extra vertical offset on Hanzi blocks
                         float vOfs = 0;
+                        bool isHanzi = false;
                         if (block.FontIdx == fntMetaHanziSimp || block.FontIdx == fntMetaHanziTrad ||
                             block.FontIdx == fntSenseHanziSimp || block.FontIdx == fntSenseHanziTrad)
+                        {
                             vOfs += getTargetHanziOfs();
+                            isHanzi = true;
+                        }
                         // No hover: draw with normal brush
                         Brush brush = bnorm;
                         // Hover: create hover brush on demand; draw with that
@@ -231,6 +237,8 @@ namespace ZD.Gui
                                 brush = bhover;
                             }
                         }
+                        if (isHanzi) g.TextRenderingHint = TextRenderingHint.AntiAlias;
+                        else g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                         g.DrawString(textPool.GetString(block.TextPos), getFont(block.FontIdx),
                             brush, pb.LocX, pb.LocY + vOfs, sf);
                     }
@@ -359,13 +367,14 @@ namespace ZD.Gui
             doPaintTargetHilites(g, bgcol);
 
             // This is how we draw text
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
             StringFormat sf = StringFormat.GenericTypographic;
             // Headword, pinyin, entry body
             using (Brush bnorm = new SolidBrush(Color.Black))
             using (Brush bfade = new SolidBrush(Color.FromArgb(200, 200, 200)))
             using (Pen pnorm = new Pen(bnorm))
             {
+                // This works best for Hanzi
+                g.TextRenderingHint = TextRenderingHint.AntiAlias;
                 // Simplified and traditional - headword
                 foreach (HeadBlock hb in headInfo.SimpBlocks)
                 {
