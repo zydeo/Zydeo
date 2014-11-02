@@ -235,12 +235,8 @@ namespace ZD.Gui.Zen
             // UI goodies, ease colors in and out
             doAnimateTo(true, overTopBtn, overThumb, overBottomBtn, pressedPart);
 
-            // Jumpy-holdy parts (buttons and full page scroll), OR thumb now gets dragged around
-            if (pressedPart == WorkingPart.TopBtn) doBuyScrollFuel(-smallSchange);
-            else if (pressedPart == WorkingPart.BottomBtn) doBuyScrollFuel(smallSchange);
-            else if (pressedPart == WorkingPart.TopJump) doBuyScrollFuel(-pageSize / 4);
-            else if (pressedPart == WorkingPart.BottomJump) doBuyScrollFuel(pageSize / 4);
-            else if (pressedPart == WorkingPart.Thumb)
+            // Thumb now gets dragged around
+            if (pressedPart == WorkingPart.Thumb)
             {
                 // Dragging the thumb means any scrolling in progress stops right now
                 // But: record mandatory scroll position
@@ -252,6 +248,26 @@ namespace ZD.Gui.Zen
                 // Start capturing mouse. We want to keep tracking even if pointer leaves to left or right while
                 // button is pressed.
                 CaptureMouse();
+            }
+            // Jumpy-holdy parts (buttons and full page scroll)
+            else
+            {
+                int fuelToBuy;
+                int repeatBuy;
+                if (pressedPart == WorkingPart.TopBtn) { fuelToBuy = -smallSchange; repeatBuy = fuelToBuy / 2; }
+                else if (pressedPart == WorkingPart.BottomBtn) { fuelToBuy = smallSchange; repeatBuy = fuelToBuy / 2; }
+                else if (pressedPart == WorkingPart.TopJump) { fuelToBuy = -pageSize / 4; repeatBuy = fuelToBuy / 6; }
+                else { fuelToBuy = pageSize / 4; repeatBuy = fuelToBuy / 6; }
+                // Buy the fuel
+                doBuyScrollFuel(fuelToBuy);
+                // Commission repeated purchases: "repeat fire" effect if button is kept pressed
+                lock (animLOScroll)
+                {
+                    animRepeatCounter = 0;
+                    animRepeatPurchase = ((float)repeatBuy);
+                    if (pressedPart == WorkingPart.TopJump || pressedPart == WorkingPart.BottomJump)
+                        animRepeatBarrierY = p.Y;
+                }
             }
             
             // We're done here.
@@ -267,7 +283,14 @@ namespace ZD.Gui.Zen
             if (pressedPart == WorkingPart.Thumb) StopCapturingMouse();
 
             pressedPart = WorkingPart.None;
-            lock (animLOScroll) { animPosInDrag = int.MinValue; }
+            lock (animLOScroll)
+            {
+                // No forced positioning
+                animPosInDrag = int.MinValue;
+                // Cancel any repeat purchase order
+                animRepeatCounter = int.MinValue;
+                animRepeatPurchase = float.MinValue;
+            }
             doAnimateTo(true, false, false, false, pressedPart);
             return true;
         }
@@ -311,8 +334,18 @@ namespace ZD.Gui.Zen
 
         public override void DoMouseLeave()
         {
-            // If we're holding on to thumb, pretend we don't leave
-            if (pressedPart != WorkingPart.Thumb) pressedPart = WorkingPart.None;
+            // When we leave, that unpresses whatever's currently pressed, except held thumb
+            if (pressedPart != WorkingPart.Thumb)
+            {
+                // If we're holding on to thumb, pretend we don't leave
+                pressedPart = WorkingPart.None;
+                // Cancel any repeat purchase order (pressed up/down buttons)
+                lock (animLOScroll)
+                {
+                    animRepeatCounter = int.MinValue;
+                    animRepeatPurchase = float.MinValue;
+                }
+            }
             // Update our make-up.
             doAnimateTo(false, false, false, false, pressedPart);
         }
@@ -563,6 +596,24 @@ namespace ZD.Gui.Zen
         private int animPosInDrag = int.MinValue;
 
         /// <summary>
+        /// <para>Counter for repeat fuel purchases (repeat fire while something is held pressed).</para>
+        /// <para>Starts at 0 if we have a repeat order; int.MinValue if we don't.</para>
+        /// </summary>
+        private int animRepeatCounter = int.MinValue;
+
+        /// <summary>
+        /// Amount to purchase if we have a repeat purchase order.
+        /// </summary>
+        private float animRepeatPurchase = float.MinValue;
+
+        /// <summary>
+        /// <para>Barrier to repeat purchases.</para>
+        /// <para>If repeat purchase is negative, order is canceled when top of thumb hits this Y value.</para>
+        /// <para>If repeat purchase is positive, order is canceled when bottom of thumb hits this Y value.</para>
+        /// </summary>
+        private int animRepeatBarrierY = int.MinValue;
+
+        /// <summary>
         /// Called in host control's timer event handler to animate inertia-based scrolling.
         /// </summary>
         /// <param name="needTimer">True if timer is still needed.</param>
@@ -586,6 +637,19 @@ namespace ZD.Gui.Zen
                         valueChanged = true;
                     }
                     return;
+                }
+
+                // Any repeat purchase?
+                if (animRepeatCounter != int.MinValue)
+                {
+                    // Sure need timer - must keep buying
+                    needTimer = true;
+                    // Count; at intervals, buy
+                    ++animRepeatCounter;
+                    // First order is delayed by ticksDelay; repeat orders then come at tickFreq
+                    int tickDelay = 5;
+                    int tickFreq = 3;
+                    if ((animRepeatCounter - tickDelay) % tickFreq == 0) animFuel += animRepeatPurchase;
                 }
 
                 // Animated, inertia scrolling from here on
@@ -678,6 +742,14 @@ namespace ZD.Gui.Zen
                         // Timer still needed to bounce back
                         needTimer = true;
                     }
+                    // Cancel repeat purchase if we have to
+                    if (animRepeatCounter != int.MinValue)
+                    {
+                        Rectangle tr = getThumbRect(position);
+                        if (animRepeatPurchase < 0 && tr.Top < animRepeatBarrierY) animRepeatCounter = int.MinValue;
+                        else if (animRepeatPurchase > 0 && tr.Bottom > animRepeatBarrierY) animRepeatCounter = int.MinValue;
+                        if (animRepeatCounter == int.MinValue) animRepeatPurchase = float.MinValue;
+                    }
                 }
             }
         }
@@ -710,12 +782,17 @@ namespace ZD.Gui.Zen
         {
             lock (animLO)
             {
+                // Empty tank, grind to a halt.
                 animFuel = 0;
                 animScrollSpeed = 0;
+                // Leave spring zone.
                 if (position < 0) position = 0;
                 else if (position + pageSize > maximum) position = maximum - pageSize;
+                // Also stop any ongoing repeat purchase
+                animRepeatCounter = int.MinValue;
+                animRepeatPurchase = float.MinValue;
                 // Any mandatory position? Used when scroll thumb starts getting dragged.
-                animPosInDrag = position;
+                animPosInDrag = posInDrag;
                 if (animPosInDrag != int.MinValue) subscribeScrollTimer();
             }
         }
