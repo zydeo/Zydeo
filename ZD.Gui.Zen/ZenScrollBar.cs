@@ -238,6 +238,8 @@ namespace ZD.Gui.Zen
             // Jumpy-holdy parts (buttons and full page scroll), OR thumb now gets dragged around
             if (pressedPart == WorkingPart.TopBtn) doBuyScrollFuel(-smallSchange);
             else if (pressedPart == WorkingPart.BottomBtn) doBuyScrollFuel(smallSchange);
+            else if (pressedPart == WorkingPart.TopJump) doBuyScrollFuel(-pageSize / 4);
+            else if (pressedPart == WorkingPart.BottomJump) doBuyScrollFuel(pageSize / 4);
             else if (pressedPart == WorkingPart.Thumb)
             {
                 // Dragging the thumb means any scrolling in progress stops right now
