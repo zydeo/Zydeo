@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Drawing.Text;
 
 using ZD.Gui.Zen;
 
@@ -71,6 +72,7 @@ namespace ZD.Gui
                 using (Font f = new Font(this.Font, FontStyle.Italic))
                 using (Brush b = new SolidBrush(Color.FromArgb(Magic.SearchInputHintOpacity, this.ForeColor)))
                 {
+                    g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                     g.DrawString(hintText, f, b, new PointF(0, 0));
                 }
             }

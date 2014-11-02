@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Text;
 
 using ZD.Common;
 using ZD.Gui.Zen;
@@ -383,6 +384,7 @@ namespace ZD.Gui
                     // Draw character, if any
                     if (i >= items.Length) continue;
                     string str = ""; str += items[i];
+                    g.TextRenderingHint = TextRenderingHint.AntiAlias;
                     g.DrawString(str, font, b, rect.X + charOfsX, rect.Y + charOfsY, sf);
                 }
             }

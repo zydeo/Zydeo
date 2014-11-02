@@ -69,6 +69,7 @@ namespace ZD.Gui.Zen
                 rectHeader.Width = hsz.Width + 1.0F;
                 if (headerEllipsed == header)
                     rectHeader.X = x + (w - rectHeader.Width) / 2.0F;
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 g.DrawString(headerEllipsed, f, b, rectHeader, sf);
             }
         }
@@ -222,6 +223,7 @@ namespace ZD.Gui.Zen
             alfa = 255F * ttp.Strength;
             using (Brush b = new SolidBrush(Color.FromArgb((int)alfa, ZenParams.TooltipTextColor)))
             {
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 g.DrawString(ttp.TTI.Tooltip.Text, f, b, trect);
             }
         }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace ZD.Gui.Zen
@@ -67,6 +68,11 @@ namespace ZD.Gui.Zen
         /// Whether or not button is enabled.
         /// </summary>
         private bool enabled = true;
+
+        /// <summary>
+        /// If true, text is drawn with only Anti-Alis, not ClearType Grid Fit.
+        /// </summary>
+        private bool onlyAntiAlias = false;
 
         /// <summary>
         /// Ctor: take parent.
@@ -194,6 +200,15 @@ namespace ZD.Gui.Zen
                 enabled = value;
                 MakeMePaint(false, RenderMode.Invalidate);
             }
+        }
+
+        /// <summary>
+        /// If true, text is drawn with only Anti-Alis, not ClearType Grid Fit.
+        /// </summary>
+        public bool OnlyAntiAlias
+        {
+            get { return onlyAntiAlias; }
+            set { onlyAntiAlias = value; }
         }
 
         /// <summary>
@@ -572,6 +587,8 @@ namespace ZD.Gui.Zen
                 Color txtColor = enabled ? ZenParams.StandardTextColor : ZenParams.DisabledTextColor;
                 using (Brush b = new SolidBrush(txtColor))
                 {
+                    if (onlyAntiAlias) g.TextRenderingHint = TextRenderingHint.AntiAlias;
+                    else g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                     g.DrawString(text, fntText, b, textRect, sf);
                 }
             }

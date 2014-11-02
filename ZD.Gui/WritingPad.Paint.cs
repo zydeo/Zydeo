@@ -150,6 +150,7 @@ namespace ZD.Gui
                 string str = tprov.GetString("WritingPadHint");
                 RectangleF rect = new Rectangle(Width / 8, Height / 4, 3 * Width / 4, Height / 2);
                 g.FillRectangle(bBack, rect);
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 g.DrawString(str, f, bTxt, rect, sf);
             }
         }

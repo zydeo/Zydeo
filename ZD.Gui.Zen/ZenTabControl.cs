@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Drawing.Text;
 
 namespace ZD.Gui.Zen
 {
@@ -125,6 +126,7 @@ namespace ZD.Gui.Zen
             {
                 float x = ZenParams.HeaderTabPadding* Scale;
                 float y = (((float)Height) - textHeight) / 2.0F;
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 g.DrawString(text, font, b, new PointF(x, y));
             }
         }

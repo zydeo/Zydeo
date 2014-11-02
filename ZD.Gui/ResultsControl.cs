@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -444,6 +445,7 @@ namespace ZD.Gui
                 // Write text
                 using (Brush b = new SolidBrush(Color.FromArgb(240, 240, 240)))
                 {
+                    g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                     g.DrawString(txtResCount, fnt, b, olRight - lblWidth, Height - olHeight + lblPad);
                 }
             }

@@ -212,7 +212,7 @@ namespace ZD.Gui
                             lemmaCharHeight - 2.0F * pad);
                         g.DrawString(textPool.GetString(block.TextPos), getFont(fntSenseId), bnorm,
                             pb.LocX + 2.0F * pad,
-                            pb.LocY + 1.5F * pad, sf);
+                            pb.LocY + /* 1.5F * */ pad, sf); // TO-DO: vertical paddig of character will need more work.
                     }
                     // Text
                     else
@@ -261,7 +261,7 @@ namespace ZD.Gui
             // Needed to make gradient work
             g.SmoothingMode = SmoothingMode.None;
             // We offset highlight vertically for more pleasing aesthetics (lots of empty space at top in text)
-            float topOfs = lemmaCharHeight / 10.0F;
+            float topOfs = lemmaCharHeight / 15.0F; // TO-DO: This will need more work; depends on font size & Scale
             // All the measured and positioned blocks in entry body
             using (Brush b = new SolidBrush(Magic.HiliteColor))
             {
