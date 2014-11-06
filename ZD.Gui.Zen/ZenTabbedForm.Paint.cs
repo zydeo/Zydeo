@@ -14,29 +14,31 @@ namespace ZD.Gui.Zen
         {
             using (Brush b = new SolidBrush(ZenParams.HeaderBackColor))
             {
-                g.FillRectangle(b, 0, 0, form.Width, headerHeight);
+                g.FillRectangle(b, 0, 0, canvas.Width, headerHeight);
             }
             // For content tab and main tab, pad with different color
             Color colPad = ZenParams.PaddingBackColor;
             if (activeTabIdx == -1) colPad = Color.White;
             using (Brush b = new SolidBrush(colPad))
             {
-                g.FillRectangle(b, innerPadding, headerHeight, form.Width - 2 * innerPadding, innerPadding);
-                g.FillRectangle(b, 0, headerHeight, innerPadding, form.Height - headerHeight);
-                g.FillRectangle(b, form.Width - innerPadding, headerHeight, innerPadding, form.Height - headerHeight);
-                g.FillRectangle(b, innerPadding, form.Height - innerPadding - 1, form.Width - 2 * innerPadding, innerPadding);
+                g.FillRectangle(b, innerPadding, headerHeight, canvas.Width - 2 * innerPadding, innerPadding);
+                g.FillRectangle(b, 0, headerHeight, innerPadding, canvas.Height - headerHeight);
+                g.FillRectangle(b, canvas.Width - innerPadding, headerHeight, innerPadding, canvas.Height - headerHeight);
+                g.FillRectangle(b, innerPadding, canvas.Height - innerPadding - 1, canvas.Width - 2 * innerPadding, innerPadding);
             }
             using (Pen p = new Pen(ZenParams.BorderColor))
             {
                 p.Width = 1;
-                g.DrawRectangle(p, 0, 0, form.Width - 1, form.Height - 1);
+                g.DrawRectangle(p, 0, 0, canvas.Width - 1, canvas.Height - 1);
             }
         }
 
         private void doPaintHeaderText(Graphics g)
         {
             // Text in header: my window title
-            float x = contentTabControls[contentTabControls.Count - 1].AbsRight;
+            float x;
+            if (contentTabControls.Count == 0) x = mainTabCtrl.AbsRight;
+            else x = contentTabControls[contentTabControls.Count - 1].AbsRight;
             x += ZenParams.HeaderTabPadding * 3.0F;
             float y = 7.0F * Scale;
             float w = btnClose.AbsLeft - x;
@@ -228,8 +230,12 @@ namespace ZD.Gui.Zen
             }
         }
 
-        public override void DoPaint(Graphics g)
+        public override sealed void DoPaint(Graphics g)
         {
+            // If form is not yet loaded, don't bother with painting.
+            // That happens during initialization
+            if (!isLoaded) return;
+
             // Header, frame, content background...
             doPaintBackground(g);
             // Header text

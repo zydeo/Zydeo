@@ -105,7 +105,7 @@ namespace ZD.Gui.Zen
             get { return Parent.Scale; }
         }
 
-        public Size Size
+        public virtual Size Size
         {
             get { return absRect.Size; }
             set

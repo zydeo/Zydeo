@@ -225,7 +225,7 @@ namespace ZD.Gui
             charOfsX = (rectWidth - charSize.Width) / 2.0F - si.RealRect.X / 2.0F;
             charOfsY = (rectHeight - charSize.Height) / 2.0F - si.RealRect.Y;
             Height = (int)Math.Round((rectHeight) * 2.0F + 0.5F);
-            MakeMePaint(true, RenderMode.Invalidate);
+            MakeMePaint(false, RenderMode.Invalidate);
         }
 
         /// <summary>

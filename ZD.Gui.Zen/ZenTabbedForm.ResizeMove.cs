@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace ZD.Gui.Zen
 {
@@ -116,7 +117,7 @@ namespace ZD.Gui.Zen
         /// <returns>True if resize/move logic has handled event.</returns>
         private bool doMouseMoveRM(Point p)
         {
-            // Window being resized by dragging at border
+            // Window being moved by dragging at top
             Point loc = form.PointToScreen(p);
             if (dragMode == DragMode.Move)
             {
@@ -126,16 +127,19 @@ namespace ZD.Gui.Zen
                 ((Form)form.TopLevelControl).Location = newLocation;
                 return true;
             }
-            else if (dragMode == DragMode.ResizeE)
+            Size szForm = canvasSize;
+
+            // Resize going on?
+            Size? newSize = null;
+            Point? newLoc = null;
+            if (dragMode == DragMode.ResizeE)
             {
                 int dx = loc.X - dragStart.X;
                 Size sz = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height);
                 Size dmin = clipDiffFromMinSize(sz);
                 sz += dmin;
-                if (form.Size == sz) return true;
-                form.Size = sz;
-                form.Refresh();
-                return true;
+                if (szForm == sz) return true;
+                newSize = sz;
             }
             else if (dragMode == DragMode.ResizeW)
             {
@@ -145,11 +149,9 @@ namespace ZD.Gui.Zen
                 Size dmin = clipDiffFromMinSize(sz);
                 sz += dmin;
                 left -= dmin.Width;
-                if (form.Left == left) return true;
-                form.Left = left;
-                form.Size = sz;
-                form.Refresh();
-                return true;
+                if (szForm == sz) return true;
+                newSize = sz;
+                newLoc = new Point(left, Location.Y);
             }
             else if (dragMode == DragMode.ResizeN)
             {
@@ -159,11 +161,9 @@ namespace ZD.Gui.Zen
                 Size dmin = clipDiffFromMinSize(sz);
                 top -= dmin.Height;
                 sz += dmin;
-                if (form.Top == top) return true;
-                form.Top = top;
-                form.Size = sz;
-                form.Refresh();
-                return true;
+                if (szForm == sz) return true;
+                newSize = sz;
+                newLoc = new Point(Location.X, top);
             }
             else if (dragMode == DragMode.ResizeS)
             {
@@ -171,10 +171,8 @@ namespace ZD.Gui.Zen
                 Size sz = new Size(formBeforeDragSize.Width, formBeforeDragSize.Height + dy);
                 Size dmin = clipDiffFromMinSize(sz);
                 sz += dmin;
-                if (form.Size == sz) return true;
-                form.Size = sz;
-                form.Refresh();
-                return true;
+                if (szForm == sz) return true;
+                newSize = sz;
             }
             else if (dragMode == DragMode.ResizeNW)
             {
@@ -186,11 +184,9 @@ namespace ZD.Gui.Zen
                 sz += dmin;
                 pt.X -= dmin.Width;
                 pt.Y -= dmin.Height;
-                if (form.Location == pt) return true;
-                form.Size = sz;
-                form.Location = pt;
-                form.Refresh();
-                return true;
+                if (szForm == sz) return true;
+                newSize = sz;
+                newLoc = pt;
             }
             else if (dragMode == DragMode.ResizeSE)
             {
@@ -199,10 +195,8 @@ namespace ZD.Gui.Zen
                 Size sz = new Size(formBeforeDragSize.Width + dx, formBeforeDragSize.Height + dy);
                 Size dmin = clipDiffFromMinSize(sz);
                 sz += dmin;
-                if (sz == form.Size) return true;
-                form.Size = sz;
-                form.Refresh();
-                return true;
+                if (szForm == sz) return true;
+                newSize = sz;
             }
             else if (dragMode == DragMode.ResizeNE)
             {
@@ -213,11 +207,9 @@ namespace ZD.Gui.Zen
                 Size dmin = clipDiffFromMinSize(sz);
                 sz += dmin;
                 pt.Y -= dmin.Height;
-                if (form.Location == pt) return true;
-                form.Size = sz;
-                form.Location = pt;
-                form.Refresh();
-                return true;
+                if (szForm == sz) return true;
+                newSize = sz;
+                newLoc = pt;
             }
             else if (dragMode == DragMode.ResizeSW)
             {
@@ -228,13 +220,49 @@ namespace ZD.Gui.Zen
                 Size dmin = clipDiffFromMinSize(sz);
                 sz += dmin;
                 pt.X -= dmin.Width;
-                if (form.Location == pt) return true;
-                form.Size = sz;
-                form.Location = pt;
-                form.Refresh();
-                return true;
+                if (szForm == sz) return true;
+                newSize = sz;
+                newLoc = pt;
             }
-            return false;
+            else return false;
+
+            if (newLoc.HasValue) form.Location = newLoc.Value;
+            lock (resizeQueue) { resizeQueue.Add(newSize.Value); }
+            ThreadPool.QueueUserWorkItem(doResizeWork);
+            return true;
+        }
+
+        /// <summary>
+        /// Latest size form should assume (the last element is the relevant one).
+        /// </summary>
+        private readonly List<Size> resizeQueue = new List<Size>();
+
+        /// <summary>
+        /// <para>Lock object around resize critical section</para>
+        /// <para>If two ran in parallel, deadlock would occur b/c of contested canvas mutex.</para>
+        /// </summary>
+        private readonly object resizeWorkLO = new object();
+
+        /// <summary>
+        /// Do the heavy lifting of resizing in a worker thread: new canvas; rearrange; repaint; flush via invoke.
+        /// </summary>
+        private void doResizeWork(object ctxt)
+        {
+            lock (resizeWorkLO)
+            {
+                // Get last requested size. If we skipped a few interim sizes, too bad
+                // We don't want to paint something that's no longer needed because window size has changed again.
+                Size sz;
+                lock (resizeQueue)
+                {
+                    if (resizeQueue.Count == 0) return;
+                    sz = resizeQueue[resizeQueue.Count - 1];
+                    resizeQueue.Clear();
+                }
+                doRecreateCanvas(sz);
+                doRepaint();
+                form.Invoke((MethodInvoker)delegate { form.Size = sz; form.Refresh(); });
+            }
         }
 
         /// <summary>

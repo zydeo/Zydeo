@@ -10,55 +10,68 @@ using System.Threading;
 
 namespace ZD.Gui.Zen
 {
+    /// <summary>
+    /// A minimal, borderless, double-buffered window that displays a zen form's canvas instead of painting.
+    /// </summary>
     internal class ZenWinForm : Form
     {
-        public class PaintCanvas : IDisposable
+        /// <summary>
+        /// Encapsulates mutex-protected access to form's canvas.
+        /// </summary>
+        public class CanvasToShow : IDisposable
         {
-            private readonly Mutex dbufferMutex;
-            private readonly Bitmap dbuffer;
-            private readonly Graphics graphics;
-
-            internal PaintCanvas(Mutex dbufferMutex, Bitmap dbuffer)
+            /// <summary>
+            /// The mutex protecting the bitmap.
+            /// </summary>
+            private readonly Mutex canvasMutex;
+            /// <summary>
+            /// The bitmap to draw on screen.
+            /// </summary>
+            public readonly Bitmap Canvas;
+            /// <summary>
+            /// Ctor: initialize. Acquires the mutex.
+            /// </summary>
+            /// <param name="canvasMutex">The mutex protecting the bitmap.</param>
+            /// <param name="canvas">The bitmap to draw on screen.</param>
+            public CanvasToShow(Mutex canvasMutex, Bitmap canvas)
             {
-                this.dbufferMutex = dbufferMutex;
-                this.dbuffer = dbuffer;
-                dbufferMutex.WaitOne();
-                graphics = Graphics.FromImage(dbuffer);
+                this.canvasMutex = canvasMutex;
+                Canvas = canvas;
             }
-
+            /// <summary>
+            /// Releases the mutex protecting the bitmap.
+            /// </summary>
             public void Dispose()
             {
-                graphics.Dispose();
-                dbufferMutex.ReleaseMutex();
-            }
-
-            public Graphics Graphics
-            {
-                get { return graphics; }
+                if (Canvas != null) canvasMutex.ReleaseMutex();
             }
         }
 
-        public delegate void RenderDelegate(Graphics g);
-
-        private readonly RenderDelegate renderDelegate;
+        /// <summary>
+        /// Delegate for acquring access to the canvas from the Windows paint event handler.
+        /// </summary>
+        /// <returns></returns>
+        public delegate CanvasToShow GetCanvasDelegate();
+        /// <summary>
+        /// Gives access to the canvas; called from the Windows paint event handler.
+        /// </summary>
+        private readonly GetCanvasDelegate getCanvas;
+        /// <summary>
+        /// The current scale (96DPI times this).
+        /// </summary>
         private readonly float scale;
-        private readonly Mutex dbufferMutex = new Mutex();
-        private Bitmap dbuffer = null;
 
-        public ZenWinForm(RenderDelegate renderDelegate)
+        public ZenWinForm(GetCanvasDelegate getCanvas)
         {
-            this.renderDelegate = renderDelegate;
+            this.getCanvas = getCanvas;
 
             SuspendLayout();
-
             DoubleBuffered = false;
             FormBorderStyle = FormBorderStyle.None;
-
             Size = new Size(800, 300);
             AutoScaleDimensions = new SizeF(6.0F, 13.0F);
             AutoScaleMode = AutoScaleMode.Font;
             scale = CurrentAutoScaleDimensions.Height / 13.0F;
-
             ResumeLayout();
         }
 
@@ -72,32 +85,6 @@ namespace ZD.Gui.Zen
             get { return Form.MousePosition; }
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            try
-            {
-                dbufferMutex.WaitOne();
-                if (dbuffer != null) { dbuffer.Dispose(); dbuffer = null; }
-            }
-            finally { dbufferMutex.ReleaseMutex(); }
-        }
-
-        protected override void OnSizeChanged(EventArgs e)
-        {
-            try
-            {
-                dbufferMutex.WaitOne();
-                if (dbuffer != null)
-                {
-                    dbuffer.Dispose();
-                    dbuffer = null;
-                }
-            }
-            finally { dbufferMutex.ReleaseMutex(); }
-            base.OnSizeChanged(e);
-        }
-
         protected override CreateParams CreateParams
         {
             get
@@ -109,12 +96,6 @@ namespace ZD.Gui.Zen
             }
         }
 
-        public PaintCanvas GetBitmapRenderer()
-        {
-            if (dbuffer == null) return null;
-            return new PaintCanvas(dbufferMutex, dbuffer);
-        }
-
         protected override void OnPaintBackground(PaintEventArgs e)
         {
             // NOP!
@@ -122,27 +103,14 @@ namespace ZD.Gui.Zen
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            CanvasToShow cts = getCanvas();
+            if (cts == null) return;
             try
             {
-                dbufferMutex.WaitOne();
-                // Do all the remaining drawing through my own hand-made double-buffering for speed
-                if (dbuffer == null)
-                {
-                    dbuffer = new Bitmap(Width, Height);
-                    using (Graphics g = Graphics.FromImage(dbuffer))
-                    {
-                        renderDelegate(g);
-                    }
-                }
-                e.Graphics.DrawImageUnscaled(dbuffer, 0, 0);
+                // Blit canvas to screen
+                e.Graphics.DrawImageUnscaled(cts.Canvas, 0, 0);
             }
-            finally { dbufferMutex.ReleaseMutex(); }
+            finally { cts.Dispose(); }
         }
-
-        protected override void OnLocationChanged(EventArgs e)
-        {
-            base.OnLocationChanged(e);
-        }
-
     }
 }

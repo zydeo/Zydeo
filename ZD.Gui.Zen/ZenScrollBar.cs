@@ -84,7 +84,7 @@ namespace ZD.Gui.Zen
                 doStopAnyScroll();
                 maximum = value;
                 if (position + pageSize > maximum) position = maximum - pageSize;
-                MakeMePaint(false, RenderMode.Invalidate);
+                //MakeMePaint(false, RenderMode.Invalidate);
             }
         }
 
@@ -102,7 +102,7 @@ namespace ZD.Gui.Zen
                 pageSize = value;
                 if (position + pageSize > maximum) position = maximum - pageSize;
                 springSize = (int)(springFactor * ((float)pageSize));
-                MakeMePaint(false, RenderMode.Invalidate);
+                //MakeMePaint(false, RenderMode.Invalidate);
             }
         }
 
@@ -118,7 +118,7 @@ namespace ZD.Gui.Zen
                 if (value > pageSize) throw new ArgumentException("Small change cannot be greater than page size.");
                 doStopAnyScroll();
                 smallSchange = value;
-                MakeMePaint(false, RenderMode.Invalidate);
+                //MakeMePaint(false, RenderMode.Invalidate);
             }
         }
 
@@ -137,7 +137,7 @@ namespace ZD.Gui.Zen
                 if (position == value) return;
                 doStopAnyScroll();
                 position = value;
-                MakeMePaint(false, RenderMode.Invalidate);
+                //MakeMePaint(false, RenderMode.Invalidate);
             }
         }
 

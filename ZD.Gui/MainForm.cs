@@ -56,7 +56,7 @@ namespace ZD.Gui
             else
             {
                 WinForm.StartPosition = FormStartPosition.Manual;
-                WinForm.Location = loc;
+                Location = loc;
                 LogicalSize = size;
             }
             // Set (logical) minimum size
@@ -115,7 +115,7 @@ namespace ZD.Gui
         {
             base.OnFormLoaded();
             if (ignoredSavedSizeAndLocation)
-                AppSettings.SetWindowSizeAndLocation(WinForm.Location, LogicalSize);
+                AppSettings.SetWindowSizeAndLocation(Location, LogicalSize);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace ZD.Gui
         /// </summary>
         protected override void DoMoveResizeFinished()
         {
-            AppSettings.SetWindowSizeAndLocation(WinForm.Location, LogicalSize);
+            AppSettings.SetWindowSizeAndLocation(Location, LogicalSize);
         }
     }
 }

@@ -15,35 +15,119 @@ namespace ZD.Gui.Zen
 {
     public partial class ZenTabbedForm : ZenControlBase, IDisposable, IZenTabsChangedListener
     {
-        private readonly ITextProvider tprov;
-        private readonly ZenTimer zenTimer;
-        private readonly ZenWinForm form;
-        private Size logicalMinimumSize = Size.Empty;
+        #region Private members
 
-        private readonly int headerHeight;
-        private readonly int innerPadding;
-        private readonly int sysBtnPadding;
-        private string header;
-        private string headerEllipsed = null;
-        private ZenSystemButton btnClose;
-        private ZenSystemButton btnMinimize;
-        private ZenTabControl mainTabCtrl;
-        private readonly List<ZenTabControl> contentTabControls = new List<ZenTabControl>();
+        /// <summary>
+        /// Source of localized UI strings;
+        /// </summary>
+        private readonly ITextProvider tprov;
+        /// <summary>
+        /// Timer for continuous 25fps animations.
+        /// </summary>
+        private readonly ZenTimer zenTimer;
+        /// <summary>
+        /// Lock object for canvas.
+        /// </summary>
+        private readonly Mutex canvasMutex = new Mutex();
+        /// <summary>
+        /// The bitmap everyone is drawing on - the full window.
+        /// </summary>
+        private Bitmap canvas = null;
+        /// <summary>
+        /// The current bitmap size.
+        /// </summary>
+        private Size canvasSize = Size.Empty;
+        /// <summary>
+        /// The form we pretend to be towards Windows.
+        /// </summary>
+        private readonly ZenWinForm form;
+        /// <summary>
+        /// True as soon as all default controls on form are created. (No layout until that point.)
+        /// </summary>
         private bool controlsCreated = false;
+        /// <summary>
+        /// True if Windows form has already loaded.
+        /// </summary>
+        private bool isLoaded = false;
+        /// <summary>
+        /// The form's close system button.
+        /// </summary>
+        private ZenSystemButton btnClose;
+        /// <summary>
+        /// The form's minimize system button.
+        /// </summary>
+        private ZenSystemButton btnMinimize;
+        /// <summary>
+        /// The "main" (leftmost) tab control at the top.
+        /// </summary>
+        private ZenTabControl mainTabCtrl;
+        /// <summary>
+        /// Content tabs to the right of the "main" tab.
+        /// </summary>
+        private readonly List<ZenTabControl> contentTabControls = new List<ZenTabControl>();
+        /// <summary>
+        /// The main tab, as defined by the form's consumer.
+        /// </summary>
         private ZenTab mainTab;
+        /// <summary>
+        /// Content tabs to the right of the "main" tab, as defined by the form's consumer.
+        /// </summary>
         private readonly ZenTabCollection tabs;
+        /// <summary>
+        /// Index of the currently active tab. -1 for main tab, 0 and onwards for other tabs.
+        /// </summary>
         private int activeTabIdx = 0;
-        private Cursor desiredCursor = Cursors.Arrow;
+        /// <summary>
+        /// Cached - height of my header area at current scale.
+        /// </summary>
+        private readonly int headerHeight;
+        /// <summary>
+        /// Cached - padding inside tooltips at current scale.
+        /// </summary>
         private readonly int tooltipPadding;
+        /// <summary>
+        /// Cached - paddig from border to edge of content area at current scale.
+        /// </summary>
+        private readonly int innerPadding;
+        /// <summary>
+        /// Cached - padding from right border to right of close button, at current scale.
+        /// </summary>
+        private readonly int sysBtnPadding;
+        /// <summary>
+        /// My window header text.
+        /// </summary>
+        private string header;
+        /// <summary>
+        /// My window header text, with dynamically calculated ellipsis at end, to fit space.
+        /// </summary>
+        private string headerEllipsed = null;
+        /// <summary>
+        /// My minimum size in logical (unscaled) pixels.
+        /// </summary>
+        private Size logicalMinimumSize = Size.Empty;
+        /// <summary>
+        /// The cursor to be shown over form (unless some hot area is active).
+        /// </summary>
+        private Cursor desiredCursor = Cursors.Arrow;
+        /// <summary>
+        /// Info about all controls that have put in a request for a tooltip.
+        /// </summary>
         private readonly Dictionary<ZenControlBase, TooltipInfo> tooltipInfos = new Dictionary<ZenControlBase, TooltipInfo>();
+        /// <summary>
+        /// The control currently capturing the mouse (used by scrollbar to keep thumb pushed even when mouse leaves form).
+        /// </summary>
         private ZenControlBase ctrlCapturingMouse = null;
+
+        #endregion
+
+        #region Ctor, init, dispose
 
         public ZenTabbedForm(ITextProvider tprov)
             : base(null)
         {
             this.tprov = tprov;
             this.zenTimer = new ZenTimer(this);
-            this.form = new ZenWinForm(DoPaint);
+            this.form = new ZenWinForm(getCanvas);
 
             headerHeight = (int)(ZenParams.HeaderHeight * Scale);
             innerPadding = (int)(ZenParams.InnerPadding * Scale);
@@ -53,7 +137,6 @@ namespace ZD.Gui.Zen
             createZenControls();
             tabs = new ZenTabCollection(this);
 
-            form.SizeChanged += onFormSizeChanged;
             form.MouseDown += onFormMouseDown;
             form.MouseMove += onFormMouseMove;
             form.MouseUp += onFormMouseUp;
@@ -67,18 +150,33 @@ namespace ZD.Gui.Zen
         public override void Dispose()
         {
             form.Dispose();
+            if (canvas != null)
+            {
+                try
+                {
+                    canvasMutex.WaitOne();
+                    canvas.Dispose();
+                    canvas = null;
+                }
+                finally
+                {
+                    canvasMutex.ReleaseMutex();
+                }
+            }
             base.Dispose();
         }
 
         private void createZenControls()
         {
+            int w = 0;
+
             btnClose = new ZenSystemButton(this, SystemButtonType.Close);
-            btnClose.AbsLocation = new Point(form.Width - btnClose.Width - sysBtnPadding, 0);
-            btnClose.MouseClick += btnClose_MouseClick;
+            btnClose.AbsLocation = new Point(w - btnClose.Width - sysBtnPadding, 0);
+            btnClose.MouseClick += onCloseClick;
 
             btnMinimize = new ZenSystemButton(this, SystemButtonType.Minimize);
             btnMinimize.AbsLocation = new Point(btnClose.AbsLeft - btnMinimize.Size.Width, 0);
-            btnMinimize.MouseClick += btnMinimize_MouseClick;
+            btnMinimize.MouseClick += onMinimizeClick;
 
             btnClose.Tooltip = new SysBtnTooltips(btnClose, tprov);
             btnMinimize.Tooltip = new SysBtnTooltips(btnMinimize, tprov);
@@ -88,41 +186,18 @@ namespace ZD.Gui.Zen
             mainTabCtrl.LogicalSize = new Size(80, 30);
             mainTabCtrl.Size = new Size(mainTabCtrl.PreferredWidth, mainTabCtrl.Height);
             mainTabCtrl.AbsLocation = new Point(1, headerHeight - mainTabCtrl.Height);
-            mainTabCtrl.MouseClick += tabCtrl_MouseClick;
+            mainTabCtrl.MouseClick += onTabCtrlClick;
 
             controlsCreated = true;
         }
 
-        private void arrangeControls()
-        {
-            if (!controlsCreated) return;
+        #endregion
 
-            headerEllipsed = null;
+        #region Properties
 
-            // Resize and place active content tab, if any
-            foreach (ZenTab zt in tabs)
-            {
-                if (!form.Created || ZenChildren.Contains(zt.Ctrl))
-                {
-                    zt.Ctrl.AbsLocation = new Point(innerPadding, headerHeight + innerPadding);
-                    zt.Ctrl.Size = new Size(
-                        form.Width - 2 * innerPadding,
-                        form.Height - 2 * innerPadding - headerHeight);
-                }
-            }
-            // Resize main tab, if active
-            if (mainTab != null && (!form.Created || ZenChildren.Contains(mainTab.Ctrl)))
-            {
-                mainTab.Ctrl.AbsLocation = new Point(innerPadding, headerHeight + innerPadding);
-                mainTab.Ctrl.Size = new Size(
-                    form.Width - 2 * innerPadding,
-                    form.Height - 2 * innerPadding - headerHeight);
-            }
-
-            btnClose.AbsLocation = new Point(form.Width - btnClose.Size.Width - sysBtnPadding, 0);
-            btnMinimize.AbsLocation = new Point(btnClose.AbsLeft - btnMinimize.Size.Width, 0);
-        }
-
+        /// <summary>
+        /// Gets the Windows form we pretend to be.
+        /// </summary>
         public Form WinForm
         {
             get { return form; }
@@ -137,11 +212,17 @@ namespace ZD.Gui.Zen
             set { desiredCursor = value; form.Cursor = value; }
         }
 
+        /// <summary>
+        /// Gets the scale (real pixes are logical [96DPI] pixels times this).
+        /// </summary>
         public override float Scale
         {
             get { return form.Scale; }
         }
 
+        /// <summary>
+        /// Gets the size of form's content area.
+        /// </summary>
         private Size ContentSize
         {
             get
@@ -152,6 +233,9 @@ namespace ZD.Gui.Zen
             }
         }
 
+        /// <summary>
+        /// Gets the location of our content area.
+        /// </summary>
         private Point ContentLocation
         {
             get
@@ -160,6 +244,9 @@ namespace ZD.Gui.Zen
             }
         }
 
+        /// <summary>
+        /// Gets or sets the main content tab (highlighted as first item in list).
+        /// </summary>
         protected ZenTab MainTab
         {
             get { return mainTab; }
@@ -173,11 +260,17 @@ namespace ZD.Gui.Zen
             }
         }
 
+        /// <summary>
+        /// Gets form's tab collection - excluding the main tab.
+        /// </summary>
         protected ZenTabCollection Tabs
         {
             get { return tabs; }
         }
 
+        /// <summary>
+        /// Gets or sets form's header text.
+        /// </summary>
         protected string Header
         {
             get { return header; }
@@ -192,136 +285,68 @@ namespace ZD.Gui.Zen
             get { return activeTabIdx; }
         }
 
+        /// <summary>
+        /// Gets or sets the form's size in actual, scaled pixels.
+        /// </summary>
+        public override sealed Size Size
+        {
+            get { return AbsRect.Size; }
+            set
+            {
+                if (AbsRect.Size == value) return;
+                doRecreateCanvas(value);
+                doRepaint();
+                form.Size = value;
+                OnSizeChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the form's size, expressed in logical (unscaled) pixels.
+        /// </summary>
         public override sealed Size LogicalSize
         {
             set
             {
                 float w = value.Width;
                 float h = value.Height;
-                Size s = new Size((int)(w * Scale), (int)(h * Scale));
-                form.Size = s;
+                Size sz = new Size((int)(w * Scale), (int)(h * Scale));
+                Size = sz;
             }
             get
             {
-                Rectangle rect = form.DisplayRectangle;
-                return new Size((int)Math.Ceiling((rect.Width / Scale)), (int)Math.Ceiling(rect.Height / Scale));
+                Size sz = canvasSize;
+                return new Size((int)Math.Ceiling((sz.Width / Scale)), (int)Math.Ceiling(sz.Height / Scale));
             }
         }
 
+        /// <summary>
+        /// Gets or sets the form's minimum size, expressed in logical (unscaled) pixels.
+        /// </summary>
         public Size LogicalMinimumSize
         {
             get { return logicalMinimumSize; }
             set { logicalMinimumSize = value; }
         }
 
+        /// <summary>
+        /// Returns mouse position in top form's coordinates (canvas's absolute coordinates).
+        /// </summary>
         protected override sealed Point MousePositionAbs
         {
             get { return form.PointToClient(form.MousePosition); }
         }
 
+        /// <summary>
+        /// Gets the form's absolute rectangle (top left is 0,0; size is form's size).
+        /// </summary>
         public override sealed Rectangle AbsRect
         {
-            get { return new Rectangle(0, 0, form.Width, form.Height); }
-        }
-
-        void IZenTabsChangedListener.ZenTabsChanged()
-        {
-            // Remove old tab controls in header, re-add them
-            List<ZenControl> toRemove = new List<ZenControl>();
-            foreach (ZenControl zc in ZenChildren)
+            get
             {
-                ZenTabControl ztc = zc as ZenTabControl;
-                if (ztc == null || ztc.IsMain) continue;
-                toRemove.Add(zc);
+                Size sz = canvasSize;
+                return new Rectangle(0, 0, sz.Width, sz.Height);
             }
-            foreach (ZenControl zc in toRemove)
-            {
-                RemoveChild(zc);
-                zc.Dispose();
-            }
-            contentTabControls.Clear();
-            // Recreate all header tabs; add content control to form's children
-            int posx = mainTabCtrl.AbsLocation.X + mainTabCtrl.Width;
-            for (int i = 0; i != tabs.Count; ++i)
-            {
-                ZenTabControl tc = new ZenTabControl(this, false);
-                tc.Text = tabs[i].Header;
-                tc.LogicalSize = new Size(80, 30);
-                tc.Size = new Size(tc.PreferredWidth, tc.Height);
-                tc.AbsLocation = new Point(posx, headerHeight - tc.Height);
-                posx += tc.Width;
-                tc.MouseClick += tabCtrl_MouseClick;
-                contentTabControls.Add(tc);
-            }
-            // If this is the first content tab being added, this will be the active (visible) one
-            if (tabs.Count == 1)
-            {
-                RemoveChild(mainTab.Ctrl);
-                contentTabControls[0].Selected = true;
-            }
-            // Must arrange controls - so newly added, and perhaps displayed, content tab
-            // gets sized and placed
-            arrangeControls();
-            // Redraw
-            doRepaint();
-            form.Invalidate();
-        }
-
-        private void onFormClosed(object sender, FormClosedEventArgs e)
-        {
-            Dispose();
-        }
-
-        private void btnClose_MouseClick(ZenControlBase sender)
-        {
-            form.Close();
-        }
-
-        void btnMinimize_MouseClick(ZenControlBase sender)
-        {
-            form.WindowState = FormWindowState.Minimized;
-        }
-
-        private void tabCtrl_MouseClick(ZenControlBase sender)
-        {
-            ZenTabControl ztc = sender as ZenTabControl;
-            // Click on active tab - nothing to do
-            if (ztc.IsMain && activeTabIdx == -1) return;
-            int idx = contentTabControls.IndexOf(ztc);
-            if (idx == activeTabIdx) return;
-            // Switching to main
-            if (idx == -1)
-            {
-                contentTabControls[activeTabIdx].Selected = false;
-                mainTabCtrl.Selected = true;
-                RemoveChild(tabs[activeTabIdx].Ctrl);
-                AddChild(mainTab.Ctrl);
-                activeTabIdx = -1;
-            }
-            // Switching away to a content tab
-            else
-            {
-                mainTabCtrl.Selected = false;
-                contentTabControls[idx].Selected = true;
-                RemoveChild(mainTab.Ctrl);
-                AddChild(tabs[idx].Ctrl);
-                activeTabIdx = idx;
-            }
-            // Newly active contol still has old size if window was resized
-            arrangeControls();
-            // Refresh
-            doRepaint();
-            form.Invalidate();
-        }
-
-        private void onFormSizeChanged(object sender, EventArgs e)
-        {
-            // We get the weirdest sizes on minimize. Ignore all that - violates even our minimum size.
-            if (form.WindowState == FormWindowState.Minimized) return;
-            // Put everything in place, repaint, render
-            arrangeControls();
-            doRepaint();
-            form.Update();
         }
 
         /// <summary>
@@ -332,87 +357,122 @@ namespace ZD.Gui.Zen
             get { return zenTimer; }
         }
 
-        protected override sealed void RegisterWinFormsControl(Control c)
+        /// <summary>
+        /// Gets or sets the form's location on screen.
+        /// </summary>
+        public Point Location
         {
-            AddWinFormsControl(c);
+            get { return form.Location; }
+            set { form.Location = value; }
         }
 
-        internal sealed override void AddWinFormsControl(Control c)
-        {
-            form.Controls.Add(c);
-        }
+        #endregion
 
-        internal sealed override void RemoveWinFormsControl(Control c)
-        {
-            form.Controls.Remove(c);
-        }
+        #region Layout, resize, paint
 
-        protected override sealed void InvokeOnForm(Delegate method)
+        /// <summary>
+        /// Arranges controls after form's size has changed.
+        /// </summary>
+        private void arrangeControls()
         {
-            form.Invoke(method);
+            if (!controlsCreated) return;
+
+            headerEllipsed = null;
+
+            // Resize and place active content tab, if any
+            foreach (ZenTab zt in tabs)
+            {
+                if (!form.Created || ZenChildren.Contains(zt.Ctrl))
+                {
+                    zt.Ctrl.AbsLocation = new Point(innerPadding, headerHeight + innerPadding);
+                    zt.Ctrl.Size = new Size(
+                        canvasSize.Width - 2 * innerPadding,
+                        canvasSize.Height - 2 * innerPadding - headerHeight);
+                }
+            }
+            // Resize main tab, if active
+            if (mainTab != null && (!form.Created || ZenChildren.Contains(mainTab.Ctrl)))
+            {
+                mainTab.Ctrl.AbsLocation = new Point(innerPadding, headerHeight + innerPadding);
+                mainTab.Ctrl.Size = new Size(
+                    canvasSize.Width - 2 * innerPadding,
+                    canvasSize.Height - 2 * innerPadding - headerHeight);
+            }
+
+            btnClose.AbsLocation = new Point(canvasSize.Width - btnClose.Size.Width - sysBtnPadding, 0);
+            btnMinimize.AbsLocation = new Point(btnClose.AbsLeft - btnMinimize.Size.Width, 0);
         }
 
         /// <summary>
-        /// Set or clears the control receiving the mouse capture.
+        /// Returns the canvas to be blitted to screen in Windows paint event.
         /// </summary>
-        internal sealed override void SetControlMouseCapture(ZenControlBase ctrl, bool capture)
+        private ZenWinForm.CanvasToShow getCanvas()
         {
-            if (capture)
+            canvasMutex.WaitOne();
+            if (canvas == null)
             {
-                ctrlCapturingMouse = ctrl;
-                WinForm.Capture = true;
+                canvasMutex.ReleaseMutex();
+                return null;
             }
-            else if (ctrl == ctrlCapturingMouse) ctrlCapturingMouse = null;
-            if (ctrlCapturingMouse == null) WinForm.Capture = false;
+            // Lock on mutex is transferred to disposable ownership class here.
+            return new ZenWinForm.CanvasToShow(canvasMutex, canvas);
         }
 
         /// <summary>
-        /// Handles the timer event for animations. Unsubscribes when timer no longer needed.
+        /// Recreates the canvas, which defines window size as far as we are concerned.
         /// </summary>
-        public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
+        /// <param name="sz">New desired size</param>
+        /// <returns>True if canvas size actually changed.</returns>
+        private bool doRecreateCanvas(Size sz)
         {
-            bool timerNeeded = false;
-            bool paintNeeded = false;
-            {
-                bool tn, pn;
-                doTimerTooltip(out tn, out pn);
-                timerNeeded |= tn;
-                paintNeeded |= pn;
-            }
-            if (!timerNeeded) UnsubscribeFromTimer();
-            if (paintNeeded) { needBackground = false; renderMode = RenderMode.Invalidate; }
-            else { needBackground = null; renderMode = null; }
-        }
-
-        private void doRepaint()
-        {
-            ZenWinForm.PaintCanvas pc = null;
             try
             {
-                pc = form.GetBitmapRenderer();
-                if (pc == null) return;
-                Graphics g = pc.Graphics;
+                canvasMutex.WaitOne();
+                if (canvas != null && canvas.Size == sz) return false;
+                if (canvas != null) { canvas.Dispose(); canvas = null; }
+                canvas = new Bitmap(sz.Width, sz.Height);
+                canvasSize = sz;
+                arrangeControls();
+                return true;
+            }
+            finally
+            {
+                canvasMutex.ReleaseMutex();
+            }
+        }
+
+        /// <summary>
+        /// Trigger full repaint of form on current canvas.
+        /// </summary>
+        private void doRepaint()
+        {
+            try
+            {
+                canvasMutex.WaitOne();
+                if (canvas == null) return;
+                Graphics g = Graphics.FromImage(canvas);
                 DoPaint(g);
             }
             finally
             {
-                if (pc != null) pc.Dispose();
+                canvasMutex.ReleaseMutex();
             }
         }
 
         /// <summary>
-        /// Calls each control's paint function. Or repaints entire canvas (all controls) if needed.
+        /// Calls paint function of provided controls. Or repaints entire canvas (all controls) if needed.
         /// </summary>
         internal override sealed void MakeControlsPaint(ReadOnlyCollection<ControlToPaint> ctrls)
         {
-            ZenWinForm.PaintCanvas pc = null;
+            if (!isLoaded) return;
             // Strongest (most immediate) render mode requested
             RenderMode rm = RenderMode.None;
             try
             {
-                pc = form.GetBitmapRenderer();
-                if (pc == null) return;
-                Graphics g = pc.Graphics;
+                canvasMutex.WaitOne();
+                if (canvas == null) return;
+                // Draw on canvas
+                Graphics g = Graphics.FromImage(canvas);
                 // Paint only individual controls, or full canvas?
                 bool needBackground = false;
                 // If a control requests its own repaint (e.g., from animation), AND there are tooltips
@@ -445,18 +505,14 @@ namespace ZD.Gui.Zen
             }
             finally
             {
-                if (pc != null) pc.Dispose();
+                canvasMutex.ReleaseMutex();
             }
             if (rm == RenderMode.None) return;
             if (form.InvokeRequired)
             {
                 try
                 {
-                    form.Invoke((MethodInvoker)delegate
-                    {
-                        if (rm == RenderMode.Invalidate) form.Invalidate();
-                        else form.Refresh();
-                    });
+                    form.BeginInvoke((MethodInvoker)delegate { doFormStuffAfterControlPaint(rm); });
                 }
                 catch (ObjectDisposedException)
                 {
@@ -465,19 +521,186 @@ namespace ZD.Gui.Zen
                     // As window gets disposed in GUI thread
                 }
             }
-            else
-            {
-                if (rm == RenderMode.Invalidate) form.Invalidate();
-                else form.Refresh();
-            }
+            else doFormStuffAfterControlPaint(rm);
         }
 
-        public override void DoMouseLeave()
+        /// <summary>
+        /// Performs UI thread actions after we made controls paint - i.e., invalidate or refresh.
+        /// </summary>
+        private void doFormStuffAfterControlPaint(RenderMode rm)
         {
-            base.DoMouseLeave();
-            // After dragging window border, reset cursor
-            if (dragMode == DragMode.None || dragMode == DragMode.Move)
-                form.Cursor = Cursors.Arrow;
+            if (rm == RenderMode.Invalidate) form.Invalidate();
+            else if (rm == RenderMode.Update) form.Refresh();
+        }
+
+        #endregion
+
+        #region Misc top-level Zen and other ZenForm logic.
+
+        /// <summary>
+        /// Handles tab change event.
+        /// </summary>
+        void IZenTabsChangedListener.ZenTabsChanged()
+        {
+            // Remove old tab controls in header, re-add them
+            List<ZenControl> toRemove = new List<ZenControl>();
+            foreach (ZenControl zc in ZenChildren)
+            {
+                ZenTabControl ztc = zc as ZenTabControl;
+                if (ztc == null || ztc.IsMain) continue;
+                toRemove.Add(zc);
+            }
+            foreach (ZenControl zc in toRemove)
+            {
+                RemoveChild(zc);
+                zc.Dispose();
+            }
+            contentTabControls.Clear();
+            // Recreate all header tabs; add content control to form's children
+            int posx = mainTabCtrl.AbsLocation.X + mainTabCtrl.Width;
+            for (int i = 0; i != tabs.Count; ++i)
+            {
+                ZenTabControl tc = new ZenTabControl(this, false);
+                tc.Text = tabs[i].Header;
+                tc.LogicalSize = new Size(80, 30);
+                tc.Size = new Size(tc.PreferredWidth, tc.Height);
+                tc.AbsLocation = new Point(posx, headerHeight - tc.Height);
+                posx += tc.Width;
+                tc.MouseClick += onTabCtrlClick;
+                contentTabControls.Add(tc);
+            }
+            // If this is the first content tab being added, this will be the active (visible) one
+            if (tabs.Count == 1)
+            {
+                RemoveChild(mainTab.Ctrl);
+                contentTabControls[0].Selected = true;
+            }
+            // Must arrange controls - so newly added, and perhaps displayed, content tab
+            // gets sized and placed
+            arrangeControls();
+            // Redraw
+            doRepaint();
+            form.Invalidate();
+        }
+
+        /// <summary>
+        /// Handles click on close button.
+        /// </summary>
+        private void onCloseClick(ZenControlBase sender)
+        {
+            form.Close();
+        }
+
+        /// <summary>
+        /// Handles click on minimize button.
+        /// </summary>
+        void onMinimizeClick(ZenControlBase sender)
+        {
+            form.WindowState = FormWindowState.Minimized;
+        }
+
+        /// <summary>
+        /// Handles click on a tab header (to switch tabs).
+        /// </summary>
+        /// <param name="sender"></param>
+        private void onTabCtrlClick(ZenControlBase sender)
+        {
+            ZenTabControl ztc = sender as ZenTabControl;
+            // Click on active tab - nothing to do
+            if (ztc.IsMain && activeTabIdx == -1) return;
+            int idx = contentTabControls.IndexOf(ztc);
+            if (idx == activeTabIdx) return;
+            // Switching to main
+            if (idx == -1)
+            {
+                contentTabControls[activeTabIdx].Selected = false;
+                mainTabCtrl.Selected = true;
+                RemoveChild(tabs[activeTabIdx].Ctrl);
+                AddChild(mainTab.Ctrl);
+                activeTabIdx = -1;
+            }
+            // Switching away to a content tab
+            else
+            {
+                mainTabCtrl.Selected = false;
+                contentTabControls[idx].Selected = true;
+                RemoveChild(mainTab.Ctrl);
+                AddChild(tabs[idx].Ctrl);
+                activeTabIdx = idx;
+            }
+            // Newly active contol still has old size if window was resized
+            arrangeControls();
+            // Refresh
+            doRepaint();
+            form.Invalidate();
+        }
+
+        /// <summary>
+        /// End of chain - takes ownership of a WinForms control, requested by a Zen child, to our controls.
+        /// </summary>
+        protected override sealed void RegisterWinFormsControl(Control c)
+        {
+            AddWinFormsControl(c);
+        }
+
+        /// <summary>
+        /// End of chain - adds a WinForms control, requested by a Zen child, to our controls.
+        /// </summary>
+        internal sealed override void AddWinFormsControl(Control c)
+        {
+            form.Controls.Add(c);
+        }
+
+        /// <summary>
+        /// End of chain - removes a WinForms control, requested by a Zen child, to our controls.
+        /// </summary>
+        internal sealed override void RemoveWinFormsControl(Control c)
+        {
+            form.Controls.Remove(c);
+        }
+
+        /// <summary>
+        /// Invokes provided delegate on Windows form's UI thread.
+        /// </summary>
+        protected override sealed void InvokeOnForm(Delegate method)
+        {
+            form.BeginInvoke(method);
+        }
+
+        /// <summary>
+        /// Set or clears the control receiving the mouse capture.
+        /// </summary>
+        internal sealed override void SetControlMouseCapture(ZenControlBase ctrl, bool capture)
+        {
+            if (capture)
+            {
+                ctrlCapturingMouse = ctrl;
+                form.Capture = true;
+            }
+            else if (ctrl == ctrlCapturingMouse) ctrlCapturingMouse = null;
+            if (ctrlCapturingMouse == null) form.Capture = false;
+        }
+
+        #endregion
+
+        #region "Raw" Windows Forms event handlers
+
+        private void onFormMouseMove(object sender, MouseEventArgs e)
+        {
+            DoMouseMove(e.Location, e.Button);
+        }
+
+        private void onFormLoaded(object sender, EventArgs e)
+        {
+            isLoaded = true;
+            doRepaint();
+            form.Invalidate();
+            OnFormLoaded();
+        }
+
+        private void onFormClosed(object sender, FormClosedEventArgs e)
+        {
+            Dispose();
         }
 
         private void onFormMouseLeave(object sender, EventArgs e)
@@ -531,11 +754,46 @@ namespace ZD.Gui.Zen
             DoMouseUp(e.Location, e.Button);
         }
 
+        #endregion
+
+        #region ZenControlBase event handlers
+
+        /// <summary>
+        /// Handles the timer event for animations. Unsubscribes when timer no longer needed.
+        /// </summary>
+        public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
+        {
+            bool timerNeeded = false;
+            bool paintNeeded = false;
+            {
+                bool tn, pn;
+                doTimerTooltip(out tn, out pn);
+                timerNeeded |= tn;
+                paintNeeded |= pn;
+            }
+            if (!timerNeeded) UnsubscribeFromTimer();
+            if (paintNeeded)
+            {
+                needBackground = true;
+                renderMode = RenderMode.Invalidate;
+            }
+            else { needBackground = null; renderMode = null; }
+        }
+
+        public override void DoMouseLeave()
+        {
+            base.DoMouseLeave();
+            // After dragging window border, reset cursor
+            if (dragMode == DragMode.None || dragMode == DragMode.Move)
+                form.Cursor = Cursors.Arrow;
+        }
+
         /// <summary>
         /// Called when form has finished moving or resizing.
         /// </summary>
         protected virtual void DoMoveResizeFinished()
         {
+            // Nothing really. Derived controls can handle event to their delight.
         }
 
         public override bool DoMouseMove(Point p, MouseButtons button)
@@ -565,14 +823,6 @@ namespace ZD.Gui.Zen
             return true;
         }
 
-        private void onFormMouseMove(object sender, MouseEventArgs e)
-        {
-            DoMouseMove(e.Location, e.Button);
-        }
-
-        private void onFormLoaded(object sender, EventArgs e)
-        {
-            OnFormLoaded();
-        }
+        #endregion
     }
 }

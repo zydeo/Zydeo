@@ -122,8 +122,19 @@ namespace ZD.Gui
             // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
             // Position below is suitable for Noto, but not for Segoe.
             //txtInput.Location = new Point(AbsLeft + padding, AbsTop + padding);
-            txtInput.Location = new Point(AbsLeft + padding, AbsTop + 1);
-            txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, textBoxHeight);
+            if (txtInput.InvokeRequired)
+            {
+                InvokeOnForm((MethodInvoker)delegate
+                {
+                    txtInput.Location = new Point(AbsLeft + padding, AbsTop + 1);
+                    txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, textBoxHeight);
+                });
+            }
+            else
+            {
+                txtInput.Location = new Point(AbsLeft + padding, AbsTop + 1);
+                txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, textBoxHeight);
+            }
 
             // Search button: right-aligned
             btnSearch.RelLocation = new Point(Width - padding - btnSearch.Width, padding);

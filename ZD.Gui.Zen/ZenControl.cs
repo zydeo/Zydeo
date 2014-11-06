@@ -71,6 +71,15 @@ namespace ZD.Gui.Zen
         }
 
         /// <summary>
+        /// Gets or sets the control's size in actual, scaled pixels.
+        /// </summary>
+        public sealed override Size Size
+        {
+            get { return base.Size; }
+            set { base.Size = value; }
+        }
+
+        /// <summary>
         /// Gets or sets the control's logical size (in unscaled pixels; real size is this times <see cref="Scale"/>.
         /// </summary>
         public sealed override Size LogicalSize

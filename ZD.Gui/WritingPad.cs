@@ -157,7 +157,7 @@ namespace ZD.Gui
         /// </summary>
         protected override void OnSizeChanged()
         {
-            MakeMePaint(true, RenderMode.Invalidate);
+            MakeMePaint(false, RenderMode.Invalidate);
         }
 
         /// <summary>
