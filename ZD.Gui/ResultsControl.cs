@@ -428,8 +428,8 @@ namespace ZD.Gui
 
                 // Gradient fade out on left
                 int gradWidth = olHeight;
-                Color colR = Color.FromArgb(196, 0, 0, 0);
-                Color colL = Color.FromArgb(0, 0, 0, 0);
+                Color colR = Color.FromArgb(Magic.ResultCountOverlayOpacity, Magic.ResultCountOverlayBackColor);
+                Color colL = Color.FromArgb(0, Magic.ResultCountOverlayBackColor);
                 Rectangle grRect = new Rectangle(olRight - lblWidth - gradWidth, Height - olHeight, gradWidth, olHeight);
                 using (LinearGradientBrush gb = new LinearGradientBrush(grRect, colL, colR, LinearGradientMode.Horizontal))
                 {
@@ -437,13 +437,12 @@ namespace ZD.Gui
                 }
 
                 // Draw solid BG for label
-                //using (Brush b = new SolidBrush(Color.FromArgb(255, 59, 59, 59)))
-                using (Brush b = new SolidBrush(Color.FromArgb(196, 0, 0, 0)))
+                using (Brush b = new SolidBrush(colR))
                 {
                     g.FillRectangle(b, olRight - lblWidth, Height - olHeight, lblWidth, olHeight);
                 }
                 // Write text
-                using (Brush b = new SolidBrush(Color.FromArgb(240, 240, 240)))
+                using (Brush b = new SolidBrush(Magic.ResoltCountOverlayTextColor))
                 {
                     g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                     g.DrawString(txtResCount, fnt, b, olRight - lblWidth, Height - olHeight + lblPad);

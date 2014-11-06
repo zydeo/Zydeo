@@ -177,5 +177,20 @@ namespace ZD.Gui
         /// Opacity of hint text in writing pad.
         /// </summary>
         public static readonly int WritingPadHintOpacity = 128;
+
+        /// <summary>
+        /// Opacity of results count overlay in bottom right corner.
+        /// </summary>
+        public static readonly int ResultCountOverlayOpacity = 196;
+
+        /// <summary>
+        /// Background color of results count overlay in bottom righ corner.
+        /// </summary>
+        public static readonly Color ResultCountOverlayBackColor = Color.FromArgb(0, 0, 0);
+
+        /// <summary>
+        /// Text color of results count overlay in bottom right corner.
+        /// </summary>
+        public static readonly Color ResoltCountOverlayTextColor = Color.FromArgb(240, 240, 240);
     }
 }
