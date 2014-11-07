@@ -274,7 +274,14 @@ namespace ZD.Gui.Zen
         protected string Header
         {
             get { return header; }
-            set { header = value; headerEllipsed = null; doRepaint(); form.Invalidate(); }
+            set
+            {
+                header = value;
+                headerEllipsed = null;
+                doRepaint();
+                form.Text = value;
+                form.Invalidate();
+            }
         }
 
         /// <summary>
