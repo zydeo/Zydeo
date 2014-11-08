@@ -267,6 +267,11 @@ namespace ZD.Gui.Zen
                     animRepeatPurchase = ((float)repeatBuy);
                     if (pressedPart == WorkingPart.TopJump || pressedPart == WorkingPart.BottomJump)
                         animRepeatBarrierY = p.Y;
+                    else
+                    {
+                        if (pressedPart == WorkingPart.TopBtn) animRepeatBarrierY = Width + 1;
+                        else animRepeatBarrierY = Height - Width - 1;
+                    }
                 }
             }
             
@@ -649,7 +654,8 @@ namespace ZD.Gui.Zen
                     // First order is delayed by ticksDelay; repeat orders then come at tickFreq
                     int tickDelay = 5;
                     int tickFreq = 3;
-                    if ((animRepeatCounter - tickDelay) % tickFreq == 0) animFuel += animRepeatPurchase;
+                    if ((animRepeatCounter - tickDelay) % tickFreq == 0)
+                        animFuel += animRepeatPurchase;
                 }
 
                 // Animated, inertia scrolling from here on
