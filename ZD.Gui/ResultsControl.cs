@@ -45,6 +45,11 @@ namespace ZD.Gui
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
 
         /// <summary>
+        /// Lock object around results controls collection - to avoid conflicts in pain while recreating.
+        /// </summary>
+        private readonly object resCtrlsLO = new object();
+
+        /// <summary>
         /// Lock object around <see cref="displayId"/> value.
         /// </summary>
         private readonly object displayIdLO = new object();
@@ -346,9 +351,12 @@ namespace ZD.Gui
                 // Empty result set - special handling
                 if (results.Count == 0)
                 {
-                    doDisposeResultControls();
-                    txtResCount = tprov.GetString("ResultsCountNone");
-                    setScrollbarVisibility(false);
+                    lock (resCtrlsLO)
+                    {
+                        doDisposeResultControls();
+                        txtResCount = tprov.GetString("ResultsCountNone");
+                        setScrollbarVisibility(false);
+                    }
                     // Render
                     doFade(false);
                     MakeMePaint(false, RenderMode.Invalidate);
@@ -406,22 +414,26 @@ namespace ZD.Gui
                 {
                     // Stop any scrolling that may be going on. Cannot scroll what's being replaced.
                     if (sbar.Parent == this) sbar.StopAnyScrolling();
-                    // Get rid of old result controls, remember/own new ones
-                    doDisposeResultControls();
-                    resCtrls = newCtrls;
-                    foreach (OneResultControl orc in resCtrls) AddChild(orc);
-                    // Actually show or hide scrollbar as per original decision
-                    setScrollbarVisibility(sbarVisible);
-                    // Now, by the time we're here, size may have changed
-                    // That is unlikely, but then we got to re-layout stuff
-                    int cwNew, chNew;
-                    getContentSize(sbarVisible, out cwNew, out chNew);
-                    if (cwNew != cw || chNew != ch) reAnalyzeResultsDisplay();
-                    else
+                    // Prevent any painting from worker threads - also accesses collection we're changing
+                    lock (resCtrlsLO)
                     {
-                        // Everything as big as it used to be...
-                        // Change our mind about scrollbar?
-                        cw = showOrHideScrollbar();
+                        // Get rid of old result controls, remember/own new ones
+                        doDisposeResultControls();
+                        resCtrls = newCtrls;
+                        foreach (OneResultControl orc in resCtrls) AddChild(orc);
+                        // Actually show or hide scrollbar as per original decision
+                        setScrollbarVisibility(sbarVisible);
+                        // Now, by the time we're here, size may have changed
+                        // That is unlikely, but then we got to re-layout stuff
+                        int cwNew, chNew;
+                        getContentSize(sbarVisible, out cwNew, out chNew);
+                        if (cwNew != cw || chNew != ch) reAnalyzeResultsDisplay();
+                        else
+                        {
+                            // Everything as big as it used to be...
+                            // Change our mind about scrollbar?
+                            cw = showOrHideScrollbar();
+                        }
                     }
                     // Results count text
                     if (resCtrls.Count == 1) txtResCount = tprov.GetString("ResultsCountOne");
@@ -620,17 +632,20 @@ namespace ZD.Gui
             g.ResetTransform();
             g.TranslateTransform(AbsLeft, AbsTop);
             g.Clip = new Region(new Rectangle(1, 1, cw, ch));
-            if (firstVisibleIdx != -1)
+            lock (resCtrlsLO)
             {
-                int ix = firstVisibleIdx;
-                while (ix < resCtrls.Count)
+                if (firstVisibleIdx != -1)
                 {
-                    OneResultControl orc = resCtrls[ix];
-                    if (orc.RelTop >= ch + 1) break;
-                    g.ResetTransform();
-                    g.TranslateTransform(orc.AbsLeft, orc.AbsTop);
-                    orc.DoPaint(g);
-                    ++ix;
+                    int ix = firstVisibleIdx;
+                    while (ix < resCtrls.Count)
+                    {
+                        OneResultControl orc = resCtrls[ix];
+                        if (orc.RelTop >= ch + 1) break;
+                        g.ResetTransform();
+                        g.TranslateTransform(orc.AbsLeft, orc.AbsTop);
+                        orc.DoPaint(g);
+                        ++ix;
+                    }
                 }
             }
             // Bottom overlay (results count, zoom, settings)
