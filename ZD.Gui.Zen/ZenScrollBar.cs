@@ -157,6 +157,14 @@ namespace ZD.Gui.Zen
             }
         }
 
+        /// <summary>
+        /// Stop whatever momentum-based scrolling is currently going on.
+        /// </summary>
+        public void StopAnyScrolling()
+        {
+            doStopAnyScroll();
+        }
+
         #region Interaction / event handling
 
         /// <summary>

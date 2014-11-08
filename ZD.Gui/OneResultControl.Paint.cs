@@ -207,7 +207,7 @@ namespace ZD.Gui
                         float pad = lemmaLineHeight * 0.1F;
                         g.DrawEllipse(pnorm,
                             pb.LocX,
-                            pb.LocY + Scale * pad,
+                            pb.LocY + scale * pad,
                             ((float)block.Width) - 2.0F * pad,
                             lemmaCharHeight - 2.0F * pad);
                         g.DrawString(textPool.GetString(block.TextPos), getFont(fntSenseId), bnorm,

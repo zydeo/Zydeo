@@ -23,6 +23,11 @@ namespace ZD.Gui
         public delegate void LookupThroughLinkDelegate(string queryString);
 
         /// <summary>
+        /// Scale, passed to me in ctor, so I don't have to ask parent (which I may not yet have during analysis).
+        /// </summary>
+        private readonly float scale;
+
+        /// <summary>
         /// Source of localized texts.
         /// </summary>
         private readonly ITextProvider tprov;
@@ -143,12 +148,13 @@ namespace ZD.Gui
         /// <param name="maxHeadLength">Longest headword in full results list.</param>
         /// <param name="script">Scripts to show in headword.</param>
         /// <param name="odd">Odd/even position in list, for alternating BG color.</param>
-        public OneResultControl(ZenControl owner, ITextProvider tprov,
+        public OneResultControl(ZenControlBase owner, float scale, ITextProvider tprov,
             LookupThroughLinkDelegate lookupThroughLink,
             ICedictEntryProvider entryProvider, CedictResult cr,
             SearchScript script, bool odd)
             : base(owner)
         {
+            this.scale = scale;
             this.tprov = tprov;
             this.lookupThroughLink = lookupThroughLink;
             this.entry = entryProvider.GetEntry(cr.EntryId);
@@ -156,11 +162,11 @@ namespace ZD.Gui
             this.analyzedScript = script;
             this.odd = odd;
 
-            padLeft = (int)(5.0F * Scale);
-            padTop = (int)(5.0F * Scale);
-            padBottom = (int)(8.0F * Scale);
-            padMid = (int)(20.0F * Scale);
-            padRight = (int)(10.0F * Scale);
+            padLeft = (int)(5.0F * scale);
+            padTop = (int)(5.0F * scale);
+            padBottom = (int)(8.0F * scale);
+            padMid = (int)(20.0F * scale);
+            padRight = (int)(10.0F * scale);
         }
 
         // Graphics resources: static, singleton, never disposed.

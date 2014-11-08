@@ -40,9 +40,19 @@ namespace ZD.Gui
         private ZenScrollBar sbar;
 
         /// <summary>
-        /// One result control for each result I'm showin.
+        /// One result control for each result I'm showing.
         /// </summary>
         private List<OneResultControl> resCtrls = new List<OneResultControl>();
+
+        /// <summary>
+        /// Lock object around <see cref="displayId"/> value.
+        /// </summary>
+        private readonly object displayIdLO = new object();
+
+        /// <summary>
+        /// Incremental lookup ID of results current being shown.
+        /// </summary>
+        private int displayId = int.MinValue;
 
         /// <summary>
         /// Index of the first results control that is at least partially visible.
@@ -68,64 +78,42 @@ namespace ZD.Gui
         }
 
         /// <summary>
+        /// Disposes existing result controls and clears list.
+        /// </summary>
+        private void doDisposeResultControls()
+        {
+            // Dispose old results controls
+            foreach (OneResultControl orc in resCtrls)
+            {
+                RemoveChild(orc);
+                orc.Dispose();
+            }
+            resCtrls.Clear();
+            firstVisibleIdx = -1;
+        }
+
+        public override void Dispose()
+        {
+            doDisposeResultControls();
+            base.Dispose();
+        }
+
+        /// <summary>
         /// Handles scroll bar's request for a timer. It's bossy, this inert scrollbar.
         /// </summary>
         private void onTimerForScrollBar()
         {
             SubscribeToTimer();
         }
-        /// <summary>
-        /// Current speed of animated scrolling. Lock with <see cref="scrollTimerLO"/>.
-        /// </summary>
-        private float scrollSpeed;
-        /// <summary>
-        /// Lock object for accessing <see cref="scrollSpeed"/>.
-        /// </summary>
-        private object scrollTimerLO = new object();
-
-        /// <summary>
-        /// Executes animations (e.g., scrolling with momentum)
-        /// </summary>
-        public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
-        {
-            bool needTimer, valueChanged;
-            sbar.DoScrollTimer(out needTimer, out valueChanged);
-            if (!needTimer) UnsubscribeFromTimer();
-            if (valueChanged)
-            {
-                int y = 1 - sbar.Position;
-                foreach (OneResultControl orc in resCtrls)
-                {
-                    orc.RelTop = y;
-                    y += orc.Height;
-                }
-                updateFirstVisibleIdx();
-                needBackground = false;
-                renderMode = RenderMode.Invalidate;
-            }
-            else
-            {
-                needBackground = null;
-                renderMode = null;
-            }
-        }
-
-        public override void Dispose()
-        {
-            foreach (OneResultControl orc in resCtrls) orc.Dispose();
-            resCtrls = null;
-            firstVisibleIdx = -1;
-            base.Dispose();
-        }
 
         /// <summary>
         /// Gets width and height of content area (occupied by individual results controls)
         /// </summary>
-        private void getContentSize(out int cw, out int ch)
+        private void getContentSize(bool sbarVisible, out int cw, out int ch)
         {
             ch = Height - 2; // Top and bottom border
             cw = Width - 2; // Left and right borders
-            if (sbar.Parent == this) cw -= sbar.Width; // Scrollbar, if visible
+            if (sbarVisible) cw -= sbar.Width; // Scrollbar, if visible
         }
 
         /// <summary>
@@ -156,7 +144,7 @@ namespace ZD.Gui
         private int showOrHideScrollbar()
         {
             int cw, ch;
-            getContentSize(out cw, out ch);
+            getContentSize(sbar.Parent == this, out cw, out ch);
             bool sbarVisible = sbar.Parent == this;
             if (sbarVisible && resCtrls[resCtrls.Count - 1].RelBottom < Height - 1 ||
                 !sbarVisible && resCtrls[resCtrls.Count - 1].RelBottom >= Height - 1)
@@ -164,7 +152,7 @@ namespace ZD.Gui
                 sbarVisible = !sbarVisible;
                 setScrollbarVisibility(sbarVisible);
                 // Get content size again - scrollbar visibility affects it
-                getContentSize(out cw, out ch);
+                getContentSize(sbar.Parent == this, out cw, out ch);
                 // Reposition results controls, laying them out from top
                 int y = 0;
                 using (Bitmap bmp = new Bitmap(1, 1))
@@ -203,7 +191,7 @@ namespace ZD.Gui
         {
             // Content rectangle height and width
             int cw, ch;
-            getContentSize(out cw, out ch);
+            getContentSize(sbar.Parent == this, out cw, out ch);
 
             // Put scroll bar in its place, update its large change (which is always one full screen)
             // Call below will not change visibility, but update sbar position.
@@ -311,18 +299,30 @@ namespace ZD.Gui
         }
 
         /// <summary>
+        /// <para>Fades out whatever is currently shown to indicate lookup in progress.</para>
+        /// <para>Next call to set content (e.g., <see cref="SetResults"/> will remove shade.</para>
+        /// </summary>
+        public void FadeOut()
+        {
+            doFade(true);
+        }
+
+        /// <summary>
         /// Displays the received results, discarding existing data.
         /// </summary>
+        /// <param name="lookupId">ID of lookup whose results are shown. If ID is smaller than last seen value, we don't show results.</param>
         /// <param name="entryProvider">The entry provider; ownership passed by caller to me.</param>
         /// <param name="results">Cedict lookup results to show.</param>
         /// <param name="script">Defines which script(s) to show.</param>
-        public void SetResults(ICedictEntryProvider entryProvider,
+        /// <returns>True if results got shown; false if they're discarded because newer results are already on display.</returns>
+        public bool SetResults(int lookupId,
+            ICedictEntryProvider entryProvider,
             ReadOnlyCollection<CedictResult> results,
             SearchScript script)
         {
             try
             {
-                doSetResults(entryProvider, results, script);
+                return doSetResults(lookupId, entryProvider, results, script);
             }
             finally
             {
@@ -333,75 +333,214 @@ namespace ZD.Gui
         /// <summary>
         /// See <see cref="SetResults"/>.
         /// </summary>
-        private void doSetResults(ICedictEntryProvider entryProvider,
+        private bool doSetResults(int lookupId,
+            ICedictEntryProvider entryProvider,
             ReadOnlyCollection<CedictResult> results,
             SearchScript script)
         {
+            lock (displayIdLO)
+            {
+                // If we're already too late, don't bother changing display.
+                if (displayId > lookupId) return false;
+                displayId = lookupId;
+                // Empty result set - special handling
+                if (results.Count == 0)
+                {
+                    doDisposeResultControls();
+                    txtResCount = tprov.GetString("ResultsCountNone");
+                    setScrollbarVisibility(false);
+                    // Render
+                    doFade(false);
+                    MakeMePaint(false, RenderMode.Invalidate);
+                    return true;
+                }
+            }
+
             // Decide if we first try with scrollbar visible or not
             // This is a very rough heuristics (10 results or more), but doesn't matter
             // Recalc costs much if there are many results, and the number covers that safely
             bool sbarVisible = results.Count > 10;
-            setScrollbarVisibility(sbarVisible);
 
             // Content rectangle height and width
             int cw, ch;
-            getContentSize(out cw, out ch);
+            getContentSize(sbarVisible, out cw, out ch);
 
-            // Dispose old results controls
-            foreach (OneResultControl orc in resCtrls)
-            {
-                RemoveChild(orc);
-                orc.Dispose();
-            }
-            resCtrls.Clear();
-            firstVisibleIdx = -1;
-
-            // No results
-            if (results.Count == 0)
-            {
-                txtResCount = tprov.GetString("ResultsCountNone");
-                setScrollbarVisibility(false);
-                MakeMePaint(false, RenderMode.Invalidate);
-                return;
-            }
-
-            // Create new result controls
+            // Create new result controls. At this point, not overwriting old ones!
+            // This is the cycle that takes *long*.
+            List<OneResultControl> newCtrls = new List<OneResultControl>(results.Count);
             int y = 0;
             using (Bitmap bmp = new Bitmap(1, 1))
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 bool odd = true;
+                bool canceled = false;
                 foreach (CedictResult cr in results)
                 {
-                    OneResultControl orc = new OneResultControl(this, tprov, lookupFromCtrl, entryProvider, cr, script, odd);
+                    OneResultControl orc = new OneResultControl(null, Scale, tprov, lookupFromCtrl, entryProvider, cr, script, odd);
                     orc.Analyze(g, cw);
-                    orc.RelLocation = new Point(1, y + 1);
+                    // Cannot use RelLocation b/c control has no parent yet
+                    orc.AbsLocation = new Point(AbsLeft + 1, AbsTop + y + 1);
                     y += orc.Height;
-                    resCtrls.Add(orc);
+                    newCtrls.Add(orc);
                     odd = !odd;
+                    // At any point, if we realize lookup ID has changed, we stop
+                    // This can happen if a later, quick lookup completes and shows results before us
+                    // Checking integers is atomic, no locking
+                    if (displayId > lookupId) { canceled = true; break; }
+                }
+                if (canceled)
+                {
+                    foreach (OneResultControl orc in newCtrls) orc.Dispose();
+                    return false;
                 }
             }
-            // Change our mind about scrollbar?
-            cw = showOrHideScrollbar();
-
-            // Results count text
-            if (resCtrls.Count == 1) txtResCount = tprov.GetString("ResultsCountOne");
-            else
+            // OK, last chance to change our mind about showing results.
+            // The rest is synchronized - but it's also fast
+            lock (displayIdLO)
             {
-                txtResCount = tprov.GetString("ResultsCountN");
-                txtResCount = string.Format(txtResCount, resCtrls.Count);
+                if (displayId > lookupId) return false;
+                displayId = lookupId;
+                // Rest must be invoked on GUI. Otherwise, as we're adding children,
+                // Collections are modified that are also accessed by paint in a resize event handler etc.
+                InvokeOnForm((MethodInvoker)delegate
+                {
+                    // Stop any scrolling that may be going on. Cannot scroll what's being replaced.
+                    if (sbar.Parent == this) sbar.StopAnyScrolling();
+                    // Get rid of old result controls, remember/own new ones
+                    doDisposeResultControls();
+                    resCtrls = newCtrls;
+                    foreach (OneResultControl orc in resCtrls) AddChild(orc);
+                    // Actually show or hide scrollbar as per original decision
+                    setScrollbarVisibility(sbarVisible);
+                    // Now, by the time we're here, size may have changed
+                    // That is unlikely, but then we got to re-layout stuff
+                    int cwNew, chNew;
+                    getContentSize(sbarVisible, out cwNew, out chNew);
+                    if (cwNew != cw || chNew != ch) reAnalyzeResultsDisplay();
+                    else
+                    {
+                        // Everything as big as it used to be...
+                        // Change our mind about scrollbar?
+                        cw = showOrHideScrollbar();
+                    }
+                    // Results count text
+                    if (resCtrls.Count == 1) txtResCount = tprov.GetString("ResultsCountOne");
+                    else
+                    {
+                        txtResCount = tprov.GetString("ResultsCountN");
+                        txtResCount = string.Format(txtResCount, resCtrls.Count);
+                    }
+                    // Update first visible control's index
+                    updateFirstVisibleIdx();
+                    // Render
+                    doFade(false);
+                    MakeMePaint(false, RenderMode.Invalidate);
+                });
+                // Done.
+                return true;
             }
-
-            // Update first visible control's index
-            updateFirstVisibleIdx();
-
-            // Render
-            MakeMePaint(false, RenderMode.Invalidate);
         }
 
+        /// <summary>
+        /// Handles event sent by control when user clicks on link (Chinese in target).
+        /// </summary>
         private void lookupFromCtrl(string queryString)
         {
             lookupThroughLink(queryString);
+        }
+
+        /// <summary>
+        /// Lock object around animation values.
+        /// </summary>
+        private readonly object animLO = new object();
+
+        /// <summary>
+        /// <para>Fade degree. 0 is no fade, 1 is greatest fade.</para>
+        /// <para>float.MinValue means no fade, and also no animbation in progress.</para>
+        /// </summary>
+        private float animFade = float.MinValue;
+
+        /// <summary>
+        /// Handles timer event for fading animation.
+        /// </summary>
+        private void doTimerFade(out bool needTimer, out bool paintNeeded)
+        {
+            needTimer = paintNeeded = false;
+            lock (animLO)
+            {
+                if (animFade == float.MinValue) return;
+                if (animFade > 1) { animFade = 1; return; }
+                animFade += 0.05F;
+                needTimer = paintNeeded = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets color (with alpha) of fade overlay.
+        /// </summary>
+        private Color getFadeColor()
+        {
+            lock (animLO)
+            {
+                if (animFade == float.MinValue) return Color.FromArgb(0, 255, 255, 255);
+                float fadeAlpha = 196F;
+                float fadeVal = Math.Min(animFade, 1);
+                fadeAlpha *= fadeVal;
+                return Color.FromArgb((int)fadeAlpha, 255, 255, 255);
+            }
+        }
+
+        /// <summary>
+        /// Starts fading in, or removes fade effect.
+        /// </summary>
+        private void doFade(bool showShadow)
+        {
+            lock (animLO)
+            {
+                if (showShadow)
+                {
+                    if (animFade == float.MinValue)
+                    {
+                        animFade = 0;
+                        SubscribeToTimer();
+                    }
+                }
+                else animFade = float.MinValue;
+            }
+        }
+
+        /// <summary>
+        /// Executes animations (e.g., scrolling with momentum)
+        /// </summary>
+        public override void DoTimer(out bool? needBackground, out RenderMode? renderMode)
+        {
+            bool ntScrool, valueChangedScroll;
+            bool ntFade, pnFade;
+            sbar.DoScrollTimer(out ntScrool, out valueChangedScroll);
+            doTimerFade(out ntFade, out pnFade);
+
+            if (!ntScrool && !ntFade) UnsubscribeFromTimer();
+
+            if (valueChangedScroll || pnFade)
+            {
+                if (valueChangedScroll)
+                {
+                    int y = 1 - sbar.Position;
+                    foreach (OneResultControl orc in resCtrls)
+                    {
+                        orc.RelTop = y;
+                        y += orc.Height;
+                    }
+                    updateFirstVisibleIdx();
+                }
+                needBackground = false;
+                renderMode = RenderMode.Invalidate;
+            }
+            else
+            {
+                needBackground = null;
+                renderMode = null;
+            }
         }
 
         private void doPaintBottomOverlay(Graphics g)
@@ -462,7 +601,7 @@ namespace ZD.Gui
         {
             // Content rectangle height and width
             int cw, ch;
-            getContentSize(out cw, out ch);
+            getContentSize(sbar.Parent == this, out cw, out ch);
 
             // Background
             using (Brush b = new SolidBrush(ZenParams.WindowColor))
@@ -507,7 +646,19 @@ namespace ZD.Gui
                 g.Clip = new Region(new Rectangle(0, 0, sbar.Width, sbar.Height));
                 sbar.DoPaint(g);
             }
+            // Fade overaly above everything but scollbar
+            Color colFade = getFadeColor();
+            if (colFade.A != 0)
+            {
+                using (Brush b = new SolidBrush(colFade))
+                {
+                    g.ResetTransform();
+                    g.TranslateTransform(AbsLeft, AbsTop);
+                    Rectangle rect = new Rectangle(1, 1, cw, ch);
+                    g.Clip = new Region(rect);
+                    g.FillRectangle(b, rect);
+                }
+            }
         }
-
     }
 }

@@ -346,19 +346,73 @@ namespace ZD.Gui
             // TO-DO: Move to worker thread!!
             // If dictionary is not yet initialized, we just don't search.
             if (dict == null) return;
-            CedictLookupResult res = dict.Lookup(text, searchScript, searchLang);
             // If search request comes from input control: select all text. Easier to overwrite.
             // Otherwise, user inserted a recognized character. Then we want to allow her to keep writing > no select.
             if (sender == ctrlSearchInput) ctrlSearchInput.SelectAll();
+            // Fade out whatever is currently shown
+            ctrlResults.FadeOut();
+            // Launch lookup and rendering in worker thread
+            lock (lookupItems)
+            {
+                ++lookupId;
+                lookupItems.Add(new LookupItem(lookupId, text, searchScript, searchLang));
+            }
+            ThreadPool.QueueUserWorkItem(search);
+        }
+
+        /// <summary>
+        /// On query to look up, queued for processing in worker thread.
+        /// </summary>
+        private class LookupItem
+        {
+            public readonly int ID;
+            public readonly string Text;
+            public readonly SearchScript Script;
+            public readonly SearchLang Lang;
+            public LookupItem(int id, string text, SearchScript script, SearchLang lang)
+            { ID = id; Text = text; Script = script; Lang = lang; }
+        }
+
+        /// <summary>
+        /// Items to look up - new item is added every time user triggers lookup.
+        /// </summary>
+        private readonly List<LookupItem> lookupItems = new List<LookupItem>();
+
+        /// <summary>
+        /// ID of latest lookup in progress.
+        /// </summary>
+        private int lookupId = -1;
+
+        /// <summary>
+        /// Dictionary lookup and results rendering in worker thread.
+        /// </summary>
+        /// <param name="ctxt"></param>
+        private void search(object ctxt)
+        {
+            LookupItem li;
+            // Pick very last item in queue to look up; clear rest of queue
+            lock (lookupItems)
+            {
+                if (lookupItems.Count == 0) return;
+                li = lookupItems[lookupItems.Count - 1];
+                lookupItems.Clear();
+                // If this is not very last request, don't even bother
+                if (li.ID != lookupId) return;
+            }
+            // Look up in dictionary
+            CedictLookupResult res = dict.Lookup(li.Text, li.Script, li.Lang);
+            // Call below transfers ownership of entry provider to results control.
+            bool shown = ctrlResults.SetResults(li.ID, res.EntryProvider, res.Results, searchScript);
+            // If these results came too late (a long query completing too late, when a later fast query already completed)
+            // Then we're done, no flashing.
+            if (!shown) return;
             // Did lookup language change?
-            if (res.ActualSearchLang != searchLang)
+            if (res.ActualSearchLang != li.Lang)
             {
                 searchLang = res.ActualSearchLang;
                 searchLangChanged();
                 btnSearchLang.Flash();
             }
-            // Call below transfers ownership of entry provider to results control.
-            ctrlResults.SetResults(res.EntryProvider, res.Results, searchScript);
         }
 
         /// <summary>

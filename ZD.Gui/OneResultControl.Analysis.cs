@@ -616,7 +616,7 @@ namespace ZD.Gui
                 ideoSize = g.MeasureString(ideoTestStr, getFont(fntZhoHeadSimp), 65535, sf);
                 var si = HanziMeasure.Instance.GetMeasures(Magic.ZhoSimpContentFontFamily, Magic.ZhoResultFontSize);
                 float hanziLinePad = 6.0F;
-                hanziLinePad *= Scale;
+                hanziLinePad *= scale;
                 ideoLineHeight = si.RealRect.Height + hanziLinePad;
             }
 

@@ -58,7 +58,7 @@ namespace ZD.Gui.Zen
         /// <summary>
         /// The control's child controls.
         /// </summary>
-        private readonly List<ZenControlBase> zenChildren = new List<ZenControlBase>();
+        private readonly HashSet<ZenControlBase> zenChildren = new HashSet<ZenControlBase>();
         /// <summary>
         /// The WinForms controls owned by this Zen control.
         /// </summary>
@@ -432,9 +432,9 @@ namespace ZD.Gui.Zen
             get { return parent; }
         }
 
-        protected ReadOnlyCollection<ZenControlBase> ZenChildren
+        protected IEnumerable<ZenControlBase> ZenChildren
         {
-            get { return new ReadOnlyCollection<ZenControlBase>(zenChildren); }
+            get { return zenChildren; }
         }
 
         protected void RemoveChild(ZenControlBase ctrl)
