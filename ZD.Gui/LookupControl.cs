@@ -147,7 +147,7 @@ namespace ZD.Gui
             // --
 
             // Character picker control under writing pad.
-            ctrlCharPicker = new CharPicker(this);
+            ctrlCharPicker = new CharPicker(this, tprov);
             ctrlCharPicker.FontFace = searchScript == SearchScript.Traditional ? Magic.ZhoTradContentFontFamily : Magic.ZhoSimpContentFontFamily;
             ctrlCharPicker.RelLocation = new Point(padding, btnClearWritingPad.RelBottom + padding);
             ctrlCharPicker.LogicalSize = new Size(200, 80);
@@ -286,37 +286,56 @@ namespace ZD.Gui
         /// </summary>
         private void recognize(object ctxt)
         {
-            WrittenCharacter wc = ctxt as WrittenCharacter;
-            CharacterDescriptor id = wc.BuildCharacterDescriptor();
-            strokesData.Reset();
-            StrokesMatcher matcher = new StrokesMatcher(id,
-                searchScript != SearchScript.Simplified,
-                searchScript != SearchScript.Traditional,
-                Magic.HanziLookupLooseness,
-                Magic.HanziLookupNumResults,
-                strokesData);
-            int matcherCount;
-            lock (runningMatchers)
+            bool error = false;
+            char[] matches = null;
+            StrokesMatcher matcher = null;
+            try
             {
-                runningMatchers.Add(matcher);
-                matcherCount = runningMatchers.Count;
+                WrittenCharacter wc = ctxt as WrittenCharacter;
+                CharacterDescriptor id = wc.BuildCharacterDescriptor();
+                strokesData.Reset();
+                matcher = new StrokesMatcher(id,
+                    searchScript != SearchScript.Simplified,
+                    searchScript != SearchScript.Traditional,
+                    Magic.HanziLookupLooseness,
+                    Magic.HanziLookupNumResults,
+                    strokesData);
+                int matcherCount;
+                lock (runningMatchers)
+                {
+                    runningMatchers.Add(matcher);
+                    matcherCount = runningMatchers.Count;
+                }
+                while (matcher.IsRunning && matcherCount > 1)
+                {
+                    Thread.Sleep(50);
+                    lock (runningMatchers) { matcherCount = runningMatchers.Count; }
+                }
+                if (!matcher.IsRunning)
+                {
+                    lock (runningMatchers) { runningMatchers.Remove(matcher); matcher = null; }
+                    return;
+                }
+                matches = matcher.DoMatching();
+                if (matches == null) return;
             }
-            while (matcher.IsRunning && matcherCount > 1)
+            catch (DiagnosticException dex)
             {
-                Thread.Sleep(50);
-                lock (runningMatchers) { matcherCount = runningMatchers.Count; }
+                if (!dex.HandleLocally) throw;
+                error = true;
             }
-            if (!matcher.IsRunning)
+            catch { error = true; }
+            finally
             {
-                lock (runningMatchers) { runningMatchers.Remove(matcher); }
-                return;
+                if (matcher != null)
+                {
+                    lock (runningMatchers) { runningMatchers.Remove(matcher); }
+                }
             }
-            char[] matches = matcher.DoMatching();
-            lock (runningMatchers) { runningMatchers.Remove(matcher); }
-            if (matches == null) return;
             InvokeOnForm((MethodInvoker)delegate
             {
-                ctrlCharPicker.SetItems(matches);
+                if (error) ctrlCharPicker.SetError();
+                else ctrlCharPicker.SetItems(matches);
             });
         }
 

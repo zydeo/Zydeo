@@ -75,7 +75,12 @@ namespace ZD.Gui
         public event CharPickedDelegate CharPicked;
 
         /// <summary>
-        /// The characters shown.
+        /// Localized UI strings provider.
+        /// </summary>
+        private readonly ITextProvider tprov;
+
+        /// <summary>
+        /// The characters shown. If null, an error message is displayed.
         /// </summary>
         private char[] items = new char[0];
 
@@ -117,9 +122,10 @@ namespace ZD.Gui
         /// <summary>
         /// Ctor: take parent.
         /// </summary>
-        public CharPicker(ZenControl owner)
+        public CharPicker(ZenControl owner, ITextProvider tprov)
             : base(owner)
         {
+            this.tprov = tprov;
             charRects = new List<CharRect>();
             for (int i = 0; i != 10; ++i) charRects.Add(new CharRect());
         }
@@ -155,6 +161,16 @@ namespace ZD.Gui
                 if (filteredItems.Count == 10) break;
             }
             this.items = filteredItems.ToArray();
+            MakeMePaint(false, RenderMode.Invalidate);
+        }
+
+        /// <summary>
+        /// Displays an error message indicating that character recognition failed.
+        /// </summary>
+        public void SetError()
+        {
+            items = null;
+            doAnimate(-1);
             MakeMePaint(false, RenderMode.Invalidate);
         }
 
@@ -249,6 +265,7 @@ namespace ZD.Gui
         /// </summary>
         public override bool DoMouseMove(Point p, System.Windows.Forms.MouseButtons button)
         {
+            if (items == null) return true;
             int ix = getCharRectIx(p);
             doAnimate(ix);
             return true;
@@ -308,7 +325,7 @@ namespace ZD.Gui
         private void doAnimate(int ix)
         {
             bool needTimer = false;
-            if (ix >= items.Length) ix = -1;
+            if (ix != -1 && ix >= items.Length) ix = -1;
             lock (animLO)
             {
                 for (int i = 0; i != charRects.Count; ++i)
@@ -369,23 +386,49 @@ namespace ZD.Gui
                 g.FillRectangle(b, 0, 0, Width, Height);
             }
             // Characters
-            StringFormat sf = StringFormat.GenericTypographic;
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            using (Brush b = new SolidBrush(Color.Black))
+            if (items != null)
             {
-                for (int i = 0; i != rects.Length; ++i)
+                StringFormat sf = StringFormat.GenericTypographic;
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                using (Brush b = new SolidBrush(Color.Black))
                 {
-                    RectangleF rect = rects[i].Rect;
-                    // Background
-                    using (Brush bgb = new SolidBrush(rects[i].BgColor))
+                    for (int i = 0; i != rects.Length; ++i)
                     {
-                        g.FillRectangle(bgb, rect);
+                        RectangleF rect = rects[i].Rect;
+                        // Background
+                        using (Brush bgb = new SolidBrush(rects[i].BgColor))
+                        {
+                            g.FillRectangle(bgb, rect);
+                        }
+                        // Draw character, if any
+                        if (i >= items.Length) continue;
+                        string str = ""; str += items[i];
+                        g.TextRenderingHint = TextRenderingHint.AntiAlias;
+                        g.DrawString(str, font, b, rect.X + charOfsX, rect.Y + charOfsY, sf);
                     }
-                    // Draw character, if any
-                    if (i >= items.Length) continue;
-                    string str = ""; str += items[i];
-                    g.TextRenderingHint = TextRenderingHint.AntiAlias;
-                    g.DrawString(str, font, b, rect.X + charOfsX, rect.Y + charOfsY, sf);
+                }
+            }
+            // Error message
+            else
+            {
+                StringFormat sf = StringFormat.GenericDefault;
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                string line1 = tprov.GetString("CharPickerError1");
+                string line2 = tprov.GetString("CharPickerError2");
+                float fontSize = Magic.CharPickerErrorFontSize;
+                using (Font f1 = new Font(ZenParams.GenericFontFamily, fontSize, FontStyle.Bold))
+                using (Font f2 = new Font(ZenParams.GenericFontFamily, fontSize))
+                using (Brush b = new SolidBrush(Color.Black))
+                {
+                    float padL = 10F * Scale;
+                    float padR = 10F * Scale;
+                    SizeF sz1 = g.MeasureString(line1, f1, (int)(Width - padL - padR), sf);
+                    SizeF sz2 = g.MeasureString(line2, f2, (int)(Width - padL - padR), sf);
+                    float hblock = sz1.Height + sz2.Height;
+                    PointF pt1 = new PointF(padL, (((float)Height - 2) - hblock) / 2F);
+                    PointF pt2 = new PointF(pt1.X, pt1.Y + sz1.Height);
+                    g.DrawString(line1, f1, b, pt1);
+                    g.DrawString(line2, f2, b, new RectangleF(pt2.X, pt2.Y, Width - pt2.X - 1, Height - pt2.Y - 1));
                 }
             }
             // Border
@@ -404,6 +447,8 @@ namespace ZD.Gui
         public override bool DoMouseClick(Point p, System.Windows.Forms.MouseButtons button)
         {
             doAnimate(-1);
+
+            if (items == null) return true;
 
             int ix = getCharRectIx(p);
             if (ix == -1) return true;

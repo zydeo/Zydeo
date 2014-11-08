@@ -112,6 +112,10 @@ namespace ZD.HanziLookup
             // Results available for us in the CharacterMatchCollector.
             char[] matches = this.matches.GetMatches();
 
+#if DEBUG
+            if (matches.Contains('中')) throw new ZD.Common.DiagnosticException(true);
+#endif
+
             // Only return matches if processing completed.
             if (running)
             {

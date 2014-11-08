@@ -56,6 +56,13 @@
     <Compile Include="WrittenPoint.cs" />
     <Compile Include="WrittenStroke.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZD.Common\ZD.Common.csproj">
+      <Project>{d151811c-2cf7-4ea9-8a09-052cc5c2f695}</Project>
+      <Name>ZD.Common</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -603,7 +603,7 @@ namespace ZD.Gui
                     g.FillRectangle(b, olRight - lblWidth, Height - olHeight, lblWidth, olHeight);
                 }
                 // Write text
-                using (Brush b = new SolidBrush(Magic.ResoltCountOverlayTextColor))
+                using (Brush b = new SolidBrush(Magic.ResultCountOverlayTextColor))
                 {
                     g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                     g.DrawString(txtResCount, fnt, b, olRight - lblWidth, Height - olHeight + lblPad);

@@ -179,6 +179,11 @@ namespace ZD.Gui
         public static readonly int WritingPadHintOpacity = 128;
 
         /// <summary>
+        /// Font size of error report in character picker.
+        /// </summary>
+        public static readonly float CharPickerErrorFontSize = 10F;
+
+        /// <summary>
         /// Opacity of results count overlay in bottom right corner.
         /// </summary>
         public static readonly int ResultCountOverlayOpacity = 196;
@@ -191,6 +196,6 @@ namespace ZD.Gui
         /// <summary>
         /// Text color of results count overlay in bottom right corner.
         /// </summary>
-        public static readonly Color ResoltCountOverlayTextColor = Color.FromArgb(240, 240, 240);
+        public static readonly Color ResultCountOverlayTextColor = Color.FromArgb(240, 240, 240);
     }
 }

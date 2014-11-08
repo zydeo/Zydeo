@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Sandbox.ZenTabbedForm")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Zydeo")]
+[assembly: AssemblyDescription("Zydeo Chinese-English dictionary")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Sandbox.ZenTabbedForm")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCompany("Gabor L Ugray")]
+[assembly: AssemblyProduct("Zydeo")]
+[assembly: AssemblyCopyright("Copyright ©2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

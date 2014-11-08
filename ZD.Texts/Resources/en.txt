@@ -36,4 +36,8 @@ ScriptBothTooltip			Showing both simplified and traditional characters.\r\nClick
 WritingPadClearTooltip		Clear the writing pad
 WritingPadUndoTooltip		Undo last stroke
 
+# In-place error messages and other in-place info
+CharPickerError1			Oops...\r\nSomething went wrong.
+CharPickerError2			You can clear the writing pad and try drawing again.
+
 
