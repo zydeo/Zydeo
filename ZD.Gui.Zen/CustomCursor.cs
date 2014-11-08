@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Reflection;
 
 namespace ZD.Gui.Zen
 {
@@ -10,6 +11,26 @@ namespace ZD.Gui.Zen
     /// </summary>
     public static class CustomCursor
     {
+        private static Cursor hand;
+
+        public static Cursor GetHand(float scale)
+        {
+            if (hand == null)
+            {
+                float f = 20F * scale;
+                Size sz = new Size((int)f, (int)f);
+                // Images for buttons under writing pad; will get owned by buttons, not that it matters.
+                Assembly a = Assembly.GetExecutingAssembly();
+                using (var imgHand = Image.FromStream(a.GetManifestResourceStream("ZD.Gui.Zen.Resources.hand-cursor.png")))
+                using (Bitmap bmpHand = new Bitmap(imgHand, sz))
+                {
+                    hand = CreateCursor(bmpHand, sz.Width / 2, 0);
+                }
+
+            }
+            return hand;
+        }
+
         private struct IconInfo
         {
             public bool fIcon;

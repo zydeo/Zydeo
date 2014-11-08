@@ -266,7 +266,8 @@ namespace ZD.Gui
                 }
             }
             // We're over a link
-            if (overWhat != null) Cursor = Cursors.Hand;
+            //if (overWhat != null) Cursor = Cursors.Hand;
+            if (overWhat != null) Cursor = CustomCursor.GetHand(Scale);
             // Nop, not over a link
             else Cursor = Cursors.Arrow;
             // Hover state changed: request a repaint
