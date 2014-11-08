@@ -336,24 +336,6 @@ namespace ZD.Gui
             // Analyze now. Not the best time here in paint, but must do.
             if (analyzedWidth != Width) Analyze(g, Width);
 
-            // Self-imposed clip rectangle
-            // Needs to be smaller what we got. If we request a repaint ourselves, our absolute coordinates
-            //   are the only clip rectangle. But because of scrolling those may be outside parent's bounds,
-            //   and then control may paint over others.
-            int clipOfsY = 0;  // Add this to clip rectangle's top
-            int clipDiffH = 0; // Subtract this from clip rectangle's height
-            if (AbsTop < Parent.AbsTop + 1) { clipOfsY = Parent.AbsTop + 1 - AbsTop; clipDiffH += clipOfsY; }
-            if (AbsBottom > Parent.AbsBottom - 1) { clipDiffH += AbsBottom - Parent.AbsBottom + 1; }
-            Region oldClip = null;
-            if (clipOfsY != 0 || clipDiffH != 0)
-            {
-                oldClip = g.Clip;
-                Rectangle clipRect = new Rectangle(Point.Empty, Size);
-                clipRect.Y += clipOfsY;
-                clipRect.Height -= clipDiffH;
-                g.SetClip(clipRect);
-            }
-
             // Background. Alternating at that!
             Color bgcol = odd ? Magic.ResultsAltBackColor : ZenParams.WindowColor;
             using (Brush b = new SolidBrush(bgcol))
@@ -395,8 +377,6 @@ namespace ZD.Gui
                 // Target (body) highlights
                 doPaintTarget(g, pnorm, bnorm, sf);
             }
-            // Restore old clip
-            if (oldClip != null) g.Clip = oldClip;
         }
     }
 }

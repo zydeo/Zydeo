@@ -384,7 +384,9 @@ namespace ZD.Gui
                 bool canceled = false;
                 foreach (CedictResult cr in results)
                 {
-                    OneResultControl orc = new OneResultControl(null, Scale, tprov, lookupFromCtrl, entryProvider, cr, script, odd);
+                    OneResultControl orc = new OneResultControl(null, Scale, tprov,
+                        lookupFromCtrl, paintFromCtrl,
+                        entryProvider, cr, script, odd);
                     orc.Analyze(g, cw);
                     // Cannot use RelLocation b/c control has no parent yet
                     orc.AbsLocation = new Point(AbsLeft + 1, AbsTop + y + 1);
@@ -451,6 +453,14 @@ namespace ZD.Gui
                 // Done.
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Repaints results control in one when a single result control needs UI update.
+        /// </summary>
+        private void paintFromCtrl()
+        {
+            MakeMePaint(false, RenderMode.Invalidate);
         }
 
         /// <summary>

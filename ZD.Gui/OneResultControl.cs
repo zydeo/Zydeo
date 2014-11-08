@@ -23,6 +23,11 @@ namespace ZD.Gui
         public delegate void LookupThroughLinkDelegate(string queryString);
 
         /// <summary>
+        /// Delegate for handling a single result control's paint request.
+        /// </summary>
+        public delegate void ParentPaintDelegate();
+
+        /// <summary>
         /// Scale, passed to me in ctor, so I don't have to ask parent (which I may not yet have during analysis).
         /// </summary>
         private readonly float scale;
@@ -36,6 +41,11 @@ namespace ZD.Gui
         /// Called when user clicks a link (Chinese text) in an entry target;
         /// </summary>
         private LookupThroughLinkDelegate lookupThroughLink;
+
+        /// <summary>
+        /// Called when this control requests a repaint.
+        /// </summary>
+        private ParentPaintDelegate parentPaint;
 
         /// <summary>
         /// Actual dictionary entry. Retrieved in ctor; nulled out once analyzed for rendering.
@@ -150,6 +160,7 @@ namespace ZD.Gui
         /// <param name="odd">Odd/even position in list, for alternating BG color.</param>
         public OneResultControl(ZenControlBase owner, float scale, ITextProvider tprov,
             LookupThroughLinkDelegate lookupThroughLink,
+            ParentPaintDelegate parentPaint,
             ICedictEntryProvider entryProvider, CedictResult cr,
             SearchScript script, bool odd)
             : base(owner)
@@ -157,6 +168,7 @@ namespace ZD.Gui
             this.scale = scale;
             this.tprov = tprov;
             this.lookupThroughLink = lookupThroughLink;
+            this.parentPaint = parentPaint;
             this.entry = entryProvider.GetEntry(cr.EntryId);
             this.res = cr;
             this.analyzedScript = script;
@@ -244,7 +256,10 @@ namespace ZD.Gui
             if (hoverLink != null)
             {
                 hoverLink = null;
-                MakeMePaint(false, RenderMode.Invalidate);
+                // Cannot request paint for myself directly: entire results control must be repainted in one
+                // - Cropping when I'm outside parent's rectangle
+                // - Stuff in overlays on top of me
+                parentPaint();
             }
         }
 
@@ -274,7 +289,10 @@ namespace ZD.Gui
             if (overWhat != hoverLink)
             {
                 hoverLink = overWhat;
-                MakeMePaint(false, RenderMode.Invalidate);
+                // Cannot request paint for myself directly: entire results control must be repainted in one
+                // - Cropping when I'm outside parent's rectangle
+                // - Stuff in overlays on top of me
+                parentPaint();
             }
             // We're done. No child controls, just return true.
             return true;
