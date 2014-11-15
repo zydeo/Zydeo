@@ -141,7 +141,8 @@ namespace ZD.Gui
         /// <summary>
         /// Font family for Pinyin in heading of displayed entries.
         /// </summary>
-        public static readonly string PinyinFontFamily = "Tahoma";
+        //public static readonly string PinyinFontFamily = "Tahoma";
+        public static readonly string PinyinFontFamily = "Segoe UI";
 
         /// <summary>
         /// Font size for Pinyin in heading of displayed entries.

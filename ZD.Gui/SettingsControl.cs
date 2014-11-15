@@ -11,9 +11,34 @@ namespace ZD.Gui
 {
     internal class SettingsControl : ZenControl
     {
+        private SettingsControlWin ctrlWin;
+
         public SettingsControl(ZenControlBase owner)
             : base(owner)
-        { }
+        {
+            ctrlWin = new SettingsControlWin();
+            ctrlWin.Size = Size;
+            ctrlWin.Location = AbsLocation;
+            RegisterWinFormsControl(ctrlWin);
+        }
+
+        protected override void OnSizeChanged()
+        {
+            base.OnSizeChanged();
+            if (ctrlWin.InvokeRequired)
+            {
+                InvokeOnForm((MethodInvoker)delegate
+                {
+                    ctrlWin.Location = AbsLocation;
+                    ctrlWin.Size = Size;
+                });
+            }
+            else
+            {
+                ctrlWin.Location = AbsLocation;
+                ctrlWin.Size = Size;
+            }
+        }
 
         public override void DoPaint(Graphics g)
         {
