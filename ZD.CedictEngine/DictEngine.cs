@@ -455,6 +455,20 @@ namespace ZD.CedictEngine
         }
 
         /// <summary>
+        /// Retrieves an entry from the dictionary. See <see cref="ICedictEngine.GetEntry"/>.
+        /// </summary>
+        /// <param name="entryId"></param>
+        /// <returns></returns>
+        public CedictEntry GetEntry(int entryId)
+        {
+            using (BinReader br = new BinReader(dictFileName))
+            {
+                br.Position = entryId;
+                return new CedictEntry(br);
+            }
+        }
+
+        /// <summary>
         /// Find entries that match the search expression.
         /// </summary>
         /// <param name="query">The query string, as entered by the user.</param>

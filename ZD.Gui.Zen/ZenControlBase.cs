@@ -542,6 +542,10 @@ namespace ZD.Gui.Zen
             Parent.RemoveWinFormsControl(c);
         }
 
+        /// <summary>
+        /// Gets WinForms control of this control, and of all its children.
+        /// </summary>
+        /// <returns></returns>
         internal IEnumerable<Control> GetWinFormsControlsRecursive()
         {
             List<Control> res = new List<Control>(winFormsControls);

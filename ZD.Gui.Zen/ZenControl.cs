@@ -71,6 +71,27 @@ namespace ZD.Gui.Zen
         }
 
         /// <summary>
+        /// <para>Called by derived controls to display a context menu.</para>
+        /// <para>Once shown, top form takes over ownership of provided control (will dispose it when closing context menu).</para>
+        /// </summary>
+        /// <param name="relLoc">Desired relative location, in calling control's coordinates.</param>
+        /// <param name="ctxtMenuCtrl">The UI to show as a context menu.</param>
+        protected void ShowContextMenu(Point relLoc, ICtxtMenuControl ctxtMenuCtrl)
+        {
+            Point absLoc = new Point(AbsRect.X + relLoc.X, AbsRect.Y + relLoc.Y);
+            Point screenLoc = CurrentParentForm.WinForm.PointToScreen(absLoc);
+            CurrentParentForm.ShowContextMenu(screenLoc, ctxtMenuCtrl);
+        }
+
+        /// <summary>
+        /// Closes the context menu control shopwn earlier (if it's still visible at all).
+        /// </summary>
+        protected void CloseContextMenu(ICtxtMenuControl ctxtMenuCtrl)
+        {
+            CurrentParentForm.CloseContextMenu(ctxtMenuCtrl);
+        }
+
+        /// <summary>
         /// Gets or sets the control's size in actual, scaled pixels.
         /// </summary>
         public sealed override Size Size

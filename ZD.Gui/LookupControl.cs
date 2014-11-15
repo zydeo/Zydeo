@@ -191,7 +191,7 @@ namespace ZD.Gui
             searchLangChanged();
 
             // Lookup results control.
-            ctrlResults = new ResultsControl(this, tprov, onLookupThroughLink);
+            ctrlResults = new ResultsControl(this, tprov, onLookupThroughLink, onGetEntry);
             ctrlResults.RelLocation = new Point(writingPad.RelRight + padding, ctrlSearchInput.RelBottom + padding);
         }
 
@@ -534,13 +534,21 @@ namespace ZD.Gui
         }
 
         /// <summary>
-        /// Event handler: looked started by clicking a link in a result control.
+        /// Event handler: lookup started by clicking a link in a result control.
         /// </summary>
         private void onLookupThroughLink(string queryString)
         {
             ctrlSearchInput.Text = queryString;
             ctrlSearchInput.SelectAll();
             onStartSearch(this, ctrlSearchInput.Text);
+        }
+
+        /// <summary>
+        /// Event handler: retrieves a specific entry from the dictionary.
+        /// </summary>
+        private CedictEntry onGetEntry(int entryId)
+        {
+            return dict.GetEntry(entryId);
         }
 
         /// <summary>

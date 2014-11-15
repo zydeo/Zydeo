@@ -133,6 +133,16 @@ namespace ZD.Common
         }
 
         /// <summary>
+        /// Gets sense at provided index.
+        /// </summary>
+        /// <param name="ix"></param>
+        /// <returns></returns>
+        public CedictSense GetSenseAt(int ix)
+        {
+            return senses[ix];
+        }
+
+        /// <summary>
         /// Compares headword's pinyin to other headword to get lexicographical ordering.
         /// </summary>
         public int PinyinCompare(CedictEntry other)

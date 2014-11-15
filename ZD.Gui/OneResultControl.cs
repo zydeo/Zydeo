@@ -28,6 +28,11 @@ namespace ZD.Gui
         public delegate void ParentPaintDelegate();
 
         /// <summary>
+        /// Delegate for handling a control's request for retrieving a dictionary entry.
+        /// </summary>
+        public delegate CedictEntry GetEntryDelegate(int entryId);
+
+        /// <summary>
         /// Scale, passed to me in ctor, so I don't have to ask parent (which I may not yet have during analysis).
         /// </summary>
         private readonly float scale;
@@ -51,14 +56,21 @@ namespace ZD.Gui
         /// Actual dictionary entry. Retrieved in ctor; nulled out once analyzed for rendering.
         /// </summary>
         private CedictEntry entry;
+
         /// <summary>
         /// The result this control displays.
         /// </summary>
         private readonly CedictResult res;
+
         /// <summary>
         /// True if my position in the results list is odd; false for even. Drives alternating BG color.
         /// </summary>
         private readonly bool odd;
+
+        /// <summary>
+        /// Called when this control needs to retrieve its dictionary entry later on in its life.
+        /// </summary>
+        private readonly GetEntryDelegate getEntry;
 
         // Paddings internal and external; calculated for current scale in ctor.
         private readonly int padLeft;
@@ -153,6 +165,7 @@ namespace ZD.Gui
         /// <param name="owner">Zen control that owns me.</param>
         /// <param name="tprov">Localized display text provider.</param>
         /// <param name="lookupThroughLink">Delegate to call when user initiates lookup by clicking on a link.</param>
+        /// <param name="getEntry">Delegate to call when an entry must be retrieved (for "copy" context menu).</param>
         /// <param name="entryProvider">Dictionary entry provider.</param>
         /// <param name="cr">The lookup result this control will show.</param>
         /// <param name="maxHeadLength">Longest headword in full results list.</param>
@@ -160,7 +173,7 @@ namespace ZD.Gui
         /// <param name="odd">Odd/even position in list, for alternating BG color.</param>
         public OneResultControl(ZenControlBase owner, float scale, ITextProvider tprov,
             LookupThroughLinkDelegate lookupThroughLink,
-            ParentPaintDelegate parentPaint,
+            ParentPaintDelegate parentPaint, GetEntryDelegate getEntry,
             ICedictEntryProvider entryProvider, CedictResult cr,
             SearchScript script, bool odd)
             : base(owner)
@@ -169,6 +182,7 @@ namespace ZD.Gui
             this.tprov = tprov;
             this.lookupThroughLink = lookupThroughLink;
             this.parentPaint = parentPaint;
+            this.getEntry = getEntry;
             this.entry = entryProvider.GetEntry(cr.EntryId);
             this.res = cr;
             this.analyzedScript = script;
@@ -300,6 +314,16 @@ namespace ZD.Gui
 
         public override bool DoMouseClick(Point p, MouseButtons button)
         {
+            // Right-click? Show context menu.
+            if (button == MouseButtons.Right)
+            {
+                CedictEntry entry = getEntry(res.EntryId);
+                ResultsCtxtControl ctxt = new ResultsCtxtControl(onCtxtMenuCommand, tprov, entry, -1, analyzedScript);
+                ShowContextMenu(p, ctxt);
+                return true;
+            }
+
+            // So, it's a left-click.
             // Are we over a link area?
             if (targetLinks == null) return true;
             LinkArea overWhat = null;
@@ -318,6 +342,14 @@ namespace ZD.Gui
             if (overWhat != null)
                 lookupThroughLink(overWhat.QueryString);
             return true;
+        }
+
+        /// <summary>
+        /// Closes context menu if it's fired a command.
+        /// </summary>
+        private void onCtxtMenuCommand(ResultsCtxtControl sender)
+        {
+            CloseContextMenu(sender);
         }
     }
 }

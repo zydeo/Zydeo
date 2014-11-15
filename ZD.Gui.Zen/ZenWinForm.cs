@@ -66,6 +66,7 @@ namespace ZD.Gui.Zen
             this.getCanvas = getCanvas;
 
             SuspendLayout();
+            KeyPreview = true;
             DoubleBuffered = false;
             FormBorderStyle = FormBorderStyle.None;
             Size = new Size(800, 300);

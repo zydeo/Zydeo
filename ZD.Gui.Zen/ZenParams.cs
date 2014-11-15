@@ -40,6 +40,7 @@ namespace ZD.Gui.Zen
         public static readonly Color TooltipBackColor = Color.FromArgb(76, 76, 76);
         public static readonly byte TooltipMaxAlfa = 224;
         public static readonly Color DisabledTextColor = Color.FromArgb(128, 128, 128);
+        public static readonly Color CtxtMenuHoverColor = Color.FromArgb(205, 205, 205);
 
         public static readonly Color BtnGradLightColor = Color.White;
         public static readonly Color BtnGradDarkColorBase = Color.FromArgb(175, 238, 238);

@@ -25,6 +25,11 @@ namespace ZD.Gui
         public delegate void LookupThroughLinkDelegate(string queryString);
 
         /// <summary>
+        /// Delegate for handling a control's request for retrieving a dictionary entry.
+        /// </summary>
+        public delegate CedictEntry GetEntryDelegate(int entryId);
+
+        /// <summary>
         /// UI text provider.
         /// </summary>
         private readonly ITextProvider tprov;
@@ -33,6 +38,11 @@ namespace ZD.Gui
         /// Called when user clicks a link (Chinese text) in an entry target;
         /// </summary>
         private LookupThroughLinkDelegate lookupThroughLink;
+
+        /// <summary>
+        /// Called when a result control requests a dictionary entry.
+        /// </summary>
+        private readonly GetEntryDelegate getEntry;
 
         /// <summary>
         /// Scroll bar.
@@ -72,11 +82,13 @@ namespace ZD.Gui
         /// <summary>
         /// Ctor.
         /// </summary>
-        public ResultsControl(ZenControl owner, ITextProvider tprov, LookupThroughLinkDelegate lookupThroughLink)
+        public ResultsControl(ZenControl owner, ITextProvider tprov,
+            LookupThroughLinkDelegate lookupThroughLink, GetEntryDelegate getEntry)
             : base(owner)
         {
             this.tprov = tprov;
             this.lookupThroughLink = lookupThroughLink;
+            this.getEntry = getEntry;
 
             sbar = new ZenScrollBar(this, onTimerForScrollBar);
             RemoveChild(sbar); // Instead of setting visible to false
@@ -385,7 +397,7 @@ namespace ZD.Gui
                 foreach (CedictResult cr in results)
                 {
                     OneResultControl orc = new OneResultControl(null, Scale, tprov,
-                        lookupFromCtrl, paintFromCtrl,
+                        onLookupFromCtrl, onPaintFromCtrl, onGetEntry,
                         entryProvider, cr, script, odd);
                     orc.Analyze(g, cw);
                     // Cannot use RelLocation b/c control has no parent yet
@@ -458,7 +470,7 @@ namespace ZD.Gui
         /// <summary>
         /// Repaints results control in one when a single result control needs UI update.
         /// </summary>
-        private void paintFromCtrl()
+        private void onPaintFromCtrl()
         {
             MakeMePaint(false, RenderMode.Invalidate);
         }
@@ -466,9 +478,17 @@ namespace ZD.Gui
         /// <summary>
         /// Handles event sent by control when user clicks on link (Chinese in target).
         /// </summary>
-        private void lookupFromCtrl(string queryString)
+        private void onLookupFromCtrl(string queryString)
         {
             lookupThroughLink(queryString);
+        }
+
+        /// <summary>
+        /// Handles request from a control to retrieve a dictionary entry.
+        /// </summary>
+        private CedictEntry onGetEntry(int entryId)
+        {
+            return getEntry(entryId);
         }
 
         /// <summary>

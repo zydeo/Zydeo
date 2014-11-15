@@ -16,6 +16,13 @@ namespace ZD.Common
         /// </summary>
         /// <param name="what">The query string.</param>
         CedictLookupResult Lookup(string what, SearchScript script, SearchLang lang);
+
+        /// <summary>
+        /// Retrieves a dictionary entry.
+        /// </summary>
+        /// <param name="entryId">The ID of the requested entry.</param>
+        /// <returns>The retrieved entry.</returns>
+        CedictEntry GetEntry(int entryId);
     }
 
     /// <summary>

@@ -117,6 +117,10 @@ namespace ZD.Gui.Zen
         /// The control currently capturing the mouse (used by scrollbar to keep thumb pushed even when mouse leaves form).
         /// </summary>
         private ZenControlBase ctrlCapturingMouse = null;
+        /// <summary>
+        /// Currently displayed context menu form.
+        /// </summary>
+        private CtxtMenuForm ctxtForm = null;
 
         #endregion
 
@@ -137,6 +141,8 @@ namespace ZD.Gui.Zen
             createZenControls();
             tabs = new ZenTabCollection(this);
 
+            form.Deactivate += onFormDeactivate;
+            form.KeyDown += onFormKeyDown;
             form.MouseDown += onFormMouseDown;
             form.MouseMove += onFormMouseMove;
             form.MouseUp += onFormMouseUp;
@@ -149,6 +155,7 @@ namespace ZD.Gui.Zen
 
         public override void Dispose()
         {
+            if (ctxtForm != null) { ctxtForm.Dispose(); ctxtForm = null; }
             form.Dispose();
             if (canvas != null)
             {
@@ -691,9 +698,92 @@ namespace ZD.Gui.Zen
             if (ctrlCapturingMouse == null) form.Capture = false;
         }
 
+        /// <summary>
+        /// Gets the screen to which the provided coordinate belongs.
+        /// </summary>
+        private Screen getScreenForPoint(Point pt)
+        {
+            foreach (Screen s in Screen.AllScreens)
+                if (s.Bounds.Contains(pt))
+                    return s;
+            return Screen.PrimaryScreen;
+        }
+
+        /// <summary>
+        /// Shows a context menu at the desired location, or the nearest best place.
+        /// </summary>
+        /// <param name="screenLoc">The desired location in screen coordinates.</param>
+        /// <param name="ctxtMenuCtrl">The context menu UI to show.</param>
+        internal void ShowContextMenu(Point screenLoc, ICtxtMenuControl ctxtMenuCtrl)
+        {
+            // If we currently have a context menu on the screen, kill it.
+            if (ctxtForm != null)
+            {
+                ctxtForm.Close();
+                ctxtForm = null;
+            }
+            // Create new form
+            var ff = new CtxtMenuForm(ctxtMenuCtrl);
+            // Calculate optimal location.
+            // Horizontally: centered around pointer
+            // Vertically: prefer above, with 3px in between
+            Screen scr = getScreenForPoint(screenLoc);
+            int x = screenLoc.X - ff.Width / 2;
+            if (x < scr.WorkingArea.Left) x = scr.WorkingArea.Left;
+            else if (x + ff.Width > scr.WorkingArea.Right) x = scr.WorkingArea.Right - ff.Width;
+            int y = screenLoc.Y - ff.Height - 3;
+            if (y < scr.WorkingArea.Top) y = screenLoc.Y + 3;
+            ff.Location = new Point(x, y);
+            // Show context menu
+            ff.Show(form);
+            form.Focus();
+            ctxtForm = ff;
+        }
+
+        /// <summary>
+        /// Closes the context menu control shopwn earlier (if it's still visible at all).
+        /// </summary>
+        internal void CloseContextMenu(ICtxtMenuControl ctxtMenuCtrl)
+        {
+            if (ctxtForm != null && ctxtMenuCtrl == ctxtForm.CtxtMenuControl)
+            {
+                ctxtForm.Close();
+                ctxtForm = null;
+            }
+        }
+
         #endregion
 
         #region "Raw" Windows Forms event handlers
+
+        private void onFormDeactivate(object sender, EventArgs e)
+        {
+            if (ctxtForm != null) CloseContextMenu(ctxtForm.CtxtMenuControl);
+        }
+
+        private void onFormKeyDown(object sender, KeyEventArgs e)
+        {
+            // We always swallow Esc here: otherwise form gives us annoying "ding"
+            e.Handled = true;
+            e.SuppressKeyPress = true;
+
+            if (e.KeyCode == Keys.Escape)
+            {
+                if (ctxtForm != null) CloseContextMenu(ctxtForm.CtxtMenuControl);
+            }
+            else if (ctxtForm != null && e.Modifiers == Keys.None)
+            {
+                if (e.KeyCode == Keys.Down) ctxtForm.CtxtMenuControl.DoNavKey(CtxtMenuNavKey.Down);
+                else if (e.KeyCode == Keys.Up) ctxtForm.CtxtMenuControl.DoNavKey(CtxtMenuNavKey.Up);
+                else if (e.KeyCode == Keys.Enter) ctxtForm.CtxtMenuControl.DoNavKey(CtxtMenuNavKey.Enter);
+                else if (e.KeyCode == Keys.Space) ctxtForm.CtxtMenuControl.DoNavKey(CtxtMenuNavKey.Space);
+            }
+            else
+            {
+                e.Handled = false;
+                e.SuppressKeyPress = false;
+            }
+        }
 
         private void onFormMouseMove(object sender, MouseEventArgs e)
         {
@@ -730,6 +820,9 @@ namespace ZD.Gui.Zen
 
         private void onFormMouseDown(object sender, MouseEventArgs e)
         {
+            // Any mouse down means we close context menu if visible
+            if (ctxtForm != null) CloseContextMenu(ctxtForm.CtxtMenuControl);
+
             // Got capture?
             if (ctrlCapturingMouse != null)
             {

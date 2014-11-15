@@ -40,4 +40,14 @@ WritingPadUndoTooltip		Undo last stroke
 CharPickerError1			Oops...\r\nSomething went wrong.
 CharPickerError2			You can clear the writing pad and try drawing again.
 
+# Context menu over a result control (for copying content to clipboard)
+CtxtCopyTitle				Copy...
+CtxtCopyEntryFormatted		Full Entry (Formatted)
+CtxtCopyEntryCedict			Full Entry (CEDICT)
+CtxtCopyHanzi				Hanzi: {0}
+CtxtCopySimplified			Simplified: {0}
+CtxtCopyTraditional			Traditional: {0}
+CtxtCopyPinyin				Pinyin: {0}
+CtxtCopySense				Sense: {0}
+
 
