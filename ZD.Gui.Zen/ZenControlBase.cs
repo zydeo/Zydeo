@@ -46,6 +46,7 @@ namespace ZD.Gui.Zen
         /// </summary>
         /// <param name="sender"></param>
         public delegate void ClickDelegate(ZenControlBase sender);
+
         /// <summary>
         /// Emitted when the control is clicked.
         /// </summary>
@@ -55,18 +56,27 @@ namespace ZD.Gui.Zen
         /// The control's parent (owner) control.
         /// </summary>
         private ZenControlBase parent;
+
+        /// <summary>
+        /// The control's top-level owner, a Zen form.
+        /// </summary>
+        private ZenTabbedForm parentForm;
+
         /// <summary>
         /// The control's child controls.
         /// </summary>
         private readonly HashSet<ZenControlBase> zenChildren = new HashSet<ZenControlBase>();
+
         /// <summary>
         /// The WinForms controls owned by this Zen control.
         /// </summary>
         private readonly List<Control> winFormsControls = new List<Control>();
+
         /// <summary>
         /// The control's absolute rectangle on top-level window canvas, in real screen pixels at current scale.
         /// </summary>
         private Rectangle absRect = new Rectangle(0, 0, 0, 0);
+
         /// <summary>
         /// The child control over which the mouse currently hovers.
         /// </summary>
@@ -74,10 +84,12 @@ namespace ZD.Gui.Zen
         /// Used to send "mouse leave" and "mouse enter" notifications to child controls.
         /// </remarks>
         private ZenControlBase ctrlWithMouse = null;
+
         /// <summary>
         /// True if control has already been disposed.
         /// </summary>
         private bool isDisposed = false;
+
 
         /// <summary>
         /// Ctor: take parent.
@@ -85,8 +97,18 @@ namespace ZD.Gui.Zen
         /// <param name="parent"></param>
         internal ZenControlBase(ZenControlBase parent)
         {
+            // Remember parent.
             this.parent = parent;
-            if (Parent != null) Parent.zenChildren.Add(this);
+            // If there is a parent provided at this point...
+            if (parent != null)
+            {
+                // Add myself to parent's children.
+                parent.zenChildren.Add(this);
+                // Find top-level parent, which is the form.
+                ZenControlBase xpar = parent;
+                while (xpar != null && !(xpar is ZenTabbedForm)) xpar = xpar.Parent;
+                if (xpar != null) parentForm = xpar as ZenTabbedForm;
+            }
         }
 
         public virtual void Dispose()
@@ -426,17 +448,40 @@ namespace ZD.Gui.Zen
             if (parent != null) parent.InvokeOnForm(method);
         }
 
-
+        /// <summary>
+        /// Gets the control's parent.
+        /// </summary>
         public ZenControlBase Parent
         {
             get { return parent; }
         }
 
+        /// <summary>
+        /// Gets the control's current parent form.
+        /// </summary>
+        public ZenTabbedForm CurrentParentForm
+        {
+            get
+            {
+                ZenControlBase zcb = parent;
+                while (zcb != null && !(zcb is ZenTabbedForm)) zcb = zcb.parent;
+                if (zcb == null) return null;
+                else return zcb as ZenTabbedForm;
+            }
+        }
+
+        /// <summary>
+        /// Gets an enumerator to the control's children.
+        /// </summary>
         protected IEnumerable<ZenControlBase> ZenChildren
         {
             get { return zenChildren; }
         }
 
+        /// <summary>
+        /// Removes a child control.
+        /// </summary>
+        /// <param name="ctrl">The child to remove.</param>
         protected void RemoveChild(ZenControlBase ctrl)
         {
             IEnumerable<Control> containedWinFormsControls = ctrl.GetWinFormsControlsRecursive();
@@ -446,16 +491,27 @@ namespace ZD.Gui.Zen
             ctrl.parent = null;
         }
 
+        /// <summary>
+        /// Adds a new child control.
+        /// </summary>
+        /// <param name="ctrl">The child to add.</param>
         protected void AddChild(ZenControlBase ctrl)
         {
+            // Make sure control is not already a child of me or someone else.
             if (zenChildren.Contains(ctrl))
             {
                 if (ctrl.Parent != this)
                     throw new InvalidOperationException("Control is already a child of a different parent.");
                 return;
             }
+            // Make sure control was not a descendant of a different top-level form before.
+            if (ctrl.parentForm != null && ctrl.parentForm != parentForm && parentForm != null)
+                throw new InvalidOperationException("Control cannot be added to the hierarchy of a different top-level form.");
+            // Set control's parent, add to my children
             ctrl.parent = this;
+            if (parentForm != null) ctrl.parentForm = parentForm;
             zenChildren.Add(ctrl);
+            // Own new control's WinForms controls.
             IEnumerable<Control> containedWinFormsControls = ctrl.GetWinFormsControlsRecursive();
             foreach (Control c in containedWinFormsControls)
                 AddWinFormsControl(c);
@@ -499,7 +555,7 @@ namespace ZD.Gui.Zen
         /// </summary>
         internal virtual ZenTimer Timer
         {
-            get { return parent.Timer; }
+            get { return parentForm.Timer; }
         }
 
         /// <summary>

@@ -500,6 +500,9 @@ namespace ZD.Gui.Zen
                 // Collect control's render mode wishes; paint them individually if needed
                 foreach (ControlToPaint ctp in ctrls)
                 {
+                    // If control no longer has parent: don't attempt to paint.
+                    if (ctp.Ctrl.CurrentParentForm == null) continue;
+                    // Strongest render mode?
                     if (ctp.RenderMode > rm) rm = ctp.RenderMode;
                     if (!needBackground)
                     {
