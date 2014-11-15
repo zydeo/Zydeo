@@ -29,6 +29,16 @@ namespace ZD.Gui
         private readonly CommandTriggeredDelegate cmdTriggered;
 
         /// <summary>
+        /// The dictionary entry for which I'm shown.
+        /// </summary>
+        private readonly CedictEntry entry;
+
+        /// <summary>
+        /// The search script, to know meaning of <see cref="lblHanzi1"/> when only one Hanzi command is shown.
+        /// </summary>
+        private readonly SearchScript script;
+
+        /// <summary>
         /// Labels that are part of the hover game.
         /// </summary>
         private readonly Label[] lblColl;
@@ -53,6 +63,8 @@ namespace ZD.Gui
             senseIX = 0;
 
             this.cmdTriggered = cmdTriggered;
+            this.entry = entry;
+            this.script = script;
             InitializeComponent();
             BackColor = ZenParams.BorderColor;
             pnlTop.BackColor = ZenParams.WindowColor;
@@ -63,7 +75,7 @@ namespace ZD.Gui
             // Display strings
             string title = tprov.GetString("CtxtCopyTitle");
             string fullFormatted, fullCedict, hanzi1, hanzi2, pinyin, sense;
-            getDisplayStrings(entry, script, tprov, senseIX, out fullFormatted, out fullCedict,
+            getDisplayStrings(tprov, senseIX, out fullFormatted, out fullCedict,
                 out hanzi1, out hanzi2, out pinyin, out sense);
             lblFullFormatted.Text = fullFormatted;
             lblFullCedict.Text = fullCedict;
@@ -131,6 +143,9 @@ namespace ZD.Gui
             if (tblSense != null) tblSense.CellPaint += onTblLayoutCellPaint;
         }
 
+        /// <summary>
+        /// Handles various table layout panels' cell paint events for hover background.
+        /// </summary>
         private void onTblLayoutCellPaint(object sender, TableLayoutCellPaintEventArgs e)
         {
             // No hover: all backgrounds default.
@@ -155,10 +170,6 @@ namespace ZD.Gui
                 hoverTable = tblSense;
                 rowIx = 1;
             }
-            if (sender == tblZho && hoverTable == tblZho)
-            {
-                int i = 0;
-            }
             if (sender == hoverTable && e.Row == rowIx)
             {
                 using (Brush b = new SolidBrush(ZenParams.CtxtMenuHoverColor))
@@ -173,23 +184,72 @@ namespace ZD.Gui
         }
 
         /// <summary>
+        /// Gets pinyin display string from entry.
+        /// </summary>
+        private string getPinyin(int syllLimit = -1)
+        {
+            int ia, ib;
+            var pinyinFull = entry.GetPinyinForDisplay(true, -1, 0, out ia, out ib);
+            List<PinyinSyllable> pinyinList = new List<PinyinSyllable>();
+            bool ellipsed = false;
+            if (syllLimit == -1) pinyinList.AddRange(pinyinFull);
+            else
+            {
+                int i;
+                for (i = 0; i < pinyinFull.Count && i < syllLimit; ++i)
+                    pinyinList.Add(pinyinFull[i]);
+                if (i != pinyinFull.Count) ellipsed = true;
+            }
+            string res = "";
+            foreach (var x in pinyinList)
+            {
+                if (res.Length > 0) res += " ";
+                res += x.GetDisplayString(true);
+            }
+            if (ellipsed) res += " …";
+            return res;
+        }
+
+        /// <summary>
+        /// Gets sense display string from entry, leaving traditional/simplified away for monolingual searches.
+        /// </summary>
+        private string getSense(int senseIx)
+        {
+            var cs = entry.GetSenseAt(senseIx);
+            string res = cs.Domain.GetPlainText();
+            if (cs.Equiv != HybridText.Empty)
+            {
+                if (res != string.Empty) res += " ";
+                res += cs.Equiv.GetPlainText();
+            }
+            if (cs.Note != HybridText.Empty)
+            {
+                if (res != string.Empty) res += " ";
+                res += cs.Note.GetPlainText();
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// Ellipses string if it's longer than provided length limit.
+        /// </summary>
+        private static string ellipse(string what, int limit)
+        {
+            if (what.Length > limit) what = what.Substring(0, limit).Trim() + "…";
+            return what;
+        }
+
+        /// <summary>
         /// Gets display strings by combining entry, sense index, and localized strings.
         /// </summary>
-        private void getDisplayStrings(CedictEntry entry, SearchScript script, ITextProvider tprov, int senseIx,
+        private void getDisplayStrings(ITextProvider tprov, int senseIx,
             out string fullFormatted, out string fullCedict,
             out string hanzi1, out string hanzi2, out string pinyin, out string sense)
         {
             fullFormatted = tprov.GetString("CtxtCopyEntryFormatted");
             fullCedict = tprov.GetString("CtxtCopyEntryCedict");
             pinyin = tprov.GetString("CtxtCopyPinyin");
-            int ia, ib;
-            var pinyinArr = entry.GetPinyinForDisplay(true, -1, 0, out ia, out ib);
-            string pinyinVal = "";
-            foreach (var x in pinyinArr)
-            {
-                if (pinyinVal.Length > 0) pinyinVal += " ";
-                pinyinVal += x.GetDisplayString(true);
-            }
+            string pinyinVal = getPinyin(Magic.CtxtMenuMaxSyllableLength);
             pinyin = string.Format(pinyin, pinyinVal);
             sense = null;
             hanzi1 = null;
@@ -197,33 +257,24 @@ namespace ZD.Gui
             if (script == SearchScript.Simplified || script == SearchScript.Traditional || entry.ChSimpl == entry.ChTrad)
             {
                 hanzi1 = tprov.GetString("CtxtCopyHanzi");
-                if (script == SearchScript.Traditional)
-                    hanzi1 = string.Format(hanzi1, entry.ChTrad);
-                else
-                    hanzi1 = string.Format(hanzi1, entry.ChSimpl);
+                string hanzi1Val = script == SearchScript.Traditional ? entry.ChTrad : entry.ChSimpl;
+                hanzi1Val = ellipse(hanzi1Val, Magic.CtxtMenuMaxSyllableLength);
+                hanzi1 = string.Format(hanzi1, hanzi1Val);
             }
             else
             {
                 hanzi1 = tprov.GetString("CtxtCopySimplified");
-                hanzi1 = string.Format(hanzi1, entry.ChSimpl);
+                string hanzi1Val = ellipse(entry.ChSimpl, Magic.CtxtMenuMaxSyllableLength);
+                hanzi1 = string.Format(hanzi1, hanzi1Val);
                 hanzi2 = tprov.GetString("CtxtCopyTraditional");
-                hanzi2 = string.Format(hanzi2, entry.ChTrad);
+                string hanzi2Val = ellipse(entry.ChTrad, Magic.CtxtMenuMaxSyllableLength);
+                hanzi2 = string.Format(hanzi2, hanzi2Val);
             }
             if (senseIx != -1)
             {
-                var cs = entry.GetSenseAt(senseIx);
-                string senseVal = cs.Domain.GetPlainText();
-                if (cs.Equiv != HybridText.Empty)
-                {
-                    if (senseVal != string.Empty) senseVal += " ";
-                    senseVal += cs.Equiv.GetPlainText();
-                }
-                if (cs.Note != HybridText.Empty)
-                {
-                    if (senseVal != string.Empty) senseVal += " ";
-                    senseVal += cs.Note.GetPlainText();
-                }
                 sense = tprov.GetString("CtxtCopySense");
+                string senseVal = getSense(senseIx);
+                senseVal = ellipse(senseVal, Magic.CtxtMenuMaxSenseLength);
                 sense = string.Format(sense, senseVal);
             }
         }
@@ -337,6 +388,26 @@ namespace ZD.Gui
         /// </summary>
         private void fire(int ix)
         {
+            // Prepare plain text for clipboard, and optionally (for formatted full entry), also html.
+            string plainText = "text";
+            string html = null;
+            // Our plain text options
+            Label lbl = lblColl[ix];
+            if (lbl == lblHanzi1)
+                plainText = script == SearchScript.Traditional ? entry.ChTrad : entry.ChSimpl;
+            else if (lbl == lblHanzi2) plainText = entry.ChTrad;
+            else if (lbl == lblPinyin) plainText = getPinyin();
+
+            // Copy to clipboard: plain text
+            if (html == null) Clipboard.SetText(plainText);
+
+            // TO-DO:
+            // - Cedict
+            // - HTML formatted (along with plain text equivalent)
+            // - Sense (after updating getSense to mind single search script)
+            // !!!
+            // - Sense ID hover behavior in OneResultControl, sense ID passed to context menu
+
             // Let parent control know that command has been triggered: time to close context menu.
             cmdTriggered(this);
         }

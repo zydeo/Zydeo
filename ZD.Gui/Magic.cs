@@ -198,5 +198,15 @@ namespace ZD.Gui
         /// Text color of results count overlay in bottom right corner.
         /// </summary>
         public static readonly Color ResultCountOverlayTextColor = Color.FromArgb(240, 240, 240);
+
+        /// <summary>
+        /// Maximum length of sense string in context menu before it is ellipsed.
+        /// </summary>
+        public static readonly int CtxtMenuMaxSenseLength = 64;
+
+        /// <summary>
+        /// Maximum number of syllables in context menu (Hanzi and Pinyin) before strings are ellipsed.
+        /// </summary>
+        public static readonly int CtxtMenuMaxSyllableLength = 4;
     }
 }

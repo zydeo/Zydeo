@@ -242,7 +242,7 @@ namespace ZD.Common
         /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>
         public string GetPinyinInOne(bool diacritics)
         {
-            if (Pinyin.Length == 0) return string.Empty;
+            if (Pinyin == null || Pinyin.Length == 0) return string.Empty;
             if (Pinyin.Length == 1) return Pinyin[0].GetDisplayString(diacritics);
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i != Pinyin.Length; ++i)
