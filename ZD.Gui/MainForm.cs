@@ -125,5 +125,21 @@ namespace ZD.Gui
         {
             AppSettings.SetWindowSizeAndLocation(Location, LogicalSize);
         }
+
+        /// <summary>
+        /// Force-closes and disposes the window.
+        /// </summary>
+        public void ForceClose()
+        {
+            if (WinForm.InvokeRequired)
+            {
+                InvokeOnForm((MethodInvoker)delegate
+                {
+                    WinForm.Close();
+                });
+                return;
+            }
+            WinForm.Close();
+        }
     }
 }

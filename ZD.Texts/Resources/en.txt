@@ -66,3 +66,8 @@ ZydeoVersion				Version
 ZydeoWeb					Web
 ZydeoUpdates				Automatic updates
 ZydeoNotifyUpdates			&Notify me when an update is available
+
+# Separate error window (shown when everything goes south)
+FatalErrorFormHeader		Zydeo error
+FatalErrorFormSorry			;-(  Sorry.
+FatalErrorFormWhy			Zydeo encountered a problem and had to close.\r\nIt is Zydeo's fault, not yours.

@@ -321,10 +321,17 @@ namespace ZD.Gui
             }
             catch (DiagnosticException dex)
             {
+                // Errors not handled locally are only for diagnostics
+                // We actually handle every real-life exception locally here.
                 if (!dex.HandleLocally) throw;
                 error = true;
+                AppErrorLogger.Instance.LogException(dex, false);
             }
-            catch { error = true; }
+            catch (Exception ex)
+            {
+                error = true;
+                AppErrorLogger.Instance.LogException(ex, false);
+            }
             finally
             {
                 if (matcher != null)

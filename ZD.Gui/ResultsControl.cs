@@ -80,6 +80,11 @@ namespace ZD.Gui
         private string txtResCount = string.Empty;
 
         /// <summary>
+        /// If true, we throw an exception from BG thread when scroll reaches bottom. to test error handling,.
+        /// </summary>
+        private bool crashForTest = false;
+
+        /// <summary>
         /// Ctor.
         /// </summary>
         public ResultsControl(ZenControl owner, ITextProvider tprov,
@@ -310,6 +315,10 @@ namespace ZD.Gui
 
         protected override void OnSizeChanged()
         {
+            // Throwing for test
+            if (crashForTest)
+                throw new ZD.Common.DiagnosticException(false);
+
             reAnalyzeResultsDisplay();
             // No need to invalidate here. Form will redraw evertyhing from top down.
             // Done.
@@ -337,6 +346,15 @@ namespace ZD.Gui
             ReadOnlyCollection<CedictResult> results,
             SearchScript script)
         {
+#if DEBUG
+            // Make us crash at bottom if first result "柏林" (comes up for "bolin")
+            if (results.Count > 0)
+            {
+                CedictEntry entry = entryProvider.GetEntry(results[0].EntryId);
+                if (entry.ChSimpl == "柏林") crashForTest = true;
+                else crashForTest = false;
+            }
+#endif
             try
             {
                 return doSetResults(lookupId, entryProvider, results, script);
@@ -583,6 +601,10 @@ namespace ZD.Gui
                 needBackground = null;
                 renderMode = null;
             }
+
+            // Throwing for test
+            if (crashForTest && sbar.Position + sbar.PageSize >= sbar.Maximum)
+                throw new ZD.Common.DiagnosticException(false);
         }
 
         private void doPaintBottomOverlay(Graphics g)

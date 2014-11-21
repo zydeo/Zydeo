@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Timers;
+using System.Threading;
 
 namespace ZD.Gui.Zen
 {
@@ -65,9 +66,9 @@ namespace ZD.Gui.Zen
         }
 
         /// <summary>
-        /// Invoked by system timer callback. Calls each subscriber's timer function.
+        /// Actual timer event handler, so first-level handler can deal only with exception wrapping.
         /// </summary>
-        private void onTimerEvent(object sender, ElapsedEventArgs e)
+        private void doTimerEvent()
         {
             List<ZenControlBase> subscribers;
             lock (timerSubscribers)
@@ -90,6 +91,26 @@ namespace ZD.Gui.Zen
                 parent.MakeControlsPaint(new ReadOnlyCollection<ZenControlBase.ControlToPaint>(ctrlsToPaint));
             // Start counting again
             timer.Start();
+        }
+
+        /// <summary>
+        /// Invoked by system timer callback. Calls each subscriber's timer function.
+        /// </summary>
+        private void onTimerEvent(object sender, ElapsedEventArgs e)
+        {
+            // Through a weird twist of fate, MS decided that timer swallows exceptions from handler
+            // We don't like that, so we re-through exception in a worker thread
+            // ...to make sure it reaches global error handler and process terminates gracefully.
+            try { doTimerEvent(); }
+            catch (Exception ex)
+            {
+                timer.Stop();
+                ThreadPool.QueueUserWorkItem(x =>
+                {
+                    throw new Exception("Exception in ZenTimer handler.", ex);
+                });
+
+            }
         }
     }
 }

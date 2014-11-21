@@ -45,6 +45,7 @@
     <Compile Include="CedictEntry.cs" />
     <Compile Include="CedictTargetHighlight.cs" />
     <Compile Include="DiagnosticException.cs" />
+    <Compile Include="ErrorLogger.cs" />
     <Compile Include="HybridText.cs" />
     <Compile Include="CedictLookupResult.cs" />
     <Compile Include="ICedictEntryProvider.cs" />

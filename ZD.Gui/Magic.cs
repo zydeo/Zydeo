@@ -9,7 +9,7 @@ namespace ZD.Gui
     /// <summary>
     /// All kinds of magic constants.
     /// </summary>
-    internal class Magic
+    public class Magic
     {
         /// <summary>
         /// The "looseness" of lookup, 0-1, higher == looser, looser more computationally intensive.
@@ -40,6 +40,11 @@ namespace ZD.Gui
         /// Name of file where Zydeo's settings are stored in its user data folder.
         /// </summary>
         public readonly static string ZydeoSettingsFile = "Settings.xml";
+
+        /// <summary>
+        /// Name of file where Zydeo logs gracefully handled as well as fateful errors.
+        /// </summary>
+        public readonly static string ZydeoErrorFile = "Errors.log";
 
         /// <summary>
         /// Window's default logical (unscaled) size.
