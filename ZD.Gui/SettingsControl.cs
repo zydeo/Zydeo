@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 
+using ZD.Common;
 using ZD.Gui.Zen;
 
 namespace ZD.Gui
@@ -13,10 +14,10 @@ namespace ZD.Gui
     {
         private SettingsControlWin ctrlWin;
 
-        public SettingsControl(ZenControlBase owner)
+        public SettingsControl(ZenControlBase owner, ITextProvider tprov, ICedictEngineFactory dictFact)
             : base(owner)
         {
-            ctrlWin = new SettingsControlWin();
+            ctrlWin = new SettingsControlWin(tprov, dictFact);
             ctrlWin.Size = Size;
             ctrlWin.Location = AbsLocation;
             RegisterWinFormsControl(ctrlWin);

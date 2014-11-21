@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="CedictCompiler.cs" />
     <Compile Include="CedictCompiler.Stats.cs" />
+    <Compile Include="DictEngine.CedictInfo.cs" />
     <Compile Include="DictEngine.cs" />
     <Compile Include="DictEngine.Pinyin.cs" />
     <Compile Include="DictEngine.TargetLookup.cs" />

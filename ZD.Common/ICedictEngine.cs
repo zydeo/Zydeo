@@ -26,6 +26,21 @@ namespace ZD.Common
     }
 
     /// <summary>
+    /// Information about this compiled Cedict dictionary.
+    /// </summary>
+    public interface ICedictInfo
+    {
+        /// <summary>
+        /// Compilation date (only year/month/day are relevant).
+        /// </summary>
+        DateTime Date { get; }
+        /// <summary>
+        /// Number of entries in actual, compiled dictionary.
+        /// </summary>
+        int EntryCount { get; }
+    }
+
+    /// <summary>
     /// A factory for creating dictionary engines.
     /// </summary>
     public interface ICedictEngineFactory
@@ -34,5 +49,10 @@ namespace ZD.Common
         /// Creates a dictionary engine for the dictionary in the provided file.
         /// </summary>
         ICedictEngine Create(string dictFileName);
+
+        /// <summary>
+        /// Gest information about dictionary, without loading indexes.
+        /// </summary>
+        ICedictInfo GetInfo(string dictFileName);
     }
 }

@@ -64,7 +64,7 @@ namespace ZD.Gui
 
             Header = tprov.GetString("WinHeader");
             lc = new LookupControl(this, dictFact, tprov);
-            stgs = new SettingsControl(this);
+            stgs = new SettingsControl(this, tprov, dictFact);
             MainTab = new ZenTab(stgs, tprov.GetString("TabMain"));
             Tabs.Add(new ZenTab(lc, tprov.GetString("TabLookup")));
         }

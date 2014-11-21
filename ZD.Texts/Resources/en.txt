@@ -50,4 +50,19 @@ CtxtCopyTraditional			Traditional: {0}
 CtxtCopyPinyin				Pinyin: {0}
 CtxtCopySense				Sense: {0}
 
-
+# Zydeo page
+ZydeoAbout					About
+ZydeoHeader1				Zydeo. The free Chinese dictionary.
+ZydeoHeader2				Delightfully simple – and open-source.
+ZydeoSourceCode				Source code
+ZydeoLicense				License
+ZydeoCopyrightVal			©2014 Gábor L Ugray
+ZydeoCopyright				Copyright
+ZydeoCharRecogVal			Based on Jordan Kiang's\r\nHanziLookup
+ZydeoCharRecog				Character recognition
+ZydeoDictionaryVal			CEDICT-CC ({0})\r\n{1} entries
+ZydeoDictionary				Dictionary
+ZydeoVersion				Version
+ZydeoWeb					Web
+ZydeoUpdates				Automatic updates
+ZydeoNotifyUpdates			&Notify me when an update is available

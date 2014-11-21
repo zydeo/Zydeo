@@ -208,5 +208,15 @@ namespace ZD.Gui
         /// Maximum number of syllables in context menu (Hanzi and Pinyin) before strings are ellipsed.
         /// </summary>
         public static readonly int CtxtMenuMaxSyllableLength = 4;
+
+        /// <summary>
+        /// Zydeo's Github URL shown on the Zydeo tab page.
+        /// </summary>
+        public static readonly string GithubUrl = "github.com/Zydeo";
+
+        /// <summary>
+        /// Zydeo's website URL shown on the Zydeo tab page.
+        /// </summary>
+        public static readonly string WebUrl = "zydeo.net";
     }
 }

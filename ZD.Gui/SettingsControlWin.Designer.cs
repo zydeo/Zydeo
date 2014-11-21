@@ -31,26 +31,26 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsControlWin));
             this.tblOut = new System.Windows.Forms.TableLayoutPanel();
             this.pnlUpdates = new System.Windows.Forms.Panel();
-            this.lblUpdates = new System.Windows.Forms.Label();
             this.chkUpdates = new System.Windows.Forms.CheckBox();
+            this.lblUpdates = new System.Windows.Forms.Label();
             this.pbLogo = new System.Windows.Forms.PictureBox();
             this.tblInner = new System.Windows.Forms.TableLayoutPanel();
-            this.pnlTitle = new System.Windows.Forms.Panel();
-            this.pnlVert = new System.Windows.Forms.Panel();
-            this.lblAbout = new System.Windows.Forms.Label();
-            this.lblHeader1 = new System.Windows.Forms.Label();
-            this.lblHeader2 = new System.Windows.Forms.Label();
-            this.lblVersion = new System.Windows.Forms.Label();
-            this.lblVersionVal = new System.Windows.Forms.Label();
-            this.lblDictionary = new System.Windows.Forms.Label();
-            this.lblDictionaryVal = new System.Windows.Forms.Label();
-            this.lblCharRecog = new System.Windows.Forms.Label();
-            this.lblCharRecogVal = new System.Windows.Forms.Label();
-            this.lblCopyright = new System.Windows.Forms.Label();
-            this.lblCopyrightVal = new System.Windows.Forms.Label();
-            this.lblLicense = new System.Windows.Forms.Label();
-            this.lblLicenseVal = new System.Windows.Forms.Label();
             this.lblSourceCode = new System.Windows.Forms.Label();
+            this.lblLicenseVal = new System.Windows.Forms.Label();
+            this.lblLicense = new System.Windows.Forms.Label();
+            this.lblCopyrightVal = new System.Windows.Forms.Label();
+            this.lblCopyright = new System.Windows.Forms.Label();
+            this.lblCharRecogVal = new System.Windows.Forms.Label();
+            this.lblCharRecog = new System.Windows.Forms.Label();
+            this.lblDictionaryVal = new System.Windows.Forms.Label();
+            this.lblDictionary = new System.Windows.Forms.Label();
+            this.lblVersionVal = new System.Windows.Forms.Label();
+            this.lblVersion = new System.Windows.Forms.Label();
+            this.lblAbout = new System.Windows.Forms.Label();
+            this.pnlTitle = new System.Windows.Forms.Panel();
+            this.lblHeader2 = new System.Windows.Forms.Label();
+            this.lblHeader1 = new System.Windows.Forms.Label();
+            this.pnlVert = new System.Windows.Forms.Panel();
             this.lblWeb = new System.Windows.Forms.Label();
             this.lblSourceCodeVal = new System.Windows.Forms.Label();
             this.lblWebVal = new System.Windows.Forms.Label();
@@ -90,16 +90,6 @@
             this.pnlUpdates.Size = new System.Drawing.Size(575, 40);
             this.pnlUpdates.TabIndex = 0;
             // 
-            // lblUpdates
-            // 
-            this.lblUpdates.AutoSize = true;
-            this.lblUpdates.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblUpdates.Location = new System.Drawing.Point(2, 2);
-            this.lblUpdates.Name = "lblUpdates";
-            this.lblUpdates.Size = new System.Drawing.Size(106, 13);
-            this.lblUpdates.TabIndex = 0;
-            this.lblUpdates.Text = "Automatic updates";
-            // 
             // chkUpdates
             // 
             this.chkUpdates.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -110,6 +100,16 @@
             this.chkUpdates.TabStop = false;
             this.chkUpdates.Text = "&Notify me when an update is available";
             this.chkUpdates.UseVisualStyleBackColor = true;
+            // 
+            // lblUpdates
+            // 
+            this.lblUpdates.AutoSize = true;
+            this.lblUpdates.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblUpdates.Location = new System.Drawing.Point(2, 2);
+            this.lblUpdates.Name = "lblUpdates";
+            this.lblUpdates.Size = new System.Drawing.Size(106, 13);
+            this.lblUpdates.TabIndex = 0;
+            this.lblUpdates.Text = "Automatic updates";
             // 
             // pbLogo
             // 
@@ -162,155 +162,29 @@
             this.tblInner.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tblInner.Size = new System.Drawing.Size(375, 344);
             this.tblInner.TabIndex = 2;
-            this.tblInner.Paint += new System.Windows.Forms.PaintEventHandler(this.tblInner_Paint);
             // 
-            // pnlTitle
+            // lblSourceCode
             // 
-            this.tblInner.SetColumnSpan(this.pnlTitle, 3);
-            this.pnlTitle.Controls.Add(this.lblHeader2);
-            this.pnlTitle.Controls.Add(this.lblHeader1);
-            this.pnlTitle.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlTitle.Location = new System.Drawing.Point(3, 3);
-            this.pnlTitle.Name = "pnlTitle";
-            this.pnlTitle.Size = new System.Drawing.Size(369, 74);
-            this.pnlTitle.TabIndex = 0;
+            this.lblSourceCode.AutoSize = true;
+            this.lblSourceCode.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblSourceCode.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSourceCode.Location = new System.Drawing.Point(3, 216);
+            this.lblSourceCode.Name = "lblSourceCode";
+            this.lblSourceCode.Size = new System.Drawing.Size(169, 18);
+            this.lblSourceCode.TabIndex = 15;
+            this.lblSourceCode.Text = "Source code";
+            this.lblSourceCode.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
-            // pnlVert
+            // lblLicenseVal
             // 
-            this.pnlVert.BackColor = System.Drawing.Color.DarkGray;
-            this.pnlVert.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlVert.Location = new System.Drawing.Point(178, 80);
-            this.pnlVert.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-            this.pnlVert.Name = "pnlVert";
-            this.tblInner.SetRowSpan(this.pnlVert, 8);
-            this.pnlVert.Size = new System.Drawing.Size(4, 169);
-            this.pnlVert.TabIndex = 1;
-            // 
-            // lblAbout
-            // 
-            this.lblAbout.AutoSize = true;
-            this.lblAbout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblAbout.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblAbout.Location = new System.Drawing.Point(3, 80);
-            this.lblAbout.Name = "lblAbout";
-            this.lblAbout.Size = new System.Drawing.Size(169, 18);
-            this.lblAbout.TabIndex = 2;
-            this.lblAbout.Text = "About";
-            this.lblAbout.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // lblHeader1
-            // 
-            this.lblHeader1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblHeader1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblHeader1.Location = new System.Drawing.Point(0, 0);
-            this.lblHeader1.Name = "lblHeader1";
-            this.lblHeader1.Size = new System.Drawing.Size(369, 26);
-            this.lblHeader1.TabIndex = 1;
-            this.lblHeader1.Text = "Zydeo. The free Chinese dictionary.";
-            this.lblHeader1.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // lblHeader2
-            // 
-            this.lblHeader2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblHeader2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblHeader2.Location = new System.Drawing.Point(0, 26);
-            this.lblHeader2.Name = "lblHeader2";
-            this.lblHeader2.Size = new System.Drawing.Size(369, 26);
-            this.lblHeader2.TabIndex = 2;
-            this.lblHeader2.Text = "Delightfully simple – and open-source.";
-            this.lblHeader2.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // lblVersion
-            // 
-            this.lblVersion.AutoSize = true;
-            this.lblVersion.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblVersion.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblVersion.Location = new System.Drawing.Point(3, 98);
-            this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(169, 18);
-            this.lblVersion.TabIndex = 4;
-            this.lblVersion.Text = "Version";
-            this.lblVersion.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // lblVersionVal
-            // 
-            this.lblVersionVal.AutoSize = true;
-            this.lblVersionVal.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblVersionVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblVersionVal.Location = new System.Drawing.Point(188, 98);
-            this.lblVersionVal.Name = "lblVersionVal";
-            this.lblVersionVal.Size = new System.Drawing.Size(184, 18);
-            this.lblVersionVal.TabIndex = 6;
-            this.lblVersionVal.Text = "1.0";
-            // 
-            // lblDictionary
-            // 
-            this.lblDictionary.AutoSize = true;
-            this.lblDictionary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblDictionary.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDictionary.Location = new System.Drawing.Point(3, 116);
-            this.lblDictionary.Name = "lblDictionary";
-            this.lblDictionary.Size = new System.Drawing.Size(169, 32);
-            this.lblDictionary.TabIndex = 7;
-            this.lblDictionary.Text = "Dictionary";
-            this.lblDictionary.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // lblDictionaryVal
-            // 
-            this.lblDictionaryVal.AutoSize = true;
-            this.lblDictionaryVal.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblDictionaryVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDictionaryVal.Location = new System.Drawing.Point(188, 116);
-            this.lblDictionaryVal.Name = "lblDictionaryVal";
-            this.lblDictionaryVal.Size = new System.Drawing.Size(184, 32);
-            this.lblDictionaryVal.TabIndex = 8;
-            this.lblDictionaryVal.Text = "CEDICT-CC (2014-11-07)\r\n110,244 entries";
-            // 
-            // lblCharRecog
-            // 
-            this.lblCharRecog.AutoSize = true;
-            this.lblCharRecog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblCharRecog.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCharRecog.Location = new System.Drawing.Point(3, 148);
-            this.lblCharRecog.Name = "lblCharRecog";
-            this.lblCharRecog.Size = new System.Drawing.Size(169, 32);
-            this.lblCharRecog.TabIndex = 9;
-            this.lblCharRecog.Text = "Character recognition";
-            this.lblCharRecog.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // lblCharRecogVal
-            // 
-            this.lblCharRecogVal.AutoSize = true;
-            this.lblCharRecogVal.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblCharRecogVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCharRecogVal.Location = new System.Drawing.Point(188, 148);
-            this.lblCharRecogVal.Name = "lblCharRecogVal";
-            this.lblCharRecogVal.Size = new System.Drawing.Size(184, 32);
-            this.lblCharRecogVal.TabIndex = 10;
-            this.lblCharRecogVal.Text = "Based on Jordan Kiang\'s\r\nHanziLookup";
-            // 
-            // lblCopyright
-            // 
-            this.lblCopyright.AutoSize = true;
-            this.lblCopyright.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblCopyright.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCopyright.Location = new System.Drawing.Point(3, 180);
-            this.lblCopyright.Name = "lblCopyright";
-            this.lblCopyright.Size = new System.Drawing.Size(169, 18);
-            this.lblCopyright.TabIndex = 11;
-            this.lblCopyright.Text = "Copyright";
-            this.lblCopyright.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // lblCopyrightVal
-            // 
-            this.lblCopyrightVal.AutoSize = true;
-            this.lblCopyrightVal.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblCopyrightVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCopyrightVal.Location = new System.Drawing.Point(188, 180);
-            this.lblCopyrightVal.Name = "lblCopyrightVal";
-            this.lblCopyrightVal.Size = new System.Drawing.Size(184, 18);
-            this.lblCopyrightVal.TabIndex = 12;
-            this.lblCopyrightVal.Text = "©2014 Gabor L Ugray";
+            this.lblLicenseVal.AutoSize = true;
+            this.lblLicenseVal.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblLicenseVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblLicenseVal.Location = new System.Drawing.Point(188, 198);
+            this.lblLicenseVal.Name = "lblLicenseVal";
+            this.lblLicenseVal.Size = new System.Drawing.Size(184, 18);
+            this.lblLicenseVal.TabIndex = 14;
+            this.lblLicenseVal.Text = "GNU GPL";
             // 
             // lblLicense
             // 
@@ -324,28 +198,149 @@
             this.lblLicense.Text = "License";
             this.lblLicense.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
-            // lblLicenseVal
+            // lblCopyrightVal
             // 
-            this.lblLicenseVal.AutoSize = true;
-            this.lblLicenseVal.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblLicenseVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLicenseVal.Location = new System.Drawing.Point(188, 198);
-            this.lblLicenseVal.Name = "lblLicenseVal";
-            this.lblLicenseVal.Size = new System.Drawing.Size(184, 18);
-            this.lblLicenseVal.TabIndex = 14;
-            this.lblLicenseVal.Text = "GNU GPL";
+            this.lblCopyrightVal.AutoSize = true;
+            this.lblCopyrightVal.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblCopyrightVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCopyrightVal.Location = new System.Drawing.Point(188, 180);
+            this.lblCopyrightVal.Name = "lblCopyrightVal";
+            this.lblCopyrightVal.Size = new System.Drawing.Size(184, 18);
+            this.lblCopyrightVal.TabIndex = 12;
+            this.lblCopyrightVal.Text = "©2014 Gabor L Ugray";
             // 
-            // lblSourceCode
+            // lblCopyright
             // 
-            this.lblSourceCode.AutoSize = true;
-            this.lblSourceCode.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblSourceCode.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSourceCode.Location = new System.Drawing.Point(3, 216);
-            this.lblSourceCode.Name = "lblSourceCode";
-            this.lblSourceCode.Size = new System.Drawing.Size(169, 18);
-            this.lblSourceCode.TabIndex = 15;
-            this.lblSourceCode.Text = "Source code";
-            this.lblSourceCode.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.lblCopyright.AutoSize = true;
+            this.lblCopyright.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblCopyright.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCopyright.Location = new System.Drawing.Point(3, 180);
+            this.lblCopyright.Name = "lblCopyright";
+            this.lblCopyright.Size = new System.Drawing.Size(169, 18);
+            this.lblCopyright.TabIndex = 11;
+            this.lblCopyright.Text = "Copyright";
+            this.lblCopyright.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // lblCharRecogVal
+            // 
+            this.lblCharRecogVal.AutoSize = true;
+            this.lblCharRecogVal.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblCharRecogVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCharRecogVal.Location = new System.Drawing.Point(188, 148);
+            this.lblCharRecogVal.Name = "lblCharRecogVal";
+            this.lblCharRecogVal.Size = new System.Drawing.Size(184, 32);
+            this.lblCharRecogVal.TabIndex = 10;
+            this.lblCharRecogVal.Text = "Based on Jordan Kiang\'s\r\nHanziLookup";
+            // 
+            // lblCharRecog
+            // 
+            this.lblCharRecog.AutoSize = true;
+            this.lblCharRecog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblCharRecog.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCharRecog.Location = new System.Drawing.Point(3, 148);
+            this.lblCharRecog.Name = "lblCharRecog";
+            this.lblCharRecog.Size = new System.Drawing.Size(169, 32);
+            this.lblCharRecog.TabIndex = 9;
+            this.lblCharRecog.Text = "Character recognition";
+            this.lblCharRecog.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // lblDictionaryVal
+            // 
+            this.lblDictionaryVal.AutoSize = true;
+            this.lblDictionaryVal.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblDictionaryVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDictionaryVal.Location = new System.Drawing.Point(188, 116);
+            this.lblDictionaryVal.Name = "lblDictionaryVal";
+            this.lblDictionaryVal.Size = new System.Drawing.Size(184, 32);
+            this.lblDictionaryVal.TabIndex = 8;
+            this.lblDictionaryVal.Text = "CEDICT-CC (2014-11-07)\r\n110,244 entries";
+            // 
+            // lblDictionary
+            // 
+            this.lblDictionary.AutoSize = true;
+            this.lblDictionary.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblDictionary.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDictionary.Location = new System.Drawing.Point(3, 116);
+            this.lblDictionary.Name = "lblDictionary";
+            this.lblDictionary.Size = new System.Drawing.Size(169, 32);
+            this.lblDictionary.TabIndex = 7;
+            this.lblDictionary.Text = "Dictionary";
+            this.lblDictionary.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // lblVersionVal
+            // 
+            this.lblVersionVal.AutoSize = true;
+            this.lblVersionVal.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblVersionVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblVersionVal.Location = new System.Drawing.Point(188, 98);
+            this.lblVersionVal.Name = "lblVersionVal";
+            this.lblVersionVal.Size = new System.Drawing.Size(184, 18);
+            this.lblVersionVal.TabIndex = 6;
+            this.lblVersionVal.Text = "1.0";
+            // 
+            // lblVersion
+            // 
+            this.lblVersion.AutoSize = true;
+            this.lblVersion.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblVersion.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblVersion.Location = new System.Drawing.Point(3, 98);
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(169, 18);
+            this.lblVersion.TabIndex = 4;
+            this.lblVersion.Text = "Version";
+            this.lblVersion.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // lblAbout
+            // 
+            this.lblAbout.AutoSize = true;
+            this.lblAbout.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblAbout.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblAbout.Location = new System.Drawing.Point(3, 80);
+            this.lblAbout.Name = "lblAbout";
+            this.lblAbout.Size = new System.Drawing.Size(169, 18);
+            this.lblAbout.TabIndex = 2;
+            this.lblAbout.Text = "About";
+            this.lblAbout.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // pnlTitle
+            // 
+            this.tblInner.SetColumnSpan(this.pnlTitle, 3);
+            this.pnlTitle.Controls.Add(this.lblHeader2);
+            this.pnlTitle.Controls.Add(this.lblHeader1);
+            this.pnlTitle.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlTitle.Location = new System.Drawing.Point(3, 3);
+            this.pnlTitle.Name = "pnlTitle";
+            this.pnlTitle.Size = new System.Drawing.Size(369, 74);
+            this.pnlTitle.TabIndex = 0;
+            // 
+            // lblHeader2
+            // 
+            this.lblHeader2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblHeader2.Location = new System.Drawing.Point(71, 36);
+            this.lblHeader2.Name = "lblHeader2";
+            this.lblHeader2.Size = new System.Drawing.Size(240, 26);
+            this.lblHeader2.TabIndex = 2;
+            this.lblHeader2.Text = "Delightfully simple – and open-source.";
+            // 
+            // lblHeader1
+            // 
+            this.lblHeader1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblHeader1.Location = new System.Drawing.Point(36, 10);
+            this.lblHeader1.Name = "lblHeader1";
+            this.lblHeader1.Size = new System.Drawing.Size(295, 26);
+            this.lblHeader1.TabIndex = 1;
+            this.lblHeader1.Text = "Zydeo. The free Chinese dictionary.";
+            // 
+            // pnlVert
+            // 
+            this.pnlVert.BackColor = System.Drawing.Color.DarkGray;
+            this.pnlVert.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlVert.Location = new System.Drawing.Point(178, 80);
+            this.pnlVert.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
+            this.pnlVert.Name = "pnlVert";
+            this.tblInner.SetRowSpan(this.pnlVert, 8);
+            this.pnlVert.Size = new System.Drawing.Size(4, 169);
+            this.pnlVert.TabIndex = 1;
             // 
             // lblWeb
             // 
@@ -362,12 +357,11 @@
             // 
             this.lblSourceCodeVal.AutoSize = true;
             this.lblSourceCodeVal.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.lblSourceCodeVal.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblSourceCodeVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblSourceCodeVal.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.lblSourceCodeVal.Location = new System.Drawing.Point(188, 216);
             this.lblSourceCodeVal.Name = "lblSourceCodeVal";
-            this.lblSourceCodeVal.Size = new System.Drawing.Size(184, 18);
+            this.lblSourceCodeVal.Size = new System.Drawing.Size(92, 13);
             this.lblSourceCodeVal.TabIndex = 17;
             this.lblSourceCodeVal.Text = "github.com/Zydeo";
             // 
@@ -375,12 +369,11 @@
             // 
             this.lblWebVal.AutoSize = true;
             this.lblWebVal.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.lblWebVal.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblWebVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblWebVal.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.lblWebVal.Location = new System.Drawing.Point(188, 234);
             this.lblWebVal.Name = "lblWebVal";
-            this.lblWebVal.Size = new System.Drawing.Size(184, 18);
+            this.lblWebVal.Size = new System.Drawing.Size(51, 13);
             this.lblWebVal.TabIndex = 18;
             this.lblWebVal.Text = "zydeo.net";
             // 
