@@ -54,17 +54,17 @@ namespace ZD.Gui
         /// <summary>
         /// Non-localized text of script selector button: simplified.
         /// </summary>
-        public readonly static string SearchSimp = "语";
+        public readonly static string SearchSimp = "简";
 
         /// <summary>
         /// Non-localized text of script selector button: traditional.
         /// </summary>
-        public readonly static string SearchTrad = "語";
+        public readonly static string SearchTrad = "繁";
 
         /// <summary>
         /// Non-localized text of script selector button: S+T.
         /// </summary>
-        public readonly static string SearchBoth = "语+語";
+        public readonly static string SearchBoth = "简+繁";
 
         /// <summary>
         /// Non-localized text of search language button: English.
