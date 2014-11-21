@@ -695,7 +695,7 @@ namespace ZD.Gui
                 string text = ps.GetDisplayString(true);
                 pb.TextPos = textPool.PoolString(text);
                 // If text is punctuation, glue it to previous syllable
-                if (text.Length == 1 && char.IsPunctuation(text[0]) && i > 0) cx -= pinyinSpaceWidth;
+                if (text.Length == 1 && CedictFormatter.SticksLeft(text) && i > 0) cx -= pinyinSpaceWidth;
                 // Block's size and relative location
                 SizeF sz = g.MeasureString(text, getFont(fntPinyinHead), 65535, sf);
                 pb.Rect = new RectangleF(cx, ctop, sz.Width, sz.Height);

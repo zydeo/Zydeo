@@ -184,33 +184,6 @@ namespace ZD.Gui
         }
 
         /// <summary>
-        /// Gets pinyin display string from entry.
-        /// </summary>
-        private string getPinyin(int syllLimit = -1)
-        {
-            int ia, ib;
-            var pinyinFull = entry.GetPinyinForDisplay(true, -1, 0, out ia, out ib);
-            List<PinyinSyllable> pinyinList = new List<PinyinSyllable>();
-            bool ellipsed = false;
-            if (syllLimit == -1) pinyinList.AddRange(pinyinFull);
-            else
-            {
-                int i;
-                for (i = 0; i < pinyinFull.Count && i < syllLimit; ++i)
-                    pinyinList.Add(pinyinFull[i]);
-                if (i != pinyinFull.Count) ellipsed = true;
-            }
-            string res = "";
-            foreach (var x in pinyinList)
-            {
-                if (res.Length > 0) res += " ";
-                res += x.GetDisplayString(true);
-            }
-            if (ellipsed) res += " …";
-            return res;
-        }
-
-        /// <summary>
         /// Gets sense display string from entry, leaving traditional/simplified away for monolingual searches.
         /// </summary>
         private string getSense(int senseIx)
@@ -249,7 +222,7 @@ namespace ZD.Gui
             fullFormatted = tprov.GetString("CtxtCopyEntryFormatted");
             fullCedict = tprov.GetString("CtxtCopyEntryCedict");
             pinyin = tprov.GetString("CtxtCopyPinyin");
-            string pinyinVal = getPinyin(Magic.CtxtMenuMaxSyllableLength);
+            string pinyinVal = CedictFormatter.GetPinyinString(entry, Magic.CtxtMenuMaxSyllableLength);
             pinyin = string.Format(pinyin, pinyinVal);
             sense = null;
             hanzi1 = null;
@@ -396,7 +369,8 @@ namespace ZD.Gui
             if (lbl == lblHanzi1)
                 plainText = script == SearchScript.Traditional ? entry.ChTrad : entry.ChSimpl;
             else if (lbl == lblHanzi2) plainText = entry.ChTrad;
-            else if (lbl == lblPinyin) plainText = getPinyin();
+            else if (lbl == lblPinyin) plainText = CedictFormatter.GetPinyinString(entry);
+            else if (lbl == lblFullCedict) plainText = CedictFormatter.GetCedict(entry);
 
             // Copy to clipboard: plain text
             if (html == null) Clipboard.SetText(plainText);

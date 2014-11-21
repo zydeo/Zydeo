@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
+    <Compile Include="CedictFormatter.cs" />
     <Compile Include="CharPicker.cs" />
     <Compile Include="AppErrorLogger.cs" />
     <Compile Include="FontPool.cs" />

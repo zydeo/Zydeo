@@ -72,6 +72,18 @@ namespace ZD.Common
         /// Gets the entry's pinyin display string: normalized; may have fewer items than raw syllables.
         /// </summary>
         /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>
+        /// <returns>String representation to show in UI.</returns>
+        public ReadOnlyCollection<PinyinSyllable> GetPinyinForDisplay(bool diacritics)
+        {
+            int a, b;
+            return GetPinyinForDisplay(diacritics, -1, 0, out a, out b);
+        }
+
+        /// <summary>
+        /// <para>Gets the entry's pinyin display string: normalized; may have fewer items than raw syllables.</para>
+        /// <para>Calculates highlights in transformed UI string.</para>
+        /// </summary>
+        /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>
         /// <param name="origHiliteStart">Start of pinyin highlight from result, or -1.</param>
         /// <param name="origHiliteLength">Length of pinyin highlight from result, or 0.</param>
         /// <param name="hiliteStart">Start of pinyin hilight in returned collection, or -1.</param>

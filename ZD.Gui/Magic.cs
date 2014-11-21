@@ -212,7 +212,7 @@ namespace ZD.Gui
         /// <summary>
         /// Maximum number of syllables in context menu (Hanzi and Pinyin) before strings are ellipsed.
         /// </summary>
-        public static readonly int CtxtMenuMaxSyllableLength = 4;
+        public static readonly int CtxtMenuMaxSyllableLength = 16;
 
         /// <summary>
         /// Zydeo's Github URL shown on the Zydeo tab page.
