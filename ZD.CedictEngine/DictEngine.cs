@@ -36,8 +36,13 @@ namespace ZD.CedictEngine
             this.dictFileName = dictFileName;
             using (BinReader br = new BinReader(dictFileName))
             {
+                // Skip release date and entry count
+                br.ReadLong();
+                br.ReadInt();
+                // Skip to position where index starts
                 int idxPos = br.ReadInt();
                 br.Position = idxPos;
+                // Load index
                 index = new Index(br);
             }
             // Now, initialize tokenizer with index's word holder

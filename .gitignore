@@ -22,6 +22,7 @@ _ReSharper*/
 # And font
 _work/*
 !_work/*.txt
+!_work/*.u8
 !_work/charstats.xlsx
 !_work/*.ttc
 !_work/*.bin

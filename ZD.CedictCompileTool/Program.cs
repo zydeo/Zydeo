@@ -13,12 +13,13 @@ namespace ZD.CedictCompileTool
     {
         static int Main(string[] args)
         {
-            if (args.Length != 3)
+            if (args.Length != 4)
             {
-                Console.WriteLine("Takes three arguments:\r\n");
+                Console.WriteLine("Takes these arguments:\r\n");
                 Console.WriteLine("1: CEDICT input file\r\n");
                 Console.WriteLine("2: Compiled dictionary file\r\n");
-                Console.WriteLine("3: Folder for diagnostics/log");
+                Console.WriteLine("3: Date of CEDICT release in YYYY-MM-DD format\r\n");
+                Console.WriteLine("4: Folder for diagnostics/log");
                 return -1;
             }
 
@@ -27,7 +28,8 @@ namespace ZD.CedictCompileTool
             try
             {
                 cedictIn = new StreamReader(args[0]);
-                string logFileName = Path.Combine(args[2], "ccomp.log");
+                DateTime date = parseDate(args[2]);
+                string logFileName = Path.Combine(args[3], "ccomp.log");
                 logStream = new StreamWriter(logFileName);
                 CedictCompiler cc = new CedictCompiler();
                 string line;
@@ -35,7 +37,7 @@ namespace ZD.CedictCompileTool
                 {
                     cc.ProcessLine(line, logStream);
                 }
-                cc.WriteResults(args[1], args[2]);
+                cc.WriteResults(date, args[1], args[3]);
             }
             catch (Exception ex)
             {
@@ -49,6 +51,15 @@ namespace ZD.CedictCompileTool
             }
 
             return 0;
+        }
+
+        private static DateTime parseDate(string yyyymmdd)
+        {
+            string[] parts = yyyymmdd.Split(new char[] { '-' });
+            int year = int.Parse(parts[0]);
+            int month = int.Parse(parts[1]);
+            int day = int.Parse(parts[2]);
+            return new DateTime(year, month, day);
         }
     }
 }

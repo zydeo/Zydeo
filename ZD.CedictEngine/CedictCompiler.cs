@@ -424,7 +424,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Writes parsed and indexed dictionary to compiled binary file.
         /// </summary>
-        public void WriteResults(string dictFileName, string statsFolder)
+        public void WriteResults(DateTime date, string dictFileName, string statsFolder)
         {
             // Cannot do this twice: we'll have replaced entry IDs with file positions in index
             if (resultsWritten) throw new InvalidOperationException("WriteResults already called.");
@@ -438,6 +438,10 @@ namespace ZD.CedictEngine
             Dictionary<int, int> senseIdToPos = new Dictionary<int, int>();
             using (BinWriter bw = new BinWriter(dictFileName))
             {
+                // Write date and entry count
+                bw.WriteLong(date.Ticks);
+                bw.WriteInt(entries.Count);
+                int returnPos = bw.Position;
                 // Placeholder: will return here to save start position of index at end
                 bw.WriteInt(-1);
                 // Serialize all entries; fill entry ID -> file pos map
@@ -459,7 +463,7 @@ namespace ZD.CedictEngine
                 }
                 // Fill in index start position
                 int idxPos = bw.Position;
-                bw.Position = 0;
+                bw.Position = returnPos;
                 bw.WriteInt(idxPos);
                 bw.Position = idxPos;
                 // Replace IDs with file positions across index

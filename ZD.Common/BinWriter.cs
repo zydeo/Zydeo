@@ -34,6 +34,11 @@ namespace ZD.Common
             writer.Write(c);
         }
 
+        public void WriteLong(long l)
+        {
+            writer.Write(l);
+        }
+
         public void WriteInt(int i)
         {
             writer.Write(i);

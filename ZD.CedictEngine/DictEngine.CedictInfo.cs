@@ -48,7 +48,14 @@ namespace ZD.CedictEngine
         /// </summary>
         public static ICedictInfo GetInfo(string dictFileName)
         {
-            return new CedictInfo(DateTime.Now, 95782);
+            long dateTicks;
+            int entryCount;
+            using (BinReader br = new BinReader(dictFileName))
+            {
+                dateTicks = br.ReadLong();
+                entryCount = br.ReadInt();
+            }
+            return new CedictInfo(new DateTime(dateTicks), entryCount);
         }
     }
 }

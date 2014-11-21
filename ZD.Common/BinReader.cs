@@ -34,6 +34,11 @@ namespace ZD.Common
             return reader.ReadChar();
         }
 
+        public long ReadLong()
+        {
+            return reader.ReadInt64();
+        }
+
         public int ReadInt()
         {
             return reader.ReadInt32();
