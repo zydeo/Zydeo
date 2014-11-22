@@ -29,6 +29,11 @@ namespace ZD.Gui
         private readonly CommandTriggeredDelegate cmdTriggered;
 
         /// <summary>
+        /// Text provider: retained because needed to create formatted clipboard content.
+        /// </summary>
+        private readonly ITextProvider tprov;
+
+        /// <summary>
         /// The dictionary entry for which I'm shown.
         /// </summary>
         private readonly CedictEntry entry;
@@ -63,6 +68,7 @@ namespace ZD.Gui
             senseIX = 0;
 
             this.cmdTriggered = cmdTriggered;
+            this.tprov = tprov;
             this.entry = entry;
             this.script = script;
             InitializeComponent();
@@ -222,7 +228,7 @@ namespace ZD.Gui
             fullFormatted = tprov.GetString("CtxtCopyEntryFormatted");
             fullCedict = tprov.GetString("CtxtCopyEntryCedict");
             pinyin = tprov.GetString("CtxtCopyPinyin");
-            string pinyinVal = CedictFormatter.GetPinyinString(entry, Magic.CtxtMenuMaxSyllableLength);
+            string pinyinVal = CedictFormatter.GetPinyinString(entry.GetPinyinForDisplay(true), Magic.CtxtMenuMaxSyllableLength);
             pinyin = string.Format(pinyin, pinyinVal);
             sense = null;
             hanzi1 = null;
@@ -369,15 +375,20 @@ namespace ZD.Gui
             if (lbl == lblHanzi1)
                 plainText = script == SearchScript.Traditional ? entry.ChTrad : entry.ChSimpl;
             else if (lbl == lblHanzi2) plainText = entry.ChTrad;
-            else if (lbl == lblPinyin) plainText = CedictFormatter.GetPinyinString(entry);
+            else if (lbl == lblPinyin) plainText = CedictFormatter.GetPinyinString(entry.GetPinyinForDisplay(true));
             else if (lbl == lblFullCedict) plainText = CedictFormatter.GetCedict(entry);
+            else if (lbl == lblFullFormatted)
+            {
+                html = CedictFormatter.GetHtml(tprov, entry, script);
+                plainText = CedictFormatter.StripPlainFromHtml(html);
+            }
 
             // Copy to clipboard: plain text
             if (html == null) Clipboard.SetText(plainText);
+            // Copy to clipboard: formatted HTML
+            else ClipboardHelper.CopyToClipboard(html, plainText);
 
             // TO-DO:
-            // - Cedict
-            // - HTML formatted (along with plain text equivalent)
             // - Sense (after updating getSense to mind single search script)
             // !!!
             // - Sense ID hover behavior in OneResultControl, sense ID passed to context menu

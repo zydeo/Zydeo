@@ -46,6 +46,7 @@
     <Compile Include="CedictFormatter.cs" />
     <Compile Include="CharPicker.cs" />
     <Compile Include="AppErrorLogger.cs" />
+    <Compile Include="ClipboardHelper.cs" />
     <Compile Include="FontPool.cs" />
     <Compile Include="HanziMeasure.cs" />
     <Compile Include="HintedTextBox.cs">
@@ -58,6 +59,7 @@
     <Compile Include="OneResultControl.Analysis.cs" />
     <Compile Include="OneResultControl.Paint.cs" />
     <Compile Include="OneResultControl.TextPool.cs" />
+    <EmbeddedResource Include="Resources\html-template-outer.html" />
     <Compile Include="ResultsControl.cs" />
     <Compile Include="ResultsCtxtControl.cs">
       <SubType>UserControl</SubType>
@@ -119,6 +121,24 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\copy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\html-sample.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\html-template-1.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\html-template-2.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\html-template-3.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\html-template-4.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\html-template-sense.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
