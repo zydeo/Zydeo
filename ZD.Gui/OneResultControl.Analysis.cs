@@ -122,7 +122,8 @@ namespace ZD.Gui
                         StickRight = true,
                         TextPos = textPool.PoolString(getSenseIdString(displaySenseIdx)),
                         NewLine = lastWasClassifier,
-                        SenseId = true
+                        SenseId = true,
+                        FirstInCedictSense = true,
                     };
                     newBlocks.Add(sidBlock);
                 }
@@ -144,6 +145,13 @@ namespace ZD.Gui
                 }
                 makeBlocks(cm.Equiv, false, hlArr[senseIdx], newBlocks, newLinks);
                 makeBlocks(cm.Note, true, null, newBlocks, newLinks);
+                // If sense is a classifier, mark first block as sense starter
+                if (classifier)
+                {
+                    Block sstart = newBlocks[startIX];
+                    sstart.FirstInCedictSense = true;
+                    newBlocks[startIX] = sstart;
+                }
                 // Measure each block
                 for (int i = startIX; i != newBlocks.Count; ++i)
                 {
@@ -377,12 +385,16 @@ namespace ZD.Gui
             // This is always re-done when function is called
             // We only get here when width has changed, so we do need to rearrange
             positionedBlocks = new PositionedBlock[measuredBlocks.Length];
+            senseAreas = null;
             List<int> currHiliteIndexes = new List<int>();
+
+            // Cycle memory for block positioning
             float blockX = lemmaL;
             float blockY = lemmaTop;
             bool firstBlock = true;
             PositionedBlock lastPB = new PositionedBlock();
             Block lastBlock = new Block();
+            
             for (int i = 0; i != measuredBlocks.Length; ++i)
             {
                 Block block = measuredBlocks[i];
@@ -449,8 +461,57 @@ namespace ZD.Gui
             doCollectHighlightRange(ref currHiliteIndexes);
             // In link areas, fill in positioned blocks and calculate actual link areas.
             doCalculateLinkAreas();
+            // Update sense areas
+            doCalculateSenseAreas();
             // Return bottom of content area.
             return measuredBlocks.Length == 0 ? blockY : blockY + lemmaLineHeight;
+        }
+
+        /// <summary>
+        /// Calculates line buffer like sense areas based on current positioning of blocks.
+        /// </summary>
+        private void doCalculateSenseAreas()
+        {
+            // No blocks: no areas. Just a defensive check.
+            if (positionedBlocks == null || positionedBlocks.Length == 0) return;
+
+            List<SenseArea> areas = new List<SenseArea>();
+            ushort currX = ushort.MinValue;
+            ushort currY = (ushort)positionedBlocks[0].LocY;
+            ushort lineIx = 0;
+            short senseIx = -1;
+            Block? bLast = null;
+            PositionedBlock? pbLast = null;
+            for (int i = 0; i != positionedBlocks.Length; ++i)
+            {
+                Block b = measuredBlocks[i];
+                PositionedBlock pb = positionedBlocks[i];
+                // Starting a new sense?
+                // Moving to new line?
+                // -> If we've had a range before, that's a new sense area.
+                if (b.FirstInCedictSense || pb.LocY != currY)
+                {
+                    // We've been building a block already
+                    if (bLast.HasValue)
+                    {
+                        SenseArea area = new SenseArea(lineIx, currX, (ushort)(pbLast.Value.LocX + bLast.Value.Width), (ushort)senseIx);
+                        areas.Add(area);
+                    }
+                    // Increment either sense index or line index or both
+                    if (b.FirstInCedictSense) ++senseIx;
+                    if (pb.LocY != currY) ++lineIx;
+                    currY = (ushort)pb.LocY;
+                    currX = (ushort)pb.LocX;
+                }
+                // Current block is next last block
+                bLast = b;
+                pbLast = pb;
+            }
+            // Finish off very last block
+            SenseArea last = new SenseArea(lineIx, currX, (ushort)(pbLast.Value.LocX + bLast.Value.Width), (ushort)senseIx);
+            areas.Add(last);
+            // We're done here.
+            senseAreas = areas.ToArray();
         }
 
         /// <summary>

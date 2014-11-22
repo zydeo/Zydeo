@@ -160,6 +160,17 @@ namespace ZD.Gui
         private LinkArea hoverLink = null;
 
         /// <summary>
+        /// Hot areas of senses, with current arrangement of blocks.
+        /// </summary>
+        private SenseArea[] senseAreas = null;
+
+        /// <summary>
+        /// <para>Index of sense currently hovered over, or -1.</para>
+        /// <para>Means ense index in original Cedict entry, not our display circles - see "Classifier".</para>
+        /// </summary>
+        private short hoverSenseIx = -1;
+
+        /// <summary>
         /// Ctor: takes data to display.
         /// </summary>
         /// <param name="owner">Zen control that owns me.</param>
@@ -266,10 +277,11 @@ namespace ZD.Gui
         {
             if (Parent == null) return;
             Cursor = Cursors.Arrow;
-            // Cursor hovered over a link: request a repaint
-            if (hoverLink != null)
+            // Cursor hovered over a link, or a sense: request a repaint
+            if (hoverLink != null || hoverSenseIx != -1)
             {
                 hoverLink = null;
+                hoverSenseIx = -1;
                 // Cannot request paint for myself directly: entire results control must be repainted in one
                 // - Cropping when I'm outside parent's rectangle
                 // - Stuff in overlays on top of me
@@ -277,10 +289,13 @@ namespace ZD.Gui
             }
         }
 
-        public override bool DoMouseMove(Point p, MouseButtons button)
+        /// <summary>
+        /// Updates state for hover behavior above links.
+        /// </summary>
+        /// <param name="p">Mouse coordinate.</param>
+        /// <returns>True if control must request a repaint.</returns>
+        private bool doCheckLinkHover(Point p)
         {
-            // If we have no links, nothing to do
-            if (targetLinks == null) return true;
             // Are we over a link area?
             LinkArea overWhat = null;
             foreach (LinkArea link in targetLinks)
@@ -303,11 +318,66 @@ namespace ZD.Gui
             if (overWhat != hoverLink)
             {
                 hoverLink = overWhat;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Finds index of sense (in original Cedict entry) under provided coordinate.
+        /// </summary>
+        /// <param name="p">Coordinate to check.</param>
+        /// <returns>Index of sense, or -1.</returns>
+        private short getSenseIxFromPoint(Point p)
+        {
+            if (senseAreas == null || senseAreas.Length == 0) return -1;
+
+            // Find which line point is over
+            PointF pf = p;
+            int lineIx = -1;
+            int ix = 0;
+            float lemmaTop = (float)padTop + pinyinInfo.PinyinHeight * 1.3F;
+            if (p.Y < lemmaTop) return -1; // No such line
+            for (float y = lemmaTop; y < Height; y += lemmaLineHeight, ++ix)
+            {
+                if (p.Y >= y && p.Y < y + lemmaLineHeight)
+                {
+                    lineIx = ix;
+                    break;
+                }
+            }
+            // No such line
+            if (lineIx == -1) return -1;
+            // Check every sense area
+            foreach (SenseArea area in senseAreas)
+            {
+                if (area.LineIx == lineIx && p.X >= area.Left && p.X < area.Right)
+                    return area.SenseIx;
+            }
+            // We did out best, but found no area.
+            return -1;
+        }
+
+        public override bool DoMouseMove(Point p, MouseButtons button)
+        {
+            // If we have no links and no hot senses, nothing to do
+            if (targetLinks == null && senseAreas == null) return true;
+
+            bool needPaint = false;
+            if (targetLinks != null) needPaint |= doCheckLinkHover(p);
+            
+            // Hover over sense?
+            short senseIx = getSenseIxFromPoint(p);
+            if (senseIx != hoverSenseIx) { hoverSenseIx = senseIx; needPaint = true; }
+
+            if (needPaint)
+            {
                 // Cannot request paint for myself directly: entire results control must be repainted in one
                 // - Cropping when I'm outside parent's rectangle
                 // - Stuff in overlays on top of me
                 parentPaint();
             }
+
             // We're done. No child controls, just return true.
             return true;
         }

@@ -13,6 +13,76 @@ namespace ZD.Gui
     partial class OneResultControl
     {
         /// <summary>
+        /// Describes "hot" areas of senses in displayed content.
+        /// </summary>
+        private struct SenseArea
+        {
+            /// <summary>
+            /// 2-byte position from left of target area; 2-byte width of this sense area.
+            /// </summary>
+            uint posLeftAndRight;
+
+            /// <summary>
+            /// 2-byte line number (index) in target area; 2-byte sense index in entry.
+            /// </summary>
+            uint lineIxAndSenseIx;
+
+            /// <summary>
+            /// Ctor: init from read data.
+            /// </summary>
+            public SenseArea(ushort lineIx, ushort left, ushort right, ushort senseIx)
+            {
+                posLeftAndRight = left;
+                posLeftAndRight <<= 16;
+                posLeftAndRight |= right;
+                lineIxAndSenseIx = lineIx;
+                lineIxAndSenseIx <<= 16;
+                lineIxAndSenseIx |= senseIx;
+            }
+
+            /// <summary>
+            /// Line index in which hot area is located. This determines vertical extent of hot zone.
+            /// </summary>
+            public int LineIx
+            {
+                get
+                {
+                    uint x = lineIxAndSenseIx;
+                    x &= 0xffff0000;
+                    x >>= 16;
+                    return (int)x;
+                }
+            }
+
+            /// <summary>
+            /// Left of area, in control's coordinates.
+            /// </summary>
+            public int Left
+            {
+                get
+                {
+                    uint x = posLeftAndRight;
+                    x &= 0xffff0000;
+                    x >>= 16;
+                    return (int)x;
+                }
+            }
+
+            /// <summary>
+            /// Right of area, in control's coordinates.
+            /// </summary>
+            public int Right
+            {
+                get { return (int)posLeftAndRight & 0xffff; }
+            }
+
+            public short SenseIx
+            {
+                get { return (short)(lineIxAndSenseIx & 0xffff); }
+            }
+        }
+
+        /// <summary>
         /// <para>Represents one hyperlink in the control, made up of multiple blocks.</para>
         /// <para>Hyperlinks have active hover behavior, and trigger a new query when clicked.</para>
         /// </summary>
@@ -116,6 +186,15 @@ namespace ZD.Gui
             {
                 get { return (Flags & 16) == 16; }
                 set { Flags &= (byte.MaxValue ^ 16); if (value) Flags |= 16; }
+            }
+            /// <summary>
+            /// <para>True if block, of whatever kind, is first block of a Cedict sense.</para>
+            /// <para>Can be true even if <see cref="SenseId"/> is false: if sense is classifier.</para>
+            /// </summary>
+            public bool FirstInCedictSense
+            {
+                get { return (Flags & 32) == 32; }
+                set { Flags &= (byte.MaxValue ^ 32); if (value) Flags |= 32; }
             }
         }
 

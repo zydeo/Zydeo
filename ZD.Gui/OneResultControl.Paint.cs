@@ -193,26 +193,46 @@ namespace ZD.Gui
         /// </summary>
         private void doPaintTarget(Graphics g, Pen pnorm, Brush bnorm, StringFormat sf)
         {
+            // Take index of hovered-over sense once - this is atomic, and we're prolly in different thread from mouse
+            short hsix = hoverSenseIx;
             Brush bhover = null;
             try
             {
                 // All the measured and positioned blocks in entry body
+                short currSenseIx = -1;
                 foreach (PositionedBlock pb in positionedBlocks)
                 {
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                     Block block = measuredBlocks[pb.BlockIdx];
+                    if (block.FirstInCedictSense) ++currSenseIx;
+                    bool hoverSense = currSenseIx == hsix;
                     // Sense ID
                     if (block.SenseId)
                     {
                         float pad = lemmaLineHeight * 0.1F;
-                        g.DrawEllipse(pnorm,
-                            pb.LocX,
-                            pb.LocY + scale * pad,
-                            ((float)block.Width) - 2.0F * pad,
-                            lemmaCharHeight - 2.0F * pad);
-                        g.DrawString(textPool.GetString(block.TextPos), getFont(fntSenseId), bnorm,
-                            pb.LocX + 2.0F * pad,
-                            pb.LocY + /* 1.5F * */ pad, sf); // TO-DO: vertical paddig of character will need more work.
+                        if (!hoverSense)
+                        {
+                            g.DrawEllipse(pnorm,
+                                pb.LocX,
+                                pb.LocY + scale * pad,
+                                ((float)block.Width) - 2.0F * pad,
+                                lemmaCharHeight - 2.0F * pad);
+                            g.DrawString(textPool.GetString(block.TextPos), getFont(fntSenseId), bnorm,
+                                pb.LocX + 2.0F * pad,
+                                pb.LocY + /* 1.5F * */ pad, sf); // TO-DO: vertical paddig of character will need more work.
+                        }
+                        else
+                        {
+                            g.FillEllipse(bnorm,
+                                pb.LocX,
+                                pb.LocY + scale * pad,
+                                ((float)block.Width) - 2.0F * pad,
+                                lemmaCharHeight - 2.0F * pad);
+                            using (Brush bgBrush = new SolidBrush(ZenParams.WindowColor))
+                            g.DrawString(textPool.GetString(block.TextPos), getFont(fntSenseId), bgBrush,
+                                pb.LocX + 2.0F * pad,
+                                pb.LocY + /* 1.5F * */ pad, sf); // TO-DO: vertical paddig of character will need more work.
+                        }
                     }
                     // Text
                     else
@@ -374,7 +394,7 @@ namespace ZD.Gui
                 {
                     doPaintPinyin(g, bnorm, bhilite, sf, bgcol);
                 }
-                // Target (body) highlights
+                // Target (body)
                 doPaintTarget(g, pnorm, bnorm, sf);
             }
         }
