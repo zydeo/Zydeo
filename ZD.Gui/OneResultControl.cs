@@ -387,8 +387,9 @@ namespace ZD.Gui
             // Right-click? Show context menu.
             if (button == MouseButtons.Right)
             {
+                short senseIx = getSenseIxFromPoint(p);
                 CedictEntry entry = getEntry(res.EntryId);
-                ResultsCtxtControl ctxt = new ResultsCtxtControl(onCtxtMenuCommand, tprov, entry, -1, analyzedScript);
+                ResultsCtxtControl ctxt = new ResultsCtxtControl(onCtxtMenuCommand, tprov, entry, senseIx, analyzedScript);
                 ShowContextMenu(p, ctxt);
                 return true;
             }

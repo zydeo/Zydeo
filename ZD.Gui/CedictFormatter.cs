@@ -24,6 +24,8 @@ namespace ZD.Gui
         private readonly static string template4;
         private readonly static string templateSenseHanziOpen = "<span style=\"font-family: SimSun;\">";
         private readonly static string templateSenseHanziClose = "</span>";
+        private readonly static string templateSenseSingleOpen = "<span style=\"font-family: Segoe UI, Tahoma, sans-serif; font-size: 10pt;\">";
+        private readonly static string templateSenseSingleClose = "</span>";
         private readonly static string templateItalicsOpen = "<i>";
         private readonly static string templateItalicsClose = "</i>";
         private readonly static string templateDiamond = "⋄";
@@ -194,7 +196,7 @@ namespace ZD.Gui
         /// <summary>
         /// Converts a hybrid text to HTML (marking up hanzi+pinyin sections).
         /// </summary>
-        public static string hybridToHtml(HybridText ht, SearchScript script)
+        public static string HybridToHtml(HybridText ht, SearchScript script)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -249,21 +251,31 @@ namespace ZD.Gui
         /// <summary>
         /// Gets the HTML for a single sense, not including enclosing paragraph etc., only inline markup.
         /// </summary>
+        /// <param name="tprov">Text provider if meta-labels (e.g. "Classifier") are to be included. If null, they are stripped.</param>
         private static string getSenseHtmlPure(ITextProvider tprov, CedictSense sense, SearchScript script)
         {
             StringBuilder sb = new StringBuilder();
 
-            string strDomain = hybridToHtml(sense.Domain, script);
-            string strEquiv = hybridToHtml(sense.Equiv, script);
-            string strNote = hybridToHtml(sense.Note, script);
+            string strDomain = HybridToHtml(sense.Domain, script);
+            string strEquiv = HybridToHtml(sense.Equiv, script);
+            string strNote = HybridToHtml(sense.Note, script);
             if (sense.Domain != HybridText.Empty)
             {
-                sb.Append(templateItalicsOpen);
                 if (sense.Domain.EqualsPlainText("CL:"))
-                    sb.Append(escape(tprov.GetString("ResultCtrlClassifier")) + " ");
+                {
+                    if (tprov != null)
+                    {
+                        sb.Append(templateItalicsOpen);
+                        sb.Append(escape(tprov.GetString("ResultCtrlClassifier")) + " ");
+                        sb.Append(templateItalicsClose);
+                    }
+                }
                 else
+                {
+                    sb.Append(templateItalicsOpen);
                     sb.Append(strDomain);
-                sb.Append(templateItalicsClose);
+                    sb.Append(templateItalicsClose);
+                }
             }
             if (sense.Domain != HybridText.Empty && !sense.Domain.EqualsPlainText("CL:"))
                 if (sense.Equiv != HybridText.Empty || sense.Note != HybridText.Empty)
@@ -280,6 +292,21 @@ namespace ZD.Gui
 
             // Done
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Gets the sense formatted in HTML.
+        /// </summary>
+        public static string GetSenseHtml(CedictSense sense, SearchScript script)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(templateOuter);
+            string htmlSense = templateSense.Replace("{sense}", getSenseHtmlPure(null, sense, script));
+            htmlSense = templateSenseSingleOpen + htmlSense + templateSenseSingleClose;
+            sb.Replace("{body}", htmlSense);
+            return sb.ToString();
+
         }
 
         /// <summary>
@@ -369,6 +396,9 @@ namespace ZD.Gui
             html = reTag.Replace(html, "");
             html = html.Replace("{{entry}}", "");
             html = html.Replace(templateDiamond, "-");
+            html = html.Replace("&lt;", "<");
+            html = html.Replace("&gt;", ">");
+            html = html.Replace("&amp;", "&");
             return html;
         }
     }

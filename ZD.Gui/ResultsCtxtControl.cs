@@ -39,6 +39,11 @@ namespace ZD.Gui
         private readonly CedictEntry entry;
 
         /// <summary>
+        /// The sense to copy, or -1.
+        /// </summary>
+        private readonly int senseIx;
+
+        /// <summary>
         /// The search script, to know meaning of <see cref="lblHanzi1"/> when only one Hanzi command is shown.
         /// </summary>
         private readonly SearchScript script;
@@ -62,14 +67,13 @@ namespace ZD.Gui
         /// <param name="script">Search script (so two Hanzi items are shown if needed).</param>
         public ResultsCtxtControl(CommandTriggeredDelegate cmdTriggered, ITextProvider tprov,
             CedictEntry entry,
-            int senseIX,
+            int senseIx,
             SearchScript script)
         {
-            senseIX = 0;
-
             this.cmdTriggered = cmdTriggered;
             this.tprov = tprov;
             this.entry = entry;
+            this.senseIx = senseIx;
             this.script = script;
             InitializeComponent();
             BackColor = ZenParams.BorderColor;
@@ -81,7 +85,7 @@ namespace ZD.Gui
             // Display strings
             string title = tprov.GetString("CtxtCopyTitle");
             string fullFormatted, fullCedict, hanzi1, hanzi2, pinyin, sense;
-            getDisplayStrings(tprov, senseIX, out fullFormatted, out fullCedict,
+            getDisplayStrings(tprov, senseIx, out fullFormatted, out fullCedict,
                 out hanzi1, out hanzi2, out pinyin, out sense);
             lblFullFormatted.Text = fullFormatted;
             lblFullCedict.Text = fullCedict;
@@ -195,16 +199,26 @@ namespace ZD.Gui
         private string getSense(int senseIx)
         {
             var cs = entry.GetSenseAt(senseIx);
-            string res = cs.Domain.GetPlainText();
+            string res = "";
+            if (!cs.Domain.EqualsPlainText("CL:"))
+            {
+                string domain = CedictFormatter.HybridToHtml(cs.Domain, script);
+                domain = CedictFormatter.StripPlainFromHtml(domain);
+                res += domain;
+            }
             if (cs.Equiv != HybridText.Empty)
             {
                 if (res != string.Empty) res += " ";
-                res += cs.Equiv.GetPlainText();
+                string equiv = CedictFormatter.HybridToHtml(cs.Equiv, script);
+                equiv = CedictFormatter.StripPlainFromHtml(equiv);
+                res += equiv;
             }
             if (cs.Note != HybridText.Empty)
             {
                 if (res != string.Empty) res += " ";
-                res += cs.Note.GetPlainText();
+                string note = CedictFormatter.HybridToHtml(cs.Note, script);
+                note = CedictFormatter.StripPlainFromHtml(note);
+                res += note;
             }
             return res;
         }
@@ -302,6 +316,7 @@ namespace ZD.Gui
             for (int i = 0; i != lblColl.Length; ++i)
             {
                 Label lbl = lblColl[i];
+                if (lbl.Parent == null) continue;
                 if (pt.Y >= lbl.Top + lbl.Parent.Top && pt.Y <= lbl.Bottom + lbl.Parent.Top)
                 {
                     ix = i;
@@ -355,7 +370,7 @@ namespace ZD.Gui
             pnlTop.Width = w;
             tblFull.Width = w;
             tblZho.Width = w;
-            tblSense.Width = w;
+            if (tblSense != null) tblSense.Width = w;
             foreach (Label lbl in lblColl)
                 lbl.Width = maxLabelW;
 
@@ -380,6 +395,11 @@ namespace ZD.Gui
             else if (lbl == lblFullFormatted)
             {
                 html = CedictFormatter.GetHtml(tprov, entry, script);
+                plainText = CedictFormatter.StripPlainFromHtml(html);
+            }
+            else if (lbl == lblSense)
+            {
+                html = CedictFormatter.GetSenseHtml(entry.GetSenseAt(senseIx), script);
                 plainText = CedictFormatter.StripPlainFromHtml(html);
             }
 
