@@ -63,9 +63,9 @@ namespace ZD.Gui
         private readonly CedictResult res;
 
         /// <summary>
-        /// True if my position in the results list is odd; false for even. Drives alternating BG color.
+        /// True if this is the last control on screen.
         /// </summary>
-        private readonly bool odd;
+        private readonly bool last;
 
         /// <summary>
         /// Called when this control needs to retrieve its dictionary entry later on in its life.
@@ -186,7 +186,7 @@ namespace ZD.Gui
             LookupThroughLinkDelegate lookupThroughLink,
             ParentPaintDelegate parentPaint, GetEntryDelegate getEntry,
             ICedictEntryProvider entryProvider, CedictResult cr,
-            SearchScript script, bool odd)
+            SearchScript script, bool last)
             : base(owner)
         {
             this.scale = scale;
@@ -197,7 +197,7 @@ namespace ZD.Gui
             this.entry = entryProvider.GetEntry(cr.EntryId);
             this.res = cr;
             this.analyzedScript = script;
-            this.odd = odd;
+            this.last = last;
 
             padLeft = (int)(5.0F * scale);
             padTop = (int)(5.0F * scale);

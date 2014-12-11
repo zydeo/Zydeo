@@ -410,19 +410,18 @@ namespace ZD.Gui
             using (Bitmap bmp = new Bitmap(1, 1))
             using (Graphics g = Graphics.FromImage(bmp))
             {
-                bool odd = true;
                 bool canceled = false;
-                foreach (CedictResult cr in results)
+                for (int rix = 0; rix != results.Count; ++rix)
                 {
+                    CedictResult cr = results[rix];
                     OneResultControl orc = new OneResultControl(null, Scale, tprov,
                         onLookupFromCtrl, onPaintFromCtrl, onGetEntry,
-                        entryProvider, cr, script, odd);
+                        entryProvider, cr, script, rix == results.Count - 1);
                     orc.Analyze(g, cw);
                     // Cannot use RelLocation b/c control has no parent yet
                     orc.AbsLocation = new Point(AbsLeft + 1, AbsTop + y + 1);
                     y += orc.Height;
                     newCtrls.Add(orc);
-                    odd = !odd;
                     // At any point, if we realize lookup ID has changed, we stop
                     // This can happen if a later, quick lookup completes and shows results before us
                     // Checking integers is atomic, no locking

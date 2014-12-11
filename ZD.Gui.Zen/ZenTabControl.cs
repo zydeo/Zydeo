@@ -87,30 +87,30 @@ namespace ZD.Gui.Zen
             {
                 if (isSelected || isHover)
                 {
-                    fillColor = Color.White;
-                    borderColor = Color.Black;
-                    textColor = Color.Black;
+                    fillColor = ZenParams.TabSysBgActive;
+                    borderColor = ZenParams.TabSysBgActive;
+                    textColor = ZenParams.TabSysTxtActive;
                 }
                 else
                 {
-                    fillColor = Color.Black;
-                    borderColor = Color.Black;
-                    textColor = Color.White;
+                    fillColor = ZenParams.TabSysBgBase;
+                    borderColor = ZenParams.TabSysBgBase;
+                    textColor = ZenParams.TabSysTxtBase;
                 }
             }
             else
             {
                 if (isSelected || isHover)
                 {
-                    fillColor = ZenParams.PaddingBackColor;
-                    borderColor = Color.LightGray;
-                    textColor = Color.Black;
+                    fillColor = ZenParams.TabOtherBgActive;
+                    borderColor = ZenParams.TabOtherBgActive;
+                    textColor = ZenParams.TabOtherTxtActive;
                 }
                 else
                 {
-                    fillColor = ZenParams.HeaderBackColor;
-                    borderColor = Color.LightGray;
-                    textColor = Color.Black;
+                    fillColor = ZenParams.TabOtherBgBase;
+                    borderColor = ZenParams.TabOtherBgActive;
+                    textColor = ZenParams.TabOtherTxtBase;
                 }
             }
             using (Brush b = new SolidBrush(fillColor))

@@ -157,12 +157,18 @@ namespace ZD.Gui
         /// <summary>
         /// Base color of highlights in a result (auto-faded gradient at ends).
         /// </summary>
-        public static readonly Color HiliteColor = Color.FromArgb(255, 232, 189);
+        public static readonly Color HiliteColor = Color.FromArgb(0xff, 0xe4, 0xcc);
+        //public static readonly Color HiliteColor = Color.FromArgb(255, 232, 189);
 
         /// <summary>
         /// Hover color of text in results that acts as a lookup link.
         /// </summary>
-        public static readonly Color LinkHoverColor = Color.Maroon;
+        public static readonly Color LinkHoverColor = Color.FromArgb(0x74, 0x35, 0x00);
+
+        /// <summary>
+        /// Background color if "sense ID" circle's inside when sense is hovered over.
+        /// </summary>
+        public static readonly Color SenseHoverColor = Color.FromArgb(0xe0, 0xdb, 0xd7);
 
         /// <summary>
         /// Font size of results count box in bottom right.
@@ -170,9 +176,9 @@ namespace ZD.Gui
         public static readonly float ResultsCountFontSize = 9.0F;
 
         /// <summary>
-        /// Alternating BG color of entries in results list.
+        /// Color of separator line at the bottom of a single result control.
         /// </summary>
-        public static readonly Color ResultsAltBackColor = Color.FromArgb(248, 248, 255);
+        public static readonly Color ResultsSeparator = Color.DarkGray;
 
         /// <summary>
         /// Opacity of text shown as hint in search input field
@@ -192,12 +198,12 @@ namespace ZD.Gui
         /// <summary>
         /// Opacity of results count overlay in bottom right corner.
         /// </summary>
-        public static readonly int ResultCountOverlayOpacity = 196;
+        public static readonly int ResultCountOverlayOpacity = 224;
 
         /// <summary>
         /// Background color of results count overlay in bottom righ corner.
         /// </summary>
-        public static readonly Color ResultCountOverlayBackColor = Color.FromArgb(0, 0, 0);
+        public static readonly Color ResultCountOverlayBackColor = Color.FromArgb(76, 76, 76);
 
         /// <summary>
         /// Text color of results count overlay in bottom right corner.

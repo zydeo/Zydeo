@@ -12,10 +12,18 @@ namespace ZD.Gui.Zen
     {
         private void doPaintBackground(Graphics g)
         {
-            using (Brush b = new SolidBrush(ZenParams.HeaderBackColor))
+            // Header: solid color in top right, full area behind system buttons
+            using (Brush b = new SolidBrush(ZenParams.HeaderBackColorR))
             {
-                g.FillRectangle(b, 0, 0, canvas.Width, headerHeight);
+                g.FillRectangle(b, btnMinimize.RelLeft, 0, canvas.Width - btnMinimize.RelLeft, headerHeight);
             }
+            // Gradient transition to left edge from there
+            Rectangle grRect = new Rectangle(0, 0, btnMinimize.RelLeft, headerHeight);
+            using (LinearGradientBrush lgb = new LinearGradientBrush(grRect, ZenParams.HeaderBackColorL, ZenParams.HeaderBackColorR, LinearGradientMode.Horizontal))
+            {
+                g.FillRectangle(lgb, grRect);
+            }
+
             // For content tab and main tab, pad with different color
             Color colPad = ZenParams.PaddingBackColor;
             if (activeTabIdx == -1) colPad = Color.White;
@@ -43,7 +51,7 @@ namespace ZD.Gui.Zen
             float y = 7.0F * Scale;
             float w = btnClose.AbsLeft - x;
             RectangleF rectHeader = new RectangleF(x, y, btnClose.AbsLeft - w, headerHeight - y);
-            using (Brush b = new SolidBrush(ZenParams.StandardTextColor))
+            using (Brush b = new SolidBrush(ZenParams.HeaderFontColor))
             using (Font f = new Font(new FontFamily(ZenParams.HeaderFontFamily), ZenParams.HeaderFontSize))
             {
                 SizeF hsz;

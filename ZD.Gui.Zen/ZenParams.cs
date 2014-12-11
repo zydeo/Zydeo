@@ -14,23 +14,40 @@ namespace ZD.Gui.Zen
         public static readonly float TooltipPadding = 8;
 
         public static readonly Size CloseBtnLogicalSize = new Size(40, 20);
-        public static readonly Color CloseBtnBgColorBase = Color.FromArgb(199, 80, 80);
-        public static readonly Color CloseBtnBgColorHover = Color.FromArgb(224, 67, 67);
+        //public static readonly Color CloseBtnBgColorBase = Color.FromArgb(0x48, 0x2e, 0x74);
+        public static readonly Color CloseBtnBgColorBase = Color.FromArgb(0x74, 0x35, 0x00);
+        public static readonly Color CloseBtnBgColorHover = Color.FromArgb(0x95, 0x93, 0x99);
+        //public static readonly Color CloseBtnBgColorBase = Color.FromArgb(199, 80, 80);
+        //public static readonly Color CloseBtnBgColorHover = Color.FromArgb(224, 67, 67);
         public static readonly Color CloseBtnForeColor = Color.White;
         public static readonly Size OtherSysBtnLogicalSize = new Size(25, 20);
-        public static readonly Color OtherSysBtnBgColorBase = Color.YellowGreen;
-        public static readonly Color OtherSysBtnBgColorHover = Color.FromArgb(54, 101, 179);
+        //public static readonly Color OtherSysBtnBgColorBase = PaddingBackColor;
+        //public static readonly Color OtherSysBtnBgColorHover = Color.FromArgb(54, 101, 179);
+        public static readonly Color OtherSysBtnBgColorBase = Color.FromArgb(0x41, 0x6b, 0x00);
+        public static readonly Color OtherSysBtnBgColorHover = Color.FromArgb(0x95, 0x93, 0x99);
         public static readonly Color OtherSysBtnForeColorBase = Color.Black;
         public static readonly Color OtherSysBtnForeColorHover = Color.White;
 
-        public static readonly Color BorderColor = Color.FromArgb(128, 128, 128);
-        public static readonly Color PaddingBackColor = Color.Honeydew;
-        public static readonly Color HeaderBackColor = Color.YellowGreen;
+        public static readonly Color TabSysBgBase = Color.FromArgb(0x74, 0x35, 0x00);
+        public static readonly Color TabSysBgActive = Color.White;
+        public static readonly Color TabSysTxtBase = Color.FromArgb(0xf7, 0xf2, 0xed);
+        public static readonly Color TabSysTxtActive = Color.Black;
+        public static readonly Color TabOtherBgBase = Color.FromArgb(0x95, 0x93, 0x99);
+        public static readonly Color TabOtherBgActive = Color.FromArgb(0xf7, 0xf2, 0xed);
+        public static readonly Color TabOtherTxtBase = Color.White;
+        public static readonly Color TabOtherTxtActive = Color.Black;
         public static readonly string HeaderTabFontFamily = "Segoe UI";
         public static readonly float HeaderTabFontSize = 12.0F;
         public static readonly float HeaderTabPadding = 12.0F;
+        
+        public static readonly Color BorderColor = Color.FromArgb(128, 128, 128);
+        public static readonly Color PaddingBackColor = Color.FromArgb(0xf7, 0xf2, 0xed);
+        public static readonly Color HeaderBackColorL = Color.FromArgb(0x51, 0x84, 0x03);
+        public static readonly Color HeaderBackColorR = Color.FromArgb(0x41, 0x6b, 0x00);
         public static readonly string HeaderFontFamily = "Segoe UI";
         public static readonly float HeaderFontSize = 13.0F;
+        public static readonly Color HeaderFontColor = Color.FromArgb(0xf7, 0xf2, 0xed);
+
         public static readonly Color WindowColor = Color.White;
         public static readonly string GenericFontFamily = "Segoe UI";
         public static readonly float StandardFontSize = 12.0F;
@@ -43,10 +60,10 @@ namespace ZD.Gui.Zen
         public static readonly Color CtxtMenuHoverColor = Color.FromArgb(205, 205, 205);
 
         public static readonly Color BtnGradLightColor = Color.White;
-        public static readonly Color BtnGradDarkColorBase = Color.FromArgb(175, 238, 238);
-        public static readonly Color BtnGradDarkColorHover = Color.YellowGreen;
+        public static readonly Color BtnGradDarkColorBase = Color.FromArgb(0xcb, 0xce, 0xc6);
+        public static readonly Color BtnGradDarkColorHover = Color.FromArgb(0xe2, 0xce, 0xff);
         public static readonly Color BtnGradDarkColorDisabled = Color.FromArgb(240, 240, 240);
-        public static readonly Color BtnPressColor = Color.FromArgb(240, 128, 128);
+        public static readonly Color BtnPressColor = Color.FromArgb(0xc5, 0x9f, 0x7f);
 
         public static readonly int ScrollBarWidth = 20;
         public static readonly Color ScrollColBg = Color.FromArgb(240, 240, 240);

@@ -210,29 +210,25 @@ namespace ZD.Gui
                     if (block.SenseId)
                     {
                         float pad = lemmaLineHeight * 0.1F;
-                        if (!hoverSense)
+                        if (hoverSense)
                         {
-                            g.DrawEllipse(pnorm,
-                                pb.LocX,
-                                pb.LocY + scale * pad,
-                                ((float)block.Width) - 2.0F * pad,
-                                lemmaCharHeight - 2.0F * pad);
-                            g.DrawString(textPool.GetString(block.TextPos), getFont(fntSenseId), bnorm,
-                                pb.LocX + 2.0F * pad,
-                                pb.LocY + /* 1.5F * */ pad, sf); // TO-DO: vertical paddig of character will need more work.
+                            using (Brush bh = new SolidBrush(Magic.SenseHoverColor))
+                            {
+                                g.FillEllipse(bh,
+                                    pb.LocX + 1F,
+                                    pb.LocY + scale * pad + 1F,
+                                    ((float)block.Width) - 2.0F * pad - 2F,
+                                    lemmaCharHeight - 2.0F * pad - 2F);
+                            }
                         }
-                        else
-                        {
-                            g.FillEllipse(bnorm,
-                                pb.LocX,
-                                pb.LocY + scale * pad,
-                                ((float)block.Width) - 2.0F * pad,
-                                lemmaCharHeight - 2.0F * pad);
-                            using (Brush bgBrush = new SolidBrush(ZenParams.WindowColor))
-                            g.DrawString(textPool.GetString(block.TextPos), getFont(fntSenseId), bgBrush,
-                                pb.LocX + 2.0F * pad,
-                                pb.LocY + /* 1.5F * */ pad, sf); // TO-DO: vertical paddig of character will need more work.
-                        }
+                        g.DrawEllipse(pnorm,
+                            pb.LocX,
+                            pb.LocY + scale * pad,
+                            ((float)block.Width) - 2.0F * pad,
+                            lemmaCharHeight - 2.0F * pad);
+                        g.DrawString(textPool.GetString(block.TextPos), getFont(fntSenseId), bnorm,
+                            pb.LocX + 2.0F * pad,
+                            pb.LocY + /* 1.5F * */ pad, sf); // TO-DO: vertical paddig of character will need more work.
                     }
                     // Text
                     else
@@ -356,11 +352,22 @@ namespace ZD.Gui
             // Analyze now. Not the best time here in paint, but must do.
             if (analyzedWidth != Width) Analyze(g, Width);
 
-            // Background. Alternating at that!
-            Color bgcol = odd ? Magic.ResultsAltBackColor : ZenParams.WindowColor;
+            // Background.
+            Color bgcol = ZenParams.WindowColor;
             using (Brush b = new SolidBrush(bgcol))
             {
                 g.FillRectangle(b, 0, 0, Width, Height);
+            }
+            // Dotted line at bottom
+            if (!last)
+            {
+                using (Pen p = new Pen(Magic.ResultsSeparator))
+                {
+                    int dp = (int)(1.3F * scale);
+                    int margin = (int)(8F * scale);
+                    p.DashPattern = new float[] { dp, dp };
+                    g.DrawLine(p, margin, Height - 1, Width - margin, Height - 1);
+                }
             }
 
             // Hanzi highlights. May draw on top, so must come before actual characters are drawn.

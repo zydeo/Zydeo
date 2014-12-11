@@ -126,16 +126,16 @@ namespace ZD.Gui
             {
                 InvokeOnForm((MethodInvoker)delegate
                 {
-                    txtInput.Location = new Point(AbsLeft + padding, AbsTop + 1);
+                    txtInput.Location = new Point(AbsLeft + padding, AbsTop + (int)(2F * Scale));
                     txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, textBoxHeight);
                 });
             }
             else
             {
-                txtInput.Location = new Point(AbsLeft + padding, AbsTop + 1);
+                txtInput.Location = new Point(AbsLeft + padding, AbsTop + (int)(2F * Scale));
                 txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, textBoxHeight);
             }
-
+            
             // Search button: right-aligned
             btnSearch.RelLocation = new Point(Width - padding - btnSearch.Width, padding);
             // Cancel button: right-aligned, to the left of search button
