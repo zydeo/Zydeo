@@ -31,19 +31,21 @@
             this.lblHeader = new System.Windows.Forms.Label();
             this.pnlOuter = new System.Windows.Forms.Panel();
             this.pnlInner = new System.Windows.Forms.Panel();
-            this.lblSorry = new System.Windows.Forms.Label();
-            this.lblWhy = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
+            this.lblWhy = new System.Windows.Forms.Label();
+            this.lblSorry = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.pnlOuter.SuspendLayout();
             this.pnlInner.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblHeader
             // 
-            this.lblHeader.BackColor = System.Drawing.Color.Green;
+            this.lblHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(107)))), ((int)(((byte)(0)))));
             this.lblHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblHeader.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblHeader.ForeColor = System.Drawing.Color.White;
+            this.lblHeader.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(247)))), ((int)(((byte)(242)))), ((int)(((byte)(237)))));
             this.lblHeader.Location = new System.Drawing.Point(0, 0);
             this.lblHeader.Name = "lblHeader";
             this.lblHeader.Size = new System.Drawing.Size(513, 24);
@@ -64,8 +66,8 @@
             // 
             // pnlInner
             // 
-            this.pnlInner.BackColor = System.Drawing.Color.White;
-            this.pnlInner.Controls.Add(this.btnClose);
+            this.pnlInner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(247)))), ((int)(((byte)(242)))), ((int)(((byte)(237)))));
+            this.pnlInner.Controls.Add(this.panel1);
             this.pnlInner.Controls.Add(this.lblWhy);
             this.pnlInner.Controls.Add(this.lblSorry);
             this.pnlInner.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -73,6 +75,26 @@
             this.pnlInner.Name = "pnlInner";
             this.pnlInner.Size = new System.Drawing.Size(511, 143);
             this.pnlInner.TabIndex = 0;
+            // 
+            // btnClose
+            // 
+            this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnClose.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnClose.Location = new System.Drawing.Point(0, 0);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(91, 23);
+            this.btnClose.TabIndex = 2;
+            this.btnClose.Text = "&Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            // 
+            // lblWhy
+            // 
+            this.lblWhy.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblWhy.Location = new System.Drawing.Point(44, 40);
+            this.lblWhy.Name = "lblWhy";
+            this.lblWhy.Size = new System.Drawing.Size(456, 66);
+            this.lblWhy.TabIndex = 1;
+            this.lblWhy.Text = "Zydeo encountered a problem and had to close.\r\nIt is Zydeo\'s fault, not yours.";
             // 
             // lblSorry
             // 
@@ -84,25 +106,15 @@
             this.lblSorry.TabIndex = 0;
             this.lblSorry.Text = ";-(  Sorry.";
             // 
-            // lblWhy
+            // panel1
             // 
-            this.lblWhy.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblWhy.Location = new System.Drawing.Point(44, 40);
-            this.lblWhy.Name = "lblWhy";
-            this.lblWhy.Size = new System.Drawing.Size(456, 66);
-            this.lblWhy.TabIndex = 1;
-            this.lblWhy.Text = "Zydeo encountered a problem and had to close.\r\nIt is Zydeo\'s fault, not yours.";
-            // 
-            // btnClose
-            // 
-            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnClose.Location = new System.Drawing.Point(409, 109);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(91, 23);
-            this.btnClose.TabIndex = 2;
-            this.btnClose.Text = "&Close";
-            this.btnClose.UseVisualStyleBackColor = true;
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.BackColor = System.Drawing.SystemColors.Control;
+            this.panel1.Controls.Add(this.btnClose);
+            this.panel1.Location = new System.Drawing.Point(409, 109);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(91, 23);
+            this.panel1.TabIndex = 3;
             // 
             // FatalErrorForm
             // 
@@ -120,6 +132,7 @@
             this.pnlOuter.ResumeLayout(false);
             this.pnlInner.ResumeLayout(false);
             this.pnlInner.PerformLayout();
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -132,5 +145,6 @@
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Label lblWhy;
         private System.Windows.Forms.Label lblSorry;
+        private System.Windows.Forms.Panel panel1;
     }
 }
