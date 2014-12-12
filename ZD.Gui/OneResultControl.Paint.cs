@@ -363,9 +363,11 @@ namespace ZD.Gui
             {
                 using (Pen p = new Pen(Magic.ResultsSeparator))
                 {
-                    int dp = (int)(1.3F * scale);
+                    float dp = (int)(1.3F * scale);
                     int margin = (int)(8F * scale);
                     p.DashPattern = new float[] { dp, dp };
+                    p.Width = 1;
+                    g.SmoothingMode = SmoothingMode.None;
                     g.DrawLine(p, margin, Height - 1, Width - margin, Height - 1);
                 }
             }
