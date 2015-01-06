@@ -27,5 +27,8 @@ _work/*
 !_work/*.ttc
 !_work/*.bin
 
+_work_chdict_prepare/*
+
+
 # Bin folder: ignore altogether
 _bin/*
