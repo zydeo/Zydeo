@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.txtEntry = new System.Windows.Forms.TextBox();
+            this.txtEntry = new ZD.DictEditor.HintingTextBox();
             this.pnlFrame = new System.Windows.Forms.Panel();
             this.flowHints = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlEditorBg = new System.Windows.Forms.Panel();
@@ -40,7 +40,7 @@
             // txtEntry
             // 
             this.txtEntry.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtEntry.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtEntry.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtEntry.Location = new System.Drawing.Point(8, 8);
             this.txtEntry.Multiline = true;
             this.txtEntry.Name = "txtEntry";
@@ -65,7 +65,8 @@
             this.flowHints.BackColor = System.Drawing.SystemColors.Window;
             this.flowHints.Location = new System.Drawing.Point(4, 192);
             this.flowHints.Name = "flowHints";
-            this.flowHints.Size = new System.Drawing.Size(516, 20);
+            this.flowHints.Margin = new System.Windows.Forms.Padding(0);
+            this.flowHints.Size = new System.Drawing.Size(516, 24);
             this.flowHints.TabIndex = 1;
             // 
             // pnlEditorBg
@@ -101,7 +102,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox txtEntry;
+        private ZD.DictEditor.HintingTextBox txtEntry;
         private System.Windows.Forms.Panel pnlFrame;
         private System.Windows.Forms.FlowLayoutPanel flowHints;
         private System.Windows.Forms.Panel pnlSeparator;

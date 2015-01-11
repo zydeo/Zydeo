@@ -57,6 +57,9 @@
     <Compile Include="EntryEditor.Designer.cs">
       <DependentUpon>EntryEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="HintingTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="HwCtrl.cs">
       <SubType>UserControl</SubType>
     </Compile>
