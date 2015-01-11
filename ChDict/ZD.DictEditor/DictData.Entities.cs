@@ -22,14 +22,14 @@ namespace ZD.DictEditor
         public class HwData
         {
             private readonly int id;
-            private readonly HwStatus status;
+            private HwStatus status;
             private readonly string simp;
             private readonly string trad;
             private readonly string pinyin;
             private string extract;
 
             public int Id { get { return id; } }
-            public HwStatus Status { get { return status; } }
+            public HwStatus Status { get { return status; } set { status = value; } }
             public string Simp { get { return simp; } }
             public string Trad { get { return trad; } }
             public string Pinyin { get { return pinyin; } }
@@ -55,7 +55,7 @@ namespace ZD.DictEditor
         public class HwEnumerator : IEnumerator<HwData>
         {
             private readonly ReadOnlyCollection<HwData> hwColl;
-            private int idx = 0;
+            private int idx = -1;
 
             public HwEnumerator(ReadOnlyCollection<HwData> hwColl)
             {
@@ -161,7 +161,7 @@ namespace ZD.DictEditor
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
             {
-                return hwColl.GetEnumerator();
+                return new HwEnumerator(hwColl);
             }
         }
     }

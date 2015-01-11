@@ -23,16 +23,7 @@ namespace ZD.DictEditor
                 sw.Write(xml);
                 sw.Flush();
             }
-            wcInfo.Navigated += onBrowserNavigated;
             wcInfo.Navigate(new Uri("file://" + fname));
-        }
-
-        private void onBrowserNavigated(object sender, System.Windows.Forms.WebBrowserNavigatedEventArgs e)
-        {
-            wcInfo.Navigated -= onBrowserNavigated;
-            string currDir = Directory.GetCurrentDirectory();
-            string fname = Path.Combine(currDir, "temp.xml");
-            File.Delete(fname);
         }
     }
 }

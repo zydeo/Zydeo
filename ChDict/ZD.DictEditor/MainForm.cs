@@ -15,6 +15,8 @@ namespace ZD.DictEditor
     public partial class MainForm : Form
     {
         private DictData dd;
+        private DictData.HwData activeHwd = null;
+        private string activeStrSenses = null;
 
         public MainForm()
         {
@@ -43,17 +45,35 @@ namespace ZD.DictEditor
 
         private void doEnterNoEntry()
         {
-
+            activeHwd = null;
+            activeStrSenses = null;
         }
 
         private void doEnterEntry(DictData.HwData data)
         {
+            activeHwd = data;
+            activeStrSenses = dd.GetSenses(data.Id);
+            editor.StrSenses = activeStrSenses;
             BackboneEntry be = dd.GetBackbone(data.Id);
             printBackbone(be);
         }
 
+        private void doSaveChanges()
+        {
+            string newStrSenses = editor.StrSenses;
+            // Save if text actually changed.
+            if (activeStrSenses != newStrSenses)
+            {
+                DictData.HwStatus status = activeHwd.Status;
+                if (editor.HasErrors) status = DictData.HwStatus.Marked;
+                else if (status != DictData.HwStatus.Marked) status = DictData.HwStatus.Edited;
+                dd.SaveSenses(activeHwd.Id, newStrSenses, status);
+            }
+        }
+
         private void onHwSelectionChanged(object sender, EventArgs e)
         {
+            if (activeHwd != null) doSaveChanges();
             if (dgvHeads.SelectedRows.Count == 0) doEnterNoEntry();
             else
             {

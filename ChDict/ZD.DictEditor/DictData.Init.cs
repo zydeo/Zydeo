@@ -193,7 +193,7 @@ namespace ZD.DictEditor
                     string trad = (string)rdr["trad"];
                     string pinyin = (string)rdr["pinyin"];
                     string extract = (string)rdr["extract"];
-                    HwData hwd = new HwData(id, HwStatus.NotStarted, simp, trad, pinyin, extract);
+                    HwData hwd = new HwData(id, status, simp, trad, pinyin, extract);
                     hwList.Add(hwd);
                 }
                 rdr.Close(); rdr.Dispose(); rdr = null;

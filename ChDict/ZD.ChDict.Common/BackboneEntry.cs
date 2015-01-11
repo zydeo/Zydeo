@@ -225,6 +225,31 @@ namespace ZD.ChDict.Common
             }
         }
 
+        private static void readDict(XmlTextReader xr, BackbonePart part, Dictionary<BackbonePart, object> storage)
+        {
+            List<TransTriple> senses = new List<TransTriple>();
+            xr.Read();
+            string orig = null;
+            string goog = null;
+            string bing = null;
+            while (true)
+            {
+                if (xr.NodeType == XmlNodeType.Whitespace) { xr.Read(); continue; }
+                if (xr.NodeType == XmlNodeType.EndElement) break;
+                if (xr.NodeType != XmlNodeType.Element) throw new Exception("XML error.");
+                if (xr.Name == "sense-orig") orig = xr.ReadElementContentAsString();
+                else if (xr.Name == "sense-goog") goog = xr.ReadElementContentAsString();
+                else if (xr.Name == "sense-bing")
+                {
+                    bing = xr.ReadElementContentAsString();
+                    senses.Add(new TransTriple(orig, goog, bing));
+                    orig = goog = bing = null;
+                }
+                else throw new Exception("XML error.");
+            }
+            storage[part] = senses.ToArray();
+        }
+
         public static BackboneEntry ReadFromXml(XmlTextReader xr)
         {
             if (xr.NodeType != XmlNodeType.Element || xr.Name != "entry") return null;
@@ -235,6 +260,9 @@ namespace ZD.ChDict.Common
             string transGoog = string.Empty;
             string transBing = string.Empty;
             Dictionary<BackbonePart, object> storage = new Dictionary<BackbonePart, object>();
+            string wikiOrig = null;
+            string wikiGoog = null;
+            string wikiBing = null;
             while (true)
             {
                 xr.Read();
@@ -242,6 +270,31 @@ namespace ZD.ChDict.Common
                 if (xr.NodeType == XmlNodeType.EndElement) break;
                 if (xr.NodeType != XmlNodeType.Element) throw new Exception("XML error.");
                 if (xr.Name == "rank") rank = xr.ReadElementContentAsInt();
+                else if (xr.Name == "trans-goog") transGoog = xr.ReadElementContentAsString();
+                else if (xr.Name == "trans-bing") transBing = xr.ReadElementContentAsString();
+                else if (xr.Name == "wiki-hu") storage[BackbonePart.WikiHu] = xr.ReadElementContentAsString();
+                else if (xr.Name == "wiki-en-orig") wikiOrig = xr.ReadElementContentAsString();
+                else if (xr.Name == "wiki-en-goog") wikiGoog = xr.ReadElementContentAsString();
+                else if (xr.Name == "wiki-en-bing")
+                {
+                    wikiBing = xr.ReadElementContentAsString();
+                    TransTriple tt = new TransTriple(wikiOrig, wikiGoog, wikiBing);
+                    storage[BackbonePart.WikiEn] = tt;
+                    wikiOrig = wikiGoog = wikiBing = null;
+                }
+                else if (xr.Name == "wiki-de-orig") wikiOrig = xr.ReadElementContentAsString();
+                else if (xr.Name == "wiki-de-goog") wikiGoog = xr.ReadElementContentAsString();
+                else if (xr.Name == "wiki-de-bing")
+                {
+                    wikiBing = xr.ReadElementContentAsString();
+                    TransTriple tt = new TransTriple(wikiOrig, wikiGoog, wikiBing);
+                    storage[BackbonePart.WikiDe] = tt;
+                    wikiOrig = wikiGoog = wikiBing = null;
+                }
+                else if (xr.Name == "cedict")
+                    readDict(xr, BackbonePart.Cedict, storage);
+                else if (xr.Name == "handedict")
+                    readDict(xr, BackbonePart.HanDeDict, storage);
                 else xr.Skip();
             }
             xr.Read();
