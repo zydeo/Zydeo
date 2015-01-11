@@ -35,7 +35,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZD.LexRank", "ChDict\ZD.Lex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZD.WikiPages", "ChDict\ZD.WikiPages\ZD.WikiPages.csproj", "{12BD6162-BF46-425F-B0F9-297D9EB6CB53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZD.DictEditor", "ZD.DictEditor\ZD.DictEditor.csproj", "{4CFE1D8E-5604-44BA-A12E-E6514E6C6384}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZD.DictEditor", "ChDict\ZD.DictEditor\ZD.DictEditor.csproj", "{4CFE1D8E-5604-44BA-A12E-E6514E6C6384}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

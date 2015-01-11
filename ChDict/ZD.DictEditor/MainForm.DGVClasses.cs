@@ -14,7 +14,7 @@ namespace ZD.DictEditor
         {
             public override Type ValueType
             {
-                get { return typeof(DictData.HwData); }
+                get { return typeof(object); }
             }
 
             private static HwCtrl ctrl = new HwCtrl();
@@ -28,8 +28,8 @@ namespace ZD.DictEditor
             {
                 var img = new Bitmap(cellBounds.Width, cellBounds.Height);
                 ctrl.Size = img.Size;
-                var data = DataGridView.DataSource as BindingList<DictData.HwBoundData>;
-				ctrl.Data = data[rowIndex].Data;
+                var data = DataGridView.DataSource as BindingList<DictData.HwData>;
+				ctrl.Data = data[rowIndex];
                 if (DataGridView.SelectedRows.Count == 1 && DataGridView.SelectedRows[0].Index == rowIndex) ctrl.Selected = true;
                 else ctrl.Selected = false;
                 ctrl.DrawToBitmap(img, new Rectangle(0, 0, ctrl.Width, ctrl.Height));
@@ -41,6 +41,7 @@ namespace ZD.DictEditor
                 base.OnClick(e);
             }
         }
+
         public class CustomColumn : DataGridViewColumn
         {
             public CustomColumn() : base(new CustomCell()) { }
@@ -48,12 +49,7 @@ namespace ZD.DictEditor
             public override DataGridViewCell CellTemplate
             {
                 get { return base.CellTemplate; }
-                set
-                {
-                    if (value != null && !value.GetType().IsAssignableFrom(typeof(CustomCell)))
-                        throw new InvalidCastException("It should be a custom Cell");
-                    base.CellTemplate = value;
-                }
+                set { base.CellTemplate = value; }
             }
         }
     }

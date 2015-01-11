@@ -131,6 +131,24 @@ namespace ZD.ChDict.Common
             foreach (var x in storage) this.storage[x.Key] = x.Value;
         }
 
+        public string WriteToXmlStr()
+        {
+            using (StringWriter sw = new StringWriter())
+            {
+                XmlWriterSettings stgs = new XmlWriterSettings();
+                stgs.OmitXmlDeclaration = true;
+                stgs.Indent = true;
+                stgs.IndentChars = "  ";
+                stgs.NewLineChars = "\r\n";
+                stgs.NewLineHandling = NewLineHandling.Replace;
+                using (XmlWriter xw = XmlWriter.Create(sw, stgs))
+                {
+                    WriteToXml(xw);
+                }
+                return sw.ToString();
+            }
+        }
+
         /// <summary>
         /// Writes the entry into the provided XML stream.
         /// </summary>
@@ -195,6 +213,16 @@ namespace ZD.ChDict.Common
 
             // End entry
             xw.WriteEndElement();
+        }
+
+        public static BackboneEntry ReadFromXmlStr(string str)
+        {
+            using (StringReader sr = new StringReader(str))
+            using (XmlTextReader xr = new XmlTextReader(sr))
+            {
+                xr.Read();
+                return ReadFromXml(xr);
+            }
         }
 
         public static BackboneEntry ReadFromXml(XmlTextReader xr)

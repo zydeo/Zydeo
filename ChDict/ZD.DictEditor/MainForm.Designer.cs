@@ -7,7 +7,6 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -79,7 +78,7 @@
             // 
             // wcInfo
             // 
-            this.wcInfo.AllowNavigation = false;
+            this.wcInfo.AllowNavigation = true;
             this.wcInfo.AllowWebBrowserDrop = false;
             this.wcInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.wcInfo.IsWebBrowserContextMenuEnabled = false;

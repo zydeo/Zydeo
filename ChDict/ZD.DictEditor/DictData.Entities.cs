@@ -12,9 +12,11 @@ namespace ZD.DictEditor
     {
         public enum HwStatus
         {
-            NotStarted,
-            Done,
-            Marked,
+            NotStarted = 0,
+            Done = 1,
+            Dropped = 2,
+            Edited = 3,
+            Marked = 4,
         }
 
         public class HwData
@@ -24,14 +26,14 @@ namespace ZD.DictEditor
             private readonly string simp;
             private readonly string trad;
             private readonly string pinyin;
-            private readonly string extract;
+            private string extract;
 
             public int Id { get { return id; } }
             public HwStatus Status { get { return status; } }
             public string Simp { get { return simp; } }
             public string Trad { get { return trad; } }
             public string Pinyin { get { return pinyin; } }
-            public string Extract { get { return extract; } }
+            public string Extract { get { return extract; } set { extract = value; } }
 
             public HwData(int id, HwStatus status, string simp, string trad, string pinyin, string extract)
             {
@@ -50,30 +52,19 @@ namespace ZD.DictEditor
             }
         }
 
-        public class HwBoundData
-        {
-            private readonly HwData data;
-            public HwData Data { get { return data; } set { throw new NotImplementedException(); } }
-            public HwBoundData(HwData data)
-            {
-                if (data == null) throw new ArgumentException("data");
-                this.data = data;
-            }
-        }
-
-        public class HWBoundEnumerator : IEnumerator<HwBoundData>
+        public class HwEnumerator : IEnumerator<HwData>
         {
             private readonly ReadOnlyCollection<HwData> hwColl;
             private int idx = 0;
 
-            public HWBoundEnumerator(ReadOnlyCollection<HwData> hwColl)
+            public HwEnumerator(ReadOnlyCollection<HwData> hwColl)
             {
                 this.hwColl = hwColl;
             }
 
-            public HwBoundData Current
+            public HwData Current
             {
-                get { if (idx < hwColl.Count) return new HwBoundData(hwColl[idx]); return null; }
+                get { if (idx < hwColl.Count) return hwColl[idx]; return null; }
             }
 
             public void Dispose()
@@ -96,23 +87,23 @@ namespace ZD.DictEditor
             }
         }
 
-        public class HwBoundCollection : IList<HwBoundData>
+        public class HwCollection : IList<HwData>
         {
             private readonly ReadOnlyCollection<HwData> hwColl;
 
-            public HwBoundCollection(ReadOnlyCollection<HwData> hwColl)
+            public HwCollection(ReadOnlyCollection<HwData> hwColl)
             {
                 this.hwColl = hwColl;
             }
 
-            public int IndexOf(HwBoundData item)
+            public int IndexOf(HwData item)
             {
                 for (int i = 0; i != hwColl.Count; ++i)
-                    if (hwColl[i] == item.Data) return i;
+                    if (hwColl[i] == item) return i;
                 return -1;
             }
 
-            public void Insert(int index, HwBoundData item)
+            public void Insert(int index, HwData item)
             {
                 throw new NotImplementedException();
             }
@@ -122,13 +113,13 @@ namespace ZD.DictEditor
                 throw new NotImplementedException();
             }
 
-            public HwBoundData this[int index]
+            public HwData this[int index]
             {
-                get { return new HwBoundData(hwColl[index]); }
+                get { return hwColl[index]; }
                 set { throw new NotImplementedException(); }
             }
 
-            public void Add(HwBoundData item)
+            public void Add(HwData item)
             {
                 throw new NotImplementedException();
             }
@@ -138,14 +129,14 @@ namespace ZD.DictEditor
                 throw new NotImplementedException();
             }
 
-            public bool Contains(HwBoundData item)
+            public bool Contains(HwData item)
             {
                 return IndexOf(item) != -1;
             }
 
-            public void CopyTo(HwBoundData[] array, int arrayIndex)
+            public void CopyTo(HwData[] array, int arrayIndex)
             {
-                for (int i = 0; i != hwColl.Count; ++i) array[i + arrayIndex] = new HwBoundData(hwColl[i]);
+                for (int i = 0; i != hwColl.Count; ++i) array[i + arrayIndex] = hwColl[i];
             }
 
             public int Count
@@ -158,14 +149,14 @@ namespace ZD.DictEditor
                 get { return true; }
             }
 
-            public bool Remove(HwBoundData item)
+            public bool Remove(HwData item)
             {
                 throw new NotImplementedException();
             }
 
-            public IEnumerator<HwBoundData> GetEnumerator()
+            public IEnumerator<HwData> GetEnumerator()
             {
-                return new HWBoundEnumerator(hwColl);
+                return new HwEnumerator(hwColl);
             }
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()

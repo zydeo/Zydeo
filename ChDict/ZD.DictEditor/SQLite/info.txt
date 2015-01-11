@@ -1,0 +1,4 @@
+System.Data.SQLite: 1.0.90.0
+SQLIte: 3.8.2
+
+http://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki
