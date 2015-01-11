@@ -50,6 +50,13 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZD.ChDict.Common\ZD.ChDict.Common.csproj">
+      <Project>{92ec72c8-6672-4c31-8931-6d74f1fa9d32}</Project>
+      <Name>ZD.ChDict.Common</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

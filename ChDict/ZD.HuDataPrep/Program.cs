@@ -12,15 +12,15 @@ namespace ZD.HuDataPrep
     {
         static int Main(string[] args)
         {
-            if (args.Length != 4)
+            if (args.Length != 6)
             {
-                Console.WriteLine("Takes these arguments:\r\n");
-                Console.WriteLine("1: Lexical scope file\r\n");
-                Console.WriteLine("2: Wikipedia page titles file\r\n");
-                Console.WriteLine("3: CEDICT file\r\n");
+                Console.WriteLine("Takes these arguments:");
+                Console.WriteLine("1: Lexical scope file");
+                Console.WriteLine("2: Wikipedia page titles file");
+                Console.WriteLine("3: CEDICT file");
                 Console.WriteLine("4: HanDeDict file\r\n");
-                Console.WriteLine("5: Output file: Lexical backbone XML\r\n");
-                Console.WriteLine("6: Output file: Summary statistics\r\n");
+                Console.WriteLine("5: Output file: Lexical backbone XML");
+                Console.WriteLine("6: Output file: Summary statistics");
                 if (Debugger.IsAttached) Console.ReadLine();
                 return -1;
             }
