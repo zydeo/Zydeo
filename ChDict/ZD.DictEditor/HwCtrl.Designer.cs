@@ -32,7 +32,6 @@
             this.lblHeadword = new System.Windows.Forms.Label();
             this.lblExtract = new System.Windows.Forms.Label();
             this.lblPinyin = new System.Windows.Forms.Label();
-            this.pnlBottomSep = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pbStatus)).BeginInit();
             this.SuspendLayout();
             // 
@@ -80,20 +79,11 @@
             this.lblPinyin.TabIndex = 3;
             this.lblPinyin.Text = "zao shang hao gei ni";
             // 
-            // pnlBottomSep
-            // 
-            this.pnlBottomSep.BackColor = System.Drawing.Color.Lavender;
-            this.pnlBottomSep.Location = new System.Drawing.Point(4, 28);
-            this.pnlBottomSep.Name = "pnlBottomSep";
-            this.pnlBottomSep.Size = new System.Drawing.Size(8, 28);
-            this.pnlBottomSep.TabIndex = 4;
-            // 
             // HwCtrl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.Controls.Add(this.pnlBottomSep);
             this.Controls.Add(this.lblPinyin);
             this.Controls.Add(this.lblExtract);
             this.Controls.Add(this.lblHeadword);
@@ -111,6 +101,5 @@
         private System.Windows.Forms.Label lblHeadword;
         private System.Windows.Forms.Label lblExtract;
         private System.Windows.Forms.Label lblPinyin;
-        private System.Windows.Forms.Panel pnlBottomSep;
     }
 }

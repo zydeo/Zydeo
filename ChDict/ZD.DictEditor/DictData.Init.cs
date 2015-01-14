@@ -47,6 +47,21 @@ namespace ZD.DictEditor
             [senses] VARCHAR(1024) NOT NULL
             );";
 
+        private static string sqlCreateTblSessionTimes =
+            @"CREATE TABLE [session_times] (
+            [id] INTEGER NOT NULL,
+            [start_time] VARCHAR(21) NOT NULL,
+            [end_time] VARCHAR(21) NOT NULL
+            );";
+
+        private static string sqlCreateTblHwTimes =
+            @"CREATE TABLE [hw_times] (
+            [session_id] INTEGER NOT NULL,
+            [heads_id] INTEGER NOT NULL,
+            [start_time] VARCHAR(21) NOT NULL,
+            [end_time] VARCHAR(21) NOT NULL
+            );";
+
         private void createDB()
         {
             SQLiteConnection conn = null;
@@ -60,6 +75,10 @@ namespace ZD.DictEditor
                 cmd = new SQLiteCommand(sqlCreateTblBackbone, conn);
                 cmd.ExecuteNonQuery(); cmd.Dispose(); cmd = null;
                 cmd = new SQLiteCommand(sqlCreateTblDict, conn);
+                cmd.ExecuteNonQuery(); cmd.Dispose(); cmd = null;
+                cmd = new SQLiteCommand(sqlCreateTblSessionTimes, conn);
+                cmd.ExecuteNonQuery(); cmd.Dispose(); cmd = null;
+                cmd = new SQLiteCommand(sqlCreateTblHwTimes, conn);
                 cmd.ExecuteNonQuery(); cmd.Dispose(); cmd = null;
             }
             finally
@@ -86,6 +105,8 @@ namespace ZD.DictEditor
         /// </summary>
         private DictData(string xmlFileName, string dbFileName)
         {
+            SessionId = 0;
+
             // SQL connection, DB
             if (File.Exists(dbFileName))
             {
@@ -207,6 +228,101 @@ namespace ZD.DictEditor
                     rdr.Dispose();
                 }
                 if (cmdSelHeads != null) cmdSelHeads.Dispose();
+                if (conn != null)
+                {
+                    if (conn.State == System.Data.ConnectionState.Open) conn.Close();
+                    conn.Dispose();
+                }
+            }
+            SessionId = getNextSessionId();
+        }
+
+        private static string sqlSelSessionTimes =
+         @"SELECT id, start_time, end_time
+            FROM [session_times];";
+
+        private static string sqlSelHwTimes =
+         @"SELECT session_id, heads_id, start_time, end_time
+            FROM [hw_times];";
+
+        private void dumpTimeLogsToConsole()
+        {
+            SQLiteConnection conn = null;
+            SQLiteCommand cmdSelSessionTimes = null;
+            SQLiteCommand cmdSelHwTimes = null;
+            SQLiteDataReader rdr = null;
+            try
+            {
+                conn = new SQLiteConnection(connString);
+                conn.Open();
+                cmdSelSessionTimes = new SQLiteCommand(sqlSelSessionTimes, conn);
+                rdr = cmdSelSessionTimes.ExecuteReader();
+                while (rdr.Read())
+                {
+                    Console.Write(rdr.GetValue(0).ToString());
+                    Console.Write("\t");
+                    Console.Write(rdr.GetValue(1).ToString());
+                    Console.Write("\t");
+                    Console.WriteLine(rdr.GetValue(2).ToString());
+                }
+                rdr.Close(); rdr.Dispose(); rdr = null;
+                Console.WriteLine("-----------------------------------------------");
+                cmdSelHwTimes = new SQLiteCommand(sqlSelHwTimes, conn);
+                rdr = cmdSelHwTimes.ExecuteReader();
+                while (rdr.Read())
+                {
+                    Console.Write(rdr.GetValue(0).ToString());
+                    Console.Write("\t");
+                    Console.Write(rdr.GetValue(1).ToString());
+                    Console.Write("\t");
+                    Console.Write(rdr.GetValue(2).ToString());
+                    Console.Write("\t");
+                    Console.WriteLine(rdr.GetValue(3).ToString());
+                }
+            }
+            finally
+            {
+                if (rdr != null)
+                {
+                    if (!rdr.IsClosed) rdr.Close();
+                    rdr.Dispose();
+                }
+                if (cmdSelSessionTimes != null) cmdSelSessionTimes.Dispose();
+                if (conn != null)
+                {
+                    if (conn.State == System.Data.ConnectionState.Open) conn.Close();
+                    conn.Dispose();
+                }
+            }
+        }
+
+        private static string sqlGetNextSessionId =
+            @"SELECT MAX(id)
+            FROM [session_times];";
+
+        private int getNextSessionId()
+        {
+            SQLiteConnection conn = null;
+            SQLiteCommand cmdGetNextSessionId = null;
+            SQLiteDataReader rdr = null;
+            try
+            {
+                conn = new SQLiteConnection(connString);
+                conn.Open();
+                cmdGetNextSessionId = new SQLiteCommand(sqlGetNextSessionId, conn);
+                rdr = cmdGetNextSessionId.ExecuteReader();
+                rdr.Read();
+                if (rdr.GetValue(0) is System.DBNull) return 0;
+                else return (int)(((long)rdr.GetValue(0)) + 1);
+            }
+            finally
+            {
+                if (rdr != null)
+                {
+                    if (!rdr.IsClosed) rdr.Close();
+                    rdr.Dispose();
+                }
+                if (cmdGetNextSessionId != null) cmdGetNextSessionId.Dispose();
                 if (conn != null)
                 {
                     if (conn.State == System.Data.ConnectionState.Open) conn.Close();
