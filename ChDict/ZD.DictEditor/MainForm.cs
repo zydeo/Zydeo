@@ -15,6 +15,7 @@ namespace ZD.DictEditor
 {
     public partial class MainForm : Form
     {
+        private bool loaded = false;
         private DictData dd;
         private DateTime dtEditStart;
         private DictData.HwData activeHwd = null;
@@ -40,6 +41,25 @@ namespace ZD.DictEditor
             btnDrop.Click += onButtonClick;
             btnGoogleTrans.Click += onButtonClick;
             btnGoogleImg.Click += onButtonClick;
+
+            // Restore window size and position, unless designing
+            if (Process.GetCurrentProcess().ProcessName == "devenv") return;
+            Point loc = new Point(Settings.WindowX, Settings.WindowY);
+            Size sz = new Size(Settings.WindowW, Settings.WindowH);
+            if (loc.X > 0 && loc.Y > 0 && sz.Width > 0 && sz.Height > 0)
+            {
+                StartPosition = FormStartPosition.Manual;
+                Location = loc;
+                Size = sz;
+            }
+            else StartPosition = FormStartPosition.WindowsDefaultLocation;
+            if (Settings.WindowStateMaximized)
+                WindowState = FormWindowState.Maximized;
+        }
+
+        static MainForm()
+        {
+            htmlSkeleton = readHtmlSkeleton();
         }
 
         private void onCommandsSizeChanged(object sender, EventArgs e)
@@ -73,12 +93,48 @@ namespace ZD.DictEditor
             dgvHeads.DataSource = new BindingList<DictData.HwData>(dd.Headwords);
             dgvHeads.SelectionChanged += onHwSelectionChanged;
             onHwSelectionChanged(null, null);
+
+            // Loaded!
+            loaded = true;
+            saveWindowSize();
+            saveWindowLocation();
+            doMoveToId(Settings.ActiveEntryId);
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
             doSaveChanges(false, false);
+        }
+
+        private void saveWindowSize()
+        {
+            Settings.WindowW = Size.Width;
+            Settings.WindowH = Size.Height;
+            Settings.WindowStateMaximized = WindowState == FormWindowState.Maximized;
+        }
+
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            if (!loaded) return;
+            if (WindowState == FormWindowState.Normal) saveWindowSize();
+            Settings.WindowStateMaximized = WindowState == FormWindowState.Maximized;
+        }
+
+        private void saveWindowLocation()
+        {
+            Settings.WindowX = Location.X;
+            Settings.WindowY = Location.Y;
+            Settings.WindowStateMaximized = WindowState == FormWindowState.Maximized;
+        }
+
+        protected override void OnLocationChanged(EventArgs e)
+        {
+            base.OnLocationChanged(e);
+            if (!loaded) return;
+            if (WindowState == FormWindowState.Normal) saveWindowLocation();
+            Settings.WindowStateMaximized = WindowState == FormWindowState.Maximized;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -109,12 +165,6 @@ namespace ZD.DictEditor
             else if (sender == btnDrop) doDrop();
             else if (sender == btnGoogleTrans) doLookup(LookupSource.GoogleMT);
             else if (sender == btnGoogleImg) doLookup(LookupSource.GoogleImg);
-        }
-
-        private void doEnterNoEntry()
-        {
-            activeHwd = null;
-            activeStrSenses = null;
         }
 
         private void doScrollDGV()
@@ -163,6 +213,20 @@ namespace ZD.DictEditor
             doScrollDGV();
         }
 
+        private void doMoveToId(int hwId)
+        {
+            if (dgvHeads.RowCount == 0) return;
+            int rowIx = -1;
+            for (int i = 0; i != dgvHeads.RowCount; ++i)
+            {
+                if ((dgvHeads.Rows[i].DataBoundItem as DictData.HwData).Id == hwId)
+                { rowIx = i; break; }
+            }
+            if (rowIx == -1) return;
+            dgvHeads.Rows[rowIx].Selected = true;
+            doScrollDGV();
+        }
+
         private void doConfirm()
         {
             bool ok = doSaveChanges(true, false);
@@ -186,6 +250,14 @@ namespace ZD.DictEditor
             dgvHeads.Refresh();
         }
 
+        private void doEnterNoEntry()
+        {
+            activeHwd = null;
+            activeStrSenses = null;
+            txtHeadSimp.Text = txtHeadTrad.Text = txtHeadPinyin.Text = "";
+            editor.Clear();
+        }
+
         private void doEnterEntry(DictData.HwData data)
         {
             activeHwd = data;
@@ -195,13 +267,14 @@ namespace ZD.DictEditor
             txtHeadSimp.Text = activeHwd.Simp;
             txtHeadTrad.Text = activeHwd.Trad;
             txtHeadTrad.ForeColor = activeHwd.Simp == activeHwd.Trad ? Color.DarkGray : SystemColors.WindowText;
-            txtHeadPinyin.Text = activeHwd.Pinyin;
-
-            string[] hints = new string[] { "kutya", "kuka", "kukásautó", "karambolprimadonna", "kaka" };
-            editor.TypingHints = hints;
+            txtHeadPinyin.Text = PinyinDisplay.GetPinyinDisplay(activeHwd.Pinyin);
 
             BackboneEntry be = dd.GetBackbone(data.Id);
-            printBackbone(be);
+            doPrintBackbone(be);
+            editor.SetVocabulary(be);
+            editor.FillClassifierIfEmpty(be);
+
+            if (loaded) Settings.ActiveEntryId = activeHwd.Id;
         }
 
         /// <summary>

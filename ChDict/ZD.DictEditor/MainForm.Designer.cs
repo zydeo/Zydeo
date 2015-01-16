@@ -80,9 +80,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlInfo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlInfo.Controls.Add(this.wcInfo);
-            this.pnlInfo.Location = new System.Drawing.Point(232, 256);
+            this.pnlInfo.Location = new System.Drawing.Point(232, 208);
             this.pnlInfo.Name = "pnlInfo";
-            this.pnlInfo.Size = new System.Drawing.Size(708, 352);
+            this.pnlInfo.Size = new System.Drawing.Size(708, 400);
             this.pnlInfo.TabIndex = 2;
             this.pnlInfo.TabStop = true;
             // 
@@ -94,7 +94,7 @@
             this.wcInfo.Location = new System.Drawing.Point(0, 0);
             this.wcInfo.MinimumSize = new System.Drawing.Size(20, 20);
             this.wcInfo.Name = "wcInfo";
-            this.wcInfo.Size = new System.Drawing.Size(706, 350);
+            this.wcInfo.Size = new System.Drawing.Size(706, 398);
             this.wcInfo.TabIndex = 2;
             this.wcInfo.TabStop = false;
             this.wcInfo.WebBrowserShortcutsEnabled = false;
@@ -106,7 +106,7 @@
             this.editor.BackColor = System.Drawing.SystemColors.Control;
             this.editor.Location = new System.Drawing.Point(232, 40);
             this.editor.Name = "editor";
-            this.editor.Size = new System.Drawing.Size(708, 160);
+            this.editor.Size = new System.Drawing.Size(708, 112);
             this.editor.StrSenses = "";
             this.editor.TabIndex = 1;
             // 
@@ -120,6 +120,7 @@
             this.txtHeadSimp.Size = new System.Drawing.Size(132, 33);
             this.txtHeadSimp.TabIndex = 3;
             this.txtHeadSimp.Text = "很好的天很好好";
+            this.txtHeadSimp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // txtHeadTrad
             // 
@@ -131,6 +132,7 @@
             this.txtHeadTrad.Size = new System.Drawing.Size(132, 33);
             this.txtHeadTrad.TabIndex = 4;
             this.txtHeadTrad.Text = "很好的天很好好";
+            this.txtHeadTrad.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // txtHeadPinyin
             // 
@@ -154,7 +156,7 @@
             this.pnlCommands.Controls.Add(this.btnConfirm);
             this.pnlCommands.Controls.Add(this.btnGoogleImg);
             this.pnlCommands.Controls.Add(this.btnGoogleTrans);
-            this.pnlCommands.Location = new System.Drawing.Point(232, 204);
+            this.pnlCommands.Location = new System.Drawing.Point(232, 156);
             this.pnlCommands.Name = "pnlCommands";
             this.pnlCommands.Size = new System.Drawing.Size(708, 46);
             this.pnlCommands.TabIndex = 6;

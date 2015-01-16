@@ -55,7 +55,7 @@ namespace ZD.DictEditor
             {
                 data = value;
                 lblHeadword.Text = value.Simp;
-                lblPinyin.Text = value.Pinyin;
+                lblPinyin.Text = PinyinDisplay.GetPinyinDisplay(value.Pinyin);
                 lblExtract.Text = value.Extract;
                 if (value.Status == DictData.HwStatus.Done) pbStatus.BackgroundImage = bmpStatDone;
                 else if (value.Status == DictData.HwStatus.Edited) pbStatus.BackgroundImage = bmpStatEdited;

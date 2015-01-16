@@ -71,6 +71,12 @@ namespace ZD.DictEditor
             }
         }
 
+        public void Clear()
+        {
+            StrSenses = "";
+            clearHints();
+        }
+
         public bool HasErrors
         {
             get { return !isTextOk(txtEntry.Text); }
@@ -108,18 +114,6 @@ namespace ZD.DictEditor
         }
 
         private string[] hints = new string[0];
-
-        public IEnumerable<string> TypingHints
-        {
-            set
-            {
-                int count = 0;
-                foreach (string str in value) ++count;
-                hints = new string[count];
-                int i = 0;
-                foreach (string str in value) { hints[i] = str; ++i; }
-            }
-        }
 
         private string lastText = string.Empty;
         private int lastCaretPos = -1;
@@ -181,16 +175,6 @@ namespace ZD.DictEditor
                 else break;
             }
             return sb.ToString();
-        }
-
-        private List<string> getHints(string prefix)
-        {
-            List<string> res = new List<string>();
-            if (prefix == string.Empty) return res;
-            foreach (string hint in hints)
-                if (hint.StartsWith(prefix) && hint.Length > prefix.Length)
-                    res.Add(hint);
-            return res;
         }
 
         private void clearHints()
