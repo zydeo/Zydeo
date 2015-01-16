@@ -63,7 +63,7 @@ namespace ZD.DictEditor
 				{
                     string trimmed = trimPunct(xpart);
 					string lo = trimmed.ToLowerInvariant();
-					if (lo != string.Empty) newVocab.Add(lo);
+					if (lo.Length > 2) newVocab.Add(lo);
                 }
 			}
 			if (newVocab.Count != 0) hints = mergeVocab(hints, newVocab);
