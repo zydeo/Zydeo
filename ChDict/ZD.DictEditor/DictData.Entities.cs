@@ -55,6 +55,7 @@ namespace ZD.DictEditor
         public class HwEnumerator : IEnumerator<HwData>
         {
             private readonly ReadOnlyCollection<HwData> hwColl;
+
             private int idx = -1;
 
             public HwEnumerator(ReadOnlyCollection<HwData> hwColl)
@@ -90,16 +91,20 @@ namespace ZD.DictEditor
         public class HwCollection : IList<HwData>
         {
             private readonly ReadOnlyCollection<HwData> hwColl;
+            private ReadOnlyCollection<HwData> filteredHwColl;
+            private string simpFilter = string.Empty;
+            private bool meFilter = false;
 
             public HwCollection(ReadOnlyCollection<HwData> hwColl)
             {
                 this.hwColl = hwColl;
+                filteredHwColl = hwColl;
             }
 
             public int IndexOf(HwData item)
             {
-                for (int i = 0; i != hwColl.Count; ++i)
-                    if (hwColl[i] == item) return i;
+                for (int i = 0; i != filteredHwColl.Count; ++i)
+                    if (filteredHwColl[i] == item) return i;
                 return -1;
             }
 
@@ -115,7 +120,7 @@ namespace ZD.DictEditor
 
             public HwData this[int index]
             {
-                get { return hwColl[index]; }
+                get { return filteredHwColl[index]; }
                 set { throw new NotImplementedException(); }
             }
 
@@ -136,12 +141,12 @@ namespace ZD.DictEditor
 
             public void CopyTo(HwData[] array, int arrayIndex)
             {
-                for (int i = 0; i != hwColl.Count; ++i) array[i + arrayIndex] = hwColl[i];
+                throw new NotImplementedException();
             }
 
             public int Count
             {
-                get { return hwColl.Count; }
+                get { return filteredHwColl.Count; }
             }
 
             public bool IsReadOnly
@@ -156,12 +161,53 @@ namespace ZD.DictEditor
 
             public IEnumerator<HwData> GetEnumerator()
             {
-                return new HwEnumerator(hwColl);
+                return new HwEnumerator(filteredHwColl);
             }
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
             {
-                return new HwEnumerator(hwColl);
+                return new HwEnumerator(filteredHwColl);
+            }
+
+            public void GetStatCounts(out int done, out int editedMarked, out int dropped, out int notStarted)
+            {
+                done = editedMarked = dropped = notStarted = 0;
+                foreach (var hw in hwColl)
+                {
+                    if (hw.Status == HwStatus.Done) ++done;
+                    else if (hw.Status == HwStatus.Dropped) ++dropped;
+                    else if (hw.Status == HwStatus.NotStarted) ++notStarted;
+                    else ++editedMarked;
+                }
+            }
+
+            private void doFilter()
+            {
+                List<HwData> fl = new List<HwData>(hwColl.Count);
+                foreach (HwData data in hwColl)
+                {
+                    if (simpFilter != string.Empty && !data.Simp.Contains(simpFilter))
+                        continue;
+                    if (meFilter && (data.Status != HwStatus.Marked && data.Status != HwStatus.Edited))
+                        continue;
+                    fl.Add(data);
+                }
+                filteredHwColl = new ReadOnlyCollection<HwData>(fl);
+            }
+
+            public void SetSimpFilter(string filter)
+            {
+                simpFilter = filter;
+                doFilter();
+            }
+
+            public bool OnlyMarkedOrEdited
+            {
+                set
+                {
+                    meFilter = value;
+                    doFilter();
+                }
             }
         }
     }

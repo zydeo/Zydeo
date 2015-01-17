@@ -42,6 +42,10 @@ namespace ZD.DictEditor
             btnGoogleTrans.Click += onButtonClick;
             btnGoogleImg.Click += onButtonClick;
 
+            txtFilter.TextChanged += onFilterChanged;
+            cbEdMarked.CheckedChanged += onFilterChanged;
+            llJump.Click += onJump;
+
             // Restore window size and position, unless designing
             if (Process.GetCurrentProcess().ProcessName == "devenv") return;
             Point loc = new Point(Settings.WindowX, Settings.WindowY);
@@ -99,6 +103,7 @@ namespace ZD.DictEditor
             saveWindowSize();
             saveWindowLocation();
             doMoveToId(Settings.ActiveEntryId);
+            doUpdateStatusBar();
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -149,6 +154,8 @@ namespace ZD.DictEditor
                 doLookup(LookupSource.GoogleMT);
             else if (keyData == (Keys.Control | Keys.I))
                 doLookup(LookupSource.GoogleImg);
+            else if (keyData == (Keys.Control | Keys.G))
+                onJump(null, null);
             else if (keyData == (Keys.Control | Keys.Up))
                 doMove(-1);
             else if (keyData == (Keys.Control | Keys.Down))
@@ -156,6 +163,42 @@ namespace ZD.DictEditor
             else
                 return base.ProcessCmdKey(ref msg, keyData);
             return true;
+        }
+
+        private void onFilterChanged(object sender, EventArgs e)
+        {
+            bool txtFilterHadFocus = txtFilter.Focused;
+
+            dd.Headwords.SetSimpFilter(txtFilter.Text);
+            dd.Headwords.OnlyMarkedOrEdited = cbEdMarked.Checked;
+
+            int ix = -1;
+            if (activeHwd != null)
+            {
+                for (int i = 0; i != dd.Headwords.Count; ++i)
+                    if (dd.Headwords[i].Id == activeHwd.Id) { ix = i; break; }
+            }
+            dgvHeads.DataSource = new BindingList<DictData.HwData>(dd.Headwords);
+            if (ix >= 0) dgvHeads.Rows[ix].Selected = true;
+            doScrollDGV();
+
+            if (txtFilterHadFocus) txtFilter.Focus();
+        }
+
+        private void onJump(object sender, EventArgs e)
+        {
+            if (dgvHeads.Rows.Count == 0) return;
+            int start = 0;
+            if (dgvHeads.SelectedRows.Count != 0) start = dgvHeads.SelectedRows[0].Index + 1;
+            for (int i = start; i < dd.Headwords.Count; ++i)
+            {
+                if (dd.Headwords[i].Status == DictData.HwStatus.NotStarted)
+                {
+                    dgvHeads.Rows[i].Selected = true;
+                    break;
+                }
+            }
+            doScrollDGV();
         }
 
         private void onButtonClick(object sender, EventArgs e)
@@ -169,6 +212,7 @@ namespace ZD.DictEditor
 
         private void doScrollDGV()
         {
+            if (dgvHeads.Rows.Count == 0) return;
             int halfWay = (dgvHeads.DisplayedRowCount(false) / 2);
             if (dgvHeads.FirstDisplayedScrollingRowIndex + halfWay > dgvHeads.SelectedRows[0].Index ||
                 (dgvHeads.FirstDisplayedScrollingRowIndex + dgvHeads.DisplayedRowCount(false) - halfWay) <= dgvHeads.SelectedRows[0].Index)
@@ -250,6 +294,16 @@ namespace ZD.DictEditor
             dgvHeads.Refresh();
         }
 
+        private void doUpdateStatusBar()
+        {
+            int done, editedMarked, dropped, notStarted;
+            dd.Headwords.GetStatCounts(out done, out editedMarked, out dropped, out notStarted);
+            float donePercent = ((float)done) * 100F / ((float)(dd.Headwords.Count - dropped));
+            tsLabelDoneVal.Text = done.ToString() + " (" + donePercent.ToString("0.0") + "%)";
+            tsEditedMarkedVal.Text = editedMarked.ToString();
+            tsRemainingVal.Text = notStarted.ToString();
+        }
+
         private void doEnterNoEntry()
         {
             activeHwd = null;
@@ -303,6 +357,7 @@ namespace ZD.DictEditor
                 dd.SaveSenses(activeHwd.Id, newStrSenses, status, dtEditStart, dtNow);
                 dtEditStart = dtNow;
             }
+            doUpdateStatusBar();
             return !hasErrors;
         }
 
