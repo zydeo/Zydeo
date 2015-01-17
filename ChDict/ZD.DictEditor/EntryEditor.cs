@@ -14,6 +14,7 @@ namespace ZD.DictEditor
         public EntryEditor()
         {
             InitializeComponent();
+            txtEntry.LanguageOption = RichTextBoxLanguageOptions.DualFont;
             pnlFrame.SizeChanged += onPanelSizeChanged;
         }
 
@@ -58,12 +59,18 @@ namespace ZD.DictEditor
             get
             {
                 string txt = txtEntry.Text.Replace("\r\n", "\n");
-                return txtEntry.Text.Replace("\n", "/");
+                txt = txt.Replace("/", "//");
+                txt = txt.Replace("\n", "/");
+                return txt;
             }
             set
             {
                 suppressHinting = true;
-                txtEntry.Text = value.Replace("/", "\n");
+                string txt = value;
+                txt = txt.Replace("//", "\ufffe");
+                txt = txt.Replace("/", "\n");
+                txt = txt.Replace("\ufffe", "/");
+                txtEntry.Text = txt;
                 suppressHinting = false;
                 lastText = txtEntry.Text;
                 hints = new string[0];
@@ -94,7 +101,6 @@ namespace ZD.DictEditor
             bool ok = true;
             if (txt.Contains("\r\n\r\n")) ok = false;
             if (txt.Contains("  ")) ok = false;
-            if (txt.Contains("/")) ok = false;
             if (txt.StartsWith(" ") || txt.EndsWith(" ")) ok = false;
             return ok;
         }
