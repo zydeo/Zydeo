@@ -34,7 +34,8 @@ namespace ZD.DictEditor
             txtHeadSimp.BackColor = SystemColors.Window;
             txtHeadTrad.BackColor = SystemColors.Window;
             txtHeadPinyin.BackColor = SystemColors.Window;
-            pnlCommands.SizeChanged += onCommandsSizeChanged;
+            pnlSplit.Panel1.SizeChanged += onCommandsSizeChanged;
+            pnlSplit.SplitterMoved += onSplitterMoved;
 
             btnConfirm.Click += onButtonClick;
             btnMark.Click += onButtonClick;
@@ -48,6 +49,7 @@ namespace ZD.DictEditor
 
             // Restore window size and position, unless designing
             if (Process.GetCurrentProcess().ProcessName == "devenv") return;
+            // -- not designing
             Point loc = new Point(Settings.WindowX, Settings.WindowY);
             Size sz = new Size(Settings.WindowW, Settings.WindowH);
             if (loc.X > 0 && loc.Y > 0 && sz.Width > 0 && sz.Height > 0)
@@ -59,6 +61,7 @@ namespace ZD.DictEditor
             else StartPosition = FormStartPosition.WindowsDefaultLocation;
             if (Settings.WindowStateMaximized)
                 WindowState = FormWindowState.Maximized;
+            pnlSplit.SplitterDistance = Settings.SplitterDist;
         }
 
         static MainForm()
@@ -66,8 +69,19 @@ namespace ZD.DictEditor
             htmlSkeleton = readHtmlSkeleton();
         }
 
+        private void onSplitterMoved(object sender, SplitterEventArgs e)
+        {
+            if (!loaded) return;
+            Settings.SplitterDist = pnlSplit.SplitterDistance;
+        }
+
         private void onCommandsSizeChanged(object sender, EventArgs e)
         {
+            int ofs = pnlSplit.Left - dgvHeads.Right;
+            Size sz = pnlSplit.Panel1.ClientSize;
+            pnlCommands.Location = new Point(0, sz.Height - pnlCommands.Height);
+            pnlCommands.Width = sz.Width;
+
             btnConfirm.Width = pnlCommands.Width / 3;
             btnMark.Left = btnConfirm.Right;
             btnMark.Width = pnlCommands.Width / 3;
@@ -77,6 +91,9 @@ namespace ZD.DictEditor
             btnGoogleTrans.Width = pnlCommands.Width / 2;
             btnGoogleImg.Left = btnGoogleTrans.Right;
             btnGoogleImg.Width = pnlCommands.Width - btnGoogleImg.Left;
+
+            editor.Location = Point.Empty;
+            editor.Size = new Size(sz.Width, sz.Height - pnlCommands.Height - ofs);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -156,6 +173,8 @@ namespace ZD.DictEditor
                 doLookup(LookupSource.GoogleImg);
             else if (keyData == (Keys.Control | Keys.G))
                 onJump(null, null);
+            else if (keyData == (Keys.Control | Keys.F))
+                onFilterIf();
             else if (keyData == (Keys.Control | Keys.Up))
                 doMove(-1);
             else if (keyData == (Keys.Control | Keys.Down))
@@ -183,6 +202,11 @@ namespace ZD.DictEditor
             doScrollDGV();
 
             if (txtFilterHadFocus) txtFilter.Focus();
+        }
+
+        private void onFilterIf()
+        {
+            txtFilter.Text = txtHeadSimp.SelectedText;
         }
 
         private void onJump(object sender, EventArgs e)
@@ -301,6 +325,7 @@ namespace ZD.DictEditor
             float donePercent = ((float)done) * 100F / ((float)(dd.Headwords.Count - dropped));
             tsLabelDoneVal.Text = done.ToString() + " (" + donePercent.ToString("0.0") + "%)";
             tsEditedMarkedVal.Text = editedMarked.ToString();
+            tsDroppedVal.Text = dropped.ToString();
             tsRemainingVal.Text = notStarted.ToString();
         }
 

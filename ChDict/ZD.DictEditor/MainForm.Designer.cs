@@ -46,15 +46,22 @@
             this.tsLabelDoneVal = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsEditedMarked = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsEditedMarkedVal = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tsDropped = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tsDroppedVal = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsRemaining = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsRemainingVal = new System.Windows.Forms.ToolStripStatusLabel();
             this.cbEdMarked = new System.Windows.Forms.CheckBox();
             this.lblPipe = new System.Windows.Forms.Label();
             this.llJump = new System.Windows.Forms.LinkLabel();
+            this.pnlSplit = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(this.dgvHeads)).BeginInit();
             this.pnlInfo.SuspendLayout();
             this.pnlCommands.SuspendLayout();
             this.statStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlSplit)).BeginInit();
+            this.pnlSplit.Panel1.SuspendLayout();
+            this.pnlSplit.Panel2.SuspendLayout();
+            this.pnlSplit.SuspendLayout();
             this.SuspendLayout();
             // 
             // dgvHeads
@@ -71,7 +78,8 @@
             this.dgvHeads.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dgvHeads.ColumnHeadersVisible = false;
             this.dgvHeads.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.dgvHeads.Location = new System.Drawing.Point(4, 40);
+            this.dgvHeads.Location = new System.Drawing.Point(6, 60);
+            this.dgvHeads.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.dgvHeads.MultiSelect = false;
             this.dgvHeads.Name = "dgvHeads";
             this.dgvHeads.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
@@ -82,19 +90,18 @@
             this.dgvHeads.ShowCellToolTips = false;
             this.dgvHeads.ShowEditingIcon = false;
             this.dgvHeads.ShowRowErrors = false;
-            this.dgvHeads.Size = new System.Drawing.Size(224, 548);
+            this.dgvHeads.Size = new System.Drawing.Size(336, 844);
             this.dgvHeads.TabIndex = 0;
             // 
             // pnlInfo
             // 
-            this.pnlInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlInfo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlInfo.Controls.Add(this.wcInfo);
-            this.pnlInfo.Location = new System.Drawing.Point(232, 212);
+            this.pnlInfo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlInfo.Location = new System.Drawing.Point(0, 0);
+            this.pnlInfo.Margin = new System.Windows.Forms.Padding(0);
             this.pnlInfo.Name = "pnlInfo";
-            this.pnlInfo.Size = new System.Drawing.Size(708, 376);
+            this.pnlInfo.Size = new System.Drawing.Size(1060, 480);
             this.pnlInfo.TabIndex = 2;
             this.pnlInfo.TabStop = true;
             // 
@@ -104,21 +111,21 @@
             this.wcInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.wcInfo.IsWebBrowserContextMenuEnabled = false;
             this.wcInfo.Location = new System.Drawing.Point(0, 0);
-            this.wcInfo.MinimumSize = new System.Drawing.Size(20, 20);
+            this.wcInfo.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.wcInfo.MinimumSize = new System.Drawing.Size(30, 31);
             this.wcInfo.Name = "wcInfo";
-            this.wcInfo.Size = new System.Drawing.Size(706, 374);
+            this.wcInfo.Size = new System.Drawing.Size(1058, 478);
             this.wcInfo.TabIndex = 2;
             this.wcInfo.TabStop = false;
             this.wcInfo.WebBrowserShortcutsEnabled = false;
             // 
             // editor
             // 
-            this.editor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.editor.BackColor = System.Drawing.SystemColors.Control;
-            this.editor.Location = new System.Drawing.Point(232, 40);
+            this.editor.Location = new System.Drawing.Point(12, 8);
+            this.editor.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.editor.Name = "editor";
-            this.editor.Size = new System.Drawing.Size(708, 120);
+            this.editor.Size = new System.Drawing.Size(1032, 260);
             this.editor.StrSenses = "";
             this.editor.TabIndex = 1;
             // 
@@ -126,10 +133,11 @@
             // 
             this.txtHeadSimp.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtHeadSimp.Font = new System.Drawing.Font("Noto Sans S Chinese Regular", 12.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.txtHeadSimp.Location = new System.Drawing.Point(232, 4);
+            this.txtHeadSimp.Location = new System.Drawing.Point(348, 6);
+            this.txtHeadSimp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtHeadSimp.Name = "txtHeadSimp";
             this.txtHeadSimp.ReadOnly = true;
-            this.txtHeadSimp.Size = new System.Drawing.Size(132, 33);
+            this.txtHeadSimp.Size = new System.Drawing.Size(197, 46);
             this.txtHeadSimp.TabIndex = 3;
             this.txtHeadSimp.Text = "很好的天很好好";
             this.txtHeadSimp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -138,10 +146,11 @@
             // 
             this.txtHeadTrad.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtHeadTrad.Font = new System.Drawing.Font("Noto Sans T Chinese Regular", 12.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.txtHeadTrad.Location = new System.Drawing.Point(368, 4);
+            this.txtHeadTrad.Location = new System.Drawing.Point(552, 6);
+            this.txtHeadTrad.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtHeadTrad.Name = "txtHeadTrad";
             this.txtHeadTrad.ReadOnly = true;
-            this.txtHeadTrad.Size = new System.Drawing.Size(132, 33);
+            this.txtHeadTrad.Size = new System.Drawing.Size(197, 46);
             this.txtHeadTrad.TabIndex = 4;
             this.txtHeadTrad.Text = "很好的天很好好";
             this.txtHeadTrad.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -152,34 +161,35 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtHeadPinyin.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtHeadPinyin.Font = new System.Drawing.Font("Noto Sans S Chinese Regular", 12.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtHeadPinyin.Location = new System.Drawing.Point(504, 4);
+            this.txtHeadPinyin.Location = new System.Drawing.Point(756, 6);
+            this.txtHeadPinyin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtHeadPinyin.Name = "txtHeadPinyin";
             this.txtHeadPinyin.ReadOnly = true;
-            this.txtHeadPinyin.Size = new System.Drawing.Size(436, 33);
+            this.txtHeadPinyin.Size = new System.Drawing.Size(653, 46);
             this.txtHeadPinyin.TabIndex = 5;
             this.txtHeadPinyin.Text = "hen3 hao3 de5 tian1 hen3 hao3 hao3";
             // 
             // pnlCommands
             // 
-            this.pnlCommands.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlCommands.Controls.Add(this.btnDrop);
             this.pnlCommands.Controls.Add(this.btnMark);
             this.pnlCommands.Controls.Add(this.btnConfirm);
             this.pnlCommands.Controls.Add(this.btnGoogleImg);
             this.pnlCommands.Controls.Add(this.btnGoogleTrans);
-            this.pnlCommands.Location = new System.Drawing.Point(232, 164);
+            this.pnlCommands.Location = new System.Drawing.Point(12, 280);
+            this.pnlCommands.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pnlCommands.Name = "pnlCommands";
-            this.pnlCommands.Size = new System.Drawing.Size(708, 46);
+            this.pnlCommands.Size = new System.Drawing.Size(1032, 71);
             this.pnlCommands.TabIndex = 6;
             // 
             // btnDrop
             // 
             this.btnDrop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDrop.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-            this.btnDrop.Location = new System.Drawing.Point(376, 0);
+            this.btnDrop.Location = new System.Drawing.Point(564, 0);
+            this.btnDrop.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnDrop.Name = "btnDrop";
-            this.btnDrop.Size = new System.Drawing.Size(188, 23);
+            this.btnDrop.Size = new System.Drawing.Size(282, 35);
             this.btnDrop.TabIndex = 4;
             this.btnDrop.Text = "Drop (Cltr+D)";
             this.btnDrop.UseVisualStyleBackColor = true;
@@ -188,9 +198,10 @@
             // 
             this.btnMark.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMark.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnMark.Location = new System.Drawing.Point(188, 0);
+            this.btnMark.Location = new System.Drawing.Point(282, 0);
+            this.btnMark.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnMark.Name = "btnMark";
-            this.btnMark.Size = new System.Drawing.Size(188, 23);
+            this.btnMark.Size = new System.Drawing.Size(282, 35);
             this.btnMark.TabIndex = 3;
             this.btnMark.Text = "Mark (Cltr+M)";
             this.btnMark.UseVisualStyleBackColor = true;
@@ -200,8 +211,9 @@
             this.btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnConfirm.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnConfirm.Location = new System.Drawing.Point(0, 0);
+            this.btnConfirm.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnConfirm.Name = "btnConfirm";
-            this.btnConfirm.Size = new System.Drawing.Size(188, 23);
+            this.btnConfirm.Size = new System.Drawing.Size(282, 35);
             this.btnConfirm.TabIndex = 2;
             this.btnConfirm.Text = "Confirm (Cltr+Enter)";
             this.btnConfirm.UseVisualStyleBackColor = true;
@@ -210,9 +222,10 @@
             // 
             this.btnGoogleImg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGoogleImg.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-            this.btnGoogleImg.Location = new System.Drawing.Point(188, 23);
+            this.btnGoogleImg.Location = new System.Drawing.Point(282, 35);
+            this.btnGoogleImg.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnGoogleImg.Name = "btnGoogleImg";
-            this.btnGoogleImg.Size = new System.Drawing.Size(188, 23);
+            this.btnGoogleImg.Size = new System.Drawing.Size(282, 35);
             this.btnGoogleImg.TabIndex = 1;
             this.btnGoogleImg.Text = "Google Image Search (Cltr+I)";
             this.btnGoogleImg.UseVisualStyleBackColor = true;
@@ -221,9 +234,10 @@
             // 
             this.btnGoogleTrans.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGoogleTrans.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-            this.btnGoogleTrans.Location = new System.Drawing.Point(0, 23);
+            this.btnGoogleTrans.Location = new System.Drawing.Point(0, 35);
+            this.btnGoogleTrans.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnGoogleTrans.Name = "btnGoogleTrans";
-            this.btnGoogleTrans.Size = new System.Drawing.Size(188, 23);
+            this.btnGoogleTrans.Size = new System.Drawing.Size(282, 35);
             this.btnGoogleTrans.TabIndex = 0;
             this.btnGoogleTrans.Text = "Google MT (Cltr+T)";
             this.btnGoogleTrans.UseVisualStyleBackColor = true;
@@ -232,9 +246,10 @@
             // 
             this.txtFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtFilter.Font = new System.Drawing.Font("Noto Sans S Chinese Regular", 12.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.txtFilter.Location = new System.Drawing.Point(5, 5);
+            this.txtFilter.Location = new System.Drawing.Point(8, 8);
+            this.txtFilter.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtFilter.Name = "txtFilter";
-            this.txtFilter.Size = new System.Drawing.Size(127, 33);
+            this.txtFilter.Size = new System.Drawing.Size(190, 46);
             this.txtFilter.TabIndex = 7;
             this.txtFilter.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -245,67 +260,85 @@
             this.tsLabelDoneVal,
             this.tsEditedMarked,
             this.tsEditedMarkedVal,
+            this.tsDropped,
+            this.tsDroppedVal,
             this.tsRemaining,
             this.tsRemainingVal});
-            this.statStrip.Location = new System.Drawing.Point(0, 589);
+            this.statStrip.Location = new System.Drawing.Point(0, 910);
             this.statStrip.Name = "statStrip";
-            this.statStrip.Size = new System.Drawing.Size(944, 22);
+            this.statStrip.Padding = new System.Windows.Forms.Padding(2, 0, 21, 0);
+            this.statStrip.Size = new System.Drawing.Size(1416, 30);
             this.statStrip.TabIndex = 8;
             // 
             // tsLabelDone
             // 
             this.tsLabelDone.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.tsLabelDone.Name = "tsLabelDone";
-            this.tsLabelDone.Size = new System.Drawing.Size(40, 17);
+            this.tsLabelDone.Size = new System.Drawing.Size(62, 25);
             this.tsLabelDone.Text = "Done:";
             // 
             // tsLabelDoneVal
             // 
             this.tsLabelDoneVal.Name = "tsLabelDoneVal";
-            this.tsLabelDoneVal.Size = new System.Drawing.Size(52, 17);
+            this.tsLabelDoneVal.Size = new System.Drawing.Size(82, 25);
             this.tsLabelDoneVal.Text = "145 (1%)";
             // 
             // tsEditedMarked
             // 
             this.tsEditedMarked.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.tsEditedMarked.Name = "tsEditedMarked";
-            this.tsEditedMarked.Size = new System.Drawing.Size(114, 17);
-            this.tsEditedMarked.Text = "Edited and marked:";
+            this.tsEditedMarked.Size = new System.Drawing.Size(143, 25);
+            this.tsEditedMarked.Text = "Edited/marked:";
             // 
             // tsEditedMarkedVal
             // 
             this.tsEditedMarkedVal.Name = "tsEditedMarkedVal";
-            this.tsEditedMarkedVal.Size = new System.Drawing.Size(13, 17);
+            this.tsEditedMarkedVal.Size = new System.Drawing.Size(22, 25);
             this.tsEditedMarkedVal.Text = "3";
+            // 
+            // tsDropped
+            // 
+            this.tsDropped.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.tsDropped.Name = "tsDropped";
+            this.tsDropped.Size = new System.Drawing.Size(91, 25);
+            this.tsDropped.Text = "Dropped:";
+            // 
+            // tsDroppedVal
+            // 
+            this.tsDroppedVal.Name = "tsDroppedVal";
+            this.tsDroppedVal.Size = new System.Drawing.Size(22, 25);
+            this.tsDroppedVal.Text = "4";
             // 
             // tsRemaining
             // 
             this.tsRemaining.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.tsRemaining.Name = "tsRemaining";
-            this.tsRemaining.Size = new System.Drawing.Size(69, 17);
+            this.tsRemaining.Size = new System.Drawing.Size(108, 25);
             this.tsRemaining.Text = "Remaining:";
             // 
             // tsRemainingVal
             // 
             this.tsRemainingVal.Name = "tsRemainingVal";
-            this.tsRemainingVal.Size = new System.Drawing.Size(37, 17);
+            this.tsRemainingVal.Size = new System.Drawing.Size(62, 25);
             this.tsRemainingVal.Text = "12634";
             // 
             // cbEdMarked
             // 
             this.cbEdMarked.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cbEdMarked.Location = new System.Drawing.Point(140, 8);
+            this.cbEdMarked.Location = new System.Drawing.Point(210, 12);
+            this.cbEdMarked.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cbEdMarked.Name = "cbEdMarked";
-            this.cbEdMarked.Size = new System.Drawing.Size(56, 28);
+            this.cbEdMarked.Size = new System.Drawing.Size(84, 43);
             this.cbEdMarked.TabIndex = 9;
             this.cbEdMarked.Text = "E&&M";
             this.cbEdMarked.UseVisualStyleBackColor = true;
             // 
             // lblPipe
             // 
-            this.lblPipe.Location = new System.Drawing.Point(196, 8);
+            this.lblPipe.Location = new System.Drawing.Point(294, 12);
+            this.lblPipe.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPipe.Name = "lblPipe";
-            this.lblPipe.Size = new System.Drawing.Size(8, 24);
+            this.lblPipe.Size = new System.Drawing.Size(12, 37);
             this.lblPipe.TabIndex = 10;
             this.lblPipe.Text = "|";
             this.lblPipe.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -314,31 +347,54 @@
             // 
             this.llJump.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
             this.llJump.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
-            this.llJump.Location = new System.Drawing.Point(208, 8);
+            this.llJump.Location = new System.Drawing.Point(312, 12);
+            this.llJump.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.llJump.Name = "llJump";
-            this.llJump.Size = new System.Drawing.Size(20, 24);
+            this.llJump.Size = new System.Drawing.Size(30, 37);
             this.llJump.TabIndex = 11;
             this.llJump.TabStop = true;
             this.llJump.Text = ">>";
             this.llJump.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // pnlSplit
+            // 
+            this.pnlSplit.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlSplit.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.pnlSplit.Location = new System.Drawing.Point(348, 60);
+            this.pnlSplit.Margin = new System.Windows.Forms.Padding(0);
+            this.pnlSplit.Name = "pnlSplit";
+            this.pnlSplit.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // pnlSplit.Panel1
+            // 
+            this.pnlSplit.Panel1.Controls.Add(this.pnlCommands);
+            this.pnlSplit.Panel1.Controls.Add(this.editor);
+            // 
+            // pnlSplit.Panel2
+            // 
+            this.pnlSplit.Panel2.Controls.Add(this.pnlInfo);
+            this.pnlSplit.Size = new System.Drawing.Size(1060, 844);
+            this.pnlSplit.SplitterDistance = 360;
+            this.pnlSplit.TabIndex = 12;
+            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(944, 611);
+            this.ClientSize = new System.Drawing.Size(1416, 940);
+            this.Controls.Add(this.pnlSplit);
             this.Controls.Add(this.llJump);
             this.Controls.Add(this.lblPipe);
             this.Controls.Add(this.cbEdMarked);
             this.Controls.Add(this.statStrip);
             this.Controls.Add(this.txtFilter);
-            this.Controls.Add(this.pnlCommands);
             this.Controls.Add(this.txtHeadPinyin);
             this.Controls.Add(this.txtHeadTrad);
             this.Controls.Add(this.txtHeadSimp);
-            this.Controls.Add(this.pnlInfo);
-            this.Controls.Add(this.editor);
             this.Controls.Add(this.dgvHeads);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "MainForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Zydeo dictionary editor";
@@ -347,6 +403,10 @@
             this.pnlCommands.ResumeLayout(false);
             this.statStrip.ResumeLayout(false);
             this.statStrip.PerformLayout();
+            this.pnlSplit.Panel1.ResumeLayout(false);
+            this.pnlSplit.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pnlSplit)).EndInit();
+            this.pnlSplit.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -378,6 +438,9 @@
         private System.Windows.Forms.CheckBox cbEdMarked;
         private System.Windows.Forms.Label lblPipe;
         private System.Windows.Forms.LinkLabel llJump;
+        private System.Windows.Forms.ToolStripStatusLabel tsDropped;
+        private System.Windows.Forms.ToolStripStatusLabel tsDroppedVal;
+        private System.Windows.Forms.SplitContainer pnlSplit;
     }
 }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 using ZD.ChDict.Common;
 
@@ -9,10 +10,26 @@ namespace ZD.DictEditor
 {
     partial class EntryEditor
     {
-		private void clearVocabulary()
+        private static string[] domains = new string[]
         {
-            hints = new string[0];
-        }
+            "(szó szerint)",
+            "(kifejezés)",
+            "(vulgáris)",
+            "(tabu)",
+            "(átirat)",
+            "(családnév)",
+            "(keresztnév)",
+            "(földrajzi név)",
+            "(tulajdonnév)",
+        };
+
+        private readonly List<string> zhoHints = new List<string>();
+
+        /// <summary>
+        /// Regex to find Chinese sequences:
+        /// 茶壺|茶壶[cha2 hu2]
+        /// </summary>
+        private Regex reZho = new Regex(@"([\u2e80-\ufff0]+\|[\u2e80-\ufff0]+\[[^\]]+\]|[\u2e80-\ufff0]+\|[\u2e80-\ufff0]+|[\u2e80-\ufff0]+\[[^\]]+\]|\[[^\]]+\])");
 
 		public void SetVocabulary(BackboneEntry be)
         {
@@ -39,6 +56,7 @@ namespace ZD.DictEditor
                 {
                     buildVocabulary(sense.Goog);
                     buildVocabulary(sense.Bing);
+                    buildZhoHints(sense.Orig);
                 }
             }
             tts = be.GetPart(BackbonePart.HanDeDict) as TransTriple[];
@@ -50,6 +68,13 @@ namespace ZD.DictEditor
                     buildVocabulary(sense.Bing);
                 }
             }
+        }
+
+        private void buildZhoHints(string str)
+        {
+            MatchCollection mc = reZho.Matches(str);
+            foreach (Match m in mc)
+                zhoHints.Add(m.Value);
         }
 
         private void buildVocabulary(string str)
@@ -86,6 +111,22 @@ namespace ZD.DictEditor
             return res.ToArray();
         }
 
+        private List<string> getSpecialHints()
+        {
+            List<string> res = new List<string>();
+            string txt = txtEntry.Text;
+            bool domainHint = txtEntry.SelectionStart == 1 && txt == "(";
+            if (!domainHint && txtEntry.SelectionStart > 2 && txt[txtEntry.SelectionStart - 1] == '(' && txt[txtEntry.SelectionStart - 2] == '\n')
+                domainHint = true;
+            if (domainHint) res.AddRange(domains);
+            else
+            {
+                bool zhoHint = txtEntry.SelectionStart > 0 && txt[txtEntry.SelectionStart - 1] == '%';
+                if (zhoHint) res.AddRange(zhoHints);
+            }
+            return res;
+        }
+
         private List<string> getHints(string prefix)
         {
             List<string> res = new List<string>();
@@ -112,6 +153,7 @@ namespace ZD.DictEditor
                 if (hint.StartsWith(lo) && hint.Length > lo.Length)
                     res.Add(adjustHint(hint, firstCap, allCap));
             }
+
             return res;
         }
 

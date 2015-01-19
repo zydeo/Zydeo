@@ -12,6 +12,11 @@ namespace ZD.DictEditor
         public static string GetPinyinDisplay(string pinyin)
         {
             string[] parts = pinyin.Split(new char[] {' '});
+            for (int i = 0; i != parts.Length; ++i)
+            {
+                parts[i] = parts[i].Replace("u:", "v");
+                parts[i] = parts[i].Replace("ü", "v");
+            }
             PinyinSyllable[] pss = new PinyinSyllable[parts.Length];
             for (int i = 0; i != parts.Length; ++i)
             {

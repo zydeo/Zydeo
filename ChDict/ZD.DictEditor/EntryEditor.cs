@@ -72,8 +72,9 @@ namespace ZD.DictEditor
                 txt = txt.Replace("\ufffe", "/");
                 txtEntry.Text = txt;
                 suppressHinting = false;
-                lastText = txtEntry.Text;
+                lastText = lastFullText = txtEntry.Text;
                 hints = new string[0];
+                zhoHints.Clear();
                 UpdateErrorBg();
             }
         }
@@ -122,10 +123,12 @@ namespace ZD.DictEditor
         private string[] hints = new string[0];
 
         private string lastText = string.Empty;
+        private string lastFullText = string.Empty;
         private int lastCaretPos = -1;
         private readonly List<Label> hintLabels = new List<Label>();
         private int activeHintIx = -1;
         private bool suppressHinting = false;
+        private bool hintReplacesFirstChar = false;
 
         private void updateHints()
         {
@@ -133,6 +136,7 @@ namespace ZD.DictEditor
             {
                 clearHints();
                 lastText = string.Empty;
+                lastFullText = txtEntry.Text;
                 if (txtEntry.SelectionLength == 0) lastCaretPos = txtEntry.SelectionStart;
                 else lastCaretPos = -1;
                 return;
@@ -144,6 +148,7 @@ namespace ZD.DictEditor
             {
                 clearHints();
                 lastText = txtEntry.Text.Substring(0, caretPos);
+                lastFullText = txtEntry.Text;
                 lastCaretPos = caretPos;
                 return;
             }
@@ -153,6 +158,9 @@ namespace ZD.DictEditor
             string currTextStart = txtEntry.Text.Substring(0, txtEntry.SelectionStart);
             bool typedOne = lastText.Length == currTextStart.Length - 1 && currTextStart.StartsWith(lastText);
             bool deletedOne = lastText.Length == currTextStart.Length + 1 && lastText.StartsWith(currTextStart);
+            int currFullLength = txtEntry.Text.Length;
+            bool fullOneDiff = currFullLength == lastFullText.Length - 1 || currFullLength == lastFullText.Length + 1;
+            lastFullText = txtEntry.Text;
             bool rightOk = typedOne || deletedOne;
             if (rightOk)
             {
@@ -160,10 +168,17 @@ namespace ZD.DictEditor
                 if (currTextStart.Length < txtEntry.TextLength) chr = txtEntry.Text[currTextStart.Length];
                 rightOk = chr == ' ' || chr == '\n' || char.IsPunctuation(chr);
             }
-            if ((typedOne || deletedOne) && rightOk)
+            if ((typedOne || deletedOne) && fullOneDiff && rightOk)
             {
                 string prefix = getPrefix(currTextStart);
-                List<string> hintsToShow = getHints(prefix);
+                List<string> hintsToShow;
+                hintReplacesFirstChar = false;
+                if (prefix.Length != 0 && prefix != "%") hintsToShow = getHints(prefix);
+                else
+                {
+                    hintsToShow = getSpecialHints();
+                    hintReplacesFirstChar = true;
+                }
                 showHints(hintsToShow);
             }
             else clearHints();
@@ -177,7 +192,7 @@ namespace ZD.DictEditor
             for (int i = txt.Length - 1; i >= 0; --i)
             {
                 char c = txt[i];
-                if (char.IsLetterOrDigit(c)) sb.Insert(0, c);
+                if (char.IsLetterOrDigit(c) || c == '%') sb.Insert(0, c);
                 else break;
             }
             return sb.ToString();
@@ -291,10 +306,18 @@ namespace ZD.DictEditor
 
         private void pasteHint(string txt)
         {
-            string currTextStart = txtEntry.Text.Substring(0, txtEntry.SelectionStart);
-            string prefix = getPrefix(currTextStart);
-            txt = txt.Substring(prefix.Length);
-            txtEntry.SelectedText = txt;
+            if (!hintReplacesFirstChar)
+            {
+                string currTextStart = txtEntry.Text.Substring(0, txtEntry.SelectionStart);
+                string prefix = getPrefix(currTextStart);
+                txt = txt.Substring(prefix.Length);
+                txtEntry.SelectedText = txt;
+            }
+            else
+            {
+                txtEntry.Select(txtEntry.SelectionStart - 1, 1);
+                txtEntry.SelectedText = txt;
+            }
             clearHints();
         }
 

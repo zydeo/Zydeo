@@ -20,6 +20,7 @@ namespace ZD.DictEditor
             public int WindowH = -1;
             public int WindowX = -1;
             public int WindowY = -1;
+            public int SplitterDist = 360;
         }
 
         /// <summary>
@@ -150,6 +151,12 @@ namespace ZD.DictEditor
         {
             get { return Data.WindowH; }
             set { Data.WindowH = value; saveData(); }
+        }
+
+        public static int SplitterDist
+        {
+            get { return Data.SplitterDist; }
+            set { Data.SplitterDist = value; saveData(); }
         }
     }
 }
