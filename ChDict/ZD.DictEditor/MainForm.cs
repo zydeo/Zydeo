@@ -414,7 +414,7 @@ namespace ZD.DictEditor
             if (ls == LookupSource.GoogleMT)
                 url = "https://translate.google.com/#zh-CN/hu/" + activeHwd.Simp;
             else
-                url = "https://www.google.com/search?q=" + activeHwd.Simp  + "&tbm=isch";
+                url = "https://www.google.com/search?q='" + activeHwd.Simp + "'+site:CN+OR+site:TW&tbm=isch&tbm=isch";
             Process.Start(url);
         }
     }
