@@ -19,7 +19,7 @@ namespace ZD.Gui
         /// </summary>
         static FontPool()
         {
-            fonts.AddFontFile("ukai.ttc");
+            fonts.AddFontFile("ukaitw.ttf");
         }
 
         /// <summary>

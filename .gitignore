@@ -24,7 +24,9 @@ _work/*
 !_work/*.txt
 !_work/*.u8
 !_work/charstats.xlsx
+!_work/fnt-coverage.xlsx
 !_work/*.ttc
+!_work/*.ttf
 !_work/*.bin
 
 _work_chdict_prepare/*
