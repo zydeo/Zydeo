@@ -16,9 +16,9 @@ namespace ZD.FontTest
         {
             //string currDir = Directory.GetCurrentDirectory();
             //string fontFile = Path.Combine(currDir, @"hdzb_75.TTF");
-            //FontCoverage.CheckCoverage(fontFile, "fnt-hdzb_75-coverage.txt");
+            //FontCoverage.CheckCoverage(fontFile, "fnt-simp-coverage.txt");
             //string fontFile = Path.Combine(currDir, @"ukaitw.TTF");
-            //FontCoverage.CheckCoverage(fontFile, "fnt-ukaitw-coverage.txt");
+            //FontCoverage.CheckCoverage(fontFile, "fnt-trad-coverage.txt");
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
