@@ -16,6 +16,15 @@ namespace ZD.CedictEngine
     public partial class CedictCompiler
     {
         /// <summary>
+        /// Simplified character coverage, or null if we don't filter.
+        /// </summary>
+        private readonly HashSet<char> covSimp;
+
+        /// <summary>
+        /// Simplified character coverage, or null if we don't filter.
+        /// </summary>
+        private readonly HashSet<char> covTrad;
+        /// <summary>
         /// Current line number, so we can indicate errors/warnings
         /// </summary>
         private int lineNum = 0;
@@ -60,8 +69,11 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Ctor: initialize.
         /// </summary>
-        public CedictCompiler()
+        public CedictCompiler(HashSet<char> covSimp, HashSet<char> covTrad)
         {
+            this.covSimp = covSimp;
+            this.covTrad = covTrad;
+
             // At this stage, index will have been initialized in-line.
             // I can refer to its word holder to initialize my tokenizer.
             tokenizer = new Tokenizer(index.WordHolder);
@@ -70,7 +82,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Parses an entry (line) that has been separated into headword and rest.
         /// </summary>
-        private CedictEntry parseEntry(string strHead, string strBody, StreamWriter logStream)
+        private CedictEntry parseEntry(string strHead, string strBody, StreamWriter logStream, StreamWriter logDropped)
         {
             // Decompose head
             Match hm = reHead.Match(strHead);
@@ -81,6 +93,11 @@ namespace ZD.CedictEngine
                 logStream.WriteLine(msg);
                 return null;
             }
+
+            // If we're checking against glyph coverage, skip if not covered
+            if (!checkCoverage(strHead, hm.Groups[1].Value, hm.Groups[2].Value, strBody, logDropped))
+                return null;
+
             // Split pinyin by spaces
             string[] pinyinParts = hm.Groups[3].Value.Split(new char[] { ' ' });
 
@@ -163,6 +180,40 @@ namespace ZD.CedictEngine
                 new ReadOnlyCollection<CedictSense>(cedictSenses),
                 hanziToPinyin);
             return res;
+        }
+
+        private bool checkCoverage(string head, string trad, string simp, string body, StreamWriter logDropped)
+        {
+            bool simpOk = true;
+            bool tradOk = true;
+            if (covSimp != null)
+            {
+                foreach (char c in simp)
+                {
+                    if (!covSimp.Contains(c))
+                    {
+                        simpOk = false;
+                        break;
+                    }
+                }
+            }
+            if (covTrad != null)
+            {
+                foreach (char c in trad)
+                {
+                    if (!covTrad.Contains(c))
+                    {
+                        tradOk = false;
+                        break;
+                    }
+                }
+            }
+            if (simpOk && tradOk) return true;
+            string logLine = tradOk ? "1 " : "0 ";
+            logLine += simpOk ? "1 " : "0 ";
+            logLine += head + " " + body;
+            logDropped.WriteLine(logLine);
+            return false;
         }
 
         /// <summary>
@@ -267,7 +318,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Processes one line of the text-based Cedict input file.
         /// </summary>
-        public void ProcessLine(string line, StreamWriter logStream)
+        public void ProcessLine(string line, StreamWriter logStream, StreamWriter logDropped)
         {
             // Must not parse new lines once results have been written
             if (resultsWritten) throw new Exception("WriteResults already called, cannot parse additional lines.");
@@ -284,7 +335,7 @@ namespace ZD.CedictEngine
             string strHead = line.Substring(0, firstSlash).Trim();
             string strBody = line.Substring(firstSlash + 1).Trim(new char[] { ' ', '/' });
             // Parse entry. If failed, we be done here.
-            CedictEntry entry = parseEntry(strHead, strBody, logStream);
+            CedictEntry entry = parseEntry(strHead, strBody, logStream, logDropped);
             if (entry == null) return;
             // Store and index entry
             int id = entries.Count;
