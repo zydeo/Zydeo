@@ -24,14 +24,16 @@ namespace ZD.FontTest
         public readonly Font Font;
         public readonly float VertOfs;
         public readonly float HorizOfs;
-        public readonly float DisplaySize;
+        public readonly float DisplayWidth;
+        public readonly float DisplayHeight;
 
-        internal FontTray(Font font, float vertOfs, float horizOfs, float displaySize)
+        internal FontTray(Font font, float vertOfs, float horizOfs, float displayWidth, float displayHeight)
         {
             Font = font;
             VertOfs = vertOfs;
             HorizOfs = horizOfs;
-            DisplaySize = displaySize;
+            DisplayWidth = displayWidth;
+            DisplayHeight = displayHeight;
         }
     }
 
@@ -85,13 +87,21 @@ namespace ZD.FontTest
             foreach (FontFamily ff in fonts.Families)
             {
                 if (ifont == IdeoFont.ArphicKai && stfont == SimpTradFont.Trad && ff.Name == "AR PL UKai TW")
-                    res = new FontTray(new Font(ff, size, style), -0.08798828125F * height, 0, height);
+                    res = new FontTray(
+                        new Font(ff, size, style), -0.08798828125F * height, -0.05F,
+                        height * 0.9F, height);
                 else if (ifont == IdeoFont.ArphicKai && stfont == SimpTradFont.Simp && ff.Name == "䡡湄楮札䍓ⵆ潮瑳")
-                    res = new FontTray(new Font(ff, size, style), 0, 0, height);
+                    res = new FontTray(
+                        new Font(ff, size, style), 0, -0.05F,
+                        height * 0.9F, height);
                 else if (ifont == IdeoFont.Noto && stfont == SimpTradFont.Trad && ff.Name == "Noto Sans T Chinese Light")
-                    res = new FontTray(new Font(ff, size * 0.85F, style), height * 0.075F, height * 0.075F, height);
+                    res = new FontTray(
+                        new Font(ff, size * 0.85F, style), height * 0.075F, height * 0.025F,
+                        height * 0.9F, height);
                 else if (ifont == IdeoFont.Noto && stfont == SimpTradFont.Simp && ff.Name == "Noto Sans S Chinese Regular")
-                    res = new FontTray(new Font(ff, size * 0.85F, style), height * 0.075F, height * 0.075F, height);
+                    res = new FontTray(
+                        new Font(ff, size * 0.85F, style), height * 0.075F, height * 0.025F,
+                        height * 0.9F, height);
                 if (res != null) break;
             }
             return res;

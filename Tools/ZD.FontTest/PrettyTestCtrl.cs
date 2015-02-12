@@ -67,7 +67,7 @@ namespace ZD.FontTest
             {
                 string chr = txt.Substring(i, 1);
                 g.DrawString(chr, ft.Font, b, new PointF(x + ft.HorizOfs, y), sf);
-                x += ft.DisplaySize;
+                x += ft.DisplayWidth;
             }
         }
 
@@ -93,16 +93,16 @@ namespace ZD.FontTest
             {
                 float x = 0;
                 drawHanzi(g, txtSimp, fntSimpA, new PointF(x, 0), b, sf);
-                x += ((float)txtSimp.Length) * fntSimpA.DisplaySize;
+                x += ((float)txtSimp.Length) * fntSimpA.DisplayWidth;
                 g.DrawString(txtLatn, fntLatn, b, new PointF(x, 0), sf);
                 x += g.MeasureString(txtLatn, fntLatn, 65535, sf).Width;
                 drawHanzi(g, txtTrad, fntTradA, new PointF(x, 0), b, sf);
-                x += ((float)txtTrad.Length) * fntTradA.DisplaySize;
+                x += ((float)txtTrad.Length) * fntTradA.DisplayWidth;
                 g.DrawString(txtLatn, fntLatn, b, new PointF(x, 0), sf);
                 x += g.MeasureString(txtLatn, fntLatn, 65535, sf).Width;
 
                 drawHanzi(g, txtSimp, fntSimpN, new PointF(x, 0), b, sf);
-                x += ((float)txtSimp.Length) * fntSimpN.DisplaySize;
+                x += ((float)txtSimp.Length) * fntSimpN.DisplayWidth;
                 g.DrawString(txtLatn, fntLatn, b, new PointF(x, 0), sf);
                 x += g.MeasureString(txtLatn, fntLatn, 65535, sf).Width;
                 drawHanzi(g, txtTrad, fntTradN, new PointF(x, 0), b, sf);
