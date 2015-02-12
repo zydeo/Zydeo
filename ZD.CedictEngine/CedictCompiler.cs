@@ -94,7 +94,7 @@ namespace ZD.CedictEngine
                 return null;
             }
 
-            // If we're checking against glyph coverage, skip if not covered
+            // If we're checking against glyph coverage, skip if not covered in *traditional* font
             if (!checkCoverage(strHead, hm.Groups[1].Value, hm.Groups[2].Value, strBody, logDropped))
                 return null;
 
@@ -208,11 +208,16 @@ namespace ZD.CedictEngine
                     }
                 }
             }
-            if (simpOk && tradOk) return true;
-            string logLine = tradOk ? "1 " : "0 ";
-            logLine += simpOk ? "1 " : "0 ";
-            logLine += head + " " + body;
-            logDropped.WriteLine(logLine);
+            // Log if at least one font does not cover character
+            if (!simpOk || !tradOk)
+            {
+                string logLine = tradOk ? "1 " : "0 ";
+                logLine += simpOk ? "1 " : "0 ";
+                logLine += head + " " + body;
+                logDropped.WriteLine(logLine);
+            }
+            // Drop only if not even traditional font covers it
+            if (tradOk) return true;
             return false;
         }
 

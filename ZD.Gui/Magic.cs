@@ -82,12 +82,6 @@ namespace ZD.Gui
         public readonly static string SearchLangZho = "中";
 
         /// <summary>
-        /// Character used to measure genuine visual rectangle of Hanzi characters in a font.
-        /// </summary>
-        /// <remarks>This character is very tall and pretty wide. Oh beautiful life.</remarks>
-        public readonly static string HanziMeasureTestChar = "蠹";
-
-        /// <summary>
         /// Font family for hard-wired texts on buttons next to search input field.
         /// </summary>
         /// <remars>
@@ -106,12 +100,7 @@ namespace ZD.Gui
         /// <summary>
         /// Font family for Hanzi in lookup results and char picker: simplified.
         /// </summary>
-        public static readonly string ZhoSimpContentFontFamily = "AR PL UKai CN";
-
-        /// <summary>
-        /// Font family for Hanzi in lookup results and char picker: traditional.
-        /// </summary>
-        public static readonly string ZhoTradContentFontFamily = "AR PL UKai CN";
+        public static readonly IdeoFamily ZhoContentFontFamily = IdeoFamily.ArphicKai;
 
         /// <summary>
         /// Font size for Hanzi heading in each displayed dictionary entry. Also in character picker.
@@ -135,7 +124,7 @@ namespace ZD.Gui
         /// <para>Depends on specific Latin and Hanzi font families used.</para>
         /// <para>Also double-check <see cref="OneResultControl.getTargetHanziOfs"/> when changing.</para>
         /// </remarks>
-        public static readonly float LemmaHanziScale = 1.3F;
+        public static readonly float LemmaHanziFontSize = 15.6F;
 
         /// <summary>
         /// Line height is font size (in pixels) times this.

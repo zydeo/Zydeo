@@ -230,15 +230,9 @@ namespace ZD.Gui
         /// </summary>
         static OneResultControl()
         {
-            fntArr[fntZhoHeadSimp] = FontPool.GetFont(Magic.ZhoSimpContentFontFamily, Magic.ZhoResultFontSize, FontStyle.Regular);
-            fntArr[fntZhoHeadTrad] = FontPool.GetFont(Magic.ZhoTradContentFontFamily, Magic.ZhoResultFontSize, FontStyle.Regular);
             fntArr[fntPinyinHead] = new Font(Magic.PinyinFontFamily, Magic.PinyinFontSize, FontStyle.Bold);
             fntArr[fntSenseLatin] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize);
-            fntArr[fntSenseHanziSimp] = FontPool.GetFont(Magic.ZhoSimpContentFontFamily, Magic.LemmaFontSize * Magic.LemmaHanziScale, FontStyle.Regular);
-            fntArr[fntSenseHanziTrad] = FontPool.GetFont(Magic.ZhoTradContentFontFamily, Magic.LemmaFontSize * Magic.LemmaHanziScale, FontStyle.Regular);
             fntArr[fntMetaLatin] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize, FontStyle.Italic);
-            fntArr[fntMetaHanziSimp] = FontPool.GetFont(Magic.ZhoSimpContentFontFamily, Magic.LemmaFontSize * Magic.LemmaHanziScale, FontStyle.Italic);
-            fntArr[fntMetaHanziTrad] = FontPool.GetFont(Magic.ZhoTradContentFontFamily, Magic.LemmaFontSize * Magic.LemmaHanziScale, FontStyle.Italic);
             fntArr[fntSenseId] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize * 0.8F);
 
             // Sense ID strings

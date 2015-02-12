@@ -27,6 +27,7 @@ _work/*
 !_work/fnt-coverage.xlsx
 !_work/*.ttc
 !_work/*.ttf
+!_work/*.otf
 !_work/*.bin
 
 _work_chdict_prepare/*

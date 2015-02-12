@@ -23,7 +23,6 @@ namespace ZD.Gui
                 return;
 
             g.SmoothingMode = SmoothingMode.None;
-            var si = HanziMeasure.Instance.GetMeasures(Magic.ZhoSimpContentFontFamily, Magic.ZhoResultFontSize);
             HeadBlock hb;
             RectangleF rect;
             // Width of gradient
@@ -39,19 +38,19 @@ namespace ZD.Gui
                     for (int ix = res.HanziHiliteStart; ix != res.HanziHiliteStart + res.HanziHiliteLength; ++ix)
                     {
                         hb = headInfo.SimpBlocks[ix];
-                        rect = new RectangleF(hb.Loc.X, hb.Loc.Y, hb.Size.Width, si.RealRect.Height);
+                        rect = new RectangleF(hb.Loc.X, hb.Loc.Y, hb.Size.Width, hb.Size.Height);
                         g.FillRectangle(b, rect);
                     }
                     // First and last chars get gradient on left and right
                     hb = headInfo.SimpBlocks[res.HanziHiliteStart];
-                    rect = new RectangleF(hb.Loc.X, hb.Loc.Y, gradw, si.RealRect.Height);
+                    rect = new RectangleF(hb.Loc.X, hb.Loc.Y, gradw, hb.Size.Height);
                     rect.X -= gradext;
                     using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, Magic.HiliteColor, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lgb, rect);
                     }
                     hb = headInfo.SimpBlocks[res.HanziHiliteStart + res.HanziHiliteLength - 1];
-                    rect = new RectangleF(hb.Loc.X + hb.Size.Width, hb.Loc.Y, gradw, si.RealRect.Height);
+                    rect = new RectangleF(hb.Loc.X + hb.Size.Width, hb.Loc.Y, gradw, hb.Size.Height);
                     rect.X += gradext;
                     rect.X -= gradw;
                     using (LinearGradientBrush lgb = new LinearGradientBrush(rect, Magic.HiliteColor, bgcol, LinearGradientMode.Horizontal))
@@ -66,19 +65,19 @@ namespace ZD.Gui
                     for (int ix = res.HanziHiliteStart; ix != res.HanziHiliteStart + res.HanziHiliteLength; ++ix)
                     {
                         hb = headInfo.TradBlocks[ix];
-                        rect = new RectangleF(hb.Loc.X, hb.Loc.Y, hb.Size.Width, si.RealRect.Height);
+                        rect = new RectangleF(hb.Loc.X, hb.Loc.Y, hb.Size.Width, hb.Size.Height);
                         g.FillRectangle(b, rect);
                     }
                     // First and last chars get gradient on left and right
                     hb = headInfo.TradBlocks[res.HanziHiliteStart];
-                    rect = new RectangleF(hb.Loc.X, hb.Loc.Y, gradw, si.RealRect.Height);
+                    rect = new RectangleF(hb.Loc.X, hb.Loc.Y, gradw, hb.Size.Height);
                     rect.X -= gradext;
                     using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, Magic.HiliteColor, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lgb, rect);
                     }
                     hb = headInfo.TradBlocks[res.HanziHiliteStart + res.HanziHiliteLength - 1];
-                    rect = new RectangleF(hb.Loc.X + hb.Size.Width, hb.Loc.Y, gradw, si.RealRect.Height);
+                    rect = new RectangleF(hb.Loc.X + hb.Size.Width, hb.Loc.Y, gradw, hb.Size.Height);
                     rect.X += gradext;
                     rect.X -= gradw;
                     using (LinearGradientBrush lgb = new LinearGradientBrush(rect, Magic.HiliteColor, bgcol, LinearGradientMode.Horizontal))
@@ -177,14 +176,10 @@ namespace ZD.Gui
         private float getTargetHanziOfs()
         {
             if (targetHanziOfs != 0) return targetHanziOfs;
-            // Calculate on demand
-            Font myFontZho = getFont(fntSenseHanziSimp);
-            var sizeInfo = HanziMeasure.Instance.GetMeasures(myFontZho.Name, myFontZho.Size);
-            float hanziMidY = sizeInfo.RealRect.Top + sizeInfo.RealRect.Height / 2.0F;
-            Font myFontLatn = getFont(fntSenseLatin);
-            FontFamily ffLatn = myFontLatn.FontFamily;
-            float latinMidY = getFont(fntSenseLatin).Height * 0.55F; // Tweak when Latin font changes
-            targetHanziOfs = latinMidY - hanziMidY;
+            // Calculate on demand.
+            // TO-DO: should include Latin font's baseline!
+            // This way it varies with Latin font.
+            targetHanziOfs = Magic.LemmaFontSize * Scale * 0.05F;
             return targetHanziOfs;
         }
 
@@ -255,8 +250,22 @@ namespace ZD.Gui
                         }
                         if (isHanzi) g.TextRenderingHint = TextRenderingHint.AntiAlias;
                         else g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                        g.DrawString(textPool.GetString(block.TextPos), getFont(block.FontIdx),
-                            brush, pb.LocX, pb.LocY + vOfs, sf);
+                        // Not a hanzi range (by font ID)
+                        if (block.FontIdx == fntSenseLatin || block.FontIdx == fntMetaLatin)
+                        {
+                            g.DrawString(textPool.GetString(block.TextPos), getFont(block.FontIdx),
+                                brush, pb.LocX, pb.LocY, sf);
+                        }
+                        // Hanzi range
+                        else
+                        {
+                            IdeoScript script = block.FontIdx == fntMetaHanziSimp || block.FontIdx == fntSenseHanziSimp
+                                ? IdeoScript.Simp : IdeoScript.Trad;
+                            bool meta = block.FontIdx == fntMetaHanziSimp || block.FontIdx == fntMetaHanziTrad;
+                            FontStyle fntStyle = meta ? FontStyle.Italic : FontStyle.Regular;
+                            HanziRenderer.DrawString(g, textPool.GetString(block.TextPos), new PointF(pb.LocX, pb.LocY + vOfs),
+                                brush, Magic.ZhoContentFontFamily, script, Magic.LemmaHanziFontSize, fntStyle);
+                        }
                     }
                 }
             }
@@ -390,13 +399,15 @@ namespace ZD.Gui
                 foreach (HeadBlock hb in headInfo.SimpBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X, hb.Loc.Y);
-                    g.DrawString(hb.Char.ToString(), getFont(fntZhoHeadSimp), bnorm, loc, sf);
+                    HanziRenderer.DrawString(g, hb.Char.ToString(), loc, bnorm, Magic.ZhoContentFontFamily,
+                        IdeoScript.Simp, Magic.ZhoResultFontSize, FontStyle.Regular);
                 }
                 foreach (HeadBlock hb in headInfo.TradBlocks)
                 {
                     PointF loc = new PointF(hb.Loc.X, hb.Loc.Y);
                     Brush b = hb.Faded ? bfade : bnorm;
-                    g.DrawString(hb.Char.ToString(), getFont(fntZhoHeadTrad), b, loc, sf);
+                    HanziRenderer.DrawString(g, hb.Char.ToString(), loc, b, Magic.ZhoContentFontFamily,
+                        IdeoScript.Trad, Magic.ZhoResultFontSize, FontStyle.Regular);
                 }
                 // Pinyin
                 using (SolidBrush bhilite = new SolidBrush(Magic.HiliteColor))

@@ -148,7 +148,8 @@ namespace ZD.Gui
 
             // Character picker control under writing pad.
             ctrlCharPicker = new CharPicker(this, tprov);
-            ctrlCharPicker.FontFace = searchScript == SearchScript.Traditional ? Magic.ZhoTradContentFontFamily : Magic.ZhoSimpContentFontFamily;
+            ctrlCharPicker.FontFam = Magic.ZhoContentFontFamily;
+            ctrlCharPicker.FontScript = searchScript == SearchScript.Traditional ? IdeoScript.Trad : IdeoScript.Simp;
             ctrlCharPicker.RelLocation = new Point(padding, btnClearWritingPad.RelBottom + padding);
             ctrlCharPicker.LogicalSize = new Size(200, 80);
             ctrlCharPicker.CharPicked += onCharPicked;
@@ -159,8 +160,9 @@ namespace ZD.Gui
             ctrlSearchInput.StartSearch += onStartSearch;
 
             // Tweaks for Chinese text on UI buttons
-            var siZho = HanziMeasure.Instance.GetMeasures(Magic.ZhoButtonFontFamily, Magic.ZhoButtonFontSize);
-            float ofsZho = -siZho.RealRect.Top;
+            //var siZho = HanziMeasure.Instance.GetMeasures(Magic.ZhoButtonFontFamily, Magic.ZhoButtonFontSize);
+            //float ofsZho = -siZho.RealRect.Top;
+            float ofsZho = 0;
 
             // Script selector button to the right of search input control
             btnSimpTrad = new ZenGradientButton(this);
@@ -168,7 +170,7 @@ namespace ZD.Gui
             btnSimpTrad.Height = ctrlSearchInput.Height;
             btnSimpTrad.SetFont(Magic.ZhoButtonFontFamily, Magic.ZhoButtonFontSize);
             btnSimpTrad.Width = getSimpTradWidth();
-            btnSimpTrad.ForcedCharHeight = siZho.RealRect.Height;
+            //btnSimpTrad.ForcedCharHeight = siZho.RealRect.Height;
             btnSimpTrad.ForcedCharVertOfs = ofsZho;
             btnSimpTrad.RelLeft = Width - padding - btnSimpTrad.Width;
             btnSimpTrad.Height = ctrlSearchInput.Height;
@@ -180,7 +182,7 @@ namespace ZD.Gui
             btnSearchLang.Height = ctrlSearchInput.Height;
             btnSearchLang.SetFont(Magic.ZhoButtonFontFamily, Magic.ZhoButtonFontSize);
             btnSearchLang.Width = getSearchLangWidth();
-            btnSearchLang.ForcedCharHeight = siZho.RealRect.Height;
+            //btnSearchLang.ForcedCharHeight = siZho.RealRect.Height;
             btnSearchLang.ForcedCharVertOfs = ofsZho;
             btnSearchLang.RelLeft = btnSimpTrad.RelLeft - padding - btnSearchLang.Width;
             btnSearchLang.Height = ctrlSearchInput.Height;
@@ -511,8 +513,7 @@ namespace ZD.Gui
             simpTradChanged();
             // Change character picker's font
             // Only if it really changes - triggers calibration
-            string newCPFont = searchScript == SearchScript.Traditional ? Magic.ZhoTradContentFontFamily : Magic.ZhoSimpContentFontFamily;
-            if (newCPFont != ctrlCharPicker.FontFace) ctrlCharPicker.FontFace = newCPFont;
+            ctrlCharPicker.FontScript = searchScript == SearchScript.Traditional ? IdeoScript.Trad : IdeoScript.Simp;
             // Re-recognize strokes, if there are any
             startNewCharRecog(writingPad.Strokes);
         }

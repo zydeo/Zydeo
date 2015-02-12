@@ -85,9 +85,19 @@ namespace ZD.Gui
         private char[] items = new char[0];
 
         /// <summary>
-        /// Font face to draw characters.
+        /// Font family to draw characters.
         /// </summary>
-        private string fontFace = Magic.ZhoSimpContentFontFamily;
+        private IdeoFamily fontFam = Magic.ZhoContentFontFamily;
+
+        /// <summary>
+        /// Drawing simplified or traditional characters.
+        /// </summary>
+        private IdeoScript fontScript = IdeoScript.Simp;
+
+        /// <summary>
+        /// Font size, as determined by calibration.
+        /// </summary>
+        private float fontSize = 0;
 
         /// <summary>
         /// Lock object to access character rectangles.
@@ -115,11 +125,6 @@ namespace ZD.Gui
         float charOfsY;
 
         /// <summary>
-        /// Actual font for drawing characters.
-        /// </summary>
-        private Font font;
-
-        /// <summary>
         /// Ctor: take parent.
         /// </summary>
         public CharPicker(ZenControl owner, ITextProvider tprov)
@@ -128,15 +133,25 @@ namespace ZD.Gui
             this.tprov = tprov;
             charRects = new List<CharRect>();
             for (int i = 0; i != 10; ++i) charRects.Add(new CharRect());
+            calibrateFont();
         }
 
         /// <summary>
-        /// Gets or sets the font face for drawing characters.
+        /// Gets or sets the font family for drawing characters.
         /// </summary>
-        public string FontFace
+        public IdeoFamily FontFam
         {
-            get { return fontFace; }
-            set { fontFace = value; calibrateFont(); }
+            get { return fontFam; }
+            set { fontFam = value; calibrateFont(); }
+        }
+
+        /// <summary>
+        /// Gets or sets the script being used (simplified or traditional).
+        /// </summary>
+        public IdeoScript FontScript
+        {
+            get { return fontScript; }
+            set { fontScript = value; }
         }
 
         /// <summary>
@@ -144,7 +159,6 @@ namespace ZD.Gui
         /// </summary>
         public override void Dispose()
         {
-            if (font != null) font.Dispose();
             base.Dispose();
         }
 
@@ -191,7 +205,7 @@ namespace ZD.Gui
         private void calibrateFont()
         {
             float width = Width;
-            float fontSize = 10.0F;
+            fontSize = 10.0F;
 
             // Measuring artefacts
             using (Bitmap bmp = new Bitmap(1, 1))
@@ -203,27 +217,20 @@ namespace ZD.Gui
                 // Keep growing font until we reach a comfortable width
                 while (true)
                 {
-                    //using (Font fnt = FontPool.GetFont(fontFace, fontSize, FontStyle.Regular))
-                    //{
-                    //    charSize = g.MeasureString("中", fnt, 65535, sf);
-                    //}
-                    //if (charSize.Width * 5.0F >= width * 0.8F) break;
-                    var xsi = HanziMeasure.Instance.GetMeasures(fontFace, fontSize);
-                    charSize = xsi.RealRect.Size;
+                    //var xsi = HanziMeasure.Instance.GetMeasures(fontFace, fontSize);
+                    //charSize = xsi.RealRect.Size;
+                    charSize = HanziRenderer.GetCharSize(fontSize);
                     if (charSize.Width * 5.0F >= width * 0.7F) break;
                     fontSize += 0.5F;
                 }
-                if (font != null) font.Dispose(); font = null;
-                font = FontPool.GetFont(fontFace, fontSize, FontStyle.Regular);
             }
 
             // Width of rectangle: using my space equally
             float rectWidth = (width - 2.0F) / 5.0F;
             // Height of rectange: depends on font's actual drawing behavior!
-            var si = HanziMeasure.Instance.GetMeasures(fontFace, fontSize);
-            float rectHeight = si.RealRect.Bottom - si.RealRect.Top;
+            float rectHeight = charSize.Height;
             // Horizontal padding is rectangle width minus measured char width, over two
-            float hPad = (rectWidth - si.RealRect.Width) / 2.0F;
+            float hPad = (rectWidth - charSize.Width) / 2.0F;
             // Add twice horizontal padding to rectangle height; offset chars from top by padding
             rectHeight += 2.0F * hPad;
 
@@ -238,8 +245,8 @@ namespace ZD.Gui
                     charRects[i + 5].Rect = rbot;
                 }
             }
-            charOfsX = (rectWidth - charSize.Width) / 2.0F - si.RealRect.X / 2.0F;
-            charOfsY = (rectHeight - charSize.Height) / 2.0F - si.RealRect.Y;
+            charOfsX = (rectWidth - charSize.Width) / 2.0F;
+            charOfsY = (rectHeight - charSize.Height) / 2.0F;
             Height = (int)Math.Round((rectHeight) * 2.0F + 0.5F);
             MakeMePaint(false, RenderMode.Invalidate);
         }
@@ -403,8 +410,8 @@ namespace ZD.Gui
                         // Draw character, if any
                         if (i >= items.Length) continue;
                         string str = ""; str += items[i];
-                        g.TextRenderingHint = TextRenderingHint.AntiAlias;
-                        g.DrawString(str, font, b, rect.X + charOfsX, rect.Y + charOfsY, sf);
+                        HanziRenderer.DrawString(g, str, new PointF(rect.X + charOfsX, rect.Y + charOfsY), b,
+                            fontFam, fontScript, fontSize, FontStyle.Regular);
                     }
                 }
             }

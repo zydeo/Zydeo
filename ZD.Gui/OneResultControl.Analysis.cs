@@ -156,7 +156,10 @@ namespace ZD.Gui
                 for (int i = startIX; i != newBlocks.Count; ++i)
                 {
                     Block tb = newBlocks[i];
-                    SizeF sz = g.MeasureString(textPool.GetString(tb.TextPos), getFont(tb.FontIdx), 65535, sf);
+                    bool isHanzi = !(tb.FontIdx == fntMetaLatin || tb.FontIdx == fntSenseLatin);
+                    SizeF sz;
+                    if (!isHanzi) sz = g.MeasureString(textPool.GetString(tb.TextPos), getFont(tb.FontIdx), 65535, sf);
+                    else sz = HanziRenderer.MeasureString(g, textPool.GetString(tb.TextPos), Magic.LemmaHanziFontSize);
                     tb.Width = (ushort)Math.Round(sz.Width);
                     newBlocks[i] = tb;
                 }
@@ -628,7 +631,8 @@ namespace ZD.Gui
                 HeadBlock hb = new HeadBlock
                 {
                     Char = str[i],
-                    Size = g.MeasureString(cstr, getFont(fntZhoHead), 65535, sf),
+                    Size = HanziRenderer.MeasureString(g, cstr, Magic.ZhoResultFontSize),
+                    //Size = g.MeasureString(cstr, getFont(fntZhoHead), 65535, sf),
                     Loc = loc,
                     Faded = false,
                 };
@@ -674,11 +678,10 @@ namespace ZD.Gui
             // We only measure simplified. Assume simplified and traditional fonts come in matching pairs -> same size.
             if (ideoSize.Width == 0)
             {
-                ideoSize = g.MeasureString(ideoTestStr, getFont(fntZhoHeadSimp), 65535, sf);
-                var si = HanziMeasure.Instance.GetMeasures(Magic.ZhoSimpContentFontFamily, Magic.ZhoResultFontSize);
+                ideoSize = HanziRenderer.GetCharSize(Magic.ZhoResultFontSize);
                 float hanziLinePad = 6.0F;
                 hanziLinePad *= scale;
-                ideoLineHeight = si.RealRect.Height + hanziLinePad;
+                ideoLineHeight = ideoSize.Height + hanziLinePad;
             }
 
             headInfo = new HeadInfo();

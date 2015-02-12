@@ -47,8 +47,7 @@
     <Compile Include="CharPicker.cs" />
     <Compile Include="AppErrorLogger.cs" />
     <Compile Include="ClipboardHelper.cs" />
-    <Compile Include="FontPool.cs" />
-    <Compile Include="HanziMeasure.cs" />
+    <Compile Include="HanziRenderer.cs" />
     <Compile Include="HintedTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -139,6 +138,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\html-template-sense.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\arphic-substitute.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

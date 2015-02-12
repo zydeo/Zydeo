@@ -42,6 +42,9 @@ namespace ZD.Gui
         {
             this.tprov = tprov;
 
+            // Initialize hanzi renderer (scale)
+            HanziRenderer.Scale = Scale;
+
             // Find out last window size and location from settings
             Size size = AppSettings.WindowLogicalSize;
             Point loc = AppSettings.WindowLoc;
