@@ -32,6 +32,6 @@ _work/*
 
 _work_chdict_prepare/*
 
-
-# Bin folder: ignore altogether
+# Bin folders: ignore altogether
 _bin/*
+_install/*
