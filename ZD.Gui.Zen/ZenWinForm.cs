@@ -102,6 +102,39 @@ namespace ZD.Gui.Zen
             // NOP!
         }
 
+        [DllImport("gdi32.dll")]
+        public static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest, int nWidth,
+           int nHeight, IntPtr hObjSource, int nXSrc, int nYSrc, TernaryRasterOperations dwRop);
+
+        [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
+        static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+
+        [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
+        static extern bool DeleteDC(IntPtr hdc);
+
+        [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
+        static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+        [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
+        static extern bool DeleteObject(IntPtr hObject);
+
+        public enum TernaryRasterOperations : uint
+        {
+            SRCCOPY = 0x00CC0020,
+        }
+
+        HiResTimer hrt = new HiResTimer();
+        Int64 timeSpent = 0;
+        Int64 eventCount = 0;
+
+        public double AvgTime
+        {
+            get
+            {
+                return ((double)timeSpent) / ((double)eventCount);
+            }
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             CanvasToShow cts = getCanvas();
@@ -109,7 +142,21 @@ namespace ZD.Gui.Zen
             try
             {
                 // Blit canvas to screen
-                e.Graphics.DrawImageUnscaled(cts.Canvas, 0, 0);
+
+                //Int64 before = hrt.Value;
+                //e.Graphics.DrawImageUnscaled(cts.Canvas, 0, 0);
+                IntPtr pTarget = e.Graphics.GetHdc();
+                IntPtr pSource = CreateCompatibleDC(pTarget);
+                IntPtr pBitmap = cts.Canvas.GetHbitmap();
+                IntPtr pOrig = SelectObject(pSource, pBitmap);
+                BitBlt(pTarget, 0, 0, cts.Canvas.Width, cts.Canvas.Height, pSource, 0, 0, TernaryRasterOperations.SRCCOPY);
+                DeleteObject(pOrig);
+                DeleteObject(pBitmap);
+                DeleteDC(pSource);
+                e.Graphics.ReleaseHdc(pTarget);
+                //Int64 after = hrt.Value;
+                //timeSpent += (after - before);
+                //++eventCount;
             }
             finally { cts.Dispose(); }
         }

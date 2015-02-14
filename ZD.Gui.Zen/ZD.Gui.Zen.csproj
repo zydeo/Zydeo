@@ -47,6 +47,7 @@
     </Compile>
     <Compile Include="CustomCursor.cs" />
     <Compile Include="GraphicsExtension.cs" />
+    <Compile Include="HiResTimer.cs" />
     <Compile Include="ICtxtMenuControl.cs" />
     <Compile Include="IZenTabsChangedListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
