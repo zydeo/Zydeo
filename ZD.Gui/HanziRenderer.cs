@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.IO;
+using System.Reflection;
 
 namespace ZD.Gui
 {
@@ -82,13 +84,31 @@ namespace ZD.Gui
             }
         }
 
+        /// <summary>
+        /// Composite value-type key identifying cached instantiate fonts.
+        /// </summary>
         private struct FontCacheKey
         {
+            /// <summary>
+            /// The font family.
+            /// </summary>
             private readonly IdeoFamily family;
+            /// <summary>
+            /// The script.
+            /// </summary>
             private readonly IdeoScript script;
+            /// <summary>
+            /// Size (100 times float size in points).
+            /// </summary>
             private readonly int size;
+            /// <summary>
+            /// Font style.
+            /// </summary>
             private readonly FontStyle style;
 
+            /// <summary>
+            /// Ctor: initialize immutable instance.
+            /// </summary>
             public FontCacheKey(IdeoFamily family, IdeoScript script, float size, FontStyle style)
             {
                 this.family = family;
@@ -97,6 +117,9 @@ namespace ZD.Gui
                 this.style = style;
             }
 
+            /// <summary>
+            /// Hash code (for use in associative collection).
+            /// </summary>
             public override int GetHashCode()
             {
                 int hash = 17;
@@ -107,11 +130,17 @@ namespace ZD.Gui
                 return hash;
             }
 
+            /// <summary>
+            /// Equality (untyped).
+            /// </summary>
             public override bool Equals(object other)
             {
                 return other is FontCacheKey ? Equals((FontCacheKey)other) : false;
             }
 
+            /// <summary>
+            /// Equality (typed).
+            /// </summary>
             public bool Equals(FontCacheKey other)
             {
                 return family == other.family &&
@@ -119,8 +148,31 @@ namespace ZD.Gui
                     size == other.size &&
                     style == other.style;
             }
-
         }
+
+        /// <summary>
+        /// Specifies Arphic font coverage for a simplified character.
+        /// </summary>
+        private enum ArphicSimpCoverage
+        {
+            /// <summary>
+            /// Simplified Arphic font has character.
+            /// </summary>
+            SimpCovers,
+            /// <summary>
+            /// Simplified font does not have character, but traditional does: can substitute.
+            /// </summary>
+            CanSubstitute,
+            /// <summary>
+            /// Not even traditional Arphic font covers character.
+            /// </summary>
+            None,
+        }
+
+        /// <summary>
+        /// Compact array holding coverage info about simplified and traditional Arphic font.
+        /// </summary>
+        private static readonly byte[] arphicCoverage;
 
         /// <summary>
         /// My private font collection - loaded from file.
@@ -128,7 +180,7 @@ namespace ZD.Gui
         private static readonly PrivateFontCollection fonts = new PrivateFontCollection();
 
         /// <summary>
-        /// Cached 
+        /// Cached instantiated fonts.
         /// </summary>
         private static readonly Dictionary<FontCacheKey, FontTray> fontCache = new Dictionary<FontCacheKey, FontTray>();
 
@@ -142,10 +194,53 @@ namespace ZD.Gui
         /// </summary>
         static HanziRenderer()
         {
+            // Deserialize compact array about Arphic font coverage
+            Assembly a = Assembly.GetExecutingAssembly();
+            using (Stream s = a.GetManifestResourceStream("ZD.Gui.Resources.arphic-coverage.bin"))
+            using (BinaryReader br = new BinaryReader(s))
+            {
+                arphicCoverage = br.ReadBytes(65536 / 4);
+            }
+
+            // Load deployed fonts
             fonts.AddFontFile("ukaitw.ttf");
             fonts.AddFontFile("hdzb_75.ttf");
             if (File.Exists("NotoSansHans-Light.otf")) fonts.AddFontFile("NotoSansHans-Light.otf");
             if (File.Exists("NotoSansHant-Light.otf")) fonts.AddFontFile("NotoSansHant-Light.otf");
+        }
+
+        /// <summary>
+        /// Returns Arphic coverage value for character from compact array.
+        /// </summary>
+        private static byte getArphicVal(char c)
+        {
+            int ix = (int)c;
+            int arrIx = ix / 4;
+            int ofsInByte = ix - arrIx * 4;
+            byte b = arphicCoverage[arrIx];
+            b >>= (ofsInByte * 2);
+            b &= 3;
+            return b;
+        }
+
+        /// <summary>
+        /// Returns true of traditional Arphic font covers provided character.
+        /// </summary>
+        private static bool hasArphicTrad(char c)
+        {
+            byte val = getArphicVal(c);
+            return ((val & 2) == 2);
+        }
+
+        /// <summary>
+        /// Tells if simplified Arphic font covers a character, or can substitute, or no coverage at all.
+        /// </summary>
+        private static ArphicSimpCoverage getArphicCoverageSimp(char c)
+        {
+            byte val = getArphicVal(c);
+            if (val == 0) return ArphicSimpCoverage.None;
+            if ((val & 1) == 1) return ArphicSimpCoverage.SimpCovers;
+            return ArphicSimpCoverage.CanSubstitute;
         }
 
         /// <summary>
@@ -161,28 +256,65 @@ namespace ZD.Gui
             return new SizeF(width, ftray.DisplayHeight);
         }
 
+        /// <summary>
+        /// Measures the display rectangle of a single character.
+        /// </summary>
         public static SizeF MeasureChar(Graphics g, char c, float size)
         {
-            // TO-DO
-            return SizeF.Empty;
+            // TO-DO: actually invoke g.MeasureString for non-Hanzi characters
+            // I.e., regular and half-width alphabetical and digits
+
+            FontTray ftray = getFont(IdeoFamily.ArphicKai, IdeoScript.Simp, size, FontStyle.Regular);
+            return new SizeF(ftray.DisplayWidth, ftray.DisplayHeight);
         }
 
         public static void DrawString(Graphics g, string text, PointF loc, Brush b,
             IdeoFamily fam, IdeoScript script, float size, FontStyle style)
         {
+            // Font tray for requested font
             FontTray ftray = getFont(fam, script, size, style);
+            // Substitute font - only for Arphic simplified
+            FontTray ftraySubst = null;
+            if (fam == IdeoFamily.ArphicKai && script == IdeoScript.Simp)
+                ftraySubst = getFont(fam, IdeoScript.Trad, size, style);
+            // Where to draw - font-specific adjustment
             float x = loc.X;
-            float y = loc.Y + ftray.VertOfs;
+            float y = loc.Y;
 
             // TO-DO: actually invoke g.MeasureString for non-Hanzi characters
             // I.e., regular and half-width alphabetical and digits
 
             StringFormat sf = StringFormat.GenericTypographic;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+
             for (int i = 0; i != text.Length; ++i)
             {
                 string chr = text.Substring(i, 1);
-                g.DrawString(chr, ftray.Font, b, new PointF(x + ftray.HorizOfs, y), sf);
+                // Get coverage info about character
+                ArphicSimpCoverage asp = ArphicSimpCoverage.SimpCovers;
+                char c = chr[0];
+                bool tofu = false;
+                if (fam == IdeoFamily.ArphicKai) tofu =
+                    (script == IdeoScript.Trad && !hasArphicTrad(c)) ||
+                    (script == IdeoScript.Simp && (asp = getArphicCoverageSimp(c)) == ArphicSimpCoverage.None);
+                // Draw tofu is must be
+                if (tofu)
+                {
+                    using (Pen p = new Pen(Color.Gray))
+                    {
+                        p.DashStyle = DashStyle.Dot;
+                        g.SmoothingMode = SmoothingMode.None;
+                        g.DrawRectangle(p, x, y, ftray.DisplayWidth, ftray.DisplayHeight);
+                        g.SmoothingMode = SmoothingMode.AntiAlias;
+                        g.DrawLine(p, x, y, x + ftray.DisplayWidth, y + ftray.DisplayHeight);
+                        g.DrawLine(p, x + ftray.DisplayWidth, y, x, y + ftray.DisplayHeight);
+                    }
+                }
+                // Draw with substitute string
+                else if (asp == ArphicSimpCoverage.CanSubstitute)
+                    g.DrawString(chr, ftraySubst.Font, b, new PointF(x + ftraySubst.HorizOfs, y + ftraySubst.VertOfs), sf);
+                // Draw with requested string
+                else g.DrawString(chr, ftray.Font, b, new PointF(x + ftray.HorizOfs, y + ftray.VertOfs), sf);
                 x += ftray.DisplayWidth;
             }
         }
@@ -220,6 +352,9 @@ namespace ZD.Gui
             }
         }
 
+        /// <summary>
+        /// Actually instantiates a specific font (based on family, script, size and style).
+        /// </summary>
         private static FontTray createFont(IdeoFamily fam, IdeoScript script, float size, FontStyle style)
         {
             FontTray ftray = null;
@@ -250,7 +385,7 @@ namespace ZD.Gui
         }
 
         /// <summary>
-        /// Gets the font with the desired parameters for measuring or drawing text.
+        /// Gets the font with the desired parameters for measuring or drawing text. Works from cache.
         /// </summary>
         private static FontTray getFont(IdeoFamily fam, IdeoScript script, float size, FontStyle style)
         {

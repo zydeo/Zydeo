@@ -626,12 +626,11 @@ namespace ZD.Gui
             for (int i = 0; i != str.Length; ++i)
             {
                 ++charsOnLine;
-                string cstr = str[i].ToString();
                 // Measure each character. They may not all be hanzi: there are latin letters in some HWS
                 HeadBlock hb = new HeadBlock
                 {
                     Char = str[i],
-                    Size = HanziRenderer.MeasureString(g, cstr, Magic.ZhoResultFontSize),
+                    Size = HanziRenderer.MeasureChar(g, str[i], Magic.ZhoResultFontSize),
                     //Size = g.MeasureString(cstr, getFont(fntZhoHead), 65535, sf),
                     Loc = loc,
                     Faded = false,

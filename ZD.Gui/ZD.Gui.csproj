@@ -140,7 +140,7 @@
     <EmbeddedResource Include="Resources\html-template-sense.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\arphic-substitute.txt" />
+    <EmbeddedResource Include="Resources\arphic-coverage.bin" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

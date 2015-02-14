@@ -40,6 +40,7 @@
             this.pnlLayout = new System.Windows.Forms.TableLayoutPanel();
             this.pnlSmart = new System.Windows.Forms.Panel();
             this.pretty = new ZD.FontTest.PrettyTestCtrl();
+            this.llSaveCoverage = new System.Windows.Forms.LinkLabel();
             this.pnlCanvas.SuspendLayout();
             this.gbParams.SuspendLayout();
             this.pnlLayout.SuspendLayout();
@@ -85,6 +86,7 @@
             // 
             this.gbParams.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbParams.Controls.Add(this.llSaveCoverage);
             this.gbParams.Controls.Add(this.btnGo);
             this.gbParams.Controls.Add(this.txtSz);
             this.gbParams.Controls.Add(this.label1);
@@ -183,6 +185,19 @@
             this.pretty.TabIndex = 0;
             this.pretty.Text = "prettyTestCtrl1";
             // 
+            // llSaveCoverage
+            // 
+            this.llSaveCoverage.AutoSize = true;
+            this.llSaveCoverage.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
+            this.llSaveCoverage.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
+            this.llSaveCoverage.Location = new System.Drawing.Point(536, 24);
+            this.llSaveCoverage.Name = "llSaveCoverage";
+            this.llSaveCoverage.Size = new System.Drawing.Size(113, 13);
+            this.llSaveCoverage.TabIndex = 7;
+            this.llSaveCoverage.TabStop = true;
+            this.llSaveCoverage.Text = "Save Arphic coverage";
+            this.llSaveCoverage.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llSaveCoverage_LinkClicked);
+            // 
             // MainForm
             // 
             this.AcceptButton = this.btnGo;
@@ -216,6 +231,7 @@
         private System.Windows.Forms.TableLayoutPanel pnlLayout;
         private System.Windows.Forms.Panel pnlSmart;
         private PrettyTestCtrl pretty;
+        private System.Windows.Forms.LinkLabel llSaveCoverage;
     }
 }
 

@@ -184,17 +184,18 @@ namespace ZD.CedictEngine
 
         private bool checkCoverage(string head, string trad, string simp, string body, StreamWriter logDropped)
         {
-            bool simpOk = true;
+            byte simpOk = 1; // 0: no coverage; 1: simplified font covers; 2: can substitute
             bool tradOk = true;
             if (covSimp != null)
             {
                 foreach (char c in simp)
                 {
-                    if (!covSimp.Contains(c))
-                    {
-                        simpOk = false;
-                        break;
-                    }
+                    byte thisSimpChar = 0;
+                    if (covSimp.Contains(c)) thisSimpChar = 1;
+                    else if (covTrad.Contains(c)) thisSimpChar = 2;
+                    if (thisSimpChar == 0) simpOk = 0;
+                    else if (thisSimpChar > simpOk) simpOk = thisSimpChar;
+                    if (simpOk == 0) break;
                 }
             }
             if (covTrad != null)
@@ -209,15 +210,19 @@ namespace ZD.CedictEngine
                 }
             }
             // Log if at least one font does not cover character
-            if (!simpOk || !tradOk)
+            bool keeper = tradOk && simpOk != 0;
+            if (simpOk != 1 || !tradOk)
             {
-                string logLine = tradOk ? "1 " : "0 ";
-                logLine += simpOk ? "1 " : "0 ";
-                logLine += head + " " + body;
+                string logLine = keeper ? "Keep\t" : "Drop\t";
+                logLine += tradOk ? "1\t" : "0\t";
+                if (simpOk == 0) logLine += "0\t";
+                else if (simpOk == 1) logLine += "1\t";
+                else logLine += "X\t";
+                logLine += head + "\t" + body;
                 logDropped.WriteLine(logLine);
             }
             // Drop only if not even traditional font covers it
-            if (tradOk) return true;
+            if (keeper) return true;
             return false;
         }
 

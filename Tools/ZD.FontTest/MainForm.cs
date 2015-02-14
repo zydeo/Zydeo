@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.IO;
 
 namespace ZD.FontTest
 {
@@ -42,6 +43,20 @@ namespace ZD.FontTest
             canvas.SetFont(font, fontSz);
 
             pretty.SetFonts("Segoe UI", fontSz);
+        }
+
+        private void llSaveCoverage_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            bool[] cvrSimp = new bool[65536];
+            bool[] cvrTrad = new bool[65536];
+
+            string currDir = Directory.GetCurrentDirectory();
+            string fontFile = Path.Combine(currDir, @"hdzb_75.TTF");
+            FontCoverage.CheckCoverage(fontFile, "fnt-simp-coverage.txt", cvrSimp);
+            fontFile = Path.Combine(currDir, @"ukaitw.TTF");
+            FontCoverage.CheckCoverage(fontFile, "fnt-trad-coverage.txt", cvrTrad);
+
+            FontCoverage.SaveArphicCoverage(cvrSimp, cvrTrad, "arphic-coverage.bin");
         }
     }
 }
