@@ -34,6 +34,7 @@ namespace ZD.FontTest
                         }
                         break;
                     }
+                    break;
                 }
                 sw.Flush();
             }

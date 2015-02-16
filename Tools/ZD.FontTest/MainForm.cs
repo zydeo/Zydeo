@@ -52,11 +52,24 @@ namespace ZD.FontTest
 
             string currDir = Directory.GetCurrentDirectory();
             string fontFile = Path.Combine(currDir, @"hdzb_75.TTF");
-            FontCoverage.CheckCoverage(fontFile, "fnt-simp-coverage.txt", cvrSimp);
+            FontCoverage.CheckCoverage(fontFile, "fnt-coverage-hdzb_75.txt", cvrSimp);
             fontFile = Path.Combine(currDir, @"ukaitw.TTF");
-            FontCoverage.CheckCoverage(fontFile, "fnt-trad-coverage.txt", cvrTrad);
-
+            FontCoverage.CheckCoverage(fontFile, "fnt-coverage-ukaitw.txt", cvrTrad);
             FontCoverage.SaveArphicCoverage(cvrSimp, cvrTrad, "arphic-coverage.bin");
+
+            //string currDir = Directory.GetCurrentDirectory();
+            //string fontFile = Path.Combine(currDir, @"NotoSansHans-Regular.otf");
+            //FontCoverage.CheckCoverage(fontFile, "fnt-coverage-Noto.txt", cvrSimp);
+
+            // System fonts
+            //FontCoverage.CheckCoverage(@"C:\Windows\Fonts\simsun.ttc", "fnt-coverage-SimSun.txt", cvrSimp);
+            //FontCoverage.CheckCoverage(@"C:\Windows\Fonts\msjh.ttc", "fnt-coverage-MSJhengHei.txt", cvrSimp);
+            //FontCoverage.CheckCoverage(@"C:\Windows\Fonts\msyh.ttc", "fnt-coverage-MSYaHei.txt", cvrSimp);
+            //FontCoverage.CheckCoverage(@"C:\Windows\Fonts\simhei.ttf", "fnt-coverage-SimHei.txt", cvrSimp);
+            //FontCoverage.CheckCoverage(@"C:\Windows\Fonts\mingliu.ttc", "fnt-coverage-MingLiu.txt", cvrSimp);
+            //FontCoverage.CheckCoverage(@"C:\Windows\Fonts\kaiu.ttf", "fnt-coverage-DFKai-SB.txt", cvrSimp);
+            //FontCoverage.CheckCoverage(@"C:\Windows\Fonts\simkai.ttf", "fnt-coverage-KaiTi.txt", cvrSimp);
+            //FontCoverage.CheckCoverage(@"C:\Windows\Fonts\simfang.ttf", "fnt-coverage-FangSong.txt", cvrSimp);
         }
     }
 }
