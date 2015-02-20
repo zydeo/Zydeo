@@ -11,6 +11,7 @@ namespace ZD.FontTest
     {
         ArphicKai,
         Noto,
+        WinKai,
     }
 
     internal enum SimpTradFont
@@ -84,6 +85,19 @@ namespace ZD.FontTest
             FontTray res = null;
             float height = size * 4F / 3F;
             height *= scale;
+
+            if (ifont == IdeoFont.WinKai)
+            {
+                if (stfont == SimpTradFont.Simp)
+                    res = new FontTray(
+                        new Font("KaiTi", size, style), 0, -0.05F,
+                        height * 0.9F, height);
+                else res = new FontTray(
+                     new Font("DFKai-SB", size, style), 0, -0.05F,
+                     height * 0.9F, height);
+                return res;
+            }
+
             foreach (FontFamily ff in fonts.Families)
             {
                 if (ifont == IdeoFont.ArphicKai && stfont == SimpTradFont.Trad && ff.Name == "AR PL UKai TW")

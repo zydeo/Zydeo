@@ -101,9 +101,20 @@ namespace ZD.CedictEngine
                 doVerifyTarget(txtTokenized, senseId, entryIdToInfo, br);
 
             // Sort entry IDs by their best score
+            // Drop entries with unprintable hanzi in HW now
             List<EntryMatchInfo> entryInfoList = new List<EntryMatchInfo>();
-            foreach (var x in entryIdToInfo) entryInfoList.Add(x.Value);
-            //entryInfoList.Add(new EntryMatchInfo { EntryId = x.Key, BestSenseScore = x.Value.BestSenseScore });
+            foreach (var x in entryIdToInfo)
+            {
+                // Check coverage. Because we don't load full entry, it's possible
+                // that some unsupported chars in hybrid text of senses slip through.
+                // There's a limit to perfectionism.
+                string simp, trad;
+                br.Position = x.Value.EntryId;
+                CedictEntry.DeserializeHanzi(br, out simp, out trad);
+                if (!areHanziCovered(simp, trad)) continue;
+                // Queue up for sorting.
+                entryInfoList.Add(x.Value);
+            }
             entryInfoList.Sort((a, b) => b.BestSenseScore.CompareTo(a.BestSenseScore));
             // Load entries, wrap into results
             foreach (EntryMatchInfo emi in entryInfoList)

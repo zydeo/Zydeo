@@ -60,7 +60,7 @@ namespace ZD.FontTest
 
         protected override void OnPaint(PaintEventArgs pe)
         {
-            if (fnt == null || txt == null || fm == null) return;
+            if (fnt == null || txt == null) return;
             Graphics g = pe.Graphics;
 
             int pad = (int)(xpad * scale);
@@ -76,8 +76,10 @@ namespace ZD.FontTest
             StringFormat sf = StringFormat.GenericTypographic;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             SizeF sz = g.MeasureString(txt, fnt, 65535, sf);
-            float yOfs = (float)(-(fm.Height - 1.0) * sz.Height * 0.85);
-            //yOfs = 0;
+            float yOfs = 0;
+            if (fm != null)
+                yOfs = (float)(-(fm.Height - 1.0) * sz.Height * 0.85);
+
             using (Pen p = new Pen(Color.Red))
             {
                 g.DrawRectangle(p, 0, yOfs, sz.Width, sz.Height);

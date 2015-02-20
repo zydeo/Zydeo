@@ -4,11 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media;
 using System.IO;
+using System.Drawing.Text;
+using System.Drawing;
 
 namespace ZD.FontTest
 {
     partial class FontTestCtrl
     {
+        public void SetSysFont(string sysFontName, float ptSize)
+        {
+            float ptSizeAdj = ptSize;
+            fnt = new System.Drawing.Font(sysFontName, ptSizeAdj, FontStyle.Regular);
+            if (fnt.Name != sysFontName) fnt = null;
+            fm = null;
+            Invalidate();
+        }
+
         public void SetFont(string fontFileName, float ptSize)
         {
             string fnFull = Path.GetFullPath(fontFileName);
@@ -22,6 +33,7 @@ namespace ZD.FontTest
                 {
                     GlyphTypeface glyph;
                     typeface.TryGetGlyphTypeface(out glyph);
+             
                     fm = new FontMetrics(typeface, glyph);
                     break;
                 }

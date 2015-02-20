@@ -38,8 +38,10 @@ namespace ZD.FontTest
         {
             fntSimpA = FontPool.GetFont(IdeoFont.ArphicKai, SimpTradFont.Simp, sz, FontStyle.Regular);
             fntTradA = FontPool.GetFont(IdeoFont.ArphicKai, SimpTradFont.Trad, sz, FontStyle.Regular);
-            fntSimpN = FontPool.GetFont(IdeoFont.Noto, SimpTradFont.Simp, sz, FontStyle.Regular);
-            fntTradN = FontPool.GetFont(IdeoFont.Noto, SimpTradFont.Trad, sz, FontStyle.Regular);
+            //fntSimpN = FontPool.GetFont(IdeoFont.Noto, SimpTradFont.Simp, sz, FontStyle.Regular);
+            //fntTradN = FontPool.GetFont(IdeoFont.Noto, SimpTradFont.Trad, sz, FontStyle.Regular);
+            fntSimpN = FontPool.GetFont(IdeoFont.WinKai, SimpTradFont.Simp, sz, FontStyle.Regular);
+            fntTradN = FontPool.GetFont(IdeoFont.WinKai, SimpTradFont.Trad, sz, FontStyle.Regular);
             fntLatn = new Font(familyLatn, sz / 1.3F, FontStyle.Regular);
             Invalidate();
         }

@@ -16,15 +16,6 @@ namespace ZD.CedictEngine
     public partial class CedictCompiler
     {
         /// <summary>
-        /// Simplified character coverage, or null if we don't filter.
-        /// </summary>
-        private readonly HashSet<char> covSimp;
-
-        /// <summary>
-        /// Simplified character coverage, or null if we don't filter.
-        /// </summary>
-        private readonly HashSet<char> covTrad;
-        /// <summary>
         /// Current line number, so we can indicate errors/warnings
         /// </summary>
         private int lineNum = 0;
@@ -69,11 +60,8 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Ctor: initialize.
         /// </summary>
-        public CedictCompiler(HashSet<char> covSimp, HashSet<char> covTrad)
+        public CedictCompiler()
         {
-            this.covSimp = covSimp;
-            this.covTrad = covTrad;
-
             // At this stage, index will have been initialized in-line.
             // I can refer to its word holder to initialize my tokenizer.
             tokenizer = new Tokenizer(index.WordHolder);
@@ -82,7 +70,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Parses an entry (line) that has been separated into headword and rest.
         /// </summary>
-        private CedictEntry parseEntry(string strHead, string strBody, StreamWriter logStream, StreamWriter logDropped)
+        private CedictEntry parseEntry(string strHead, string strBody, StreamWriter logStream)
         {
             // Decompose head
             Match hm = reHead.Match(strHead);
@@ -93,10 +81,6 @@ namespace ZD.CedictEngine
                 logStream.WriteLine(msg);
                 return null;
             }
-
-            // If we're checking against glyph coverage, skip if not covered in *traditional* font
-            if (!checkCoverage(strHead, hm.Groups[1].Value, hm.Groups[2].Value, strBody, logDropped))
-                return null;
 
             // Split pinyin by spaces
             string[] pinyinParts = hm.Groups[3].Value.Split(new char[] { ' ' });
@@ -180,50 +164,6 @@ namespace ZD.CedictEngine
                 new ReadOnlyCollection<CedictSense>(cedictSenses),
                 hanziToPinyin);
             return res;
-        }
-
-        private bool checkCoverage(string head, string trad, string simp, string body, StreamWriter logDropped)
-        {
-            byte simpOk = 1; // 0: no coverage; 1: simplified font covers; 2: can substitute
-            bool tradOk = true;
-            if (covSimp != null)
-            {
-                foreach (char c in simp)
-                {
-                    byte thisSimpChar = 0;
-                    if (covSimp.Contains(c)) thisSimpChar = 1;
-                    else if (covTrad.Contains(c)) thisSimpChar = 2;
-                    if (thisSimpChar == 0) simpOk = 0;
-                    else if (thisSimpChar > simpOk) simpOk = thisSimpChar;
-                    if (simpOk == 0) break;
-                }
-            }
-            if (covTrad != null)
-            {
-                foreach (char c in trad)
-                {
-                    if (!covTrad.Contains(c))
-                    {
-                        tradOk = false;
-                        break;
-                    }
-                }
-            }
-            // Log if at least one font does not cover character
-            bool keeper = tradOk && simpOk != 0;
-            if (simpOk != 1 || !tradOk)
-            {
-                string logLine = keeper ? "Keep\t" : "Drop\t";
-                logLine += tradOk ? "1\t" : "0\t";
-                if (simpOk == 0) logLine += "0\t";
-                else if (simpOk == 1) logLine += "1\t";
-                else logLine += "X\t";
-                logLine += head + "\t" + body;
-                logDropped.WriteLine(logLine);
-            }
-            // Drop only if not even traditional font covers it
-            if (keeper) return true;
-            return false;
         }
 
         /// <summary>
@@ -328,7 +268,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Processes one line of the text-based Cedict input file.
         /// </summary>
-        public void ProcessLine(string line, StreamWriter logStream, StreamWriter logDropped)
+        public void ProcessLine(string line, StreamWriter logStream)
         {
             // Must not parse new lines once results have been written
             if (resultsWritten) throw new Exception("WriteResults already called, cannot parse additional lines.");
@@ -345,7 +285,7 @@ namespace ZD.CedictEngine
             string strHead = line.Substring(0, firstSlash).Trim();
             string strBody = line.Substring(firstSlash + 1).Trim(new char[] { ' ', '/' });
             // Parse entry. If failed, we be done here.
-            CedictEntry entry = parseEntry(strHead, strBody, logStream, logDropped);
+            CedictEntry entry = parseEntry(strHead, strBody, logStream);
             if (entry == null) return;
             // Store and index entry
             int id = entries.Count;

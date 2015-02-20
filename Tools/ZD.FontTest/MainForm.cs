@@ -28,21 +28,32 @@ namespace ZD.FontTest
             rbArphic.CheckedChanged += onFontChanged;
             rbNoto.CheckedChanged += onFontChanged;
             rbSimp.CheckedChanged += onFontChanged;
+            rbDFKai.CheckedChanged += onFontChanged;
+            rbKaiTi.CheckedChanged += onFontChanged;
             txtSz.TextChanged += onFontChanged;
             onFontChanged(null, null);
         }
 
         private void onFontChanged(object sender, EventArgs e)
         {
-            string font = "ukaitw.TTF";
-            if (rbSimp.Checked) font = "hdzb_75.TTF";
-            else if (rbNoto.Checked) font = "NotoSansHans-Regular.otf";
             float sz;
             if (!float.TryParse(txtSz.Text, out sz)) sz = fontSz;
             fontSz = sz;
-            canvas.SetFont(font, fontSz);
-
             pretty.SetFonts("Segoe UI", fontSz);
+
+            if (rbDFKai.Checked || rbKaiTi.Checked)
+            {
+                string font = "DFKai-SB";
+                if (rbKaiTi.Checked) font = "KaiTi";
+                canvas.SetSysFont(font, fontSz);
+            }
+            else
+            {
+                string font = "ukaitw.TTF";
+                if (rbSimp.Checked) font = "hdzb_75.TTF";
+                else if (rbNoto.Checked) font = "NotoSansHans-Regular.otf";
+                canvas.SetFont(font, fontSz);
+            }
         }
 
         private void llSaveCoverage_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -50,12 +61,19 @@ namespace ZD.FontTest
             bool[] cvrSimp = new bool[65536];
             bool[] cvrTrad = new bool[65536];
 
-            string currDir = Directory.GetCurrentDirectory();
-            string fontFile = Path.Combine(currDir, @"hdzb_75.TTF");
-            FontCoverage.CheckCoverage(fontFile, "fnt-coverage-hdzb_75.txt", cvrSimp);
-            fontFile = Path.Combine(currDir, @"ukaitw.TTF");
-            FontCoverage.CheckCoverage(fontFile, "fnt-coverage-ukaitw.txt", cvrTrad);
-            FontCoverage.SaveArphicCoverage(cvrSimp, cvrTrad, "arphic-coverage.bin");
+            //string currDir = Directory.GetCurrentDirectory();
+            //string fontFile = Path.Combine(currDir, @"hdzb_75.TTF");
+            //FontCoverage.CheckCoverage(fontFile, "fnt-coverage-hdzb_75.txt", cvrSimp);
+            //fontFile = Path.Combine(currDir, @"ukaitw.TTF");
+            //FontCoverage.CheckCoverage(fontFile, "fnt-coverage-ukaitw.txt", cvrTrad);
+            //FontCoverage.SaveArphicCoverage(cvrSimp, cvrTrad, "arphic-coverage.bin");
+
+            string currDir = @"C:\Windows\Fonts";
+            string fontFile = Path.Combine(currDir, @"kaiu.ttf");
+            FontCoverage.CheckCoverage(fontFile, "fnt-coverage-dfkai-sb.txt", cvrSimp);
+            fontFile = Path.Combine(currDir, @"simkai.ttf");
+            FontCoverage.CheckCoverage(fontFile, "fnt-coverage-kaiti.txt", cvrTrad);
+            FontCoverage.SaveArphicCoverage(cvrSimp, cvrTrad, "winfonts-coverage.bin");
 
             //string currDir = Directory.GetCurrentDirectory();
             //string fontFile = Path.Combine(currDir, @"NotoSansHans-Regular.otf");

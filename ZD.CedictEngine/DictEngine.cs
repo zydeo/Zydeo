@@ -19,6 +19,11 @@ namespace ZD.CedictEngine
         private readonly string dictFileName;
 
         /// <summary>
+        /// Font coverage info provider. Used to filter results we chars the caller cannot display.
+        /// </summary>
+        private readonly IFontCoverage cvr;
+
+        /// <summary>
         /// Index: loaded from dictionary file when object is created.
         /// </summary>
         private readonly Index index;
@@ -31,9 +36,12 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Ctor: initialize from binary dictionary file.
         /// </summary>
-        public DictEngine(string dictFileName)
+        /// <param name="dictFileName">Name of the compiled binary dictionary.</param>
+        /// <param name="cvr">Font coverage info provider for lookup filtering.</param>
+        public DictEngine(string dictFileName, IFontCoverage cvr)
         {
             this.dictFileName = dictFileName;
+            this.cvr = cvr;
             using (BinReader br = new BinReader(dictFileName))
             {
                 // Skip release date and entry count
@@ -96,6 +104,65 @@ namespace ZD.CedictEngine
         }
 
         /// <summary>
+        /// Returns true of display font covers all Hanzi in entry; false otherwise.
+        /// </summary>
+        private bool areHanziCovered(string simp, string trad)
+        {
+            // Simplified headword
+            foreach (char c in simp)
+                if (!cvr.GetCoverage(c).HasFlag(FontCoverageFlags.Simp))
+                    return false;
+            // Traditional headword
+            foreach (char c in trad)
+                if (!cvr.GetCoverage(c).HasFlag(FontCoverageFlags.Trad))
+                    return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if display font covers all Hanzi in hybrid text; false otherwise.
+        /// </summary>
+        private bool areHanziCovered(HybridText ht)
+        {
+            if (ht.IsEmpty) return true;
+            for (int i = 0; i != ht.RunCount; ++i)
+            {
+                TextRun tr = ht.GetRunAt(i);
+                TextRunZho trJoe = tr as TextRunZho;
+                if (trJoe == null) continue;
+                if (trJoe.Simp == null) continue;
+                foreach (char c in trJoe.Simp)
+                    if (!cvr.GetCoverage(c).HasFlag(FontCoverageFlags.Simp))
+                        return false;
+                if (trJoe.Trad == null) continue;
+                foreach (char c in trJoe.Trad)
+                    if (!cvr.GetCoverage(c).HasFlag(FontCoverageFlags.Trad))
+                        return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true of display font covers all Hanzi in entry; false otherwise.
+        /// </summary>
+        private bool areHanziCovered(CedictEntry entry)
+        {
+            // Simplified and traditional headword
+            if (!areHanziCovered(entry.ChSimpl, entry.ChTrad))
+                return false;
+            // Hanzi in hybrid text of senses
+            for (int i = 0; i != entry.SenseCount; ++i)
+            {
+                CedictSense cs = entry.GetSenseAt(i);
+                if (!areHanziCovered(cs.Domain)) return false;
+                if (!areHanziCovered(cs.Equiv)) return false;
+                if (!areHanziCovered(cs.Note)) return false;
+            }
+            // We're good to go.
+            return true;
+        }
+
+        /// <summary>
         /// Retrieves hanzi lookup candidates, verifies actual presence of search expression in headword.
         /// </summary>
         List<ResWithEntry> doLoadVerifyHanzi(BinReader br, IEnumerable<int> poss, string query, SearchScript script)
@@ -109,6 +176,7 @@ namespace ZD.CedictEngine
                 // Load up entry from file
                 br.Position = pos;
                 CedictEntry entry = new CedictEntry(br);
+
                 // Figure out position/length of query string in simplified and traditional headwords
                 int hiliteStart = -1;
                 int hiliteLength = 0;
@@ -123,6 +191,9 @@ namespace ZD.CedictEngine
                 // Entry is a keeper if either source or target headword contains query
                 if (hiliteLength != 0)
                 {
+                    // Drop if there's any unprintable hanzi
+                    if (!areHanziCovered(entry)) continue;
+                    
                     // TO-DO: indicate wrong script in result
                     CedictResult res = new CedictResult(CedictResult.SimpTradWarning.None,
                         pos, entry.HanziPinyinMap,
@@ -243,6 +314,10 @@ namespace ZD.CedictEngine
                 }
                 // Entry is a keeper if query syllables found
                 if (syllStart == -1) continue;
+
+                // Drop if there's any unprintable Hanzi
+                if (!areHanziCovered(entry)) continue;
+
                 // Keeper!
                 CedictResult res = new CedictResult(pos, entry.HanziPinyinMap, syllStart, sylls.Count);
                 ResWithEntry resWE = new ResWithEntry(res, entry);

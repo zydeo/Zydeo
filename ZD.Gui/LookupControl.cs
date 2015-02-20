@@ -237,7 +237,7 @@ namespace ZD.Gui
         private void loadDictionary(object ctxt)
         {
             Thread.Sleep(100);
-            dict = dictFact.Create(Magic.DictFileName);
+            dict = dictFact.Create(Magic.DictFileName, HanziRenderer.GetFontCoverage(Magic.ZhoContentFontFamily));
         }
 
         /// <summary>

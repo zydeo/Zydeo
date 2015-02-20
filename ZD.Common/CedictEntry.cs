@@ -200,6 +200,18 @@ namespace ZD.Common
                     this.hanziPinyinMap[i] = -1;
             }
         }
+        
+        /// <summary>
+        /// Deserializes simplified and traditional headword, without reading *full* entry.
+        /// </summary>
+        public static void DeserializeHanzi(BinReader br, out string simp, out string trad)
+        {
+            // Pinyin - will drop this
+            br.ReadArray(brr => new PinyinSyllable(brr));
+            // Headword simp & trad
+            simp = br.ReadString();
+            trad = br.ReadString();
+        }
 
         /// <summary>
         /// Ctor: deserialize from binary stream.

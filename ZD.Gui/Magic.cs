@@ -98,9 +98,25 @@ namespace ZD.Gui
         public static readonly float ZhoButtonFontSize = 18.0F;
 
         /// <summary>
-        /// Font family for Hanzi in lookup results and char picker: simplified.
+        /// See <see cref="ZhoContentFontFamily"/>.
         /// </summary>
-        public static readonly IdeoFamily ZhoContentFontFamily = IdeoFamily.ArphicKai;
+        private static IdeoFamily zhoContentFontFamily = IdeoFamily.WinKai;
+
+        /// <summary>
+        /// Font family for Hanzi in lookup results and char picker.
+        /// </summary>
+        public static IdeoFamily ZhoContentFontFamily
+        {
+            get { return zhoContentFontFamily; }
+        }
+
+        /// <summary>
+        /// Sets the font family for Hanzi characters in lookup results and char picker.
+        /// </summary>
+        public static void SetZhoContentFontFamily(IdeoFamily fam)
+        {
+            zhoContentFontFamily = fam;
+        }
 
         /// <summary>
         /// Font size for Hanzi heading in each displayed dictionary entry. Also in character picker.

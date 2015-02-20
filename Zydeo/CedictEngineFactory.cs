@@ -16,9 +16,9 @@ namespace ZD
         /// <summary>
         /// See <see cref="ZD.Common.ICedictEngineFactory.Create"/>.
         /// </summary>
-        public ICedictEngine Create(string dictFileName)
+        public ICedictEngine Create(string dictFileName, IFontCoverage cvr)
         {
-            return new DictEngine(dictFileName);
+            return new DictEngine(dictFileName, cvr);
         }
 
         /// <summary>

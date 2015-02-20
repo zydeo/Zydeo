@@ -42,8 +42,12 @@ namespace ZD.Gui
         {
             this.tprov = tprov;
 
-            // Initialize hanzi renderer (scale)
+            // Initialize hanzi renderer
+            // -- Scale (DPI)
+            // -- Available systems fonts
             HanziRenderer.Scale = Scale;
+            if (HanziRenderer.IsWinKaiAvailable()) Magic.SetZhoContentFontFamily(IdeoFamily.WinKai);
+            else Magic.SetZhoContentFontFamily(IdeoFamily.ArphicKai);
 
             // Find out last window size and location from settings
             Size size = AppSettings.WindowLogicalSize;

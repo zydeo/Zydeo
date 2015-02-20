@@ -8,6 +8,8 @@ using System.Drawing.Text;
 using System.IO;
 using System.Reflection;
 
+using ZD.Common;
+
 namespace ZD.Gui
 {
     /// <summary>
@@ -20,7 +22,11 @@ namespace ZD.Gui
         /// </summary>
         ArphicKai,
         /// <summary>
-        /// Noto Sans Han, Regular.
+        /// DFKai-SB and KaiTi, the two Kai fonts installed with Windows (Vista and above).
+        /// </summary>
+        WinKai,
+        /// <summary>
+        /// Noto Sans Han T/S, Regular.
         /// </summary>
         Noto,
     }
@@ -151,6 +157,54 @@ namespace ZD.Gui
         }
 
         /// <summary>
+        /// Returns coverage info from a binary compact array.
+        /// </summary>
+        private class CvrBinary : IFontCoverage
+        {
+            /// <summary>
+            /// The compact binary array with info about the font's code point coverage.
+            /// </summary>
+            private readonly byte[] coverage;
+
+            /// <summary>
+            /// Ctor: take reference to compact binary array.
+            /// </summary>
+            /// <param name="coverage"></param>
+            public CvrBinary(byte[] coverage)
+            {
+                if (coverage == null) throw new ArgumentNullException("coverage");
+                if (coverage.Length != 65536 / 4) throw new ArgumentException("Coverage array must be 16k long.");
+                this.coverage = coverage;
+            }
+
+            /// <summary>
+            /// Returns coverage value for character from compact array.
+            /// </summary>
+            private byte getCvrVal(char c)
+            {
+                int ix = (int)c;
+                int arrIx = ix / 4;
+                int ofsInByte = ix - arrIx * 4;
+                byte b = arphicCoverage[arrIx];
+                b >>= (ofsInByte * 2);
+                b &= 3;
+                return b;
+            }
+
+            /// <summary>
+            /// See <see cref="IFontCoverage.GetCoverage"/>.
+            /// </summary>
+            public FontCoverageFlags GetCoverage(char c)
+            {
+                FontCoverageFlags res = FontCoverageFlags.None;
+                byte val = getCvrVal(c);
+                if ((val & 1) == 1) res |= FontCoverageFlags.Simp;
+                if ((val & 2) == 2) res |= FontCoverageFlags.Trad;
+                return res;
+            }
+        }
+
+        /// <summary>
         /// Specifies Arphic font coverage for a simplified character.
         /// </summary>
         private enum ArphicSimpCoverage
@@ -169,10 +223,29 @@ namespace ZD.Gui
             None,
         }
 
+        #region Font face and file names etc.
+        private readonly static string myFileTradKai = "ukaitw.ttf";
+        private readonly static string myFileSimpKai = "hdzb_75.ttf";
+        private readonly static string myFileTradHei = "NotoSansHant-Light.otf";
+        private readonly static string myFileSimpHei = "NotoSansHans-Light.otf";
+        private readonly static string winFontNameTrad = "DFKai-SB";
+        private readonly static string winFontNameSimp = "KaiTi";
+        #endregion
+
         /// <summary>
         /// Compact array holding coverage info about simplified and traditional Arphic font.
         /// </summary>
         private static readonly byte[] arphicCoverage;
+
+        /// <summary>
+        /// Compact array holding coverage info about the Windows system Kai fonts.
+        /// </summary>
+        private static readonly byte[] winCoverage;
+
+        /// <summary>
+        /// Coverage info provider about the Arphic fonts.
+        /// </summary>
+        private static readonly CvrBinary cvrArphic;
 
         /// <summary>
         /// My private font collection - loaded from file.
@@ -190,46 +263,58 @@ namespace ZD.Gui
         private static float scale = 0;
 
         /// <summary>
+        /// Returns true if the built-in Windows Kai fonts are available on the system.
+        /// </summary>
+        public static bool IsWinKaiAvailable()
+        {
+            bool simpThere = false;
+            bool tradThere = false;
+            using (Font fnt = new Font(winFontNameSimp, 10F))
+            {
+                simpThere = fnt.Name == winFontNameSimp;
+            }
+            using (Font fnt = new Font(winFontNameTrad, 10F))
+            {
+                tradThere = fnt.Name == winFontNameTrad;
+            }
+            return simpThere && tradThere;
+        }
+
+        /// <summary>
+        /// Returns a coverage info provider for the specified font family.
+        /// </summary>
+        public static IFontCoverage GetFontCoverage(IdeoFamily fam)
+        {
+            if (fam == IdeoFamily.Noto) return new FontCoverageFull();
+            else if (fam == IdeoFamily.ArphicKai) return cvrArphic;
+            else if (fam == IdeoFamily.WinKai) return new CvrBinary(winCoverage);
+            else throw new Exception("Forgotten family: " + fam.ToString());
+        }
+
+        /// <summary>
         /// Static ctor: loads fonts deployed with Zydeo.
         /// </summary>
         static HanziRenderer()
         {
-            // Deserialize compact array about Arphic font coverage
+            // Deserialize compact arrays about font coverage
             Assembly a = Assembly.GetExecutingAssembly();
             using (Stream s = a.GetManifestResourceStream("ZD.Gui.Resources.arphic-coverage.bin"))
             using (BinaryReader br = new BinaryReader(s))
             {
                 arphicCoverage = br.ReadBytes(65536 / 4);
+                cvrArphic = new CvrBinary(arphicCoverage);
+            }
+            using (Stream s = a.GetManifestResourceStream("ZD.Gui.Resources.winfonts-coverage.bin"))
+            using (BinaryReader br = new BinaryReader(s))
+            {
+                winCoverage = br.ReadBytes(65536 / 4);
             }
 
-            // Load deployed fonts
-            fonts.AddFontFile("ukaitw.ttf");
-            fonts.AddFontFile("hdzb_75.ttf");
-            if (File.Exists("NotoSansHans-Light.otf")) fonts.AddFontFile("NotoSansHans-Light.otf");
-            if (File.Exists("NotoSansHant-Light.otf")) fonts.AddFontFile("NotoSansHant-Light.otf");
-        }
-
-        /// <summary>
-        /// Returns Arphic coverage value for character from compact array.
-        /// </summary>
-        private static byte getArphicVal(char c)
-        {
-            int ix = (int)c;
-            int arrIx = ix / 4;
-            int ofsInByte = ix - arrIx * 4;
-            byte b = arphicCoverage[arrIx];
-            b >>= (ofsInByte * 2);
-            b &= 3;
-            return b;
-        }
-
-        /// <summary>
-        /// Returns true of traditional Arphic font covers provided character.
-        /// </summary>
-        private static bool hasArphicTrad(char c)
-        {
-            byte val = getArphicVal(c);
-            return ((val & 2) == 2);
+            // Load deployed fonts into private collection
+            fonts.AddFontFile(myFileTradKai);
+            fonts.AddFontFile(myFileSimpKai);
+            if (File.Exists(myFileSimpHei)) fonts.AddFontFile(myFileSimpHei);
+            if (File.Exists(myFileTradHei)) fonts.AddFontFile(myFileTradHei);
         }
 
         /// <summary>
@@ -237,9 +322,9 @@ namespace ZD.Gui
         /// </summary>
         private static ArphicSimpCoverage getArphicCoverageSimp(char c)
         {
-            byte val = getArphicVal(c);
-            if (val == 0) return ArphicSimpCoverage.None;
-            if ((val & 1) == 1) return ArphicSimpCoverage.SimpCovers;
+            FontCoverageFlags flags = cvrArphic.GetCoverage(c);
+            if (flags == FontCoverageFlags.None) return ArphicSimpCoverage.None;
+            if (flags == FontCoverageFlags.Simp) return ArphicSimpCoverage.SimpCovers;
             return ArphicSimpCoverage.CanSubstitute;
         }
 
@@ -268,6 +353,9 @@ namespace ZD.Gui
             return new SizeF(ftray.DisplayWidth, ftray.DisplayHeight);
         }
 
+        /// <summary>
+        /// Draws a Hanzi string in the desired font.
+        /// </summary>
         public static void DrawString(Graphics g, string text, PointF loc, Brush b,
             IdeoFamily fam, IdeoScript script, float size, FontStyle style)
         {
@@ -295,7 +383,7 @@ namespace ZD.Gui
                 char c = chr[0];
                 bool tofu = false;
                 if (fam == IdeoFamily.ArphicKai) tofu =
-                    (script == IdeoScript.Trad && !hasArphicTrad(c)) ||
+                    (script == IdeoScript.Trad && !cvrArphic.GetCoverage(c).HasFlag(FontCoverageFlags.Trad)) ||
                     (script == IdeoScript.Simp && (asp = getArphicCoverageSimp(c)) == ArphicSimpCoverage.None);
                 // Draw tofu is must be
                 if (tofu)
@@ -360,6 +448,28 @@ namespace ZD.Gui
             FontTray ftray = null;
             float height = size * 4F / 3F;
             height *= scale;
+
+            // If a system font is requested, instantiate
+            if (fam == IdeoFamily.WinKai)
+            {
+                if (script == IdeoScript.Simp)
+                {
+                    ftray = new FontTray(
+                        new Font(winFontNameSimp, size, style), 0, -0.05F,
+                        height * 0.9F, height);
+                    if (ftray.Font.Name != winFontNameSimp) throw new Exception("Requested font not available.");
+                }
+                else
+                {
+                    ftray = new FontTray(
+                         new Font(winFontNameTrad, size, style), 0, -0.05F,
+                         height * 0.9F, height);
+                    if (ftray.Font.Name != winFontNameTrad) throw new Exception("Requested font not available.");
+                }
+                return ftray;
+            }
+
+            // If a private font is requested, find font face in private collection and instantiate
             foreach (FontFamily ff in fonts.Families)
             {
                 if (fam == IdeoFamily.ArphicKai && script == IdeoScript.Trad && ff.Name == "AR PL UKai TW")

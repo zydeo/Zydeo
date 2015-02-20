@@ -32,6 +32,7 @@
             this.canvas = new ZD.FontTest.FontTestCtrl();
             this.rbArphic = new System.Windows.Forms.RadioButton();
             this.gbParams = new System.Windows.Forms.GroupBox();
+            this.llSaveCoverage = new System.Windows.Forms.LinkLabel();
             this.btnGo = new System.Windows.Forms.Button();
             this.txtSz = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -40,7 +41,8 @@
             this.pnlLayout = new System.Windows.Forms.TableLayoutPanel();
             this.pnlSmart = new System.Windows.Forms.Panel();
             this.pretty = new ZD.FontTest.PrettyTestCtrl();
-            this.llSaveCoverage = new System.Windows.Forms.LinkLabel();
+            this.rbKaiTi = new System.Windows.Forms.RadioButton();
+            this.rbDFKai = new System.Windows.Forms.RadioButton();
             this.pnlCanvas.SuspendLayout();
             this.gbParams.SuspendLayout();
             this.pnlLayout.SuspendLayout();
@@ -86,6 +88,8 @@
             // 
             this.gbParams.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbParams.Controls.Add(this.rbKaiTi);
+            this.gbParams.Controls.Add(this.rbDFKai);
             this.gbParams.Controls.Add(this.llSaveCoverage);
             this.gbParams.Controls.Add(this.btnGo);
             this.gbParams.Controls.Add(this.txtSz);
@@ -100,9 +104,23 @@
             this.gbParams.TabStop = false;
             this.gbParams.Text = "Params";
             // 
+            // llSaveCoverage
+            // 
+            this.llSaveCoverage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.llSaveCoverage.AutoSize = true;
+            this.llSaveCoverage.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
+            this.llSaveCoverage.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
+            this.llSaveCoverage.Location = new System.Drawing.Point(724, 24);
+            this.llSaveCoverage.Name = "llSaveCoverage";
+            this.llSaveCoverage.Size = new System.Drawing.Size(113, 13);
+            this.llSaveCoverage.TabIndex = 7;
+            this.llSaveCoverage.TabStop = true;
+            this.llSaveCoverage.Text = "Save Arphic coverage";
+            this.llSaveCoverage.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llSaveCoverage_LinkClicked);
+            // 
             // btnGo
             // 
-            this.btnGo.Location = new System.Drawing.Point(368, 16);
+            this.btnGo.Location = new System.Drawing.Point(528, 16);
             this.btnGo.Name = "btnGo";
             this.btnGo.Size = new System.Drawing.Size(75, 24);
             this.btnGo.TabIndex = 6;
@@ -112,7 +130,7 @@
             // txtSz
             // 
             this.txtSz.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtSz.Location = new System.Drawing.Point(316, 16);
+            this.txtSz.Location = new System.Drawing.Point(476, 16);
             this.txtSz.Name = "txtSz";
             this.txtSz.Size = new System.Drawing.Size(52, 24);
             this.txtSz.TabIndex = 5;
@@ -121,7 +139,7 @@
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(236, 16);
+            this.label1.Location = new System.Drawing.Point(396, 16);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(80, 24);
             this.label1.TabIndex = 4;
@@ -145,7 +163,7 @@
             this.rbSimp.Size = new System.Drawing.Size(82, 24);
             this.rbSimp.TabIndex = 2;
             this.rbSimp.TabStop = true;
-            this.rbSimp.Text = "Simplified";
+            this.rbSimp.Text = "HDZB";
             this.rbSimp.UseVisualStyleBackColor = true;
             // 
             // pnlLayout
@@ -185,18 +203,25 @@
             this.pretty.TabIndex = 0;
             this.pretty.Text = "prettyTestCtrl1";
             // 
-            // llSaveCoverage
+            // rbKaiTi
             // 
-            this.llSaveCoverage.AutoSize = true;
-            this.llSaveCoverage.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-            this.llSaveCoverage.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
-            this.llSaveCoverage.Location = new System.Drawing.Point(536, 24);
-            this.llSaveCoverage.Name = "llSaveCoverage";
-            this.llSaveCoverage.Size = new System.Drawing.Size(113, 13);
-            this.llSaveCoverage.TabIndex = 7;
-            this.llSaveCoverage.TabStop = true;
-            this.llSaveCoverage.Text = "Save Arphic coverage";
-            this.llSaveCoverage.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llSaveCoverage_LinkClicked);
+            this.rbKaiTi.Location = new System.Drawing.Point(320, 16);
+            this.rbKaiTi.Name = "rbKaiTi";
+            this.rbKaiTi.Size = new System.Drawing.Size(69, 24);
+            this.rbKaiTi.TabIndex = 9;
+            this.rbKaiTi.TabStop = true;
+            this.rbKaiTi.Text = "Kaiti";
+            this.rbKaiTi.UseVisualStyleBackColor = true;
+            // 
+            // rbDFKai
+            // 
+            this.rbDFKai.Location = new System.Drawing.Point(244, 16);
+            this.rbDFKai.Name = "rbDFKai";
+            this.rbDFKai.Size = new System.Drawing.Size(82, 24);
+            this.rbDFKai.TabIndex = 8;
+            this.rbDFKai.TabStop = true;
+            this.rbDFKai.Text = "DFKai-SB";
+            this.rbDFKai.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -232,6 +257,8 @@
         private System.Windows.Forms.Panel pnlSmart;
         private PrettyTestCtrl pretty;
         private System.Windows.Forms.LinkLabel llSaveCoverage;
+        private System.Windows.Forms.RadioButton rbKaiTi;
+        private System.Windows.Forms.RadioButton rbDFKai;
     }
 }
 

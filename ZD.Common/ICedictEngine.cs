@@ -48,7 +48,9 @@ namespace ZD.Common
         /// <summary>
         /// Creates a dictionary engine for the dictionary in the provided file.
         /// </summary>
-        ICedictEngine Create(string dictFileName);
+        /// <param name="dictFileName">Name of the compiled binary dictionary.</param>
+        /// <param name="cvr">Font coverage info provider for lookup filtering.</param>
+        ICedictEngine Create(string dictFileName, IFontCoverage cvr);
 
         /// <summary>
         /// Gest information about dictionary, without loading indexes.
