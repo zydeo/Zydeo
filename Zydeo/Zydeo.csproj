@@ -139,6 +139,7 @@
 copy $(SolutionDir)_work\strokes-zydeo.bin $(SolutionDir)_bin
 copy $(SolutionDir)_work\ukaitw.ttf $(SolutionDir)_bin
 copy $(SolutionDir)_work\hdzb_75.ttf $(SolutionDir)_bin
+copy $(SolutionDir)_work\Ubuntu-Bold.ttf $(SolutionDir)_bin
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

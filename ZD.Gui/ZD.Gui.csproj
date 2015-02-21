@@ -47,6 +47,7 @@
     <Compile Include="CharPicker.cs" />
     <Compile Include="AppErrorLogger.cs" />
     <Compile Include="ClipboardHelper.cs" />
+    <Compile Include="FontCollection.cs" />
     <Compile Include="HanziRenderer.cs" />
     <Compile Include="HintedTextBox.cs">
       <SubType>Component</SubType>

@@ -41,7 +41,7 @@ namespace ZD.Gui
                 spaceWidth = (int)sz.Width;
                 lemmaCharHeight = sz.Height;
                 lemmaLineHeight = sz.Height * Magic.LemmaLineHeightScale;
-                sz = g.MeasureString(spaceTestStr, getFont(fntPinyinHead), 65535, sf);
+                sz = g.MeasureString(Magic.PinyinSpaceTestString, getFont(fntPinyinHead), 65535, sf);
                 pinyinSpaceWidth = sz.Width;
             }
 
@@ -698,8 +698,7 @@ namespace ZD.Gui
             float hwidth = 5.0F * ideoSize.Width;
             headInfo.HeadwordRight = padLeft + hwidth;
             // Measure simplified chars from start; break when needed
-            PointF loc = new PointF(((float)padLeft) + ideoSize.Width, padTop / 2.0F); // Less padding above hanzi - font leaves enough space
-            //PointF loc = new PointF(padLeft, padTop / 2.0F); // Less padding above hanzi - font leaves enough space
+            PointF loc = new PointF(((float)padLeft) + ideoSize.Width, padTop);
             bool lbrk = false;
             if (analyzedScript == SearchScript.Simplified || analyzedScript == SearchScript.Both)
             {

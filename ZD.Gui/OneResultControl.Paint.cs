@@ -99,18 +99,25 @@ namespace ZD.Gui
             // We do have highlights
             if (pinyinInfo.HiliteStart != -1)
             {
+                // We offset highlight vertically for more pleasing aesthetics (lots of empty space at top in text)
+                float topOfs = pinyinInfo.Blocks[0].Rect.Height / 15.0F; // TO-DO: This will need more work; depends on font size & Scale
+                // We make highlight exten a bit farther down
+                float hFactor = 1.1F;
+
                 // Needed to make gradient work
                 g.SmoothingMode = SmoothingMode.None;
                 float edgeLeft = 0;
                 float edgeRight = 0;
                 for (int i = 0; i != pinyinInfo.Blocks.Count; ++i)
                 {
-                    PinyinBlock pb = pinyinInfo.Blocks[i];
-                    // Where?
-                    PointF loc = pb.Rect.Location;
                     // Not in highlight now
                     if (i < pinyinInfo.HiliteStart || i >= pinyinInfo.HiliteStart + pinyinInfo.HiliteLength)
                         continue;
+                    // Get block
+                    PinyinBlock pb = pinyinInfo.Blocks[i];
+                    // Where?
+                    PointF loc = pb.Rect.Location;
+                    loc.Y += topOfs;
                     // Remember edges
                     if (i == pinyinInfo.HiliteStart)
                         edgeLeft = pb.Rect.Left;
@@ -118,6 +125,7 @@ namespace ZD.Gui
                         edgeRight = pb.Rect.Right;
                     // Hilight syllable itself
                     RectangleF hlr = new RectangleF(loc, pb.Rect.Size);
+                    hlr.Height *= hFactor;
                     g.FillRectangle(bhilite, hlr);
                     // For middle and last: hilight space before
                     if (i > pinyinInfo.HiliteStart)
@@ -132,7 +140,7 @@ namespace ZD.Gui
                 // Extends one space's width beyond edge
                 // Reach max color two spaces' width within syllable, OR
                 // by midpoint, if edgeRight - edgeLeft < 4 spaces
-                float y = pinyinInfo.Blocks[0].Rect.Top;
+                float y = pinyinInfo.Blocks[0].Rect.Top + topOfs;
                 float w = pinyinSpaceWidth;
                 if (edgeLeft != 0 && edgeRight != 0)
                 {
@@ -140,18 +148,18 @@ namespace ZD.Gui
                     float whalf = (edgeRight - edgeLeft) / 2.0F;
                     RectangleF rleft;
                     if (whalf < 2.0F * w)
-                        rleft = new RectangleF(edgeLeft - w, y, w + whalf, pinyinInfo.PinyinHeight);
+                        rleft = new RectangleF(edgeLeft - w, y, w + whalf, pinyinInfo.PinyinHeight * hFactor);
                     else
-                        rleft = new RectangleF(edgeLeft - w, y, w * 3.0F, pinyinInfo.PinyinHeight);
+                        rleft = new RectangleF(edgeLeft - w, y, w * 3.0F, pinyinInfo.PinyinHeight * hFactor);
                     using (LinearGradientBrush lbr = new LinearGradientBrush(rleft, bgcol, Magic.HiliteColor, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lbr, rleft);
                     }
                     RectangleF rright;
                     if (whalf < 2.0F * w)
-                        rright = new RectangleF(midPoint, y, w + whalf, pinyinInfo.PinyinHeight);
+                        rright = new RectangleF(midPoint, y, w + whalf, pinyinInfo.PinyinHeight * hFactor);
                     else
-                        rright = new RectangleF(edgeRight - 2.0F * w, y, w * 3.0F, pinyinInfo.PinyinHeight);
+                        rright = new RectangleF(edgeRight - 2.0F * w, y, w * 3.0F, pinyinInfo.PinyinHeight * hFactor);
                     using (LinearGradientBrush lbr = new LinearGradientBrush(rright, Magic.HiliteColor, bgcol, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lbr, rright);
@@ -411,8 +419,9 @@ namespace ZD.Gui
                 }
                 // Pinyin
                 using (SolidBrush bhilite = new SolidBrush(Magic.HiliteColor))
+                using (SolidBrush bpinyin = new SolidBrush(Magic.PinyinColor))
                 {
-                    doPaintPinyin(g, bnorm, bhilite, sf, bgcol);
+                    doPaintPinyin(g, bpinyin, bhilite, sf, bgcol);
                 }
                 // Target (body)
                 doPaintTarget(g, pnorm, bnorm, sf);

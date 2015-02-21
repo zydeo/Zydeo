@@ -151,13 +151,30 @@ namespace ZD.Gui
         /// <summary>
         /// Font family for Pinyin in heading of displayed entries.
         /// </summary>
+        public static readonly string PinyinFontFamily = "Ubuntu";
         //public static readonly string PinyinFontFamily = "Tahoma";
-        public static readonly string PinyinFontFamily = "Segoe UI";
+        //public static readonly string PinyinFontFamily = "Segoe UI";
+
+        /// <summary>
+        /// Font style for Pinyin in heading of displayed entries.
+        /// </summary>
+        public static readonly FontStyle PinyinFontStyle = FontStyle.Regular;
+        //public static readonly FontStyle PinyinFontStyle = FontStyle.Regular;
 
         /// <summary>
         /// Font size for Pinyin in heading of displayed entries.
         /// </summary>
         public static readonly float PinyinFontSize = 12.0F;
+
+        /// <summary>
+        /// Text color of Pinyin in heading of entries.
+        /// </summary>
+        public static readonly Color PinyinColor = Color.FromArgb(32, 32, 32);
+
+        /// <summary>
+        /// Text measuredto get width of space. Varies with fonts.
+        /// </summary>
+        public static readonly string PinyinSpaceTestString = "i";
 
         /// <summary>
         /// Base color of highlights in a result (auto-faded gradient at ends).

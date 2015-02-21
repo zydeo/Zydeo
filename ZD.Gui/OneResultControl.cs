@@ -200,7 +200,7 @@ namespace ZD.Gui
             this.last = last;
 
             padLeft = (int)(5.0F * scale);
-            padTop = (int)(5.0F * scale);
+            padTop = (int)(4.0F * scale);
             padBottom = (int)(8.0F * scale);
             padMid = (int)(20.0F * scale);
             padRight = (int)(10.0F * scale);
@@ -230,7 +230,7 @@ namespace ZD.Gui
         /// </summary>
         static OneResultControl()
         {
-            fntArr[fntPinyinHead] = new Font(Magic.PinyinFontFamily, Magic.PinyinFontSize, FontStyle.Bold);
+            fntArr[fntPinyinHead] = FontCollection.CreateFont(Magic.PinyinFontFamily, Magic.PinyinFontSize, Magic.PinyinFontStyle);
             fntArr[fntSenseLatin] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize);
             fntArr[fntMetaLatin] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize, FontStyle.Italic);
             fntArr[fntSenseId] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize * 0.8F);
