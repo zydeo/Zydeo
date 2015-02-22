@@ -21,6 +21,11 @@ namespace ZD.Gui
     internal partial class LookupControl : ZenControl
     {
         /// <summary>
+        /// Type of callback when user chooses to close Zydeo and update.
+        /// </summary>
+        public delegate void UpdateNowDelegate();
+
+        /// <summary>
         /// Dictionary factory: we use this to create dictionary in worker thread, after startup, when window is already shown.
         /// </summary>
         private readonly ICedictEngineFactory dictFact;
@@ -228,6 +233,15 @@ namespace ZD.Gui
         {
             base.OnFormLoaded();
             ThreadPool.QueueUserWorkItem(loadDictionary);
+        }
+
+        /// <summary>
+        /// Hides results control and shows welcome screen with info about an available update.
+        /// </summary>
+        public void SetWelcomeUpdate(int vmaj, int vmin, DateTime rdate, string rnotes,
+            UpdateNowDelegate updateNowDelegate)
+        {
+
         }
 
         /// <summary>

@@ -34,6 +34,7 @@ namespace ZD.Gui
         /// <summary>
         /// Subfolder in user's appdata where Zydeo stores its persistent user-specific data.
         /// </summary>
+        /// <remarks>Keep in sync with <see cref="ZD.AU.Magic.ZydeoUserFolder"/>.</remarks>
         public readonly static string ZydeoUserFolder = "Zydeo";
 
         /// <summary>

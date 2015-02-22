@@ -33,6 +33,10 @@ namespace ZD.Gui
         /// True if saved size and location didn't make sense and we reverted to defaults.
         /// </summary>
         private readonly bool ignoredSavedSizeAndLocation;
+        /// <summary>
+        /// True if updater should be launched when form is closed.
+        /// </summary>
+        private bool updateAfterClose = false;
 
         /// <summary>
         /// Ctor: initializes main form.
@@ -74,6 +78,31 @@ namespace ZD.Gui
             stgs = new SettingsControl(this, tprov, dictFact);
             MainTab = new ZenTab(stgs, tprov.GetString("TabMain"));
             Tabs.Add(new ZenTab(lc, tprov.GetString("TabLookup")));
+        }
+
+        /// <summary>
+        /// Shows welcome screen in form informing user about an available update.
+        /// </summary>
+        public void SetWelcomeUpdate(int vmaj, int vmin, DateTime rdate, string rnotes)
+        {
+            lc.SetWelcomeUpdate(vmaj, vmin, rdate, rnotes, updateNow);
+        }
+
+        /// <summary>
+        /// Gets whether Zydeo updater should be launched after closing window.
+        /// </summary>
+        public bool UpdateAfterClose
+        {
+            get { return updateAfterClose; }
+        }
+
+        /// <summary>
+        /// Handles user's action to close and update.
+        /// </summary>
+        private void updateNow()
+        {
+            updateAfterClose = true;
+            WinForm.Close();
         }
 
         /// <summary>

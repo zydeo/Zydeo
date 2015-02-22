@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5550F54A-EFBC-4A7B-876A-227D335193DB}</ProjectGuid>
+    <ProjectGuid>{E01BC3B1-39D0-4A8F-BBEC-356302DA200D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ZD</RootNamespace>
-    <AssemblyName>Zydeo</AssemblyName>
+    <RootNamespace>ZD.AU</RootNamespace>
+    <AssemblyName>ZD.AU</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,31 +31,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\_bin\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>..\_bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Zydeo.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\ZydeoSetup.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -67,18 +48,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CedictEngineFactory.cs" />
-    <Compile Include="FatalErrorForm.cs">
+    <Compile Include="AppUpdateChecker.cs" />
+    <Compile Include="Helper.cs" />
+    <Compile Include="NamedPipeStream.cs" />
+    <Compile Include="ServiceController.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ServiceInstaller.cs" />
+    <Compile Include="ServiceMgr.cs" />
+    <Compile Include="ServicePipeThread.cs" />
+    <Compile Include="SignatureCheck.cs" />
+    <Compile Include="UpdateInfo.cs" />
+    <Compile Include="ZydeoUpdateForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FatalErrorForm.Designer.cs">
-      <DependentUpon>FatalErrorForm.cs</DependentUpon>
+    <Compile Include="ZydeoUpdateForm.Designer.cs">
+      <DependentUpon>ZydeoUpdateForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FileErrorLogger.cs" />
+    <Compile Include="FileLogger.cs" />
+    <Compile Include="Magic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="FatalErrorForm.resx">
-      <DependentUpon>FatalErrorForm.cs</DependentUpon>
+    <Compile Include="ZydeoUpdateService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ZydeoUpdateService.Designer.cs">
+      <DependentUpon>ZydeoUpdateService.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="ZydeoUpdateForm.resx">
+      <DependentUpon>ZydeoUpdateForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -88,7 +86,6 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -101,52 +98,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <EmbeddedResource Include="Resources\ZydeoSetup.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ZD.AU\ZD.AU.csproj">
-      <Project>{e01bc3b1-39d0-4a8f-bbec-356302da200d}</Project>
-      <Name>ZD.AU</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\ZD.CedictEngine\ZD.CedictEngine.csproj">
-      <Project>{5c3bd324-3b92-4f78-86a4-77dad6801bd2}</Project>
-      <Name>ZD.CedictEngine</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\ZD.Common\ZD.Common.csproj">
-      <Project>{d151811c-2cf7-4ea9-8a09-052cc5c2f695}</Project>
-      <Name>ZD.Common</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\ZD.Gui.Zen\ZD.Gui.Zen.csproj">
-      <Project>{eb902a28-802f-4ee8-a98b-221706bcca44}</Project>
-      <Name>ZD.Gui.Zen</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\ZD.Gui\ZD.Gui.csproj">
-      <Project>{e08421c2-073f-4e52-a4cc-1ab4baf1eee3}</Project>
-      <Name>ZD.Gui</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\ZD.Texts\ZD.Texts.csproj">
-      <Project>{78dc52ab-427a-4ef7-9466-61417520295a}</Project>
-      <Name>ZD.Texts</Name>
-      <Private>False</Private>
-    </ProjectReference>
+    <EmbeddedResource Include="Resources\installer1.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Zydeo.ico" />
+    <EmbeddedResource Include="Resources\PubKey.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>copy $(SolutionDir)_work\cedict-zydeo.bin $(SolutionDir)_bin
-copy $(SolutionDir)_work\strokes-zydeo.bin $(SolutionDir)_bin
-copy $(SolutionDir)_work\ukaitw.ttf $(SolutionDir)_bin
-copy $(SolutionDir)_work\hdzb_75.ttf $(SolutionDir)_bin
-copy $(SolutionDir)_work\Ubuntu-Bold.ttf $(SolutionDir)_bin
-</PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

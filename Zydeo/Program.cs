@@ -7,6 +7,7 @@ using System.Threading;
 
 using ZD.Gui;
 using ZD.Texts;
+using ZD.AU;
 
 namespace ZD
 {
@@ -21,11 +22,12 @@ namespace ZD
 
         static void mainCore()
         {
-
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             mf = new MainForm(cef, tprov);
+            mf.WinForm.FormClosed += onFormClosed;
+            doCheckUpdate();
             Application.Run(mf.WinForm);
         }
         
@@ -38,6 +40,42 @@ namespace ZD
             ZD.Gui.AppErrorLogger.Instance = new FileErrorLogger();
             AppDomain.CurrentDomain.UnhandledException += onUnhandledException;
             mainCore();
+        }
+
+        /// <summary>
+        /// Checks if an update is available and tells main form. Launches deferred update check otherwise.
+        /// </summary>
+        private static void doCheckUpdate()
+        {
+            // Start deferred check - update info changes all the time
+            AppUpdateChecker.StartDeferredCheck(5000);
+            // Any number of things can go wrong here.
+            // If there's an exception, we just assume no update.
+            try
+            {
+                // No update - done here.
+                if (!UpdateInfo.UpdateAvailable) return;
+                // Get details
+                int vmaj, vmin;
+                DateTime rdate;
+                string rnotes;
+                // This call, in particular, is allowed to throw if Update.xml's data does not verify
+                UpdateInfo.GetUpdateInfo(out vmaj, out vmin, out rdate, out rnotes);
+                // Tell form
+                mf.SetWelcomeUpdate(vmaj, vmin, rdate, rnotes);
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// Called when main form is closed.
+        /// </summary>
+        private static void onFormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (mf.UpdateAfterClose)
+            {
+                int iii = 0;
+            }
         }
 
         private static void onUnhandledException(object sender, UnhandledExceptionEventArgs e)
