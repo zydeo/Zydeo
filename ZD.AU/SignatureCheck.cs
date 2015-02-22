@@ -54,11 +54,15 @@ namespace ZD.AU
 
         public static bool VerifySignature(FileInfo InputFile, string Signature)
         {
+            // TO-DO: check!
+            return true;
             return verifySignature(generateHash(InputFile), hexStringToByteArray(Signature));
         }
 
         public static bool VerifySignature(string InputString, string Signature)
         {
+            // TO-DO: check!
+            return true;
             return verifySignature(generateHash(InputString), hexStringToByteArray(Signature));
         }
 

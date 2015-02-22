@@ -130,6 +130,7 @@ namespace ZD.AU
             //   <available>yes</available>
             //   <url>http://zydeo.net/getupdate/ZydeoSetup-v1.1.exe</url>
             //   <urlhash>QWTTY3gffdkj343rwe+vs789</urlhash>
+            //   <filehash>jhkf8r75+vds/sdf56</filehash>
             //   <vmajor>1</vmajor>
             //   <vminor>1</vminor>
             //   <releasedate>2015-01-29</releasedate>
@@ -151,8 +152,8 @@ namespace ZD.AU
             int day = int.Parse(rdateStr.Substring(8, 2));
             DateTime rdate = new DateTime(year, month, day);
             // Store info about this update
-            UpdateInfo.SetUpdate(root["url"].InnerText, root["urlhash"].InnerText, vmaj, vmin, rdate,
-                root["releasenotes"].InnerText);
+            UpdateInfo.SetUpdate(root["url"].InnerText, root["urlhash"].InnerText, root["filehash"].InnerText,
+                vmaj, vmin, rdate, root["releasenotes"].InnerText);
         }
     }
 }

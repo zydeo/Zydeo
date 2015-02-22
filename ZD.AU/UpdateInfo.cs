@@ -20,6 +20,7 @@ namespace ZD.AU
             public bool UpdateAvailable = false;
             public string UpdateUrl = string.Empty;
             public string UpdateUrlHash = string.Empty;
+            public string UpdateFileHash = string.Empty;
             public ushort UpdateVersionInOne = 0;
             public string UpdateReleaseDate = string.Empty; // "2015-01-29"
             public string ReleaseNotesUrl = string.Empty;
@@ -179,8 +180,8 @@ namespace ZD.AU
         /// <summary>
         /// Sets information about an available update. If provided data is incorrect, stores "no udate" and throws.
         /// </summary>
-        internal static void SetUpdate(string url, string urlHash, int verMajor, int verMinor,
-            DateTime releaseDate, string releaseNotesUrl)
+        internal static void SetUpdate(string url, string urlHash, string fileHash,
+            int verMajor, int verMinor, DateTime releaseDate, string releaseNotesUrl)
         {
             try
             {
@@ -190,7 +191,7 @@ namespace ZD.AU
                 if (!SignatureCheck.VerifySignature(url, urlHash))
                     throw new ArgumentException("Update URL signature incorrect.");
                 if (verMajor < 1 || verMajor > 255) throw new ArgumentException("Invalid major version.");
-                if (verMinor < 0 || verMinor > 0) throw new ArgumentException("Invalid minor version.");
+                if (verMinor < 0 || verMinor > 255) throw new ArgumentException("Invalid minor version.");
                 Uri notesUri = new Uri(releaseNotesUrl);
                 if (notesUri.IsFile || (notesUri.Scheme != "http" && notesUri.Scheme != "https"))
                     throw new ArgumentException("Invalid release notes URL.");
@@ -203,6 +204,7 @@ namespace ZD.AU
                 Data.UpdateAvailable = true;
                 Data.UpdateUrl = url;
                 Data.UpdateUrlHash = urlHash;
+                Data.UpdateFileHash = fileHash;
                 Data.UpdateVersionInOne = (ushort)verInOne;
                 Data.UpdateReleaseDate = releaseDate.Year.ToString() + "-" + releaseDate.Month.ToString("00") + "-" + releaseDate.Day.ToString("00");
                 Data.ReleaseNotesUrl = releaseNotesUrl;
