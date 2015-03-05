@@ -42,6 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AntiLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CtxtMenuForm.cs">
       <SubType>Form</SubType>
     </Compile>

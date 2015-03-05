@@ -12,6 +12,7 @@ using System.Reflection;
 using ZD.Common;
 using ZD.HanziLookup;
 using ZD.Gui.Zen;
+using ZD.Gui.WhiteContent;
 
 namespace ZD.Gui
 {
@@ -20,11 +21,6 @@ namespace ZD.Gui
     /// </summary>
     internal partial class LookupControl : ZenControl
     {
-        /// <summary>
-        /// Type of callback when user chooses to close Zydeo and update.
-        /// </summary>
-        public delegate void UpdateNowDelegate();
-
         /// <summary>
         /// Dictionary factory: we use this to create dictionary in worker thread, after startup, when window is already shown.
         /// </summary>
@@ -76,6 +72,10 @@ namespace ZD.Gui
         /// Lookup results.
         /// </summary>
         private ResultsControl ctrlResults;
+        /// <summary>
+        /// White content control (only if we have a special message to show).
+        /// </summary>
+        private ResWhiteControl ctrlWhite = null;
         /// <summary>
         /// Character picker under writing pad.
         /// </summary>
@@ -207,13 +207,15 @@ namespace ZD.Gui
         /// </summary>
         protected override void OnSizeChanged()
         {
+            ZenControlBase resOrWhiteCtrl = ctrlWhite == null ? (ZenControlBase)ctrlResults : (ZenControlBase)ctrlWhite;
+
             ctrlSearchInput.RelLocation = new Point(writingPad.RelRight + padding, padding);
-            ctrlSearchInput.Width = Width - ctrlResults.RelLeft - btnSimpTrad.Width - btnSearchLang.Width - 3 * padding;
+            ctrlSearchInput.Width = Width - resOrWhiteCtrl.RelLeft - btnSimpTrad.Width - btnSearchLang.Width - 3 * padding;
             btnSimpTrad.RelLeft = Width - padding - btnSimpTrad.Width;
             btnSimpTrad.Height = ctrlSearchInput.Height;
             btnSearchLang.RelLeft = btnSimpTrad.RelLeft - padding - btnSearchLang.Width;
             btnSearchLang.Height = ctrlSearchInput.Height;
-            ctrlResults.Size = new Size(Width - ctrlResults.RelLeft - padding, Height - ctrlResults.RelTop - padding);
+            resOrWhiteCtrl.Size = new Size(Width - resOrWhiteCtrl.RelLeft - padding, Height - resOrWhiteCtrl.RelTop - padding);
         }
 
         /// <summary>
@@ -241,7 +243,26 @@ namespace ZD.Gui
         public void SetWelcomeUpdate(int vmaj, int vmin, DateTime rdate, string rnotes,
             UpdateNowDelegate updateNowDelegate)
         {
+            RemoveChild(ctrlResults);
+            ResWhiteWinUpdate winCtrl = new ResWhiteWinUpdate(vmaj, vmin, rdate, rnotes, updateNowDelegate);
+            ctrlWhite = new ResWhiteControl(this, winCtrl, tprov);
+            ctrlWhite.RelLocation = new Point(writingPad.RelRight + padding, ctrlSearchInput.RelBottom + padding);
+            OnSizeChanged();
+        }
 
+        private void clearWhite()
+        {
+            if (ctrlWhite != null)
+            {
+                RemoveChild(ctrlWhite);
+                ctrlWhite.Dispose();
+                ctrlWhite = null;
+                AddChild(ctrlResults);
+                ctrlResults.SetResults(lookupId, null,
+                    new ReadOnlyCollection<CedictResult>(new CedictResult[0]),
+                    searchScript);
+                OnSizeChanged();
+            }
         }
 
         /// <summary>
@@ -392,6 +413,7 @@ namespace ZD.Gui
             // Otherwise, user inserted a recognized character. Then we want to allow her to keep writing > no select.
             if (sender == ctrlSearchInput) ctrlSearchInput.SelectAll();
             // Fade out whatever is currently shown
+            clearWhite();
             ctrlResults.FadeOut();
             // Launch lookup and rendering in worker thread
             lock (lookupItems)
@@ -444,6 +466,7 @@ namespace ZD.Gui
             // Look up in dictionary
             CedictLookupResult res = dict.Lookup(li.Text, li.Script, li.Lang);
             // Call below transfers ownership of entry provider to results control.
+            clearWhite();
             bool shown = ctrlResults.SetResults(li.ID, res.EntryProvider, res.Results, searchScript);
             // If these results came too late (a long query completing too late, when a later fast query already completed)
             // Then we're done, no flashing.

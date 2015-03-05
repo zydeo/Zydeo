@@ -361,7 +361,7 @@ namespace ZD.Gui
             }
             finally
             {
-                entryProvider.Dispose();
+                if (entryProvider != null) entryProvider.Dispose();
             }
         }
 
