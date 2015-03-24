@@ -20,6 +20,11 @@ namespace ZD.Gui.Zen
         private int padding = 0;
 
         /// <summary>
+        /// See <see cref="ImageExtraPadding"/>.
+        /// </summary>
+        private int imageExtraPadding = 0;
+
+        /// <summary>
         /// Font face of button text.
         /// </summary>
         private string fontFace = ZenParams.GenericFontFamily;
@@ -166,7 +171,7 @@ namespace ZD.Gui.Zen
                 if (disabledImage != null) { disabledImage.Dispose(); image = null; }
                 image = value;
                 disabledImage = makeDisabledImage(image);
-                MakeMePaint(false, RenderMode.Invalidate);
+                //MakeMePaint(false, RenderMode.Invalidate);
             }
         }
 
@@ -179,7 +184,19 @@ namespace ZD.Gui.Zen
             set
             {
                 padding = value;
-                MakeMePaint(false, RenderMode.Invalidate);
+                //MakeMePaint(false, RenderMode.Invalidate);
+            }
+        }
+
+        /// <summary>
+        /// Extra padding around image, within button's normal <see cref="Padding"/>. Real pixels.
+        /// </summary>
+        public int ImageExtraPadding
+        {
+            get { return imageExtraPadding; }
+            set
+            {
+                imageExtraPadding = value;
             }
         }
 
@@ -222,7 +239,7 @@ namespace ZD.Gui.Zen
             int w = (int)wf;
             // If there is no image, preferred width is text plus padding on left and right
             if (image == null) return w + 2 * padding;
-            // Otherwise, image takes up control height on left; plus text; plus pad right
+            // Otherwise, padded image takes up control height on left; plus text; plus pad right
             return Height + w + padding;
         }
 
@@ -556,8 +573,8 @@ namespace ZD.Gui.Zen
             // Image, if we have any
             if (image != null)
             {
-                RectangleF imgRect = new RectangleF(padding, padding,
-                    Height - 2 * (padding), Height - 2 * (padding));
+                RectangleF imgRect = new RectangleF(padding + imageExtraPadding, padding + imageExtraPadding,
+                    Height - 2 * (padding + imageExtraPadding), Height - 2 * (padding + imageExtraPadding));
                 if (enabled) g.DrawImage(image, imgRect);
                 else g.DrawImage(disabledImage, imgRect);
             }

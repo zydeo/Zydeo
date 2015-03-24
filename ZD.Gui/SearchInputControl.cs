@@ -92,6 +92,7 @@ namespace ZD.Gui
             var imgCancel = Image.FromStream(a.GetManifestResourceStream("ZD.Gui.Resources.cancel.png"));
             btnCancel = new ZenImageButton(this);
             btnCancel.Size = new Size(Height - 2 * padding, Height - 2 * padding);
+            btnCancel.Padding = padding; // We want the X to be somewhat smaller
             btnCancel.RelLocation = new Point(Width - padding - btnCancel.Width, padding);
             btnCancel.Image = imgCancel;
             btnCancel.Visible = false;

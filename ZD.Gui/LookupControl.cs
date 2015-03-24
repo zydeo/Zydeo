@@ -133,6 +133,7 @@ namespace ZD.Gui
             btnClearWritingPad.Text = tprov.GetString("WritingPadClear");
             btnClearWritingPad.SetFont(ZenParams.GenericFontFamily, 9.0F);
             btnClearWritingPad.Padding = (int)(3.0F * Scale);
+            btnClearWritingPad.ImageExtraPadding = (int)(3.0F * Scale);
             btnClearWritingPad.Image = imgStrokesClear;
             btnClearWritingPad.Enabled = false;
             btnClearWritingPad.MouseClick += onClearWritingPad;
@@ -143,6 +144,7 @@ namespace ZD.Gui
             btnUndoStroke.Text = tprov.GetString("WritingPadUndo");
             btnUndoStroke.SetFont(ZenParams.GenericFontFamily, 9.0F);
             btnUndoStroke.Padding = (int)(3.0F * Scale);
+            btnUndoStroke.ImageExtraPadding = (int)(1.5F * Scale);
             btnUndoStroke.Image = imgStrokesUndo;
             btnUndoStroke.Enabled = false;
             btnUndoStroke.MouseClick += onUndoStroke;

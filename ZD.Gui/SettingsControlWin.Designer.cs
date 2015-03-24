@@ -118,7 +118,7 @@
             this.pbLogo.Dock = System.Windows.Forms.DockStyle.Top;
             this.pbLogo.Location = new System.Drawing.Point(3, 3);
             this.pbLogo.Name = "pbLogo";
-            this.pbLogo.Size = new System.Drawing.Size(194, 180);
+            this.pbLogo.Size = new System.Drawing.Size(194, 50);
             this.pbLogo.TabIndex = 1;
             this.pbLogo.TabStop = false;
             // 

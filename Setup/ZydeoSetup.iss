@@ -53,6 +53,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "..\_bin\Zydeo.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\_bin\ZD.AU.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ZD.CedictEngine.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ZD.Common.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ZD.Gui.dll"; DestDir: "{app}"; Flags: ignoreversion

@@ -30,24 +30,24 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ResultsCtxtControl));
             this.tblLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.tblSense = new System.Windows.Forms.TableLayoutPanel();
+            this.lblSense = new System.Windows.Forms.Label();
             this.pnlTop = new System.Windows.Forms.Panel();
             this.lblHead = new System.Windows.Forms.Label();
             this.pbCopyIcon = new System.Windows.Forms.PictureBox();
+            this.tblFull = new System.Windows.Forms.TableLayoutPanel();
+            this.lblFullCedict = new System.Windows.Forms.Label();
+            this.lblFullFormatted = new System.Windows.Forms.Label();
             this.tblZho = new System.Windows.Forms.TableLayoutPanel();
             this.lblPinyin = new System.Windows.Forms.Label();
             this.lblHanzi2 = new System.Windows.Forms.Label();
             this.lblHanzi1 = new System.Windows.Forms.Label();
-            this.tblFull = new System.Windows.Forms.TableLayoutPanel();
-            this.lblFullCedict = new System.Windows.Forms.Label();
-            this.lblFullFormatted = new System.Windows.Forms.Label();
-            this.tblSense = new System.Windows.Forms.TableLayoutPanel();
-            this.lblSense = new System.Windows.Forms.Label();
             this.tblLayout.SuspendLayout();
+            this.tblSense.SuspendLayout();
             this.pnlTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbCopyIcon)).BeginInit();
-            this.tblZho.SuspendLayout();
             this.tblFull.SuspendLayout();
-            this.tblSense.SuspendLayout();
+            this.tblZho.SuspendLayout();
             this.SuspendLayout();
             // 
             // tblLayout
@@ -70,6 +70,35 @@
             this.tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
             this.tblLayout.Size = new System.Drawing.Size(400, 186);
             this.tblLayout.TabIndex = 0;
+            // 
+            // tblSense
+            // 
+            this.tblSense.BackColor = System.Drawing.Color.White;
+            this.tblSense.ColumnCount = 1;
+            this.tblSense.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tblSense.Controls.Add(this.lblSense, 0, 1);
+            this.tblSense.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tblSense.Location = new System.Drawing.Point(0, 163);
+            this.tblSense.Margin = new System.Windows.Forms.Padding(0, 0, 0, 1);
+            this.tblSense.Name = "tblSense";
+            this.tblSense.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
+            this.tblSense.RowCount = 3;
+            this.tblSense.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
+            this.tblSense.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
+            this.tblSense.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 2F));
+            this.tblSense.Size = new System.Drawing.Size(400, 23);
+            this.tblSense.TabIndex = 5;
+            // 
+            // lblSense
+            // 
+            this.lblSense.BackColor = System.Drawing.Color.Transparent;
+            this.lblSense.Location = new System.Drawing.Point(12, 1);
+            this.lblSense.Margin = new System.Windows.Forms.Padding(0);
+            this.lblSense.Name = "lblSense";
+            this.lblSense.Size = new System.Drawing.Size(376, 21);
+            this.lblSense.TabIndex = 0;
+            this.lblSense.Text = "Sense: language";
+            this.lblSense.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // pnlTop
             // 
@@ -103,61 +132,6 @@
             this.pbCopyIcon.TabIndex = 0;
             this.pbCopyIcon.TabStop = false;
             // 
-            // tblZho
-            // 
-            this.tblZho.BackColor = System.Drawing.Color.White;
-            this.tblZho.ColumnCount = 1;
-            this.tblZho.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tblZho.Controls.Add(this.lblPinyin, 0, 3);
-            this.tblZho.Controls.Add(this.lblHanzi2, 0, 2);
-            this.tblZho.Controls.Add(this.lblHanzi1, 0, 1);
-            this.tblZho.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tblZho.Location = new System.Drawing.Point(0, 90);
-            this.tblZho.Margin = new System.Windows.Forms.Padding(0, 0, 0, 1);
-            this.tblZho.Name = "tblZho";
-            this.tblZho.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
-            this.tblZho.RowCount = 5;
-            this.tblZho.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
-            this.tblZho.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
-            this.tblZho.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
-            this.tblZho.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
-            this.tblZho.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 2F));
-            this.tblZho.Size = new System.Drawing.Size(400, 69);
-            this.tblZho.TabIndex = 4;
-            // 
-            // lblPinyin
-            // 
-            this.lblPinyin.Location = new System.Drawing.Point(12, 46);
-            this.lblPinyin.Margin = new System.Windows.Forms.Padding(0);
-            this.lblPinyin.Name = "lblPinyin";
-            this.lblPinyin.Size = new System.Drawing.Size(376, 21);
-            this.lblPinyin.TabIndex = 2;
-            this.lblPinyin.Text = "Pinyin: yǔ ​yán";
-            this.lblPinyin.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblPinyin.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // lblHanzi2
-            // 
-            this.lblHanzi2.Location = new System.Drawing.Point(12, 24);
-            this.lblHanzi2.Margin = new System.Windows.Forms.Padding(0);
-            this.lblHanzi2.Name = "lblHanzi2";
-            this.lblHanzi2.Size = new System.Drawing.Size(376, 21);
-            this.lblHanzi2.TabIndex = 1;
-            this.lblHanzi2.Text = "Traditional: 語言";
-            this.lblHanzi2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblHanzi2.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // lblHanzi1
-            // 
-            this.lblHanzi1.Location = new System.Drawing.Point(12, 2);
-            this.lblHanzi1.Margin = new System.Windows.Forms.Padding(0);
-            this.lblHanzi1.Name = "lblHanzi1";
-            this.lblHanzi1.Size = new System.Drawing.Size(376, 21);
-            this.lblHanzi1.TabIndex = 0;
-            this.lblHanzi1.Text = "Simplified: 语言";
-            this.lblHanzi1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblHanzi1.BackColor = System.Drawing.Color.Transparent;
-            // 
             // tblFull
             // 
             this.tblFull.BackColor = System.Drawing.Color.White;
@@ -180,54 +154,80 @@
             // 
             // lblFullCedict
             // 
-            this.lblFullCedict.Location = new System.Drawing.Point(12, 24);
-            this.lblFullCedict.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
+            this.lblFullCedict.BackColor = System.Drawing.Color.Transparent;
+            this.lblFullCedict.Location = new System.Drawing.Point(12, 22);
+            this.lblFullCedict.Margin = new System.Windows.Forms.Padding(0);
             this.lblFullCedict.Name = "lblFullCedict";
             this.lblFullCedict.Size = new System.Drawing.Size(376, 21);
             this.lblFullCedict.TabIndex = 1;
             this.lblFullCedict.Text = "Full Entry (CEDICT)";
             this.lblFullCedict.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblFullCedict.BackColor = System.Drawing.Color.Transparent;
             // 
             // lblFullFormatted
             // 
-            this.lblFullFormatted.Location = new System.Drawing.Point(12, 2);
+            this.lblFullFormatted.BackColor = System.Drawing.Color.Transparent;
+            this.lblFullFormatted.Location = new System.Drawing.Point(12, 1);
             this.lblFullFormatted.Margin = new System.Windows.Forms.Padding(0);
             this.lblFullFormatted.Name = "lblFullFormatted";
             this.lblFullFormatted.Size = new System.Drawing.Size(376, 21);
             this.lblFullFormatted.TabIndex = 0;
             this.lblFullFormatted.Text = "Full Entry (Formatted)";
             this.lblFullFormatted.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblFullFormatted.BackColor = System.Drawing.Color.Transparent;
             // 
-            // tblSense
+            // tblZho
             // 
-            this.tblSense.BackColor = System.Drawing.Color.White;
-            this.tblSense.ColumnCount = 1;
-            this.tblSense.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tblSense.Controls.Add(this.lblSense, 0, 1);
-            this.tblSense.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tblSense.Location = new System.Drawing.Point(0, 151);
-            this.tblSense.Margin = new System.Windows.Forms.Padding(0, 0, 0, 1);
-            this.tblSense.Name = "tblSense";
-            this.tblSense.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
-            this.tblSense.RowCount = 3;
-            this.tblSense.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
-            this.tblSense.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
-            this.tblSense.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 2F));
-            this.tblSense.Size = new System.Drawing.Size(400, 24);
-            this.tblSense.TabIndex = 5;
+            this.tblZho.BackColor = System.Drawing.Color.White;
+            this.tblZho.ColumnCount = 1;
+            this.tblZho.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tblZho.Controls.Add(this.lblPinyin, 0, 3);
+            this.tblZho.Controls.Add(this.lblHanzi2, 0, 2);
+            this.tblZho.Controls.Add(this.lblHanzi1, 0, 1);
+            this.tblZho.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tblZho.Location = new System.Drawing.Point(0, 96);
+            this.tblZho.Margin = new System.Windows.Forms.Padding(0, 0, 0, 1);
+            this.tblZho.Name = "tblZho";
+            this.tblZho.Padding = new System.Windows.Forms.Padding(12, 0, 12, 0);
+            this.tblZho.RowCount = 5;
+            this.tblZho.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
+            this.tblZho.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
+            this.tblZho.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
+            this.tblZho.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
+            this.tblZho.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 2F));
+            this.tblZho.Size = new System.Drawing.Size(400, 66);
+            this.tblZho.TabIndex = 4;
             // 
-            // lblSense
+            // lblPinyin
             // 
-            this.lblSense.Location = new System.Drawing.Point(12, 0);
-            this.lblSense.Margin = new System.Windows.Forms.Padding(0);
-            this.lblSense.Name = "lblSense";
-            this.lblSense.Size = new System.Drawing.Size(376, 21);
-            this.lblSense.TabIndex = 0;
-            this.lblSense.Text = "Sense: language";
-            this.lblSense.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblSense.BackColor = System.Drawing.Color.Transparent;
+            this.lblPinyin.BackColor = System.Drawing.Color.Transparent;
+            this.lblPinyin.Location = new System.Drawing.Point(12, 43);
+            this.lblPinyin.Margin = new System.Windows.Forms.Padding(0);
+            this.lblPinyin.Name = "lblPinyin";
+            this.lblPinyin.Size = new System.Drawing.Size(376, 21);
+            this.lblPinyin.TabIndex = 2;
+            this.lblPinyin.Text = "Pinyin: yǔ ​yán";
+            this.lblPinyin.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // lblHanzi2
+            // 
+            this.lblHanzi2.BackColor = System.Drawing.Color.Transparent;
+            this.lblHanzi2.Location = new System.Drawing.Point(12, 22);
+            this.lblHanzi2.Margin = new System.Windows.Forms.Padding(0);
+            this.lblHanzi2.Name = "lblHanzi2";
+            this.lblHanzi2.Size = new System.Drawing.Size(376, 21);
+            this.lblHanzi2.TabIndex = 1;
+            this.lblHanzi2.Text = "Traditional: 語言";
+            this.lblHanzi2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // lblHanzi1
+            // 
+            this.lblHanzi1.BackColor = System.Drawing.Color.Transparent;
+            this.lblHanzi1.Location = new System.Drawing.Point(12, 1);
+            this.lblHanzi1.Margin = new System.Windows.Forms.Padding(0);
+            this.lblHanzi1.Name = "lblHanzi1";
+            this.lblHanzi1.Size = new System.Drawing.Size(376, 21);
+            this.lblHanzi1.TabIndex = 0;
+            this.lblHanzi1.Text = "Simplified: 语言";
+            this.lblHanzi1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // ResultsCtxtControl
             // 
@@ -238,11 +238,11 @@
             this.Name = "ResultsCtxtControl";
             this.Size = new System.Drawing.Size(402, 175);
             this.tblLayout.ResumeLayout(false);
+            this.tblSense.ResumeLayout(false);
             this.pnlTop.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbCopyIcon)).EndInit();
-            this.tblZho.ResumeLayout(false);
             this.tblFull.ResumeLayout(false);
-            this.tblSense.ResumeLayout(false);
+            this.tblZho.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

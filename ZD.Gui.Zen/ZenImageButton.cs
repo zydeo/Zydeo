@@ -287,7 +287,7 @@ namespace ZD.Gui.Zen
                     float sz = (float)(Height - 2 * (padding));
                     sz *= prop;
                     float szHalf = sz / 2.0F;
-                    float imgMid = ((float)(Height + padding)) / 2.0F;
+                    float imgMid = ((float)(Height)) / 2.0F;
                     imgRect = new RectangleF(imgMid - szHalf, imgMid - szHalf, sz, sz);
                 }
                 // Full size: easier
