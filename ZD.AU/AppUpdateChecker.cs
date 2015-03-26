@@ -16,6 +16,12 @@ namespace ZD.AU
     public class AppUpdateChecker
     {
         /// <summary>
+        /// When invoked from Zydeo, app can override UI language here.
+        /// This value will be stored in update info XML, so update UI can choose its own display language.
+        /// </summary>
+        public static string UILang = "en";
+
+        /// <summary>
         /// Starts a deferred check for updates online, from a background thread. Asynchronous.
         /// </summary>
         /// <param name="msecDelay">Time to defer online query, in msec.</param>
@@ -153,7 +159,7 @@ namespace ZD.AU
             DateTime rdate = new DateTime(year, month, day);
             // Store info about this update
             UpdateInfo.SetUpdate(root["url"].InnerText, root["urlhash"].InnerText, root["filehash"].InnerText,
-                vmaj, vmin, rdate, root["releasenotes"].InnerText);
+                vmaj, vmin, rdate, root["releasenotes"].InnerText, UILang);
         }
     }
 }

@@ -74,7 +74,7 @@ namespace ZD.AU
         private const UInt32 GENERIC_WRITE = 0x40000000;
 
         //Constants for return value:
-        private const Int32 INVALID_HANDLE_VALUE = -1;
+        private static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
 
         //Constants for dwFlagsAndAttributes:
         private const UInt32 FILE_FLAG_OVERLAPPED = 0x40000000;
@@ -212,7 +212,7 @@ namespace ZD.AU
             if ((mode & FileAccess.Write) > 0) pipemode |= GENERIC_WRITE;
             IntPtr handle = CreateFile(pipename, pipemode, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
 
-            if (handle.ToInt32() == INVALID_HANDLE_VALUE)
+            if (handle == INVALID_HANDLE_VALUE)
             {
                 int err = Marshal.GetLastWin32Error();
                 throw new Win32Exception(err,
@@ -249,7 +249,7 @@ namespace ZD.AU
                 1024, // inBuffer,
                 NMPWAIT_WAIT_FOREVER,
                 pipeSecPtr);
-            if (handle.ToInt32() == INVALID_HANDLE_VALUE)
+            if (handle == INVALID_HANDLE_VALUE)
                 throw new Win32Exception("Error creating named pipe " + name + " . Internal error: " + Marshal.GetLastWin32Error().ToString());
             
             // Set members persistently...

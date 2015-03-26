@@ -11,6 +11,9 @@ using System.Reflection;
 
 namespace ZD.AU
 {
+    /// <summary>
+    /// UI, running in user's name, for process of downloading update and installing it.
+    /// </summary>
     internal partial class ZydeoUpdateForm : Form
     {
         private Point formOrigLoc = Point.Empty;

@@ -13,6 +13,9 @@ using System.Reflection;
 
 namespace ZD.AU
 {
+    /// <summary>
+    /// Contains the actual AU service logic: receives name/signature of installer to run, then runs it if everything's OK.
+    /// </summary>
     internal class ServicePipeThread
     {
         private NamedPipeStream servicePipe;

@@ -26,29 +26,43 @@ namespace ZD.AU
         public static extern bool MoveFileEx(string lpExistingFileName, string lpNewFileName,
             MoveFileFlags dwFlags);
 
+        /// <summary>
+        /// Returns true if current process is running as a Windows service.
+        /// </summary>
         public static bool IsService()
         {
             return WindowsIdentity.GetCurrent().IsSystem;
         }
 
+        /// <summary>
+        /// Returns true if current process is running from the TEMP folder.
+        /// </summary>
         public static bool IsRunningFromTemp()
         {
             string assLoc = Assembly.GetExecutingAssembly().Location;
             return assLoc.StartsWith(Path.GetTempPath(), StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public static string GetTempExePath()
+        /// <summary>
+        /// Gets a new random EXE file name in the TEMP folder.
+        /// </summary>
+        /// <returns></returns>
+        private static string getTempExePath()
         {
             string tempPath = Path.GetTempPath();
 
             // Generate temp .exe file name
             string tempExeName = Path.GetRandomFileName().Replace(".", "") + ".exe";
+            tempExeName = Magic.TempCopyPrefix + tempExeName;
             return Path.Combine(tempPath, tempExeName);
         }
 
+        /// <summary>
+        /// Re-launches current process from a TEMP folder; passes current PID as first argument.
+        /// </summary>
         public static void StartFromTemp()
         {
-            string tempExePath = GetTempExePath();
+            string tempExePath = getTempExePath();
 
             // Make a copy of ourselves to the temp path, and start it
             File.Copy(Assembly.GetExecutingAssembly().Location, tempExePath);
@@ -59,6 +73,9 @@ namespace ZD.AU
             MoveFileEx(tempExePath, null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
         }
 
+        /// <summary>
+        /// Waits for a process to exit.
+        /// </summary>
         public static void WaitForProcessExit(int pid)
         {
             try
@@ -69,6 +86,9 @@ namespace ZD.AU
             catch { }
         }
 
+        /// <summary>
+        /// Returns true if the AU helper service is currently registered.
+        /// </summary>
         public static bool IsServiceRegistered()
         {
             foreach (var svc in ZydeoServiceController.GetServices())
@@ -77,6 +97,9 @@ namespace ZD.AU
             return false;
         }
 
+        /// <summary>
+        /// Deletes a file without ever throwing. Marks it for deletion after restart if that don't work.
+        /// </summary>
         internal static void SafeDeleteFile(string Path)
         {
             int tryCount = 5;
@@ -98,6 +121,9 @@ namespace ZD.AU
             if (!success) MoveFileEx(Path, null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
         }
 
+        /// <summary>
+        /// Reads exactly N number of bytes from stream.
+        /// </summary>
         public static void ForceReadBytes(Stream str, ref byte[] buffer, int length)
         {
             int readSoFar = 0;
@@ -105,6 +131,9 @@ namespace ZD.AU
                 readSoFar += str.Read(buffer, readSoFar, length - readSoFar);
         }
 
+        /// <summary>
+        /// Serializes UInt32 into a 4-byte array.
+        /// </summary>
         public static byte[] SerializeUInt32(UInt32 value)
         {
             // Little endian encoding
@@ -118,6 +147,9 @@ namespace ZD.AU
             return ret;
         }
 
+        /// <summary>
+        /// Deserializes UInt32 from a 4-byte array.
+        /// </summary>
         public static UInt32 DeserializeUInt32(byte[] input)
         {
             if (input.Length != 4) throw new ArgumentException("Invalid byte length");
@@ -125,9 +157,12 @@ namespace ZD.AU
             return (UInt32)input[0] | ((UInt32)input[1]) << 8 | ((UInt32)input[2]) << 16 | ((UInt32)input[3]) << 24;
         }
 
-        public static string CalculateSHA1Hash(string Path)
+        /// <summary>
+        /// Calculates SHA1 hash of string.
+        /// </summary>
+        public static string CalculateSHA1Hash(string str)
         {
-            using (FileStream fs = new FileStream(Path, FileMode.Open, FileAccess.Read))
+            using (FileStream fs = new FileStream(str, FileMode.Open, FileAccess.Read))
             using (BufferedStream bs = new BufferedStream(fs))
             {
                 using (SHA1Managed sha1 = new SHA1Managed())

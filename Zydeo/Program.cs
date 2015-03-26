@@ -55,6 +55,7 @@ namespace ZD
         private static void doCheckUpdate()
         {
             // Start deferred check - update info changes all the time
+            AppUpdateChecker.UILang = "en"; // When we have UI lang settings, get this from ZD.Gui.AppSettings
             AppUpdateChecker.StartDeferredCheck(5000);
             // Any number of things can go wrong here.
             // If there's an exception, we just assume no update.
@@ -81,7 +82,7 @@ namespace ZD
         {
             if (mf.UpdateAfterClose)
             {
-                int iii = 0;
+                System.Diagnostics.Process.Start("ZD.AU.exe", "/update");
             }
         }
 

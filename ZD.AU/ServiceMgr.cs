@@ -9,6 +9,9 @@ using System.Text;
 
 namespace ZD.AU
 {
+    /// <summary>
+    /// Wraps up Windows API calls for setting service's start mode and security descriptors.
+    /// </summary>
     internal static class ServiceMgr
     {
         /// <summary>
@@ -97,7 +100,9 @@ namespace ZD.AU
         private const uint SERVICE_CHANGE_CONFIG = 0x00000002;
         private const uint SC_MANAGER_ALL_ACCESS = 0x000F003F;
 
-
+        /// <summary>
+        /// Gets a service's security descriptor as SDDL.
+        /// </summary>
         public static string GetServiceSDDL(string ServiceName, SecurityInfos SecurityInfos)
         {
             ServiceController sc = new ServiceController(ServiceName);
@@ -124,6 +129,9 @@ namespace ZD.AU
             return ConvertSDtoStringSD(psd);
         }
 
+        /// <summary>
+        /// Sets a service's security descriptor as SDDL.
+        /// </summary>
         public static void SetServiceSDDL(string ServiceName, SecurityInfos SecurityInfos, string SDDL)
         {
             ServiceController sc = new ServiceController(ServiceName);
@@ -132,6 +140,9 @@ namespace ZD.AU
                 throw new ApplicationException("error calling SetServiceObjectSecurity(); error code=" + Marshal.GetLastWin32Error());
         }
 
+        /// <summary>
+        /// Converts between two ugly ways of saying "security descriptor".
+        /// </summary>
         public static string ConvertSDtoStringSD(byte[] securityDescriptor)
         {
             IntPtr stringSecurityDescriptorPtr = IntPtr.Zero;
@@ -162,6 +173,9 @@ namespace ZD.AU
             return stringSecurityDescriptor;
         }
 
+        /// <summary>
+        /// Converts between two ugly ways of saying "security descriptor".
+        /// </summary>
         public static byte[] ConvertStringSDtoSD(
             string stringSecurityDescriptor)
         {
@@ -190,6 +204,9 @@ namespace ZD.AU
             return securityDescriptor;
         }
 
+        /// <summary>
+        /// Changes a service's start mode.
+        /// </summary>
         public static void ChangeStartMode(string ServiceName, ServiceStartMode mode)
         {
             var scManagerHandle = OpenSCManager(null, null, SC_MANAGER_ALL_ACCESS);

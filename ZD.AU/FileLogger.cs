@@ -8,7 +8,7 @@ using System.Reflection;
 namespace ZD.AU
 {
     /// <summary>
-    /// An error logger that appends errors to file in user's roaming profile.
+    /// An error logger that appends errors to file in user's roaming profile, or to log file in TEMP folder.
     /// </summary>
     internal class FileLogger
     {
@@ -67,6 +67,9 @@ namespace ZD.AU
             }
         }
 
+        /// <summary>
+        /// Appens exception with custom message to file.
+        /// </summary>
         public void LogError(Exception ex, string msg)
         {
             lock (fileLO)
@@ -76,6 +79,9 @@ namespace ZD.AU
             }
         }
 
+        /// <summary>
+        /// Does the actual logging of an exception plus message to file.
+        /// </summary>
         private void doLogException(Exception ex, string msg)
         {
             string logNameWithVersion = Helper.IsService() ?
@@ -102,6 +108,9 @@ namespace ZD.AU
             }
         }
 
+        /// <summary>
+        /// Creates log file's folder if it's missing.
+        /// </summary>
         private void doEnsureFolder(string fullPath)
         {
             string dir = Path.GetDirectoryName(fullPath);

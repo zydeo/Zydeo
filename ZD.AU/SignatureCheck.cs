@@ -8,6 +8,10 @@ using System.Reflection;
 
 namespace ZD.AU
 {
+    /// <summary>
+    /// <para>Provides functionality to verify a string's or file's signature with our own public key.</para>
+    /// <para>Private key is secret of Zydeo publisher.</para>
+    /// </summary>
     class SignatureCheck
     {
         /* Generating a new key
@@ -52,6 +56,9 @@ namespace ZD.AU
             }
         }
 
+        /// <summary>
+        /// Verifies signature of a file.
+        /// </summary>
         public static bool VerifySignature(FileInfo InputFile, string Signature)
         {
             // TO-DO: check!
@@ -59,6 +66,9 @@ namespace ZD.AU
             return verifySignature(generateHash(InputFile), hexStringToByteArray(Signature));
         }
 
+        /// <summary>
+        /// Verifies signature of a string.
+        /// </summary>
         public static bool VerifySignature(string InputString, string Signature)
         {
             // TO-DO: check!

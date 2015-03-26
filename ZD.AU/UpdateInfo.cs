@@ -18,6 +18,7 @@ namespace ZD.AU
         public class SerializedData
         {
             public bool UpdateAvailable = false;
+            public string UILang = "en";
             public string UpdateUrl = string.Empty;
             public string UpdateUrlHash = string.Empty;
             public string UpdateFileHash = string.Empty;
@@ -145,6 +146,14 @@ namespace ZD.AU
         }
 
         /// <summary>
+        /// Gets UI language of main application, as it was last seen.
+        /// </summary>
+        public static string GetUILang()
+        {
+            return Data.UILang;
+        }
+
+        /// <summary>
         /// Retrieves information about an available update. Throws if data is incorrect or if there is no update.
         /// </summary>
         public static void GetUpdateInfo(out int verMajor, out int verMinor, out DateTime releaseDate,
@@ -181,7 +190,8 @@ namespace ZD.AU
         /// Sets information about an available update. If provided data is incorrect, stores "no udate" and throws.
         /// </summary>
         internal static void SetUpdate(string url, string urlHash, string fileHash,
-            int verMajor, int verMinor, DateTime releaseDate, string releaseNotesUrl)
+            int verMajor, int verMinor, DateTime releaseDate, string releaseNotesUrl,
+            string uiLang)
         {
             try
             {
@@ -208,6 +218,7 @@ namespace ZD.AU
                 Data.UpdateVersionInOne = (ushort)verInOne;
                 Data.UpdateReleaseDate = releaseDate.Year.ToString() + "-" + releaseDate.Month.ToString("00") + "-" + releaseDate.Day.ToString("00");
                 Data.ReleaseNotesUrl = releaseNotesUrl;
+                Data.UILang = uiLang;
                 saveData();
             }
             catch
