@@ -12,7 +12,6 @@ using System.Reflection;
 using ZD.Common;
 using ZD.HanziLookup;
 using ZD.Gui.Zen;
-using ZD.Gui.WhiteContent;
 
 namespace ZD.Gui
 {
@@ -75,7 +74,7 @@ namespace ZD.Gui
         /// <summary>
         /// White content control (only if we have a special message to show).
         /// </summary>
-        private ResWhiteControl ctrlWhite = null;
+        private WhiteUpdateControl ctrlWhite = null;
         /// <summary>
         /// Character picker under writing pad.
         /// </summary>
@@ -246,8 +245,7 @@ namespace ZD.Gui
             UpdateNowDelegate updateNowDelegate)
         {
             RemoveChild(ctrlResults);
-            ResWhiteWinUpdate winCtrl = new ResWhiteWinUpdate(vmaj, vmin, rdate, rnotes, updateNowDelegate);
-            ctrlWhite = new ResWhiteControl(this, winCtrl, tprov);
+            ctrlWhite = new WhiteUpdateControl(this, tprov, vmaj, vmin, rdate, rnotes, updateNowDelegate);
             ctrlWhite.RelLocation = new Point(writingPad.RelRight + padding, ctrlSearchInput.RelBottom + padding);
             OnSizeChanged();
         }
@@ -260,10 +258,11 @@ namespace ZD.Gui
                 ctrlWhite.Dispose();
                 ctrlWhite = null;
                 AddChild(ctrlResults);
-                ctrlResults.SetResults(lookupId, null,
-                    new ReadOnlyCollection<CedictResult>(new CedictResult[0]),
-                    searchScript);
+                //ctrlResults.SetResults(lookupId, null,
+                //    new ReadOnlyCollection<CedictResult>(new CedictResult[0]),
+                //    searchScript);
                 OnSizeChanged();
+                MakeMePaint(true, RenderMode.Invalidate);
             }
         }
 

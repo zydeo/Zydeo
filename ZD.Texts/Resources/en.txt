@@ -71,3 +71,14 @@ ZydeoNotifyUpdates			&Notify me when an update is available
 FatalErrorFormHeader		Zydeo error
 FatalErrorFormSorry			;-(  Sorry.
 FatalErrorFormWhy			Zydeo encountered a problem and had to close.\r\nIt is Zydeo's fault, not yours.
+
+# Update notification shown in content white space
+WhiteUpdateTitle			Update available
+WhiteUpdateBody				A new version of Zydeo is available for you. To download and install now, click the “Update now” button below. If you prefer to update later, just start using Zydeo as usual.
+WhiteUpdateTblHeader		About this update
+WhiteUpdateTblVersion		Version
+WhiteUpdateTblVersionVal	{0} (installed) ► {1} (new)
+WhiteUpdateTblDate			Date
+WhiteUpdateTblNotes			Release notes
+WhiteUpdateTblNotesVal		Read online
+WhiteUpdateButton			Update now

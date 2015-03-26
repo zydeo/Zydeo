@@ -86,22 +86,12 @@
     <Compile Include="SettingsControlWin.Designer.cs">
       <DependentUpon>SettingsControlWin.cs</DependentUpon>
     </Compile>
-    <Compile Include="WhiteContent\ResWhiteControl.cs" />
-    <Compile Include="WhiteContent\ResWhiteWinUpdate.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="WhiteContent\ResWhiteWinUpdate.Designer.cs">
-      <DependentUpon>ResWhiteWinUpdate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="WhiteContent\UpdateNowDelegate.cs" />
+    <Compile Include="WhiteContent\WhiteUpdateControl.cs" />
     <Compile Include="WritingPad.cs" />
     <Compile Include="WritingPad.Designer.cs">
       <DependentUpon>WritingPad.cs</DependentUpon>
     </Compile>
     <Compile Include="WritingPad.Paint.cs" />
-    <EmbeddedResource Include="WhiteContent\ResWhiteWinUpdate.resx">
-      <DependentUpon>ResWhiteWinUpdate.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ZD.Common\ZD.Common.csproj">
