@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Reflection;
 
 using ZD.Common;
 
@@ -19,6 +20,10 @@ namespace ZD
         public FatalErrorForm(ITextProvider tprov)
         {
             InitializeComponent();
+
+            Assembly a = Assembly.GetExecutingAssembly();
+            Icon = new Icon(a.GetManifestResourceStream("ZD.Zydeo.ico"));
+
             // We want 1px to be 1px at all resolutions
             pnlOuter.Padding = new Padding(1);
             // Update localized labels

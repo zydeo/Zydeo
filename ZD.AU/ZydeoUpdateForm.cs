@@ -26,11 +26,11 @@ namespace ZD.AU
             // We want 1px to be 1px at all resolutions
             pnlOuter.Padding = new Padding(1);
 
-            // Set image
+            // Set image and icon
             Assembly a = Assembly.GetExecutingAssembly();
             var img = Image.FromStream(a.GetManifestResourceStream("ZD.AU.Resources.installer1.bmp"));
             pictureBox1.BackgroundImage = img;
-
+            Icon = new Icon(a.GetManifestResourceStream("ZD.AU.Resources.ZydeoSetup.ico"));
 
             // Moveable by header
             lblHeader.MouseDown += onHeaderMouseDown;

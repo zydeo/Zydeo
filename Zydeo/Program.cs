@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Reflection;
+using System.Drawing;
 
 using ZD.Gui;
 using ZD.Texts;
@@ -25,7 +27,12 @@ namespace ZD
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            Assembly a = Assembly.GetExecutingAssembly();
+            Icon icon = new Icon(a.GetManifestResourceStream("ZD.Zydeo.ico"));
+
             mf = new MainForm(cef, tprov);
+            mf.WinForm.Icon = icon;
             mf.WinForm.FormClosed += onFormClosed;
             doCheckUpdate();
             Application.Run(mf.WinForm);
