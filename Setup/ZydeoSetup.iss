@@ -64,6 +64,7 @@ Source: "..\_bin\ZD.Texts.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ukaitw.ttf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\hdzb_75.ttf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\Ubuntu-Bold.ttf"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\_bin\Neuton-Regular.ttf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\cedict-zydeo.bin"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\strokes-zydeo.bin"; DestDir: "{app}"; Flags: ignoreversion
 

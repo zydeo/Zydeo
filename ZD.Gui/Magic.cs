@@ -252,5 +252,14 @@ namespace ZD.Gui
         /// Zydeo's website URL shown on the Zydeo tab page.
         /// </summary>
         public static readonly string WebUrl = "zydeo.net";
+
+        public static readonly string WhiteUpdFntTitle = "Neuton";
+        public static readonly float WhiteUpFntTitleSz = 24F;
+        public static readonly string WhiteUpdFntNorm = "Segoe UI";
+        public static readonly float WhiteUpdFntNormSz = 10F;
+        public static readonly Color WhiteUpdClrTitle = Color.FromArgb(0xa8, 0x80, 0x5f);
+        public static readonly Color WhiteUpdClrBody = Color.FromArgb(0x26, 0x26, 0x26);
+        public static readonly Color WhiteUpdClrLink = Color.FromArgb(0, 0, 192);
+        public static readonly Color WhiteUpdClrDetailsSep = Color.FromArgb(0xa9, 0xa9, 0xa9);
     }
 }

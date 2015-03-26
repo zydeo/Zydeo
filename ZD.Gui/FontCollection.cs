@@ -17,10 +17,13 @@ namespace ZD.Gui
         /// </summary>
         private static PrivateFontCollection fonts = new PrivateFontCollection();
 
+        /// <summary>
+        /// Static ctor: add custom fonts to private collection.
+        /// </summary>
         static FontCollection()
         {
             fonts.AddFontFile("Ubuntu-Bold.ttf");
-
+            fonts.AddFontFile("Neuton-Regular.ttf");
         }
 
         /// <summary>
