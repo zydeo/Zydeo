@@ -31,6 +31,11 @@ namespace ZD.AU
         private static ZydeoUpdateForm uf = null;
 
         /// <summary>
+        /// File to delete when update UI closes or crashes.
+        /// </summary>
+        private static string fileToDelete = null;
+
+        /// <summary>
         /// Installs the AU helper service on this system.
         /// </summary>
         private static void doInstallService()
@@ -127,6 +132,30 @@ namespace ZD.AU
         }
 
         /// <summary>
+        /// Schedules a file for deletion before we quit or crash.
+        /// </summary>
+        private static void doScheduleFileToDelete(string fname)
+        {
+            fileToDelete = fname;
+        }
+
+        /// <summary>
+        /// Deletes scheduled file; never throws.
+        /// </summary>
+        private static void doSafeDeleteScheduledFile()
+        {
+            try
+            {
+                if (fileToDelete != null)
+                {
+                    Helper.SafeDeleteFile(fileToDelete);
+                    fileToDelete = null;
+                }
+            }
+            catch { }
+        }
+
+        /// <summary>
         /// Shows the update UI.
         /// </summary>
         private static void doUpdateForm()
@@ -135,8 +164,11 @@ namespace ZD.AU
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            uf = new ZydeoUpdateForm();
+            uf = new ZydeoUpdateForm(doScheduleFileToDelete);
             Application.Run(uf);
+            // When quitting gracefully, delete file
+            // But never throw on this attempt
+            doSafeDeleteScheduledFile();
         }
 
         /// <summary>
@@ -241,6 +273,10 @@ namespace ZD.AU
         /// <param name="o"></param>
         private static void doHandleExceptionLastResort(object o)
         {
+            // Before dealing with exception: delete temp file from UI.
+            doSafeDeleteScheduledFile();
+
+            // Deal with exception.
             Exception ex = null;
             // About all the swallowed exceptions.
             // We have already thrown. If the handler throws too, all bets are really of - nothing left to do here.

@@ -34,10 +34,10 @@ namespace ZD.AU
             }
         }
 
-        private bool listen(int Timeout)
+        private bool listen(int timeoutMsec)
         {
             int passedSoFar = 0;
-            while (passedSoFar < Timeout && !servicePipe.IsConnected)
+            while (passedSoFar < timeoutMsec && !servicePipe.IsConnected)
             {
                 Thread.Sleep(100);
                 passedSoFar += 100;
@@ -55,7 +55,7 @@ namespace ZD.AU
             try
             {
                 FileLogger.Instance.LogInfo("Waiting for client to connect...");
-                if (!listen(60000))
+                if (!listen(Magic.ServicePipeTimeoutMsec))
                 {
                     FileLogger.Instance.LogInfo("Client failed to connect, exiting...");
                     return;

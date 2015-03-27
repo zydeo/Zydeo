@@ -60,5 +60,15 @@ namespace ZD.AU
         /// Product for which we request update from URL. Same URL may be serving other products later.
         /// </summary>
         public static readonly string UpdateProduct = "Zydeo";
+
+        /// <summary>
+        /// Timeout, in seconds, after which download fails.
+        /// </summary>
+        public static readonly double DownloadTimeoutSec = 30;
+
+        /// <summary>
+        /// How long the service waits for a connection from update client, in msec.
+        /// </summary>
+        public static readonly int ServicePipeTimeoutMsec = 60000;
     }
 }

@@ -98,7 +98,9 @@
             this.pbar.Step = 1;
             this.pbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pbar.TabIndex = 6;
-            this.pbar.Value = 42;
+            this.pbar.Maximum = 1000;
+            this.pbar.Value = 420;
+            this.pbar.ForeColor = System.Drawing.Color.Red;
             // 
             // lblStatus
             // 
@@ -141,7 +143,6 @@
             // 
             // ZydeoUpdateForm
             // 
-            this.AcceptButton = this.btnClose;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DimGray;

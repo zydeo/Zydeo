@@ -154,6 +154,17 @@ namespace ZD.AU
         }
 
         /// <summary>
+        /// Retrieves update's download URL, and URL and file hashes. Throws if no update is actually available.
+        /// </summary>
+        public static void GetDownloadInfo(out string url, out string urlHash, out string fileHash)
+        {
+            if (!UpdateAvailable) throw new InvalidOperationException("No update is available.");
+            url = Data.UpdateUrl;
+            urlHash = Data.UpdateUrlHash;
+            fileHash = Data.UpdateFileHash;
+        }
+
+        /// <summary>
         /// Retrieves information about an available update. Throws if data is incorrect or if there is no update.
         /// </summary>
         public static void GetUpdateInfo(out int verMajor, out int verMinor, out DateTime releaseDate,

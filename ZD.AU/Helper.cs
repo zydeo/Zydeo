@@ -47,7 +47,7 @@ namespace ZD.AU
         /// Gets a new random EXE file name in the TEMP folder.
         /// </summary>
         /// <returns></returns>
-        private static string getTempExePath()
+        public static string GetTempExePath()
         {
             string tempPath = Path.GetTempPath();
 
@@ -62,7 +62,7 @@ namespace ZD.AU
         /// </summary>
         public static void StartFromTemp()
         {
-            string tempExePath = getTempExePath();
+            string tempExePath = GetTempExePath();
 
             // Make a copy of ourselves to the temp path, and start it
             File.Copy(Assembly.GetExecutingAssembly().Location, tempExePath);
