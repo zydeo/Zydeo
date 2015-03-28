@@ -57,6 +57,7 @@
     </Compile>
     <Compile Include="ServiceInstaller.cs" />
     <Compile Include="SignatureCheck.cs" />
+    <Compile Include="TextProvider.cs" />
     <Compile Include="UpdateInfo.cs" />
     <Compile Include="ZydeoUpdateForm.cs">
       <SubType>Form</SubType>
@@ -104,6 +105,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\PubKey.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\au_en.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

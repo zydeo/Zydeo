@@ -1,0 +1,42 @@
+﻿# Window header
+AuHeader						Zydeo updater
+
+# Button labels
+AuButtonClose					&Close
+AuButtonCancel					&Cancel
+
+# Initialization failed before update even started
+AuStateInitFailedStatus			Failed to initialize update
+AuStateInitFailedDetail			Zydeo cannot automatically download this update. Please visit the Zydeo website and download the latest installer manually.
+
+# Download in progress
+AuStateDownloadingStatus		Downloading update...
+AuStateDownloadingDetail		{0:0.00} of {1:0.00} MB downloaded
+
+# Download canceled
+AuStateDownloadCanceledStatus	Download canceled
+AuStateDownloadCanceledDetail	You have canceled the download before it completed. You can continue using the previous version of Zydeo on your computer, and update later.
+
+# Download failed
+AuStateDownloadFailedStatus		Download failed
+AuStateDownloadFailedDetail		Failed to download update package. Zydeo has not been updated.
+
+# Verifying update
+AuStateVerifyingStatus			Verifying update...
+AuStateVerifyingDetail			Zydeo is verifying the update package.
+
+# Package failed to verify
+AuStateVerifyFailedStatus		Invalid update package
+AuStateVerifyFailedDetail		The update package seems to be damaged. Please try updating again from Zydeo.
+
+# Installing update
+AuStateInstallingStatus			Installing update...
+AuStateInstallingDetail			Please wait while the update is being installed.\r\nDo not start Zydeo until this step is finished.
+
+# Installation failed
+AuStateInstallFailedStatus		Failed to install update
+AuStateInstallFailedDetail		An error occurred while installing the update. You can continue using the previous version of Zydeo on your computer, and update later.
+
+# Mission accomplished
+AuStateSuccessStatus			Finished
+AuStateSuccessDetail			Awesome! Zydeo's latest version is now installed for you.

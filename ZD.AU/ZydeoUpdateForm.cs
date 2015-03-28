@@ -21,17 +21,6 @@ namespace ZD.AU
     internal partial class ZydeoUpdateForm : Form
     {
         /// <summary>
-        /// Delegate for scheduling a temp file for deletion.
-        /// </summary>
-        /// <param name="fname"></param>
-        public delegate void ScheduleFileToDeleteDelegate(string fname);
-
-        /// <summary>
-        /// Delegete that I'll call to schedule a file for deletion when form closes or process crashes.
-        /// </summary>
-        private readonly ScheduleFileToDeleteDelegate scheduleFileToDelete;
-
-        /// <summary>
         /// States of the download/update process.
         /// </summary>
         private enum State
@@ -46,6 +35,22 @@ namespace ZD.AU
             InstallFailed,
             InstallSuccess,
         }
+
+        /// <summary>
+        /// Delegate for scheduling a temp file for deletion.
+        /// </summary>
+        /// <param name="fname"></param>
+        public delegate void ScheduleFileToDeleteDelegate(string fname);
+
+        /// <summary>
+        /// Delegete that I'll call to schedule a file for deletion when form closes or process crashes.
+        /// </summary>
+        private readonly ScheduleFileToDeleteDelegate scheduleFileToDelete;
+
+        /// <summary>
+        /// Localized UI strings provider.
+        /// </summary>
+        private readonly TextProvider tprov;
 
         /// <summary>
         /// Form's original location (for home-cooked moving around on screen).
@@ -85,7 +90,12 @@ namespace ZD.AU
         public ZydeoUpdateForm(ScheduleFileToDeleteDelegate scheduleFileToDelete,
             bool serviceStartedForUI)
         {
+            // Desginer code
             InitializeComponent();
+
+            // Initialized text provider.
+            tprov = new TextProvider(UpdateInfo.GetUILang());
+            lblHeader.Text = tprov.GetString("AuHeader");
 
             // If we're in designer, done here
             if (Process.GetCurrentProcess().ProcessName == "devenv") return;
@@ -452,10 +462,8 @@ namespace ZD.AU
             double progress = ((double)e.BytesReceived) / ((double)e.TotalBytesToReceive) * 1000.0;
             double mbReceived = ((double)e.BytesReceived) / ((double)1048576);
             double mbTotal = ((double)e.TotalBytesToReceive) / ((double)1048576);
-            // TO-DO: localize
-            string strDetail = "{0:0.00} of {1:0.00} MB downloaded";
+            string strDetail = tprov.GetString("AuStateDownloadingDetail");
             strDetail = string.Format(strDetail, mbReceived, mbTotal);
-            // TO-DO: time remaining
             // Update UI
             doSetDownloadProgressSafe(strDetail, (int)progress);
         }
@@ -518,6 +526,9 @@ namespace ZD.AU
         /// </summary>
         private void doSetStateSafe(State state)
         {
+            string btnLabelClose = tprov.GetString("AuButtonClose");
+            string btnLabelCancel = tprov.GetString("AuButtonCancel");
+
             string strStatus;
             string strDetail;
             ProgressBarStyle pbarStyle;
@@ -526,97 +537,96 @@ namespace ZD.AU
             string strButtonText;
             bool btnEnabled;
             bool linkVisible = false;
-            // TO-DO: Localize
             switch (state)
             {
                 case State.InitFailed:
-                    strStatus = "Failed to initialize update";
-                    strDetail = "Zydeo cannot automatically download this update. Please visit the Zydeo website and download the latest installer manually.";
+                    strStatus = tprov.GetString("AuStateInitFailedStatus");
+                    strDetail = tprov.GetString("AuStateInitFailedDetail");
                     pbarStyle = ProgressBarStyle.Continuous;
                     pbarState = ProgressBarState.Error;
                     pbarValue = 1000;
-                    strButtonText = "&Close";
+                    strButtonText = btnLabelClose;
                     btnEnabled = true;
                     btnClosesWindow = true;
                     linkVisible = true;
                     break;
                 case State.DLoading:
-                    strStatus = "Downloading update...";
+                    strStatus = tprov.GetString("AuStateDownloadingStatus");
                     strDetail = "";
                     pbarStyle = ProgressBarStyle.Continuous;
                     pbarState = ProgressBarState.Normal;
                     pbarValue = 0;
-                    strButtonText = "&Cancel";
+                    strButtonText = btnLabelCancel;
                     btnEnabled = true;
                     btnClosesWindow = false;
                     break;
                 case State.DLoadCanceled:
-                    strStatus = "Download canceled";
-                    strDetail = "You have canceled the download before it completed. You can continue using the previous version of Zydeo on your computer, and update later.";
+                    strStatus = tprov.GetString("AuStateDownloadCanceledStatus");
+                    strDetail = tprov.GetString("AuStateDownloadCanceledDetail");
                     pbarStyle = ProgressBarStyle.Continuous;
                     pbarState = ProgressBarState.Warning;
                     pbarValue = 1000;
-                    strButtonText = "&Close";
+                    strButtonText = btnLabelClose;
                     btnEnabled = true;
                     btnClosesWindow = true;
                     break;
                 case State.DLoadFailed:
-                    strStatus = "Download failed";
-                    strDetail = "Failed to download update package. Zydeo has not been updated.";
+                    strStatus = tprov.GetString("AuStateDownloadFailedStatus");
+                    strDetail = tprov.GetString("AuStateDownloadFailedDetail");
                     pbarStyle = ProgressBarStyle.Continuous;
                     pbarState = ProgressBarState.Error;
                     pbarValue = 1000;
-                    strButtonText = "&Close";
+                    strButtonText = btnLabelClose;
                     btnEnabled = true;
                     btnClosesWindow = true;
                     break;
                 case State.Verifying:
-                    strStatus = "Verifying update...";
-                    strDetail = "Zydeo is verifying the update package.";
+                    strStatus = tprov.GetString("AuStateVerifyingStatus");
+                    strDetail = tprov.GetString("AuStateVerifyingDetail");
                     pbarStyle = ProgressBarStyle.Marquee;
                     pbarState = ProgressBarState.Normal;
                     pbarValue = 0;
-                    strButtonText = "&Cancel";
+                    strButtonText = btnLabelCancel;
                     btnEnabled = false;
                     btnClosesWindow = false;
                     break;
                 case State.VerifyFailed:
-                    strStatus = "Invalid update package";
-                    strDetail = "Zydeo failed to verify the update package it has just downloaded. This may be because of an error on the Zydeo site. You can continue using the previous version of Zydeo on your computer, and update later.";
+                    strStatus = tprov.GetString("AuStateVerifyFailedStatus");
+                    strDetail = tprov.GetString("AuStateVerifyFailedDetail");
                     pbarStyle = ProgressBarStyle.Continuous;
                     pbarState = ProgressBarState.Error;
                     pbarValue = 1000;
-                    strButtonText = "&Close";
+                    strButtonText = btnLabelClose;
                     btnEnabled = true;
                     btnClosesWindow = true;
                     break;
                 case State.Installing:
-                    strStatus = "Installing update...";
-                    strDetail = "Please wait while the update is being installed.\r\nDo not start Zydeo until this step is finished.";
+                    strStatus = tprov.GetString("AuStateInstallingStatus");
+                    strDetail = tprov.GetString("AuStateInstallingDetail");
                     pbarStyle = ProgressBarStyle.Marquee;
                     pbarState = ProgressBarState.Normal;
                     pbarValue = 0;
-                    strButtonText = "&Cancel";
+                    strButtonText = btnLabelCancel;
                     btnEnabled = false;
                     btnClosesWindow = false;
                     break;
                 case State.InstallFailed:
-                    strStatus = "Failed to install update";
-                    strDetail = "An error occurred while installing the update. You can continue using the previous version of Zydeo on your computer, and update later.";
+                    strStatus = tprov.GetString("AuStateInstallFailedStatus");
+                    strDetail = tprov.GetString("AuStateInstallFailedDetail");
                     pbarStyle = ProgressBarStyle.Continuous;
                     pbarState = ProgressBarState.Error;
                     pbarValue = 1000;
-                    strButtonText = "&Close";
+                    strButtonText = btnLabelClose;
                     btnEnabled = true;
                     btnClosesWindow = true;
                     break;
                 case State.InstallSuccess:
-                    strStatus = "Finished";
-                    strDetail = "Awesome! Zydeo's latest version is now installed for you.";
+                    strStatus = tprov.GetString("AuStateSuccessStatus");
+                    strDetail = tprov.GetString("AuStateSuccessDetail");
                     pbarStyle = ProgressBarStyle.Continuous;
                     pbarState = ProgressBarState.Normal;
                     pbarValue = 1000;
-                    strButtonText = "&Close";
+                    strButtonText = btnLabelClose;
                     btnEnabled = true;
                     btnClosesWindow = true;
                     break;
