@@ -72,7 +72,7 @@ namespace ZD.AU
 
                 // Wait for client (updater UI) to connect; but not too long.
                 FileLogger.Instance.LogInfo("Waiting for client to connect.");
-                if (!doListen(pstream)) throw new Exception("Client didn't show up; tired of waiting.");
+                if (!doListen(ref pstream)) throw new Exception("Client didn't show up; tired of waiting.");
                 FileLogger.Instance.LogInfo("Client connected, reading paths and hash.");
 
                 // Read location of downloaded installer and its file hash.
@@ -198,7 +198,7 @@ namespace ZD.AU
         /// Waits for incoming connection over named pipe.
         /// </summary>
         /// <returns>True if connected, false if got tired of waiting.</returns>
-        private static bool doListen(NamedPipeStream pstream)
+        private static bool doListen(ref NamedPipeStream pstream)
         {
             ThreadPool.QueueUserWorkItem(doClosePipeAfterWaiting, pstream);
             // This call blocks. It will return in one of two ways:
@@ -209,7 +209,12 @@ namespace ZD.AU
             lock (isConnectedLO)
             {
                 // -1 value here means thread killed the named pipe.
-                if (isConnected == -1) return false;
+                if (isConnected == -1)
+                {
+                    pstream.Dispose();
+                    pstream = null;
+                    return false;
+                }
                 // Tell thread not to kill named pipe now
                 isConnected = 1;
                 return true;
