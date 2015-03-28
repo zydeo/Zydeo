@@ -69,6 +69,11 @@ namespace ZD
                 string rnotes;
                 // This call, in particular, is allowed to throw if Update.xml's data does not verify
                 UpdateInfo.GetUpdateInfo(out vmaj, out vmin, out rdate, out rnotes);
+                // If update's version is equal to mine or smaller, then it's just data lingering around
+                // from before last successful update
+                Version myVer = Assembly.GetExecutingAssembly().GetName().Version;
+                if (vmaj < myVer.Major || (vmaj == myVer.Major && vmin <= myVer.Minor))
+                    return;
                 // Tell form
                 mf.SetWelcomeUpdate(vmaj, vmin, rdate, rnotes);
             }

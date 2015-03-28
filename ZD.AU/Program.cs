@@ -7,6 +7,7 @@ using System.Threading;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Diagnostics;
+using System.IO;
 
 namespace ZD.AU
 {
@@ -179,6 +180,30 @@ namespace ZD.AU
         }
 
         /// <summary>
+        /// <para>Signs an update URL and and update package with the provided private key.</para>
+        /// <para>The private key belongs to the embedded public key that we use for verification, but it's NOT included in the code base.</para>
+        /// </summary>
+        private static void doSignUpdate(string[] args)
+        {
+            if (args.Length != 5)
+                throw new Exception("Expected usage: /sign <url> <installer-file> <private-key-file> <output-file>");
+
+            using (StreamReader srKey = new StreamReader(args[3]))
+            using (StreamWriter srOut = new StreamWriter(args[4]))
+            {
+                string keyXml = srKey.ReadToEnd();
+                string sigUrl = SignatureCheck.Sign(args[1], keyXml);
+                string sigFile = SignatureCheck.Sign(new FileInfo(args[2]), keyXml);
+                srOut.WriteLine("URL signature:");
+                srOut.WriteLine(sigUrl);
+                srOut.WriteLine();
+                srOut.WriteLine("File signature:");
+                srOut.WriteLine(sigFile);
+                srOut.WriteLine();
+            }
+        }
+
+        /// <summary>
         /// Main entry point, within the exception cushion.
         /// </summary>
         /// <param name="args"></param>
@@ -203,6 +228,9 @@ namespace ZD.AU
                             return;
                         }
                         break;
+                    case "/sign":
+                        doSignUpdate(args);
+                        return;
                }
             }
 

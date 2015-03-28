@@ -76,4 +76,9 @@ Name: "{commonstartmenu}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppNameShort}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
+Filename: {app}\ZD.AU.exe; Parameters: /install; WorkingDir: {app}; Flags: runascurrentuser
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
+[UninstallRun]
+Filename: {app}\ZD.AU.exe; Parameters: /uninstall; WorkingDir: {app}; Flags: runascurrentuser
+

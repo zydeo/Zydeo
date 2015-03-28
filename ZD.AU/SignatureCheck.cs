@@ -28,18 +28,18 @@ namespace ZD.AU
             }
         }
 
-        private static byte[] generateHash(FileInfo InputFile)
+        private static byte[] generateHash(FileInfo inputFile)
         {
             using (SHA1 sha1 = new SHA1CryptoServiceProvider())
             {
-                using (FileStream fs = new FileStream(InputFile.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (FileStream fs = new FileStream(inputFile.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     return sha1.ComputeHash(fs);
                 }
             }
         }
 
-        private static bool verifySignature(byte[] Hash, byte[] Signature)
+        private static bool verifySignature(byte[] hash, byte[] signature)
         {
             string keyXml;
             Assembly a = Assembly.GetExecutingAssembly();
@@ -52,53 +52,86 @@ namespace ZD.AU
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
             {
                 rsa.FromXmlString(keyXml);
-                return rsa.VerifyHash(Hash, CryptoConfig.MapNameToOID("SHA1"), Signature);
+                return rsa.VerifyHash(hash, CryptoConfig.MapNameToOID("SHA1"), signature);
             }
         }
 
         /// <summary>
         /// Verifies signature of a file.
         /// </summary>
-        public static bool VerifySignature(FileInfo InputFile, string Signature)
+        public static bool VerifySignature(FileInfo inputFile, string sigStr)
         {
-            // TO-DO: check!
-            return true;
-            return verifySignature(generateHash(InputFile), hexStringToByteArray(Signature));
+            return verifySignature(generateHash(inputFile), hexStringToByteArray(sigStr));
         }
 
         /// <summary>
         /// Verifies signature of a string.
         /// </summary>
-        public static bool VerifySignature(string InputString, string Signature)
+        public static bool VerifySignature(string inputString, string sigStr)
         {
-            // TO-DO: check!
-            return true;
-            return verifySignature(generateHash(InputString), hexStringToByteArray(Signature));
+            return verifySignature(generateHash(inputString), hexStringToByteArray(sigStr));
         }
 
-        private static byte[] hexStringToByteArray(string HexString)
+        /// <summary>
+        /// Signs a file with the full (private) RSA key provided as XML.
+        /// </summary>
+        public static string Sign(FileInfo file, string keyXml)
+        {
+            byte[] hash = generateHash(file);
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+            {
+                rsa.FromXmlString(keyXml);
+                byte[] sig = rsa.SignHash(hash, CryptoConfig.MapNameToOID("SHA1"));
+                return byteArrayToHexString(sig);
+            }
+        }
+
+        /// <summary>
+        /// Sings a string with the full (private) RSA key provided as XML.
+        /// </summary>
+        public static string Sign(string inputString, string keyXml)
+        {
+            byte[] hash = generateHash(inputString);
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+            {
+                rsa.FromXmlString(keyXml);
+                byte[] sig = rsa.SignHash(hash, CryptoConfig.MapNameToOID("SHA1"));
+                return byteArrayToHexString(sig);
+            }
+        }
+
+        /// <summary>
+        /// Parses a hex string into a byte array.
+        /// </summary>
+        private static byte[] hexStringToByteArray(string hexString)
         {
             // See if hex string has an even number of characters
-            if (HexString.Length % 2 != 0)
+            if (hexString.Length % 2 != 0)
                 throw new InvalidDataException("Invalid string length");
 
             List<byte> bytes = new List<byte>();
 
             // Convert two char to a byte
-            for (int i = 0; i < HexString.Length / 2; i++)
-                bytes.Add(charsToByte(HexString[i * 2], HexString[i * 2 + 1]));
+            for (int i = 0; i < hexString.Length / 2; i++)
+                bytes.Add(charsToByte(hexString[i * 2], hexString[i * 2 + 1]));
 
             return bytes.ToArray();
         }
 
-        private static byte charsToByte(char HighChar, char LowChar)
+        /// <summary>
+        /// Converts a pair of chars (in hex) to a byte.
+        /// </summary>
+        private static byte charsToByte(char hiChar, char loChar)
         {
-            return (byte)((charToByte(HighChar) & 15) << 4 | (charToByte(LowChar) & (byte)15));
+            return (byte)((charToByte(hiChar) & 15) << 4 | (charToByte(loChar) & (byte)15));
         }
 
-        private static byte charToByte(char Char)
+        /// <summary>
+        /// Converts a single HEX char to a byte; case-insensitive, and erm, weird.
+        /// </summary>
+        private static byte charToByte(char chr)
         {
-            switch (Char)
+            switch (chr)
             {
                 case '0': return 0;
                 case '1': return 1;
@@ -126,10 +159,13 @@ namespace ZD.AU
             throw new Exception("Unexpected hex character.");
         }
 
-        private static string byteToString(byte[] Bytes)
+        /// <summary>
+        /// Converts byte array to string.
+        /// </summary>
+        private static string byteArrayToHexString(byte[] bytes)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (byte b in Bytes)
+            foreach (byte b in bytes)
                 sb.Append(b.ToString("x2"));
             return sb.ToString();
         }
