@@ -9,6 +9,10 @@ using System.Security.Principal;
 
 namespace ZD.AU
 {
+    /// <summary>
+    /// Wraps a named pipe into a stream.
+    /// </summary>
+    /// <remarks>http://www.pinvoke.net/default.aspx/kernel32.createnamedpipe</remarks>
     internal class NamedPipeStream : Stream
     {
         [DllImport("kernel32.dll", EntryPoint = "CreateFile", SetLastError = true)]
@@ -221,8 +225,8 @@ namespace ZD.AU
 
             _mode = mode;
             _handle = handle;
-
         }
+
         /// <summary>
         /// Create a named pipe instance.
         /// </summary>

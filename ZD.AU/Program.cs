@@ -47,8 +47,8 @@ namespace ZD.AU
 
                 string assLoc = Assembly.GetExecutingAssembly().Location;
                 ServiceInstaller.InstallService(assLoc, Magic.ServiceShortName, Magic.ServiceDisplayName);
-                ServiceMgr.ChangeStartMode(Magic.ServiceShortName, ServiceStartMode.Manual);
-                ServiceMgr.SetServiceSDDL(Magic.ServiceShortName, System.Security.AccessControl.SecurityInfos.DiscretionaryAcl, ServiceMgr.AuSvcDaclSDDL);
+                ServiceInstaller.ChangeStartMode(Magic.ServiceShortName, ServiceStartMode.Manual);
+                ServiceInstaller.SetServiceSDDL(Magic.ServiceShortName, System.Security.AccessControl.SecurityInfos.DiscretionaryAcl, ServiceInstaller.AuSvcDaclSDDL);
                 Environment.ExitCode = 0;
             }
             catch (Exception ex)
@@ -65,7 +65,8 @@ namespace ZD.AU
         {
             try
             {
-                ServiceInstaller.UnInstallService(Magic.ServiceShortName);
+                if (!ServiceInstaller.UnInstallService(Magic.ServiceShortName))
+                    throw new Exception("UninstallService call failed.");
                 Environment.ExitCode = 0;
             }
             catch (Exception ex)
@@ -78,7 +79,7 @@ namespace ZD.AU
         /// <summary>
         /// Re-launches the update UI from a TEMP folder.
         /// </summary>
-        private static void doLaunchUpdate()
+        private static void doLaunchUpdateFromTemp()
         {
             // Running from original location, launch ourselves from temp
             try
@@ -87,7 +88,7 @@ namespace ZD.AU
             }
             catch (Exception ex)
             {
-                FileLogger.Instance.LogError(ex, "Failed to launch update");
+                FileLogger.Instance.LogError(ex, "Failed to launch update from TEMP folder.");
                 Environment.ExitCode = -1;
             }
         }
@@ -99,7 +100,7 @@ namespace ZD.AU
         /// </summary>
         private static void doStartService()
         {
-            FileLogger.Instance.LogInfo("Starting service");
+            FileLogger.Instance.LogInfo("Starting service.");
             try
             {
                 using (ServiceController sc = new ServiceController(Magic.ServiceShortName))
@@ -109,30 +110,29 @@ namespace ZD.AU
             }
             catch (Exception ex)
             {
-                FileLogger.Instance.LogError(ex, "Failed to start service");
+                FileLogger.Instance.LogError(ex, "Failed to start service.");
             }
         }
 
         /// <summary>
-        /// Starts the service pipe thread, through which relaunched service listens to update UI's wishes.
+        /// Listens to update UI's wishes and exectures installer if everything's OK.
         /// </summary>
-        private static void doStartServicePipeThread()
+        private static void doServiceWork()
         {
             string pname = Process.GetCurrentProcess().ProcessName;
-            FileLogger.Instance.LogInfo("Starting ServicePipeThread [" + pname + "]");
+            FileLogger.Instance.LogInfo("Service starting from temp location [" + pname + "]");
             try
             {
-                ServicePipeThread spt = new ServicePipeThread();
-                spt.Start();
+                Service.Work();
             }
             catch (Exception ex)
             {
-                FileLogger.Instance.LogError(ex, "Failed to start ServicePipeThread");
+                FileLogger.Instance.LogError(ex, "Service.Work() terminated with an error.");
             }
         }
 
         /// <summary>
-        /// Schedules a file for deletion before we quit or crash.
+        /// Schedules a file for deletion before we quit or crash. This is how we clean up installer downloded by UI.
         /// </summary>
         private static void doScheduleFileToDelete(string fname)
         {
@@ -160,7 +160,7 @@ namespace ZD.AU
         /// </summary>
         private static void doUpdateForm()
         {
-            FileLogger.Instance.LogInfo("Showing form");
+            FileLogger.Instance.LogInfo("Showing form.");
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -189,33 +189,43 @@ namespace ZD.AU
                         doUninstallService();
                         return;
                     case "/update":
+                        // Only re-launching from temp if we're not debugging. Otherwise, run straight.
                         if (!inDebugger)
                         {
-                            doLaunchUpdate();
+                            doLaunchUpdateFromTemp();
                             return;
                         }
                         break;
                }
             }
 
+            // No arguments, running in debugger: just do service work
+            if (inDebugger && args.Length == 0)
+            {
+                doServiceWork();
+                return;
+            }
+
+            // No arguments, I'm a service, but not running from temp >> relaunch from temp
             if (Helper.IsService() && !Helper.IsRunningFromTemp())
             {
                 // Running from original location
                 // Start the service, which will re-launch itself from temp location
-                ServiceToRun = new ZydeoUpdateService();
+                ServiceToRun = new Service();
                 ServiceBase.Run(ServiceToRun);
                 return;
             }
 
+            // At this point we must be the user process
+            // This should never happen.
             if (!inDebugger && !Helper.IsRunningFromTemp())
             {
-                // At this point we must be the user process
-                // We should never get here
                 Environment.ExitCode = -1;
                 return;
             }
 
             // OK, we're definitely running from temp folder now. (Or debugging.)
+            // If we're the UI client, fire up service
             if (!Helper.IsService()) doStartService();
 
             // Running from temp as either SYSTEM or user
@@ -233,7 +243,7 @@ namespace ZD.AU
                 Helper.WaitForProcessExit(parentProcessId);
             }
 
-            if (Helper.IsService()) doStartServicePipeThread();
+            if (Helper.IsService()) doServiceWork();
             else doUpdateForm();
         }
 

@@ -91,7 +91,7 @@ namespace ZD.AU
         /// </summary>
         public static bool IsServiceRegistered()
         {
-            foreach (var svc in ZydeoServiceController.GetServices())
+            foreach (var svc in ServiceController.GetServices())
                 if (svc.ServiceName.Equals(Magic.ServiceShortName))
                     return true;
             return false;
@@ -155,27 +155,6 @@ namespace ZD.AU
             if (input.Length != 4) throw new ArgumentException("Invalid byte length");
 
             return (UInt32)input[0] | ((UInt32)input[1]) << 8 | ((UInt32)input[2]) << 16 | ((UInt32)input[3]) << 24;
-        }
-
-        /// <summary>
-        /// Calculates SHA1 hash of string.
-        /// </summary>
-        public static string CalculateSHA1Hash(string str)
-        {
-            using (FileStream fs = new FileStream(str, FileMode.Open, FileAccess.Read))
-            using (BufferedStream bs = new BufferedStream(fs))
-            {
-                using (SHA1Managed sha1 = new SHA1Managed())
-                {
-                    byte[] hash = sha1.ComputeHash(bs);
-                    StringBuilder formatted = new StringBuilder(2 * hash.Length);
-                    foreach (byte b in hash)
-                    {
-                        formatted.AppendFormat("{0:X2}", b);
-                    }
-                    return formatted.ToString();
-                }
-            }
         }
     }
 }

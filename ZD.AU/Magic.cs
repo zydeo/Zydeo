@@ -67,8 +67,25 @@ namespace ZD.AU
         public static readonly double DownloadTimeoutSec = 30;
 
         /// <summary>
-        /// How long the service waits for a connection from update client, in msec.
+        /// <para>How long the service waits for a connection from update client, in msec.</para>
+        /// <para>If client doesn't show up in time, process just quits.</para>
+        /// <para>Same number is used for client-side timeout (how long updater UI waits for connection).</para>
         /// </summary>
-        public static readonly int ServicePipeTimeoutMsec = 60000;
+        public static readonly int ServicePipeTimeoutMsec = 20000;
+
+        /// <summary>
+        /// Returned through named pipe by update service upon failure.
+        /// </summary>
+        public static readonly byte SrvCodeFail = 0xff;
+
+        /// <summary>
+        /// Returned through named pipe by update service when it launches installer.
+        /// </summary>
+        public static readonly byte SrvCodeInstallStarted = 0x01;
+
+        /// <summary>
+        /// Returned through named pipe by update service upon success (installer finished).
+        /// </summary>
+        public static readonly byte SrvCodeSuccess = 0x00;
     }
 }

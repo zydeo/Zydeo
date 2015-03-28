@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZD.AU
 {
-    partial class ZydeoUpdateService
+    partial class Service
     {
         /// <summary> 
         /// Required designer variable.

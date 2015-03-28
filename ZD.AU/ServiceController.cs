@@ -2,28 +2,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.ServiceProcess;
+using System.Text;
 
 namespace ZD.AU
 {
-    internal class ZydeoServiceController : ServiceController
+    /// <summary>
+    /// The Windows service controller, and static helper functions for setting security descriptors, start mode etc.
+    /// </summary>
+    internal class ServiceController : System.ServiceProcess.ServiceController
     {
         private string m_ImagePath;
         private ServiceController[] m_DependentServices;
         private ServiceController[] m_ServicesDependedOn;
 
-        public ZydeoServiceController()
+        public ServiceController()
             : base()
         {
         }
 
-        public ZydeoServiceController(string name)
+        public ServiceController(string name)
             : base(name)
         {
         }
 
-        public ZydeoServiceController(string name, string machineName)
+        public ServiceController(string name, string machineName)
             : base(name, machineName)
         {
         }
@@ -42,7 +45,7 @@ namespace ZD.AU
             get
             {
                 if (m_DependentServices == null)
-                    m_DependentServices = ZydeoServiceController.GetServices(base.DependentServices);
+                    m_DependentServices = ServiceController.GetServices(base.DependentServices);
                 return m_DependentServices;
             }
         }
@@ -52,7 +55,7 @@ namespace ZD.AU
             get
             {
                 if (m_ServicesDependedOn == null)
-                    m_ServicesDependedOn = ZydeoServiceController.GetServices(base.ServicesDependedOn);
+                    m_ServicesDependedOn = ServiceController.GetServices(base.ServicesDependedOn);
                 return m_ServicesDependedOn;
             }
         }

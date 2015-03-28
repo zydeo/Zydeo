@@ -36,6 +36,7 @@ namespace ZD.AU
         /// </summary>
         private enum State
         {
+            InitFailed,
             DLoading,
             DLoadCanceled,
             DLoadFailed,
@@ -50,18 +51,32 @@ namespace ZD.AU
         /// Form's original location (for home-cooked moving around on screen).
         /// </summary>
         private Point formOrigLoc = Point.Empty;
+
         /// <summary>
         /// Form's original position when mouse button is pressed (for home-cooked moving around on screen).
         /// </summary>
         private Point moveStart;
+
         /// <summary>
         /// If true, clicking button closes form; otherwise, click cancels download.
         /// </summary>
         private bool btnClosesWindow = false;
+
         /// <summary>
         /// If set, worker thread stops downloading the next time it looks around.
         /// </summary>
         private bool cancel = false;
+
+        /// <summary>
+        /// <para>The named pipe stream we use to communicate with service.</para>
+        /// <para>Owned when created; we get rid of it in Dispose.</para>
+        /// </summary>
+        private NamedPipeStream pstream;
+
+        /// <summary>
+        /// If init failed, we don't even start worker thread; only one state upon load.
+        /// </summary>
+        private readonly bool initOK;
 
         /// <summary>
         /// Constructs updater form.
@@ -86,22 +101,48 @@ namespace ZD.AU
             pictureBox1.BackgroundImage = img;
             Icon = new Icon(a.GetManifestResourceStream("ZD.AU.Resources.ZydeoSetup.ico"));
 
-            // Moveable by header
+            // Moveable by header; button event
             lblHeader.MouseDown += onHeaderMouseDown;
             lblHeader.MouseUp += onHeaderMouseUp;
             lblHeader.MouseMove += onHeaderMouseMove;
+            btnClose.Click += onBtnClick;
 
             // Initial state
-            doSetStateSafe(State.DLoading);
-            btnClose.Click += onBtnClick;
+            initOK = doConnectToService();
+            if (initOK) doSetStateSafe(State.DLoading);
+            else doSetStateSafe(State.InitFailed);
         }
 
         /// <summary>
-        /// Load event handler: starts download.
+        /// Dispose: free owned resources.
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Resources created by Designer.
+                if (components != null) components.Dispose();
+                // Named pipe
+                if (pstream != null)
+                {
+                    try
+                    {
+                        pstream.Close();
+                        pstream.Dispose();
+                    }
+                    catch { }
+                }
+            }
+            base.Dispose(disposing);
+        }
+
+        /// <summary>
+        /// Load event handler: starts download if initialization was successful.
         /// </summary>
         protected override void OnLoad(EventArgs e)
         {
-            ThreadPool.QueueUserWorkItem(threadFun);
+            if (initOK) ThreadPool.QueueUserWorkItem(threadFun);
             base.OnLoad(e);
         }
 
@@ -176,6 +217,36 @@ namespace ZD.AU
         }
 
         /// <summary>
+        /// Connects to update service (opens named pipe stream).
+        /// </summary>
+        /// <returns>True on success, false on failure.</returns>
+        private bool doConnectToService()
+        {
+            DateTime startTime = DateTime.Now;
+            Exception connectEx = null;
+            while (DateTime.Now.Subtract(startTime).TotalMilliseconds < Magic.ServicePipeTimeoutMsec)
+            {
+                try
+                {
+                    pstream = new NamedPipeStream(@"\\.\pipe\" + Magic.ServiceShortName, FileAccess.ReadWrite);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    connectEx = ex;
+                    FileLogger.Instance.LogInfo("Failed to connect to named pipe; retrying in 0.5 sec.");
+                }
+                Thread.Sleep(500);
+            }
+            if (pstream == null)
+            {
+                FileLogger.Instance.LogError(connectEx, "Gave up trying to connect to named pipe; last exception below.");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Background thread worker function.
         /// </summary>
         private void threadFun(object ctxt)
@@ -187,19 +258,41 @@ namespace ZD.AU
             // Service will do the same, but this preliminary check allows us to report to user.
             if (!doVerifyFile(fname, fileHash)) return;
             // Install
-            doInstall(fname);
+            doInstall(fname, fileHash);
         }
 
         /// <summary>
         /// Installs update.
         /// </summary>
-        private void doInstall(string fname)
+        private void doInstall(string fname, string fhash)
         {
             try
             {
+                // UI state: installing
                 doSetStateSafe(State.Installing);
-                Thread.Sleep(3000);
-                doSetStateSafe(State.InstallSuccess);
+
+                // Send info over named pipe
+                byte[] buf = Encoding.Unicode.GetBytes(fname);
+                pstream.Write(Helper.SerializeUInt32((uint)buf.Length), 0, 4);
+                pstream.Write(buf, 0, buf.Length);
+                buf = Encoding.Unicode.GetBytes(fhash);
+                pstream.Write(Helper.SerializeUInt32((uint)buf.Length), 0, 4);
+                pstream.Write(buf, 0, buf.Length);
+
+                // Wait for result
+                buf = new byte[1];
+                Helper.ForceReadBytes(pstream, ref buf, buf.Length);
+                // All we like here is "installation in progress"
+                if (buf[0] != Magic.SrvCodeInstallStarted)
+                {
+                    doSetStateSafe(State.InstallFailed);
+                    return;
+                }
+                // Read one more: this blocks until installation is finished
+                Helper.ForceReadBytes(pstream, ref buf, buf.Length);
+                // Set final UI state: success or failure
+                if (buf[0] == Magic.SrvCodeSuccess) doSetStateSafe(State.InstallSuccess);
+                else doSetStateSafe(State.InstallFailed);
             }
             catch
             {
@@ -222,7 +315,11 @@ namespace ZD.AU
                     return false;
                 }
             }
-            catch { return false; }
+            catch
+            {
+                doSetStateSafe(State.VerifyFailed);
+                return false;
+            }
             return true;
         }
         

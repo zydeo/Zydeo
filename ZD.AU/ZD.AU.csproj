@@ -55,8 +55,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ServiceInstaller.cs" />
-    <Compile Include="ServiceMgr.cs" />
-    <Compile Include="ServicePipeThread.cs" />
     <Compile Include="SignatureCheck.cs" />
     <Compile Include="UpdateInfo.cs" />
     <Compile Include="ZydeoUpdateForm.cs">
@@ -69,11 +67,11 @@
     <Compile Include="Magic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ZydeoUpdateService.cs">
+    <Compile Include="Service.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ZydeoUpdateService.Designer.cs">
-      <DependentUpon>ZydeoUpdateService.cs</DependentUpon>
+    <Compile Include="Service.Designer.cs">
+      <DependentUpon>Service.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="ZydeoUpdateForm.resx">
       <DependentUpon>ZydeoUpdateForm.cs</DependentUpon>
