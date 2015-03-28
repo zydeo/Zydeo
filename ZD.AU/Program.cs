@@ -42,9 +42,13 @@ namespace ZD.AU
         {
             try
             {
+                // Make sure registry is salted.
+                Salt.EnsureSalt();
+
                 // Simply exit if service has already been installed
                 if (Helper.IsServiceRegistered()) return;
 
+                // Install service; set security permissions and startup mode
                 string assLoc = Assembly.GetExecutingAssembly().Location;
                 ServiceInstaller.InstallService(assLoc, Magic.ServiceShortName, Magic.ServiceDisplayName);
                 ServiceInstaller.ChangeStartMode(Magic.ServiceShortName, ServiceStartMode.Manual);

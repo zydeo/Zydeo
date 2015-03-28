@@ -51,6 +51,7 @@
     <Compile Include="AppUpdateChecker.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="NamedPipeStream.cs" />
+    <Compile Include="Salt.cs" />
     <Compile Include="ServiceController.cs">
       <SubType>Component</SubType>
     </Compile>

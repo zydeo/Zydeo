@@ -56,7 +56,7 @@ namespace ZD.AU
         private static void checkForUpdates()
         {
             // Version info and salt
-            int salt = 42;
+            uint salt = (uint)Salt.GetSalt();
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
 
             // Create web request; make sure we go through user's configured proxy, if any.

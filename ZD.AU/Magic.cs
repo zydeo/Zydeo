@@ -47,6 +47,16 @@ namespace ZD.AU
         public static readonly string ZydeoUpdateInfoFile = "Update.xml";
 
         /// <summary>
+        /// Zydeo's registry key under HKLM\Software.
+        /// </summary>
+        public static readonly string ZydeoSoftwareRegKey = "Zydeo";
+
+        /// <summary>
+        /// Name of DWORD value, in Zydeo's registry key, for salt.
+        /// </summary>
+        public static readonly string ZydeoSaltRegVal = "Salt";
+
+        /// <summary>
         /// URL that returns info about available updates.
         /// </summary>
         public static readonly string UpdateCheckUrl = "http://zydeo.net/autoupdate";
@@ -54,7 +64,7 @@ namespace ZD.AU
         /// <summary>
         /// POSTDATA to send to update URL.
         /// </summary>
-        public static readonly string UpdatePostPattern = "product={0}&salt={1}&vmaj={2}&vmin={3}";
+        public static readonly string UpdatePostPattern = "product={0}&salt={1:X8}&vmaj={2}&vmin={3}";
 
         /// <summary>
         /// Product for which we request update from URL. Same URL may be serving other products later.
