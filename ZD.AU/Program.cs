@@ -102,7 +102,8 @@ namespace ZD.AU
         /// Relaunched EXE from TEMP folder listens for our requests through named pipe.
         /// Still running as LOCAL SYSTEM, it has privileges to run our installer after verifying it.
         /// </summary>
-        private static void doStartService()
+        /// <returns>True if service started; false if couldn't start service.</returns>
+        private static bool doStartService()
         {
             FileLogger.Instance.LogInfo("Starting service.");
             try
@@ -110,11 +111,13 @@ namespace ZD.AU
                 using (ServiceController sc = new ServiceController(Magic.ServiceShortName))
                 {
                     sc.Start();
+                    return true;
                 }
             }
             catch (Exception ex)
             {
                 FileLogger.Instance.LogError(ex, "Failed to start service.");
+                return false;
             }
         }
 
@@ -162,13 +165,13 @@ namespace ZD.AU
         /// <summary>
         /// Shows the update UI.
         /// </summary>
-        private static void doUpdateForm()
+        private static void doUpdateForm(bool serviceStartedForUI)
         {
             FileLogger.Instance.LogInfo("Showing form.");
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            uf = new ZydeoUpdateForm(doScheduleFileToDelete);
+            uf = new ZydeoUpdateForm(doScheduleFileToDelete, serviceStartedForUI);
             Application.Run(uf);
             // When quitting gracefully, delete file
             // But never throw on this attempt
@@ -230,7 +233,8 @@ namespace ZD.AU
 
             // OK, we're definitely running from temp folder now. (Or debugging.)
             // If we're the UI client, fire up service
-            if (!Helper.IsService()) doStartService();
+            bool serviceStartedForUI = false;
+            if (!Helper.IsService()) serviceStartedForUI = doStartService();
 
             // Running from temp as either SYSTEM or user
             // Wait until parent process exists. Parent's process ID is passed onto us as the first cmdline argument
@@ -248,7 +252,7 @@ namespace ZD.AU
             }
 
             if (Helper.IsService()) doServiceWork();
-            else doUpdateForm();
+            else doUpdateForm(serviceStartedForUI);
         }
 
         /// <summary>

@@ -82,7 +82,8 @@ namespace ZD.AU
         /// Constructs updater form.
         /// </summary>
         /// <param name="fileToDelete">The file to delete when form is closed, or on crash.</param>
-        public ZydeoUpdateForm(ScheduleFileToDeleteDelegate scheduleFileToDelete)
+        public ZydeoUpdateForm(ScheduleFileToDeleteDelegate scheduleFileToDelete,
+            bool serviceStartedForUI)
         {
             InitializeComponent();
 
@@ -95,20 +96,25 @@ namespace ZD.AU
             // We want 1px to be 1px at all resolutions
             pnlOuter.Padding = new Padding(1);
 
-            // Set image and icon
+            // Set image and icon; Zydeo link text
             Assembly a = Assembly.GetExecutingAssembly();
             var img = Image.FromStream(a.GetManifestResourceStream("ZD.AU.Resources.installer1.bmp"));
             pictureBox1.BackgroundImage = img;
             Icon = new Icon(a.GetManifestResourceStream("ZD.AU.Resources.ZydeoSetup.ico"));
+            llZydeoSite.Text = Magic.ZydeoSiteUrl;
+            llZydeoSite.LinkArea = new LinkArea(0, llZydeoSite.Text.Length + 1);
 
             // Moveable by header; button event
             lblHeader.MouseDown += onHeaderMouseDown;
             lblHeader.MouseUp += onHeaderMouseUp;
             lblHeader.MouseMove += onHeaderMouseMove;
             btnClose.Click += onBtnClick;
+            llZydeoSite.Click += onLinkClick;
 
-            // Initial state
-            initOK = doConnectToService();
+            // Initial state: see if service is running; try to connect.
+            if (!serviceStartedForUI) initOK = false;
+            else initOK = doConnectToService();
+            // May start with inevatible fail state
             if (initOK) doSetStateSafe(State.DLoading);
             else doSetStateSafe(State.InitFailed);
         }
@@ -204,6 +210,19 @@ namespace ZD.AU
                 CreateParams cp = base.CreateParams;
                 cp.ClassStyle |= CS_DROPSHADOW;
                 return cp;
+            }
+        }
+
+        /// <summary>
+        /// Zydeo website link clicked: open in default browser.
+        /// </summary>
+        private void onLinkClick(object sender, EventArgs e)
+        {
+            try { System.Diagnostics.Process.Start("http://" + Magic.ZydeoSiteUrl); }
+            catch
+            {
+                // Swallow it all. Worst case, we don't open link - so what.
+                // Not worth a crash or messages.
             }
         }
 
@@ -470,7 +489,7 @@ namespace ZD.AU
         /// Updates the UI. Not thread-safe.
         /// </summary>
         private void doUpdateUI(string strStatus, string strDetail, ProgressBarStyle pbarStyle,
-            ProgressBarState pbarState, int pbarValue1000, string strButtonText, bool btnEnabled)
+            ProgressBarState pbarState, int pbarValue1000, string strButtonText, bool btnEnabled, bool linkVisible)
         {
             lblStatus.Text = strStatus;
             lblDetail.Text = strDetail;
@@ -479,6 +498,7 @@ namespace ZD.AU
             SendMessage(pbar.Handle, 1040, (IntPtr)pbarState, IntPtr.Zero);
             btnClose.Text = strButtonText;
             btnClose.Enabled = btnEnabled;
+            llZydeoSite.Visible = linkVisible;
         }
 
         /// <summary>
@@ -505,9 +525,21 @@ namespace ZD.AU
             int pbarValue;
             string strButtonText;
             bool btnEnabled;
+            bool linkVisible = false;
             // TO-DO: Localize
             switch (state)
             {
+                case State.InitFailed:
+                    strStatus = "Failed to initialize update";
+                    strDetail = "Zydeo cannot automatically download this update. Please visit the Zydeo website and download the latest installer manually.";
+                    pbarStyle = ProgressBarStyle.Continuous;
+                    pbarState = ProgressBarState.Error;
+                    pbarValue = 1000;
+                    strButtonText = "&Close";
+                    btnEnabled = true;
+                    btnClosesWindow = true;
+                    linkVisible = true;
+                    break;
                 case State.DLoading:
                     strStatus = "Downloading update...";
                     strDetail = "";
@@ -595,10 +627,10 @@ namespace ZD.AU
             {
                 Invoke((MethodInvoker)delegate
                 {
-                    doUpdateUI(strStatus, strDetail, pbarStyle, pbarState, pbarValue, strButtonText, btnEnabled);
+                    doUpdateUI(strStatus, strDetail, pbarStyle, pbarState, pbarValue, strButtonText, btnEnabled, linkVisible);
                 });
             }
-            else doUpdateUI(strStatus, strDetail, pbarStyle, pbarState, pbarValue, strButtonText, btnEnabled);
+            else doUpdateUI(strStatus, strDetail, pbarStyle, pbarState, pbarValue, strButtonText, btnEnabled, linkVisible);
         }
     }
 }

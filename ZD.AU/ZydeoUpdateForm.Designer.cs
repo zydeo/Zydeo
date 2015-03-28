@@ -24,6 +24,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnClose = new System.Windows.Forms.Button();
+            this.llZydeoSite = new System.Windows.Forms.LinkLabel();
             this.pnlOuter.SuspendLayout();
             this.pnlInner.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -57,6 +58,7 @@
             // pnlInner
             // 
             this.pnlInner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(247)))), ((int)(((byte)(242)))), ((int)(((byte)(237)))));
+            this.pnlInner.Controls.Add(this.llZydeoSite);
             this.pnlInner.Controls.Add(this.lblDetail);
             this.pnlInner.Controls.Add(this.pbar);
             this.pnlInner.Controls.Add(this.lblStatus);
@@ -79,15 +81,15 @@
             // 
             // pbar
             // 
+            this.pbar.ForeColor = System.Drawing.Color.Red;
             this.pbar.Location = new System.Drawing.Point(180, 124);
+            this.pbar.Maximum = 1000;
             this.pbar.Name = "pbar";
             this.pbar.Size = new System.Drawing.Size(324, 23);
             this.pbar.Step = 1;
             this.pbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pbar.TabIndex = 6;
-            this.pbar.Maximum = 1000;
             this.pbar.Value = 420;
-            this.pbar.ForeColor = System.Drawing.Color.Red;
             // 
             // lblStatus
             // 
@@ -128,6 +130,19 @@
             this.btnClose.Text = "&Close";
             this.btnClose.UseVisualStyleBackColor = true;
             // 
+            // llZydeoSite
+            // 
+            this.llZydeoSite.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.llZydeoSite.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
+            this.llZydeoSite.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
+            this.llZydeoSite.Location = new System.Drawing.Point(179, 279);
+            this.llZydeoSite.Name = "llZydeoSite";
+            this.llZydeoSite.Size = new System.Drawing.Size(213, 23);
+            this.llZydeoSite.TabIndex = 8;
+            this.llZydeoSite.TabStop = true;
+            this.llZydeoSite.Text = "website.com";
+            this.llZydeoSite.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // ZydeoUpdateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -159,5 +174,6 @@
         private System.Windows.Forms.Label lblDetail;
         private System.Windows.Forms.ProgressBar pbar;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.LinkLabel llZydeoSite;
     }
 }

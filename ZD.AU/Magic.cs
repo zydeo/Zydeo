@@ -57,6 +57,11 @@ namespace ZD.AU
         public static readonly string ZydeoSaltRegVal = "Salt";
 
         /// <summary>
+        /// URL of Zydeo site to upen (if update fails and user clicks link)
+        /// </summary>
+        public static readonly string ZydeoSiteUrl = "zydeo.net";
+
+        /// <summary>
         /// URL that returns info about available updates.
         /// </summary>
         public static readonly string UpdateCheckUrl = "http://zydeo.net/autoupdate";
