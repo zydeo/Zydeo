@@ -81,10 +81,12 @@ namespace ZD.Gui
         }
 
         /// <summary>
-        /// Shows welcome screen in form informing user about an available update.
+        /// <para>Shows welcome screen in form informing user about an available update.</para>
+        /// <para>Has no effect if user settings say no update notifications.</para>
         /// </summary>
         public void SetWelcomeUpdate(int vmaj, int vmin, DateTime rdate, string rnotes)
         {
+            if (!AppSettings.NotifyOfUpdates) return;
             lc.SetWelcomeUpdate(vmaj, vmin, rdate, rnotes, updateNow);
         }
 
