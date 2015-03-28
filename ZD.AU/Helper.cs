@@ -98,9 +98,18 @@ namespace ZD.AU
         }
 
         /// <summary>
+        /// If current executable is in a TEMP folder, schedules it for deletion after reboot.
+        /// </summary>
+        public static void DeleteAfterRebootIfTemp()
+        {
+            if (!IsRunningFromTemp()) return;
+            MoveFileEx(Assembly.GetExecutingAssembly().Location, null, MoveFileFlags.MOVEFILE_DELAY_UNTIL_REBOOT);
+        }
+
+        /// <summary>
         /// Deletes a file without ever throwing. Marks it for deletion after restart if that don't work.
         /// </summary>
-        internal static void SafeDeleteFile(string Path)
+        public static void SafeDeleteFile(string Path)
         {
             int tryCount = 5;
             bool success = false;

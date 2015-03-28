@@ -231,6 +231,9 @@ namespace ZD.AU
                 return;
             }
 
+            // If we're running form temporary folder, schedule ourselves for demolition, sorry, deletion
+            Helper.DeleteAfterRebootIfTemp();
+
             // OK, we're definitely running from temp folder now. (Or debugging.)
             // If we're the UI client, fire up service
             bool serviceStartedForUI = false;
