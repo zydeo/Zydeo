@@ -70,7 +70,7 @@ namespace ZD.AU
         private static int getRandomSalt()
         {
             int salt = 0;
-            while (salt == 0)
+            while (salt == 0 || salt == 1)
             {
                 Guid g = Guid.NewGuid();
                 salt = g.GetHashCode();
