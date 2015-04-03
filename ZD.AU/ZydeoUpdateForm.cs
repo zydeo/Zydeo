@@ -393,6 +393,7 @@ namespace ZD.AU
                 scheduleFileToDelete(fname);
                 dloadLastProgress = DateTime.Now;
                 wc = new WebClient();
+                wc.Headers["user-agent"] = "Zydeo updater";
                 wc.UseDefaultCredentials = true;
                 wc.Proxy = WebRequest.GetSystemWebProxy();
                 wc.DownloadFileCompleted += onDownloadCompleted;
