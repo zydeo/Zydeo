@@ -146,7 +146,7 @@ copy $(SolutionDir)_work\ukaitw.ttf $(SolutionDir)_bin
 copy $(SolutionDir)_work\hdzb_75.ttf $(SolutionDir)_bin
 copy $(SolutionDir)_work\Ubuntu-Bold.ttf $(SolutionDir)_bin
 copy $(SolutionDir)_work\Neuton-Regular.ttf $(SolutionDir)_bin
-</PostBuildEvent>
+copy $(SolutionDir)License.html $(SolutionDir)_bin</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

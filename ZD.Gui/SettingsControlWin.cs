@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Reflection;
+using System.IO;
 
 using ZD.Common;
 
@@ -25,6 +26,7 @@ namespace ZD.Gui
             chkUpdates.CheckedChanged += onUpdatesCheckedChanged;
             lblWebVal.Click += onLinkLabelClick;
             lblSourceCodeVal.Click += onLinkLabelClick;
+            lblLicenseVal.Click += onLinkLabelClick;
         }
 
         private void setTexts(ITextProvider tprov, ICedictEngineFactory dictFact)
@@ -35,6 +37,7 @@ namespace ZD.Gui
             lblHeader2.Text = tprov.GetString("ZydeoHeader2");
             lblSourceCode.Text = tprov.GetString("ZydeoSourceCode");
             lblLicense.Text = tprov.GetString("ZydeoLicense");
+            lblLicenseVal.Text = tprov.GetString("ZydeoLicenseVal");
             lblCopyrightVal.Text = tprov.GetString("ZydeoCopyrightVal");
             lblCopyright.Text = tprov.GetString("ZydeoCopyright");
             lblCharRecogVal.Text = tprov.GetString("ZydeoCharRecogVal");
@@ -85,9 +88,13 @@ namespace ZD.Gui
 
         void onLinkLabelClick(object sender, EventArgs e)
         {
+            string licFilePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            licFilePath = Path.Combine(licFilePath, Magic.LicenseFileName);
+
             string openUrl = null;
             if (sender == lblSourceCodeVal) openUrl = "http://" + Magic.GithubUrl;
             else if (sender == lblWebVal) openUrl = "http://" + Magic.WebUrl;
+            else if (sender == lblLicenseVal) openUrl = "file://" + licFilePath;
             if (openUrl == null) return;
             // Open URL in system's default browser - if we can.
             try

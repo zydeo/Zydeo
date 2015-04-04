@@ -68,6 +68,13 @@ Source: "..\_bin\Neuton-Regular.ttf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\cedict-zydeo.bin"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\strokes-zydeo.bin"; DestDir: "{app}"; Flags: ignoreversion
 
+Source: "..\License.html"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\License-CC-BY-SA-3.0.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\License-GNU-GPL-3.0.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\License-ArphicPublicLicense.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\License-SIL-OpenFont-1.1.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\License-UbuntuFont-1.0.txt"; DestDir: "{app}"; Flags: ignoreversion
+
 Source: "ZydeoSetup.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 

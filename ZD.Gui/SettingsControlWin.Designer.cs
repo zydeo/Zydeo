@@ -179,6 +179,8 @@
             // 
             this.lblLicenseVal.AutoSize = true;
             this.lblLicenseVal.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblLicenseVal.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
+            this.lblLicenseVal.Cursor = System.Windows.Forms.Cursors.Hand;
             this.lblLicenseVal.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblLicenseVal.Location = new System.Drawing.Point(188, 198);
             this.lblLicenseVal.Name = "lblLicenseVal";

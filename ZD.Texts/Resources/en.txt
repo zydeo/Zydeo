@@ -56,7 +56,8 @@ ZydeoHeader1				Zydeo. The free Chinese dictionary.
 ZydeoHeader2				Delightfully simple – and open-source.
 ZydeoSourceCode				Source code
 ZydeoLicense				License
-ZydeoCopyrightVal			©2014 Gábor L Ugray
+ZydeoLicenseVal				GNU GPL (view)
+ZydeoCopyrightVal			©2015 Gábor L Ugray
 ZydeoCopyright				Copyright
 ZydeoCharRecogVal			Based on Jordan Kiang's\r\nHanziLookup
 ZydeoCharRecog				Character recognition

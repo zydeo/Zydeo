@@ -32,6 +32,11 @@ namespace ZD.Gui
         public readonly static string StrokesFileName = "strokes-zydeo.bin";
 
         /// <summary>
+        /// Name of the license file, deployed in binary folder, that opens when user clicks on link Zydeo tab.
+        /// </summary>
+        public readonly static string LicenseFileName = "License.html";
+
+        /// <summary>
         /// Subfolder in user's appdata where Zydeo stores its persistent user-specific data.
         /// </summary>
         /// <remarks>Keep in sync with <see cref="ZD.AU.Magic.ZydeoUserFolder"/>.</remarks>
