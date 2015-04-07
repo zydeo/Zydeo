@@ -457,14 +457,16 @@ namespace ZD.Gui
                     ftray = new FontTray(
                         new Font(winFontNameSimp, size, style), 0, -0.05F,
                         height * 0.9F, height);
-                    if (ftray.Font.Name != winFontNameSimp) throw new Exception("Requested font not available.");
+                    if (ftray.Font.Name != winFontNameSimp)
+                        throw new Exception("Requested font not available: " + winFontNameSimp);
                 }
                 else
                 {
                     ftray = new FontTray(
                          new Font(winFontNameTrad, size, style), 0, -0.05F,
                          height * 0.9F, height);
-                    if (ftray.Font.Name != winFontNameTrad) throw new Exception("Requested font not available.");
+                    if (ftray.Font.Name != winFontNameTrad)
+                        throw new Exception("Requested font not available: " + winFontNameTrad);
                 }
                 return ftray;
             }
@@ -476,7 +478,8 @@ namespace ZD.Gui
                     ftray = new FontTray(
                         new Font(ff, size, style), -0.08798828125F * height, -0.05F,
                         height * 0.9F, height);
-                else if (fam == IdeoFamily.ArphicKai && script == IdeoScript.Simp && ff.Name == "䡡湄楮札䍓ⵆ潮瑳")
+                // Alternative names below for name of HDZB_75: First shows up on Win8, second on Win7.
+                else if (fam == IdeoFamily.ArphicKai && script == IdeoScript.Simp && (ff.Name == "䡡湄楮札䍓ⵆ潮瑳" || ff.Name == "汉鼎简中楷"))
                     ftray = new FontTray(
                         new Font(ff, size, style), 0, -0.05F,
                         height * 0.9F, height);

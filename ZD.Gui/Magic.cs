@@ -164,8 +164,7 @@ namespace ZD.Gui
         /// <summary>
         /// Font style for Pinyin in heading of displayed entries.
         /// </summary>
-        public static readonly FontStyle PinyinFontStyle = FontStyle.Regular;
-        //public static readonly FontStyle PinyinFontStyle = FontStyle.Regular;
+        public static readonly FontStyle PinyinFontStyle = FontStyle.Bold;
 
         /// <summary>
         /// Font size for Pinyin in heading of displayed entries.
