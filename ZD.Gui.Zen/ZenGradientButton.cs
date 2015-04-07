@@ -139,7 +139,8 @@ namespace ZD.Gui.Zen
             {
                 this.text = value == null ? string.Empty : value;
                 textSize = measure(text);
-                MakeMePaint(false, RenderMode.Invalidate);
+                // Text setter can be called from animation thread; repaint request can lead to deadlock
+                //MakeMePaint(false, RenderMode.Invalidate);
             }
         }
 
