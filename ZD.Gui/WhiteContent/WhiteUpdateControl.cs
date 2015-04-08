@@ -314,6 +314,7 @@ namespace ZD.Gui
             // Title
             using (Brush b = new SolidBrush(clrTitle))
             {
+                // Neution is not good with "ClearTypeGridFit"
                 g.TextRenderingHint = TextRenderingHint.AntiAlias;
                 StringFormat sf = StringFormat.GenericDefault;
                 sf.Alignment = StringAlignment.Center;
@@ -325,7 +326,7 @@ namespace ZD.Gui
             // Message body
             using (Brush b = new SolidBrush(clrBody))
             {
-                g.TextRenderingHint = TextRenderingHint.AntiAlias;
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 StringFormat sf = StringFormat.GenericDefault;
                 sf.Alignment = StringAlignment.Center;
                 float w = Width - padLR * 2;
@@ -343,7 +344,7 @@ namespace ZD.Gui
             using (Brush bSep = new SolidBrush(clrDetailsSep))
             using (Brush bLink = new SolidBrush(clrDetailsLink))
             {
-                g.TextRenderingHint = TextRenderingHint.AntiAlias;
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 StringFormat sf = StringFormat.GenericDefault;
                 // Measure all texts
                 SizeF szTblHead = g.MeasureString(strTblHead, fntTblHead, 65535, sf);
