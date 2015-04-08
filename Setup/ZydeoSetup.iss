@@ -46,6 +46,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
+Source: isxdl.dll; Flags: dontcopy
+Source: isxdl_english.ini; Flags: dontcopy
+
 Source: "..\_bin\Zydeo.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ZD.AU.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ZD.CedictEngine.dll"; DestDir: "{app}"; Flags: ignoreversion
