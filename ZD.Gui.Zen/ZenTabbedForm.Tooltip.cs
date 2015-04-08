@@ -242,7 +242,8 @@ namespace ZD.Gui.Zen
                         float strength = (100F - (ast - 300F)) / 100F;
                         res.Add(new TooltipToPaint(x.Key, x.Value, strength));
                     }
-                    // Other: already faded out, nothing.
+                    // Other: already faded out, "paint" one last time with 0 strength to make sure it disappears.
+                    else res.Add(new TooltipToPaint(x.Key, x.Value, 0));
                 }
             }
             return res;
