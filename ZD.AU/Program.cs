@@ -209,7 +209,12 @@ namespace ZD.AU
         /// <param name="args"></param>
         private static void mainCore(string[] args)
         {
+            // No self-copying when runnung a debug build, in the debugger
             inDebugger = Debugger.IsAttached;
+#if !DEBUG
+            inDebugger = false;
+#endif
+
             if (args.Length > 0)
             {
                 switch (args[0])
