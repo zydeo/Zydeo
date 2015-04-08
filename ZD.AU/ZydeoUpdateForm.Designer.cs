@@ -81,7 +81,6 @@
             // 
             // pbar
             // 
-            this.pbar.ForeColor = System.Drawing.Color.Red;
             this.pbar.Location = new System.Drawing.Point(180, 124);
             this.pbar.Maximum = 1000;
             this.pbar.Name = "pbar";
