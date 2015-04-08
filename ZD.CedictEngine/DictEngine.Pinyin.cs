@@ -74,9 +74,17 @@ namespace ZD.CedictEngine
                 // Find matching syllable
                 if (rest.StartsWith(ps.Text))
                 {
-                    ends.Add(pos + ps.Text.Length);
+                    int endPos = pos + ps.Text.Length;
+                    // We have a tone mark (digit 1-5) after syllable: got to skip that
+                    if (rest.Length > ps.Text.Length)
+                    {
+                        char nextChr = rest[ps.Text.Length];
+                        if (nextChr >= '1' && nextChr <= '5') ++endPos;
+                    }
+                    // Record end of syllable
+                    ends.Add(endPos);
                     // If rest matches, we're done
-                    if (doMatchSylls(str, pos + ps.Text.Length, ends)) return true;
+                    if (doMatchSylls(str, endPos, ends)) return true;
                     // Otherwise, backtrack, move on to next syllable
                     ends.RemoveAt(ends.Count - 1);
                 }
