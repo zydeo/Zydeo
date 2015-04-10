@@ -635,6 +635,12 @@ namespace ZD.Gui
                 Rectangle grRect = new Rectangle(olRight - lblWidth - gradWidth, Height - olHeight, gradWidth, olHeight);
                 using (LinearGradientBrush gb = new LinearGradientBrush(grRect, colL, colR, LinearGradientMode.Horizontal))
                 {
+                    // If we use same rectangle that we passed to LGbrush, randomly it gets
+                    // the leftmost column (1px) wrong - fetching it from other end of scale.
+                    // We draw a narrower rectangle instead.
+                    grRect.X += 1;
+                    grRect.Width -= 1;
+                    // Fill rectangle
                     g.FillRectangle(gb, grRect);
                 }
 
