@@ -58,12 +58,12 @@ Source: "..\_bin\ZD.Gui.Zen.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ZD.HanziLookup.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ZD.Texts.dll"; DestDir: "{app}"; Flags: ignoreversion
 
-Source: "..\_bin\ukaitw.ttf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\_bin\hdzb_75.ttf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\_bin\Ubuntu-Bold.ttf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\_bin\Neuton-Regular.ttf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\_bin\cedict-zydeo.bin"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\_bin\strokes-zydeo.bin"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\_bin\Fonts\ukaitw.ttf"; DestDir: "{app}\Fonts"; Flags: ignoreversion
+Source: "..\_bin\Fonts\hdzb_75.ttf"; DestDir: "{app}\Fonts"; Flags: ignoreversion
+Source: "..\_bin\Fonts\Ubuntu-Bold.ttf"; DestDir: "{app}\Fonts"; Flags: ignoreversion
+Source: "..\_bin\Fonts\Neuton-Regular.ttf"; DestDir: "{app}\Fonts"; Flags: ignoreversion
+Source: "..\_bin\Data\cedict-zydeo.bin"; DestDir: "{app}\Data"; Flags: ignoreversion
+Source: "..\_bin\Data\strokes-zydeo.bin"; DestDir: "{app}\Data"; Flags: ignoreversion
 
 Source: "..\License.html"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\License-CC-BY-SA-3.0.txt"; DestDir: "{app}"; Flags: ignoreversion

@@ -24,12 +24,12 @@ namespace ZD.Gui
         /// <summary>
         /// Name of compiled, binary dictionary file.
         /// </summary>
-        public readonly static string DictFileName = "cedict-zydeo.bin";
+        public readonly static string DictFileName = @"Data\cedict-zydeo.bin";
 
         /// <summary>
         /// Name of compiled, binary stroke recognition data.
         /// </summary>
-        public readonly static string StrokesFileName = "strokes-zydeo.bin";
+        public readonly static string StrokesFileName = @"Data\strokes-zydeo.bin";
 
         /// <summary>
         /// Name of the license file, deployed in binary folder, that opens when user clicks on link Zydeo tab.

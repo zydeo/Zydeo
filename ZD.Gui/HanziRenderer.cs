@@ -224,10 +224,10 @@ namespace ZD.Gui
         }
 
         #region Font face and file names etc.
-        private readonly static string myFileTradKai = "ukaitw.ttf";
-        private readonly static string myFileSimpKai = "hdzb_75.ttf";
-        private readonly static string myFileTradHei = "NotoSansHant-Light.otf";
-        private readonly static string myFileSimpHei = "NotoSansHans-Light.otf";
+        private readonly static string myFileTradKai = @"Fonts\ukaitw.ttf";
+        private readonly static string myFileSimpKai = @"Fonts\hdzb_75.ttf";
+        private readonly static string myFileTradHei = @"Fonts\NotoSansHant-Light.otf";
+        private readonly static string myFileSimpHei = @"Fonts\NotoSansHans-Light.otf";
         private readonly static string winFontNameTrad = "DFKai-SB";
         private readonly static string winFontNameSimp = "KaiTi";
         #endregion
@@ -311,8 +311,8 @@ namespace ZD.Gui
             }
 
             // Load deployed fonts into private collection
-            fonts.AddFontFile(myFileTradKai);
-            fonts.AddFontFile(myFileSimpKai);
+            if (File.Exists(myFileTradKai)) fonts.AddFontFile(myFileTradKai);
+            if (File.Exists(myFileSimpKai)) fonts.AddFontFile(myFileSimpKai);
             if (File.Exists(myFileSimpHei)) fonts.AddFontFile(myFileSimpHei);
             if (File.Exists(myFileTradHei)) fonts.AddFontFile(myFileTradHei);
         }
@@ -331,12 +331,12 @@ namespace ZD.Gui
         /// <summary>
         /// Measures the display rectangle of a string.
         /// </summary>
-        public static SizeF MeasureString(Graphics g, string text, float size)
+        public static SizeF MeasureString(Graphics g, IdeoFamily fam, string text, float size)
         {
             // TO-DO: actually invoke g.MeasureString for non-Hanzi characters
             // I.e., regular and half-width alphabetical and digits
 
-            FontTray ftray = getFont(IdeoFamily.ArphicKai, IdeoScript.Simp, size, FontStyle.Regular);
+            FontTray ftray = getFont(fam, IdeoScript.Simp, size, FontStyle.Regular);
             float width = ((float)text.Length) * ftray.DisplayWidth;
             return new SizeF(width, ftray.DisplayHeight);
         }
@@ -344,12 +344,12 @@ namespace ZD.Gui
         /// <summary>
         /// Measures the display rectangle of a single character.
         /// </summary>
-        public static SizeF MeasureChar(Graphics g, char c, float size)
+        public static SizeF MeasureChar(Graphics g, IdeoFamily fam, char c, float size)
         {
             // TO-DO: actually invoke g.MeasureString for non-Hanzi characters
             // I.e., regular and half-width alphabetical and digits
 
-            FontTray ftray = getFont(IdeoFamily.ArphicKai, IdeoScript.Simp, size, FontStyle.Regular);
+            FontTray ftray = getFont(fam, IdeoScript.Simp, size, FontStyle.Regular);
             return new SizeF(ftray.DisplayWidth, ftray.DisplayHeight);
         }
 
@@ -423,7 +423,7 @@ namespace ZD.Gui
         /// <para>Gets the size of a Hanzi's display rectangle, if using the font with the provided parameters.</para>
         /// <para>Expensive (instantiates and destroys font).</para>
         /// </summary>
-        public static SizeF GetCharSize(float size)
+        public static SizeF GetCharSize(IdeoFamily fam, float size)
         {
             FontTray ftray = null;
             try
@@ -431,7 +431,7 @@ namespace ZD.Gui
                 // Font family and script do not matter
                 // Whole point of this class is to make sure the display rectangles
                 //   for any family and script are standardized.
-                ftray = createFont(IdeoFamily.ArphicKai, IdeoScript.Simp, size, FontStyle.Regular);
+                ftray = createFont(fam, IdeoScript.Simp, size, FontStyle.Regular);
                 return new SizeF(ftray.DisplayWidth, ftray.DisplayHeight);
             }
             finally

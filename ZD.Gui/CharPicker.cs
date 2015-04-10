@@ -219,7 +219,7 @@ namespace ZD.Gui
                 {
                     //var xsi = HanziMeasure.Instance.GetMeasures(fontFace, fontSize);
                     //charSize = xsi.RealRect.Size;
-                    charSize = HanziRenderer.GetCharSize(fontSize);
+                    charSize = HanziRenderer.GetCharSize(Magic.ZhoContentFontFamily, fontSize);
                     if (charSize.Width * 5.0F >= width * 0.9F) break;
                     fontSize += 0.5F;
                 }

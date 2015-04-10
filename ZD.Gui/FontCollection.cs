@@ -18,18 +18,26 @@ namespace ZD.Gui
         /// </summary>
         private static PrivateFontCollection fonts = new PrivateFontCollection();
 
+        private readonly static string fnUbuntu = @"Fonts\Ubuntu-Bold.ttf";
+        private readonly static string fnNeuton = @"Fonts\Neuton-Regular.ttf";
+        private readonly static string fnNotoSansHanS = @"Fonts\NotoSansHans-Regular.otf";
+        private readonly static string fnNotoSansRegular = @"Fonts\NotoSans-Regular.ttf";
+        private readonly static string fnNotoSansBold = @"Fonts\NotoSans-Bold.ttf";
+        private readonly static string fnNotoSansItalic = @"Fonts\NotoSans-Italic.ttf";
+        private readonly static string fnNotoSansBoldItalic = @"Fonts\NotoSans-BoldItalic.ttf";
+
         /// <summary>
         /// Static ctor: add custom fonts to private collection.
         /// </summary>
         static FontCollection()
         {
-            fonts.AddFontFile("Ubuntu-Bold.ttf");
-            fonts.AddFontFile("Neuton-Regular.ttf");
-            if (File.Exists("NotoSansHans-Regular.otf")) fonts.AddFontFile("NotoSansHans-Regular.otf");
-            if (File.Exists("NotoSans-Regular.ttf")) fonts.AddFontFile("NotoSans-Regular.ttf");
-            if (File.Exists("NotoSans-Bold.ttf")) fonts.AddFontFile("NotoSans-Bold.ttf");
-            if (File.Exists("NotoSans-Italic.ttf")) fonts.AddFontFile("NotoSans-Italic.ttf");
-            if (File.Exists("NotoSans-BoldItalic.ttf")) fonts.AddFontFile("NotoSans-BoldItalic.ttf");
+            fonts.AddFontFile(fnUbuntu);
+            fonts.AddFontFile(fnUbuntu);
+            if (File.Exists(fnNotoSansHanS)) fonts.AddFontFile(fnNotoSansHanS);
+            if (File.Exists(fnNotoSansRegular)) fonts.AddFontFile(fnNotoSansRegular);
+            if (File.Exists(fnNotoSansBold)) fonts.AddFontFile(fnNotoSansBold);
+            if (File.Exists(fnNotoSansItalic)) fonts.AddFontFile(fnNotoSansItalic);
+            if (File.Exists(fnNotoSansBoldItalic)) fonts.AddFontFile(fnNotoSansBoldItalic);
         }
 
         /// <summary>
