@@ -30,6 +30,11 @@ namespace ZD.Gui
         }
 
         /// <summary>
+        /// True if IME is composing (active).
+        /// </summary>
+        private bool imeActive = false;
+
+        /// <summary>
         /// Ctor: inits colors to match Zen parameters.
         /// </summary>
         public HintedTextBox()
@@ -44,10 +49,25 @@ namespace ZD.Gui
         private const int WM_PAINT = 0x0f;
 
         /// <summary>
+        /// IME composition started event.
+        /// </summary>
+        private const int WM_IME_STARTCOMPOSITION = 0x10d;
+
+        /// <summary>
+        /// IME composition ended event.
+        /// </summary>
+        private const int WM_IME_ENDCOMPOSITION = 0x10e;
+
+        /// <summary>
         /// Intercepts (at least some) Paint events to display hint.
         /// </summary>
         protected override void WndProc(ref Message m)
         {
+            if (m.Msg == WM_IME_STARTCOMPOSITION || m.Msg == WM_IME_ENDCOMPOSITION)
+            {
+                imeActive = m.Msg == WM_IME_STARTCOMPOSITION;
+                Invalidate();
+            }
             base.WndProc(ref m);
             if (m.Msg == WM_PAINT) doPaintOver();
         }
@@ -58,6 +78,7 @@ namespace ZD.Gui
         protected override void OnTextChanged(EventArgs e)
         {
             base.OnTextChanged(e);
+            imeActive = false;
             doPaintOver();
         }
 
@@ -66,7 +87,7 @@ namespace ZD.Gui
         /// </summary>
         private void doPaintOver()
         {
-            if (Text != string.Empty || hintText == string.Empty) return;
+            if (Text != string.Empty || hintText == string.Empty || imeActive) return;
             using (Graphics g = CreateGraphics())
             {
                 using (Font f = new Font(this.Font, FontStyle.Italic))
