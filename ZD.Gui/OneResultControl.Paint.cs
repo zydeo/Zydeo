@@ -24,7 +24,7 @@ namespace ZD.Gui
 
             g.SmoothingMode = SmoothingMode.None;
             HeadBlock hb;
-            RectangleF rect;
+            RectangleF rect, brushRect;
             // Width of gradient
             float gradw = ideoSize.Width / 2.0F;
             // Extent of gradient outside character
@@ -45,7 +45,11 @@ namespace ZD.Gui
                     hb = headInfo.SimpBlocks[res.HanziHiliteStart];
                     rect = new RectangleF(hb.Loc.X, hb.Loc.Y, gradw, hb.Size.Height);
                     rect.X -= gradext;
-                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, bgcol, Magic.HiliteColor, LinearGradientMode.Horizontal))
+                    // Brush must extend beyond due to gradient brush bug
+                    brushRect = rect;
+                    brushRect.X -= 1;
+                    brushRect.Width += 1;
+                    using (LinearGradientBrush lgb = new LinearGradientBrush(brushRect, bgcol, Magic.HiliteColor, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lgb, rect);
                     }
@@ -53,7 +57,11 @@ namespace ZD.Gui
                     rect = new RectangleF(hb.Loc.X + hb.Size.Width, hb.Loc.Y, gradw, hb.Size.Height);
                     rect.X += gradext;
                     rect.X -= gradw;
-                    using (LinearGradientBrush lgb = new LinearGradientBrush(rect, Magic.HiliteColor, bgcol, LinearGradientMode.Horizontal))
+                    // Brush must extend beyond due to gradient brush bug
+                    brushRect = rect;
+                    brushRect.X -= 1;
+                    brushRect.Width += 1;
+                    using (LinearGradientBrush lgb = new LinearGradientBrush(brushRect, Magic.HiliteColor, bgcol, LinearGradientMode.Horizontal))
                     {
                         g.FillRectangle(lgb, rect);
                     }
