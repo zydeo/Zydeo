@@ -69,7 +69,7 @@ namespace ZD.AU
         /// <summary>
         /// POSTDATA to send to update URL.
         /// </summary>
-        public static readonly string UpdatePostPattern = "product={0}&salt={1:X8}&vmaj={2}&vmin={3}";
+        public static readonly string UpdatePostPattern = "product={0}&salt={1:X8}&vmaj={2}&vmin={3}&winver={4}";
 
         /// <summary>
         /// Product for which we request update from URL. Same URL may be serving other products later.

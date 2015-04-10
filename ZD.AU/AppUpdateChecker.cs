@@ -58,6 +58,8 @@ namespace ZD.AU
             // Version info and salt
             uint salt = (uint)Salt.GetSalt();
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
+            OperatingSystem osi = Environment.OSVersion;
+            string osVerStr = osi.Version.Major + "." + osi.Version.Minor + "." + osi.Version.Build + "." + osi.Version.Revision;
 
             // Create web request; make sure we go through user's configured proxy, if any.
             WebRequest req = HttpWebRequest.Create(Magic.UpdateCheckUrl);
@@ -65,7 +67,7 @@ namespace ZD.AU
             req.Proxy.Credentials = CredentialCache.DefaultCredentials;
             // POST data
             string pdata = Magic.UpdatePostPattern;
-            pdata = string.Format(pdata, Magic.UpdateProduct, salt, ver.Major, ver.Minor);
+            pdata = string.Format(pdata, Magic.UpdateProduct, salt, ver.Major, ver.Minor, osVerStr);
             byte[] data = Encoding.ASCII.GetBytes(pdata);
             // Send POST data
             req.Method = "POST";
