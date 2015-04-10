@@ -615,7 +615,7 @@ namespace ZD.Gui
             // First, measure size of "N results" text
             StringFormat sf = StringFormat.GenericTypographic;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            using (Font fnt = new Font(ZenParams.GenericFontFamily, Magic.ResultsCountFontSize))
+            using (Font fnt = SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, Magic.ResultsCountFontSize))
             {
                 // Measure label size: this is solid BG
                 SizeF txtSizeF = g.MeasureString(txtResCount, fnt);

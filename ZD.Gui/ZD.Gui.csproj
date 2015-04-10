@@ -59,6 +59,7 @@
     <Compile Include="OneResultControl.Analysis.cs" />
     <Compile Include="OneResultControl.Paint.cs" />
     <Compile Include="OneResultControl.TextPool.cs" />
+    <Compile Include="ZydeoSystemFontProvider.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

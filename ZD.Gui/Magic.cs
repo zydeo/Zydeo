@@ -88,17 +88,6 @@ namespace ZD.Gui
         public readonly static string SearchLangZho = "中";
 
         /// <summary>
-        /// Font family for hard-wired texts on buttons next to search input field.
-        /// </summary>
-        /// <remars>
-        /// Other fonts tested:
-        /// DFKai-SB
-        /// 䡡湄楮札䍓ⵆ潮瑳
-        /// Noto Sans S Chinese Regular
-        /// </remars>
-        public static readonly string ZhoButtonFontFamily = "Segoe UI";
-
-        /// <summary>
         /// Font size for hard-wired texts on buttons next to search input field.
         /// </summary>
         public static readonly float ZhoButtonFontSize = 18.0F;
@@ -130,11 +119,6 @@ namespace ZD.Gui
         public static readonly float ZhoResultFontSize = 26.0F;
 
         /// <summary>
-        /// Font family for lemma (domain, equiv, note) in displayed entries. Also for Hanzi ranges.
-        /// </summary>
-        public static readonly string LemmaFontFamily = "Segoe UI";
-
-        /// <summary>
         /// Font size for lemma (domain, equiv, note) in displayed entries. Hanzi size derived from this.
         /// </summary>
         public static readonly float LemmaFontSize = 12.0F;
@@ -158,8 +142,6 @@ namespace ZD.Gui
         /// Font family for Pinyin in heading of displayed entries.
         /// </summary>
         public static readonly string PinyinFontFamily = "Ubuntu";
-        //public static readonly string PinyinFontFamily = "Tahoma";
-        //public static readonly string PinyinFontFamily = "Segoe UI";
 
         /// <summary>
         /// Font style for Pinyin in heading of displayed entries.
@@ -259,7 +241,6 @@ namespace ZD.Gui
 
         public static readonly string WhiteUpdFntTitle = "Neuton";
         public static readonly float WhiteUpFntTitleSz = 24F;
-        public static readonly string WhiteUpdFntNorm = "Segoe UI";
         public static readonly float WhiteUpdFntNormSz = 10F;
         public static readonly Color WhiteUpdClrTitle = Color.FromArgb(0xa8, 0x80, 0x5f);
         public static readonly Color WhiteUpdClrBody = Color.FromArgb(0x26, 0x26, 0x26);

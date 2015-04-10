@@ -22,9 +22,7 @@ namespace ZD.Gui.Zen
             : base(owner)
         {
             this.isMain = isMain;
-            font = new Font(new FontFamily(ZenParams.HeaderTabFontFamily),
-                ZenParams.HeaderTabFontSize,
-                FontStyle.Regular);
+            font = SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, ZenParams.HeaderTabFontSize);
         }
 
         public string Text

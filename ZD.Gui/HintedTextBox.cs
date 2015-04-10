@@ -72,8 +72,15 @@ namespace ZD.Gui
                 using (Font f = new Font(this.Font, FontStyle.Italic))
                 using (Brush b = new SolidBrush(Color.FromArgb(Magic.SearchInputHintOpacity, this.ForeColor)))
                 {
+                    // Vertical offset for Noto. Ugly but not my fault the whole thing. Stupid fonts.
+                    float top = 0;
+                    if (f.Name.StartsWith("Noto"))
+                    {
+                        float scale = this.FindForm().CurrentAutoScaleDimensions.Height / 13.0F;
+                        top = scale * 4F;
+                    }
                     g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                    g.DrawString(hintText, f, b, new PointF(0, 0));
+                    g.DrawString(hintText, f, b, new PointF(0, top));
                 }
             }
         }

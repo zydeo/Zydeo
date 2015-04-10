@@ -66,12 +66,11 @@ namespace ZD.Gui
             txtInput.BorderStyle = BorderStyle.None;
             RegisterWinFormsControl(txtInput);
             // My font family, and other properties to achieve a borderless inside input field.
-            string fface = Magic.ZhoButtonFontFamily;
-            txtInput.Font = new System.Drawing.Font(fface, 16F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+            txtInput.Font = (SystemFontProvider.Instance as ZydeoSystemFontProvider).GetZhoButtonFont(
+                FontStyle.Regular, 16F);
             txtInput.AutoSize = false;
             txtInput.Height = txtInput.PreferredHeight + padding;
             txtInput.HintText = tprov.GetString("SearchTextHint");
-            //txtInput.BackColor = Color.Magenta;
 
             // My height depends on text box's height at current font settings.
             blockSizeChanged = true;
@@ -121,19 +120,23 @@ namespace ZD.Gui
             // Text field: search icon on left, X icon on right
             // ctrlHeight stands for width of buttons (they're all rectangular)
             // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
-            // Position below is suitable for Noto, but not for Segoe.
-            //txtInput.Location = new Point(AbsLeft + padding, AbsTop + padding);
+            // Different for Segoe and Noto to make it look good.
+            Point locTxtInput;
+            if ((SystemFontProvider.Instance as ZydeoSystemFontProvider).SegoeExists)
+                locTxtInput = new Point(AbsLeft + padding, AbsTop + (int)(2F * Scale));
+            else
+                locTxtInput = new Point(AbsLeft + padding, AbsTop + padding - 1);
             if (txtInput.InvokeRequired)
             {
                 InvokeOnForm((MethodInvoker)delegate
                 {
-                    txtInput.Location = new Point(AbsLeft + padding, AbsTop + (int)(2F * Scale));
+                    txtInput.Location = locTxtInput;
                     txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, textBoxHeight);
                 });
             }
             else
             {
-                txtInput.Location = new Point(AbsLeft + padding, AbsTop + (int)(2F * Scale));
+                txtInput.Location = locTxtInput;
                 txtInput.Size = new Size(Width - 4 * padding - 2 * ctrlHeight, textBoxHeight);
             }
             

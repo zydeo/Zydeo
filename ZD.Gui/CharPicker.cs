@@ -423,8 +423,8 @@ namespace ZD.Gui
                 string line1 = tprov.GetString("CharPickerError1");
                 string line2 = tprov.GetString("CharPickerError2");
                 float fontSize = Magic.CharPickerErrorFontSize;
-                using (Font f1 = new Font(ZenParams.GenericFontFamily, fontSize, FontStyle.Bold))
-                using (Font f2 = new Font(ZenParams.GenericFontFamily, fontSize))
+                using (Font f1 = SystemFontProvider.Instance.GetSystemFont(FontStyle.Bold, fontSize))
+                using (Font f2 = SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, fontSize))
                 using (Brush b = new SolidBrush(Color.Black))
                 {
                     float padL = 10F * Scale;

@@ -36,7 +36,7 @@ namespace ZD.Gui.Zen
         public static readonly Color TabOtherBgActive = Color.FromArgb(0xf7, 0xf2, 0xed);
         public static readonly Color TabOtherTxtBase = Color.White;
         public static readonly Color TabOtherTxtActive = Color.Black;
-        public static readonly string HeaderTabFontFamily = "Segoe UI";
+        public static readonly string DefaultSysFontFamily = "Segoe UI";
         public static readonly float HeaderTabFontSize = 12.0F;
         public static readonly float HeaderTabPadding = 12.0F;
         
@@ -44,12 +44,10 @@ namespace ZD.Gui.Zen
         public static readonly Color PaddingBackColor = Color.FromArgb(0xf7, 0xf2, 0xed);
         public static readonly Color HeaderBackColorL = Color.FromArgb(0x51, 0x84, 0x03);
         public static readonly Color HeaderBackColorR = Color.FromArgb(0x41, 0x6b, 0x00);
-        public static readonly string HeaderFontFamily = "Segoe UI";
         public static readonly float HeaderFontSize = 13.0F;
         public static readonly Color HeaderFontColor = Color.FromArgb(0xf7, 0xf2, 0xed);
 
         public static readonly Color WindowColor = Color.White;
-        public static readonly string GenericFontFamily = "Segoe UI";
         public static readonly float StandardFontSize = 12.0F;
         public static readonly Color StandardTextColor = Color.Black;
         public static readonly float TooltipFontSize = 10.0F;

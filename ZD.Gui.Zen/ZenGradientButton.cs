@@ -25,19 +25,9 @@ namespace ZD.Gui.Zen
         private int imageExtraPadding = 0;
 
         /// <summary>
-        /// Font face of button text.
+        /// Font used for button text; owned by button.
         /// </summary>
-        private string fontFace = ZenParams.GenericFontFamily;
-
-        /// <summary>
-        /// Font size of button text.
-        /// </summary>
-        private float fontSize = ZenParams.StandardFontSize;
-
-        /// <summary>
-        /// Cached font for drawing text; owned here.
-        /// </summary>
-        private Font fntText;
+        private Font font;
 
         /// <summary>
         /// The button's label.
@@ -85,7 +75,7 @@ namespace ZD.Gui.Zen
         public ZenGradientButton(ZenControlBase parent)
             : base(parent)
         {
-            fntText = new Font(fontFace, fontSize);
+            font = SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, ZenParams.StandardFontSize);
         }
 
         /// <summary>
@@ -93,22 +83,19 @@ namespace ZD.Gui.Zen
         /// </summary>
         public override void Dispose()
         {
-            if (fntText != null) fntText.Dispose();
+            if (font != null) font.Dispose();
             if (image != null) image.Dispose();
             if (disabledImage != null) image.Dispose();
             base.Dispose();
         }
 
         /// <summary>
-        /// Sets the button's display font for showing the text.
+        /// Sets the button's display font for showing the text. Takes ownership of font object.
         /// </summary>
-        public void SetFont(string fontFace, float fontSize)
+        public void SetFont(Font newFont)
         {
-            if (fntText != null) fntText.Dispose();
-            fntText = null;
-            this.fontFace = fontFace;
-            this.fontSize = fontSize;
-            fntText = new Font(fontFace, fontSize);
+            if (font != null) font.Dispose();
+            font = newFont;
             textSize = measure(text);
             MakeMePaint(false, RenderMode.Invalidate);
         }
@@ -118,7 +105,7 @@ namespace ZD.Gui.Zen
         /// </summary>
         public string FontFace
         {
-            get { return fontFace; }
+            get { return font.FontFamily.Name; }
         }
 
         /// <summary>
@@ -126,7 +113,7 @@ namespace ZD.Gui.Zen
         /// </summary>
         public float FontSize
         {
-            get { return fontSize; }
+            get { return font.Size; }
         }
 
         /// <summary>
@@ -488,7 +475,7 @@ namespace ZD.Gui.Zen
         private SizeF measure(string text)
         {
             StringFormat sf = StringFormat.GenericTypographic;
-            return MeasureText(text, fntText, sf);
+            return MeasureText(text, font, sf);
         }
 
         private Image makeDisabledImage(Image image)
@@ -599,6 +586,8 @@ namespace ZD.Gui.Zen
                 // For Hanzi, need different strategy
                 if (forcedCharHeight != 0)
                     txtTop = (int)(((float)Height) * 0.5F - (forcedCharHeight / 2.0F) + forcedCharVertOfs);
+                else if (forcedCharVertOfs != 0)
+                    txtTop = (int)(((float)Height) * 0.5F - (textSize.Height / 2.0F) + forcedCharVertOfs);
                 RectangleF textRect = new RectangleF(txtLeft, txtTop, textSize.Width + 1, textSize.Height + 1);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
                 StringFormat sf = StringFormat.GenericTypographic;
@@ -607,7 +596,7 @@ namespace ZD.Gui.Zen
                 {
                     if (onlyAntiAlias) g.TextRenderingHint = TextRenderingHint.AntiAlias;
                     else g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                    g.DrawString(text, fntText, b, textRect, sf);
+                    g.DrawString(text, font, b, textRect, sf);
                 }
             }
 

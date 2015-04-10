@@ -53,6 +53,10 @@ namespace ZD.Gui
             if (HanziRenderer.IsWinKaiAvailable()) Magic.SetZhoContentFontFamily(IdeoFamily.WinKai);
             else Magic.SetZhoContentFontFamily(IdeoFamily.ArphicKai);
 
+            // Initialize system font provider with our own
+            if (SystemFontProvider.Instance as ZydeoSystemFontProvider == null)
+                SystemFontProvider.Instance = new ZydeoSystemFontProvider();
+
             // Find out last window size and location from settings
             Size size = AppSettings.WindowLogicalSize;
             Point loc = AppSettings.WindowLoc;

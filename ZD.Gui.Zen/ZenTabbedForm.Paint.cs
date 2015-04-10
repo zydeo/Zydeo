@@ -52,7 +52,7 @@ namespace ZD.Gui.Zen
             float w = btnClose.AbsLeft - x;
             RectangleF rectHeader = new RectangleF(x, y, btnClose.AbsLeft - w, headerHeight - y);
             using (Brush b = new SolidBrush(ZenParams.HeaderFontColor))
-            using (Font f = new Font(new FontFamily(ZenParams.HeaderFontFamily), ZenParams.HeaderFontSize))
+            using (Font f = SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, ZenParams.HeaderFontSize))
             {
                 SizeF hsz;
                 StringFormat sf = StringFormat.GenericTypographic;
@@ -254,7 +254,7 @@ namespace ZD.Gui.Zen
             List<TooltipToPaint> ttpList = getTooltipsToPaint();
             if (ttpList.Count != 0)
             {
-                using (Font f = new Font(ZenParams.GenericFontFamily, ZenParams.TooltipFontSize, FontStyle.Regular))
+                using (Font f = SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, ZenParams.TooltipFontSize))
                 {
                     foreach (TooltipToPaint ttp in ttpList) doPaintTooltip(g, f, ttp);
                 }

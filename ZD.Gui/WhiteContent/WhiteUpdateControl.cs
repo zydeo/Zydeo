@@ -92,9 +92,9 @@ namespace ZD.Gui
 
             // Fonts. !! Dispose 'em.
             fntTitle = FontCollection.CreateFont(Magic.WhiteUpdFntTitle, Magic.WhiteUpFntTitleSz, FontStyle.Regular);
-            fntNorm = FontCollection.CreateFont(Magic.WhiteUpdFntNorm, Magic.WhiteUpdFntNormSz, FontStyle.Regular);
-            fntTblHead = FontCollection.CreateFont(Magic.WhiteUpdFntNorm, Magic.WhiteUpdFntNormSz, FontStyle.Bold);
-            fntTblValues = FontCollection.CreateFont(Magic.WhiteUpdFntNorm, 10F, FontStyle.Italic);
+            fntNorm = SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, Magic.WhiteUpdFntNormSz);
+            fntTblHead = SystemFontProvider.Instance.GetSystemFont(FontStyle.Bold, Magic.WhiteUpdFntNormSz);
+            fntTblValues = SystemFontProvider.Instance.GetSystemFont(FontStyle.Italic, 10F);
 
             // Construct UI strings
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
@@ -223,7 +223,7 @@ namespace ZD.Gui
             btnUpdate.Height = (int)(scale * 24F);
             btnUpdate.Width = btnUpdateWidth;
             btnUpdate.RelLocation = btnUpdateRelLoc;
-            btnUpdate.SetFont(ZenParams.GenericFontFamily, 10F);
+            btnUpdate.SetFont(SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, 10F));
             btnUpdate.Text = tprov.GetString("WhiteUpdateButton");
             btnUpdate.MouseClick += onBtnUpdateClick;
         }

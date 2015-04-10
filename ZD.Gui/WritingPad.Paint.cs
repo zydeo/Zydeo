@@ -142,7 +142,7 @@ namespace ZD.Gui
             float textOpacity = ((float)Magic.WritingPadHintOpacity) * hintState;
             using (Brush bTxt = new SolidBrush(Color.FromArgb((int)backOpacity, ZenParams.StandardTextColor)))
             using (Brush bBack = new SolidBrush(Color.FromArgb((int)textOpacity, ZenParams.WindowColor)))
-            using (Font f = new Font(ZenParams.GenericFontFamily, 10.0F))
+            using (Font f = SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, 10F))
             {
                 StringFormat sf = new StringFormat();
                 sf.Alignment = StringAlignment.Center;

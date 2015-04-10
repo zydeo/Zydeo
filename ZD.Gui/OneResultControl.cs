@@ -231,9 +231,12 @@ namespace ZD.Gui
         static OneResultControl()
         {
             fntArr[fntPinyinHead] = FontCollection.CreateFont(Magic.PinyinFontFamily, Magic.PinyinFontSize, Magic.PinyinFontStyle);
-            fntArr[fntSenseLatin] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize);
-            fntArr[fntMetaLatin] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize, FontStyle.Italic);
-            fntArr[fntSenseId] = new Font(Magic.LemmaFontFamily, Magic.LemmaFontSize * 0.8F);
+            fntArr[fntSenseLatin] = (SystemFontProvider.Instance as ZydeoSystemFontProvider).GetLemmaFont(
+                FontStyle.Regular, Magic.LemmaFontSize);
+            fntArr[fntMetaLatin] = (SystemFontProvider.Instance as ZydeoSystemFontProvider).GetLemmaFont(
+                FontStyle.Italic, Magic.LemmaFontSize);
+            fntArr[fntSenseId] = (SystemFontProvider.Instance as ZydeoSystemFontProvider).GetLemmaFont(
+                FontStyle.Regular, Magic.LemmaFontSize * 0.8F);
 
             // Sense ID strings
             for (int i = 0; i != senseIdxStrings.Length; ++i)

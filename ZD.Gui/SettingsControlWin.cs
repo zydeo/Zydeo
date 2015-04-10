@@ -10,6 +10,7 @@ using System.Reflection;
 using System.IO;
 
 using ZD.Common;
+using ZD.Gui.Zen;
 
 namespace ZD.Gui
 {
@@ -27,6 +28,17 @@ namespace ZD.Gui
             lblWebVal.Click += onLinkLabelClick;
             lblSourceCodeVal.Click += onLinkLabelClick;
             lblLicenseVal.Click += onLinkLabelClick;
+
+            setSystemFont();
+        }
+
+        private void setSystemFont()
+        {
+            foreach (Control c in Controls)
+            {
+                Font fnt = SystemFontProvider.Instance.GetSystemFont(c.Font.Style, c.Font.Size);
+                c.Font = fnt;
+            }
         }
 
         private void setTexts(ITextProvider tprov, ICedictEngineFactory dictFact)

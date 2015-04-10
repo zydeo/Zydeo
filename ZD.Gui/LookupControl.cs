@@ -130,7 +130,7 @@ namespace ZD.Gui
             btnClearWritingPad.RelLocation = new Point(writingPad.RelLeft, writingPad.RelBottom - 1);
             btnClearWritingPad.Size = new Size((int)leftBtnWidth, (int)btnHeight);
             btnClearWritingPad.Text = tprov.GetString("WritingPadClear");
-            btnClearWritingPad.SetFont(ZenParams.GenericFontFamily, 9.0F);
+            btnClearWritingPad.SetFont(SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, 9.0F));
             btnClearWritingPad.Padding = (int)(3.0F * Scale);
             btnClearWritingPad.ImageExtraPadding = (int)(3.0F * Scale);
             btnClearWritingPad.Image = imgStrokesClear;
@@ -141,7 +141,7 @@ namespace ZD.Gui
             btnUndoStroke.RelLocation = new Point(btnClearWritingPad.RelRight - 1, writingPad.RelBottom - 1);
             btnUndoStroke.Size = new Size(writingPad.RelRight - btnUndoStroke.RelLeft, (int)btnHeight);
             btnUndoStroke.Text = tprov.GetString("WritingPadUndo");
-            btnUndoStroke.SetFont(ZenParams.GenericFontFamily, 9.0F);
+            btnUndoStroke.SetFont(SystemFontProvider.Instance.GetSystemFont(FontStyle.Regular, 9.0F));
             btnUndoStroke.Padding = (int)(3.0F * Scale);
             btnUndoStroke.ImageExtraPadding = (int)(1.5F * Scale);
             btnUndoStroke.Image = imgStrokesUndo;
@@ -166,17 +166,18 @@ namespace ZD.Gui
             ctrlSearchInput.StartSearch += onStartSearch;
 
             // Tweaks for Chinese text on UI buttons
-            //var siZho = HanziMeasure.Instance.GetMeasures(Magic.ZhoButtonFontFamily, Magic.ZhoButtonFontSize);
-            //float ofsZho = -siZho.RealRect.Top;
+            // This is specific to Segoe UI and Noto Sans S Chinese fonts.
             float ofsZho = 0;
+            if (!(SystemFontProvider.Instance as ZydeoSystemFontProvider).SegoeExists)
+                ofsZho = Magic.ZhoButtonFontSize * Scale / 3.7F;
 
             // Script selector button to the right of search input control
             btnSimpTrad = new ZenGradientButton(this);
             btnSimpTrad.RelTop = padding;
             btnSimpTrad.Height = ctrlSearchInput.Height;
-            btnSimpTrad.SetFont(Magic.ZhoButtonFontFamily, Magic.ZhoButtonFontSize);
+            btnSimpTrad.SetFont((SystemFontProvider.Instance as ZydeoSystemFontProvider).GetZhoButtonFont(
+                FontStyle.Regular, Magic.ZhoButtonFontSize));
             btnSimpTrad.Width = getSimpTradWidth();
-            //btnSimpTrad.ForcedCharHeight = siZho.RealRect.Height;
             btnSimpTrad.ForcedCharVertOfs = ofsZho;
             btnSimpTrad.RelLeft = Width - padding - btnSimpTrad.Width;
             btnSimpTrad.Height = ctrlSearchInput.Height;
@@ -186,9 +187,9 @@ namespace ZD.Gui
             btnSearchLang = new ZenGradientButton(this);
             btnSearchLang.RelTop = padding;
             btnSearchLang.Height = ctrlSearchInput.Height;
-            btnSearchLang.SetFont(Magic.ZhoButtonFontFamily, Magic.ZhoButtonFontSize);
+            btnSearchLang.SetFont((SystemFontProvider.Instance as ZydeoSystemFontProvider).GetZhoButtonFont(
+                FontStyle.Regular, Magic.ZhoButtonFontSize));
             btnSearchLang.Width = getSearchLangWidth();
-            //btnSearchLang.ForcedCharHeight = siZho.RealRect.Height;
             btnSearchLang.ForcedCharVertOfs = ofsZho;
             btnSearchLang.RelLeft = btnSimpTrad.RelLeft - padding - btnSearchLang.Width;
             btnSearchLang.Height = ctrlSearchInput.Height;
