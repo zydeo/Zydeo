@@ -537,6 +537,10 @@ namespace ZD.Gui.Zen
                     // Cannot prevent timer threads from requesting a repaint
                     // As window gets disposed in GUI thread
                 }
+                catch (InvalidOperationException)
+                {
+                    // Same as above.
+                }
             }
             else doFormStuffAfterControlPaint(rm);
         }
