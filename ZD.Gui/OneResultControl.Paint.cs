@@ -237,9 +237,10 @@ namespace ZD.Gui
                             pb.LocY + scale * pad,
                             ((float)block.Width) - 2.0F * pad,
                             lemmaCharHeight - 2.0F * pad);
+                        float idOfsV = -2.896F + scale * 4.396F;
                         g.DrawString(textPool.GetString(block.TextPos), getFont(fntSenseId), bnorm,
                             pb.LocX + 2.0F * pad,
-                            pb.LocY + /* 1.5F * */ pad, sf); // TO-DO: vertical paddig of character will need more work.
+                            pb.LocY + idOfsV, sf); // TO-DO: vertical paddig of character will need more work.
                     }
                     // Text
                     else
