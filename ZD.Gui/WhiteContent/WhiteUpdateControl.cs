@@ -253,16 +253,16 @@ namespace ZD.Gui
         /// <summary>
         /// Gets current colors to use in painting (anim state dependent).
         /// </summary>
-        private void getColors(out Color clrTitle, out Color clrBody, out Color clrDetailsLink,
-            out Color clrDetailsText, out Color clrDetailsSep)
+        private void getColors(out Color clrTitleBg, out Color clrTitle, out Color clrBody,
+            out Color clrDetailsLink, out Color clrDetailsText, out Color clrDetailsSep)
         {
-            int alfaTitle;
+            float propTitle;
             int alfaBody;
             int alfaTable;
             lock (animLO)
             {
-                if (animVal < 1F) alfaTitle = (int)(255F * animVal * animVal);
-                else alfaTitle = 255;
+                if (animVal < 1F) propTitle = animVal * animVal;
+                else propTitle = 1;
                 if (animVal < 0.5F) alfaBody = 0;
                 else if (animVal < 1.5F) alfaBody = (int)(255F * (animVal - 0.5F) * (animVal - 0.5F));
                 else alfaBody = 255;
@@ -271,7 +271,8 @@ namespace ZD.Gui
                 else alfaTable = 255;
             }
 
-            clrTitle = Color.FromArgb(alfaTitle, Magic.WhiteUpdClrTitle);
+            clrTitle = Magic.WhiteUpdClrTitleText;
+            clrTitleBg = MixColors(Color.White, Magic.WhiteUpdClrTitleBg, propTitle);
             clrBody = Color.FromArgb(alfaBody, Magic.WhiteUpdClrBody);
             clrDetailsLink = Color.FromArgb(alfaTable, Magic.WhiteUpdClrLink);
             clrDetailsText = Color.FromArgb(alfaTable, Magic.WhiteUpdClrBody);
@@ -302,26 +303,31 @@ namespace ZD.Gui
 
             // Get colors as of now (animation)
             Color clrTitle;
+            Color clrTitleBg;
             Color clrBody;
             Color clrDetailsText;
             Color clrDetailsSep;
             Color clrDetailsLink;
-            getColors(out clrTitle, out clrBody, out clrDetailsLink, out clrDetailsText, out clrDetailsSep);
+            getColors(out clrTitleBg, out clrTitle, out clrBody, out clrDetailsLink, out clrDetailsText, out clrDetailsSep);
 
             // Draw stuff
             float y = 20F * scale;
             float padLR = 20F * scale;
             // Title
-            using (Brush b = new SolidBrush(clrTitle))
+            using (Brush bText = new SolidBrush(clrTitle))
+            using (Brush bBg = new SolidBrush(clrTitleBg))
             {
-                // Neution is not good with "ClearTypeGridFit"
+                // Neuton is not good with "ClearTypeGridFit"
                 g.TextRenderingHint = TextRenderingHint.AntiAlias;
                 StringFormat sf = StringFormat.GenericDefault;
                 sf.Alignment = StringAlignment.Center;
                 float h = g.MeasureString(strTitle, fntTitle, 65535, sf).Height;
+                // Bacground fill
+                g.FillRectangle(bBg, new RectangleF(1, 1, Width - 2, y + h + 20F * scale));
+                // Text
                 RectangleF rect = new RectangleF(padLR, y, Width - padLR * 2, h);
-                g.DrawString(strTitle, fntTitle, b, rect, sf);
-                y += h + 10F * scale;
+                g.DrawString(strTitle, fntTitle, bText, rect, sf);
+                y += h + 30F * scale;
             }
             // Message body
             using (Brush b = new SolidBrush(clrBody))
