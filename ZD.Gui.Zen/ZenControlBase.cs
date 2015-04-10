@@ -108,6 +108,7 @@ namespace ZD.Gui.Zen
                 ZenControlBase xpar = parent;
                 while (xpar != null && !(xpar is ZenTabbedForm)) xpar = xpar.Parent;
                 if (xpar != null) parentForm = xpar as ZenTabbedForm;
+                else parentForm = parent.parentForm;
             }
         }
 
