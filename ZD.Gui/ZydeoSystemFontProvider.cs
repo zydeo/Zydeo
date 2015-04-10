@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Text;
 
 using ZD.Gui.Zen;
 
@@ -56,7 +57,7 @@ namespace ZD.Gui
             else
             {
                 systemFontFace = "Noto Sans";
-                zhoButtonFontFace = "Noto Sans S Chinese Regular";
+                zhoButtonFontFace = "Microsoft Sans Serif";
                 lemmaFontFace = "Noto Sans";
             }
         }

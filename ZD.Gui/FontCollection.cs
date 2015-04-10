@@ -20,7 +20,6 @@ namespace ZD.Gui
 
         private readonly static string fnUbuntu = @"Fonts\Ubuntu-Bold.ttf";
         private readonly static string fnNeuton = @"Fonts\Neuton-Regular.ttf";
-        private readonly static string fnNotoSansHanS = @"Fonts\NotoSansHans-Regular.otf";
         private readonly static string fnNotoSansRegular = @"Fonts\NotoSans-Regular.ttf";
         private readonly static string fnNotoSansBold = @"Fonts\NotoSans-Bold.ttf";
         private readonly static string fnNotoSansItalic = @"Fonts\NotoSans-Italic.ttf";
@@ -32,8 +31,7 @@ namespace ZD.Gui
         static FontCollection()
         {
             fonts.AddFontFile(fnUbuntu);
-            fonts.AddFontFile(fnUbuntu);
-            if (File.Exists(fnNotoSansHanS)) fonts.AddFontFile(fnNotoSansHanS);
+            fonts.AddFontFile(fnNeuton);
             if (File.Exists(fnNotoSansRegular)) fonts.AddFontFile(fnNotoSansRegular);
             if (File.Exists(fnNotoSansBold)) fonts.AddFontFile(fnNotoSansBold);
             if (File.Exists(fnNotoSansItalic)) fonts.AddFontFile(fnNotoSansItalic);

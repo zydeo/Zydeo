@@ -122,10 +122,9 @@ namespace ZD.Gui
             // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
             // Different for Segoe and Noto to make it look good.
             Point locTxtInput;
-            if ((SystemFontProvider.Instance as ZydeoSystemFontProvider).SegoeExists)
+            /* if ((SystemFontProvider.Instance as ZydeoSystemFontProvider).SegoeExists)
                 locTxtInput = new Point(AbsLeft + padding, AbsTop + (int)(2F * Scale));
-            else
-                locTxtInput = new Point(AbsLeft + padding, AbsTop + padding - 1);
+            else */ locTxtInput = new Point(AbsLeft + padding, AbsTop + padding - 1);
             if (txtInput.InvokeRequired)
             {
                 InvokeOnForm((MethodInvoker)delegate

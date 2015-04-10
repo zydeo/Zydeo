@@ -118,7 +118,6 @@ const
   notoUrl2 = 'http://zydeo.net/downloadinstaller?file=NotoSans-Italic.ttf';
   notoUrl3 = 'http://zydeo.net/downloadinstaller?file=NotoSans-Bold.ttf';
   notoUrl4 = 'http://zydeo.net/downloadinstaller?file=NotoSans-BoldItalic.ttf';
-  notoUrl5 = 'http://zydeo.net/downloadinstaller?file=NotoSansHans-Regular.otf';
   arphicUrl1 = 'http://zydeo.net/downloadinstaller?file=hdzb_75.ttf';
   arphicUrl2 = 'http://zydeo.net/downloadinstaller?file=ukaitw.ttf';
 
@@ -178,7 +177,6 @@ begin
     isxdl_AddFile(notoUrl2, ExpandConstant('{tmp}\tmp-NotoSans-Italic.ttf'));
     isxdl_AddFile(notoUrl3, ExpandConstant('{tmp}\tmp-NotoSans-Bold.ttf'));
     isxdl_AddFile(notoUrl4, ExpandConstant('{tmp}\tmp-NotoSans-BoldItalic.ttf'));
-    isxdl_AddFile(notoUrl5, ExpandConstant('{tmp}\tmp-NotoSansHans-Regular.otf'));
   end;
 
   // Check for existence of both DFKai-SB (kaiu.ttf) and KaiTi (simkai.ttf)
@@ -240,7 +238,6 @@ begin
       FileCopy(ExpandConstant('{tmp}\tmp-NotoSans-Italic.ttf'), ExpandConstant('{app}\Fonts\NotoSans-Italic.ttf'), False);
       FileCopy(ExpandConstant('{tmp}\tmp-NotoSans-Bold.ttf'), ExpandConstant('{app}\Fonts\NotoSans-Bold.ttf'), False);
       FileCopy(ExpandConstant('{tmp}\tmp-NotoSans-BlodItalic.ttf'), ExpandConstant('{app}\Fonts\NotoSans-BlodItalic.ttf'), False);
-      FileCopy(ExpandConstant('{tmp}\tmp-NotoSansHans-Regular.otf'), ExpandConstant('{app}\Fonts\NotoSansHans-Regular.otf'), False);
     end;
     // Copy downloaded files to app folder: Arphic Kai font(s)
     if arphicNeeded then begin

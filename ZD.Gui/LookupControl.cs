@@ -168,8 +168,8 @@ namespace ZD.Gui
             // Tweaks for Chinese text on UI buttons
             // This is specific to Segoe UI and Noto Sans S Chinese fonts.
             float ofsZho = 0;
-            if (!(SystemFontProvider.Instance as ZydeoSystemFontProvider).SegoeExists)
-                ofsZho = Magic.ZhoButtonFontSize * Scale / 3.7F;
+            //if (!(SystemFontProvider.Instance as ZydeoSystemFontProvider).SegoeExists)
+            //    ofsZho = Magic.ZhoButtonFontSize * Scale / 3.7F;
 
             // Script selector button to the right of search input control
             btnSimpTrad = new ZenGradientButton(this);
