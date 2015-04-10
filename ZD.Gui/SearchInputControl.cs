@@ -182,14 +182,14 @@ namespace ZD.Gui
         }
 
         /// <summary>
-        /// Decides if the "clear text" button should be visible, based on mouse position.
+        /// Decides if the "clear text" button should be visible, based on mouse position and text in input field.
         /// </summary>
         /// <returns></returns>
         private bool isCancelVisible()
         {
             if (txtInput.Text == string.Empty) return false;
             Point p = MousePosition;
-            Rectangle rect = new Rectangle(1, 1, btnCancel.RelRight - 1, Height - 2);
+            Rectangle rect = new Rectangle(1, 1, Width - 2, Height - 2);
             bool visible = rect.Contains(p);
             return visible;
         }
