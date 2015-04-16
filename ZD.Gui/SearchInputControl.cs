@@ -116,15 +116,12 @@ namespace ZD.Gui
             //int textBoxHeight = Height - 2 * padding;
             //int textBoxTop = AbsTop + padding;
             int textBoxHeight = Height - padding;
-            int textBoxTop = AbsTop + 1;
+            int textBoxTop = AbsTop + (int)(2.5F * Scale);
             // Text field: search icon on left, X icon on right
             // ctrlHeight stands for width of buttons (they're all rectangular)
             // Position must be in absolute (canvas) position, winforms controls' onwer is borderless form.
             // Different for Segoe and Noto to make it look good.
-            Point locTxtInput;
-            /* if ((SystemFontProvider.Instance as ZydeoSystemFontProvider).SegoeExists)
-                locTxtInput = new Point(AbsLeft + padding, AbsTop + (int)(2F * Scale));
-            else */ locTxtInput = new Point(AbsLeft + padding, AbsTop + padding - 1);
+            Point locTxtInput = new Point(AbsLeft + padding, textBoxTop);
             if (txtInput.InvokeRequired)
             {
                 InvokeOnForm((MethodInvoker)delegate
