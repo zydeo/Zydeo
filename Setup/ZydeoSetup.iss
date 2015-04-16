@@ -53,6 +53,7 @@ Source: isxdl.dll; Flags: dontcopy
 Source: isxdl_english.ini; Flags: dontcopy
 
 Source: "..\_bin\Zydeo.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\_bin\Zydeo.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ZD.AU.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ZD.CedictEngine.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\_bin\ZD.Common.dll"; DestDir: "{app}"; Flags: ignoreversion
