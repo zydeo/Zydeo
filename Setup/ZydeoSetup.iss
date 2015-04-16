@@ -1,4 +1,5 @@
 #define MyAppName "Zydeo Chinese dictionary"
+#define MyInstallerName "Zydeo Chinese dictionary installer"
 #define MyAppNameShort "Zydeo"
 #define MyAppVersion "1.0"
 #define MyAppPublisher "Gábor L Ugray"
@@ -39,6 +40,7 @@ VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppName} setup
 VersionInfoCopyright=(C) {#MyAppPublisher} 2015
 VersionInfoVersion={#MyAppVersion}.0.0
+SignTool=SignTool
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
