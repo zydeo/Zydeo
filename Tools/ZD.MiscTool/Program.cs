@@ -25,6 +25,11 @@ namespace ZD.MiscTool
             Console.WriteLine("--pinyin    <cedict-file> <output-file>");
             Console.WriteLine("  Parses dictionary file and collects pinyin syllables");
             Console.WriteLine();
+            Console.WriteLine("--fontscope <cedict-file> <gb-file> <big5-file> <uni-file> <z-file> <out-chars-file> <out-simp-to-trad-file>");
+            Console.WriteLine("  Parses CEDICT headwords and font coverage files");
+            Console.WriteLine("  Produces statistics/font coverage of characters found in headwords");
+            Console.WriteLine("  Produces simplified > traditional forms list from headwords");
+            Console.WriteLine();
         }
 
         private static object parseArgs(string[] args)
@@ -47,6 +52,12 @@ namespace ZD.MiscTool
                 OptPinyinSyllables opt = new OptPinyinSyllables(args[1], args[2]);
                 return opt;
             }
+            if (args[0] == "--fontscope")
+            {
+                if (args.Length != 8) return null;
+                OptFontScope opt = new OptFontScope(args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
+                return opt;
+            }
             return null;
         }
 
@@ -55,6 +66,7 @@ namespace ZD.MiscTool
             if (opt is OptCharStats) return new WrkCharStats(opt as OptCharStats);
             if (opt is OptStrokes) return new WrkStrokes(opt as OptStrokes);
             if (opt is OptPinyinSyllables) return new WrkPinyinSyllables(opt as OptPinyinSyllables);
+            if (opt is OptFontScope) return new WrkFontScope(opt as OptFontScope);
             throw new Exception(opt.GetType().ToString() + " is not recognized as an options type.");
         }
 

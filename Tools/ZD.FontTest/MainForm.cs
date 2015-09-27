@@ -61,6 +61,10 @@ namespace ZD.FontTest
             bool[] cvrSimp = new bool[65536];
             bool[] cvrTrad = new bool[65536];
 
+            string currDir = @"D:\Development\Zydeo\_bin\Fonts";
+            string fontFile = Path.Combine(currDir, @"ukaitw.ttf");
+            FontCoverage.CheckCoverage(fontFile, "fnt-coverage-ukaitw.txt", cvrSimp);
+
             //string currDir = Directory.GetCurrentDirectory();
             //string fontFile = Path.Combine(currDir, @"hdzb_75.TTF");
             //FontCoverage.CheckCoverage(fontFile, "fnt-coverage-hdzb_75.txt", cvrSimp);
@@ -68,12 +72,12 @@ namespace ZD.FontTest
             //FontCoverage.CheckCoverage(fontFile, "fnt-coverage-ukaitw.txt", cvrTrad);
             //FontCoverage.SaveArphicCoverage(cvrSimp, cvrTrad, "arphic-coverage.bin");
 
-            string currDir = @"C:\Windows\Fonts";
-            string fontFile = Path.Combine(currDir, @"kaiu.ttf");
-            FontCoverage.CheckCoverage(fontFile, "fnt-coverage-dfkai-sb.txt", cvrSimp);
-            fontFile = Path.Combine(currDir, @"simkai.ttf");
-            FontCoverage.CheckCoverage(fontFile, "fnt-coverage-kaiti.txt", cvrTrad);
-            FontCoverage.SaveArphicCoverage(cvrSimp, cvrTrad, "winfonts-coverage.bin");
+            //string currDir = @"C:\Windows\Fonts";
+            //string fontFile = Path.Combine(currDir, @"kaiu.ttf");
+            //FontCoverage.CheckCoverage(fontFile, "fnt-coverage-dfkai-sb.txt", cvrSimp);
+            //fontFile = Path.Combine(currDir, @"simkai.ttf");
+            //FontCoverage.CheckCoverage(fontFile, "fnt-coverage-kaiti.txt", cvrTrad);
+            //FontCoverage.SaveArphicCoverage(cvrSimp, cvrTrad, "winfonts-coverage.bin");
 
             //string currDir = Directory.GetCurrentDirectory();
             //string fontFile = Path.Combine(currDir, @"NotoSansHans-Regular.otf");

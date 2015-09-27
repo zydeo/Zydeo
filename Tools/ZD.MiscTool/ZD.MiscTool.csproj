@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharStats\CharStatInfo.cs" />
+    <Compile Include="FontScope\OptFontScope.cs" />
+    <Compile Include="FontScope\WrkFontScope.cs" />
     <Compile Include="IWorker.cs" />
     <Compile Include="CharStats\OptCharStats.cs" />
     <Compile Include="PinyinSyllables\OptPinyinSyllables.cs" />
