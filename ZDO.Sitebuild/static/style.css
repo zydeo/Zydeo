@@ -1,10 +1,10 @@
 body {
-  font-family: Verdana, sans-serif;
+  font-family: Noto-Sans, sans-serif;
   margin: 0;
   padding: 0;
   border: 0;
   font-size: 12pt;
-  background-color: white;
+  background-color: #fafafa;
 }
 
 #loading-box {
@@ -43,9 +43,8 @@ body {
 }
 
 .hei {
-  font-family: Tahoma, Helvetica, Verdana, SimHei, "Microsoft Yahei","????", STXihei, STHeitiSC-Medium, DengXian, "????", sans-serif;
+  font-family: "Noto Sans", SimHei, "Microsoft Yahei","????", STXihei, STHeitiSC-Medium, DengXian, "????", sans-serif;
 }
-
 
 #search-bar {
   position: fixed;
@@ -152,14 +151,9 @@ input:focus {
 
 #content-core {
   width: 40em;
-  background-color: aliceblue;
   margin-left: auto;
   margin-right: auto;
   padding-top: 1em;
-}
-
-#results {
-  margin-top: 1.5em;
 }
 
 #stroke-input {
@@ -308,15 +302,104 @@ body.mobile .sugItem {
   width: 12.5%;
 }
 
+body.mobile #results {
+  margin-top: 4em;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
+  font-size: 150%;
+}
 
-/* ------------------------------- DRAWING CANVAS ------------------------------- */
+body.mobile .sense-ix {
+  font-size: 24pt;
+  border-radius: 24pt;
+  -moz-border-radius: 24pt;
+  -webkit-border-radius: 24pt;
+  line-height: 24pt;
+  width: 24pt;
+}
 
-#wordsOut {
-  width:600px;
-  height:100px;
-  padding:5px;
-  margin:10px;
-  font-size:32px;
+
+
+/* ------------------------------- LOOKUP RESULTS ------------------------------- */
+
+#results {
+  margin-top: 1.5em;
+  color: #303030;
+}
+
+.entry {
+  padding-top: 1em;
+  padding-bottom: 1em;
+  display: block;
+  float: left;
+  width: 100%;
+  clear: right;
+  border-top: 1px dotted #303030;
+}
+
+.entry:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.hw-simp,
+.hw-trad,
+.hw-sep,
+.hw-pinyin,
+.senses {
+  display: block;
+  float: left;
+}
+
+.hw-simp,
+.hw-trad,
+.hw-sep {
+  font-size: 250%;
+}
+
+.hw-sep {
+  margin-left: 0.2em;
+  margin-right: 0.2em;
+}
+
+.hw-pinyin {
+  clear: left;
+  font-family: Ubuntu;
+  font-weight: 700;
+  font-size: 150%;
+}
+
+.senses {
+  clear: left;
+  margin-top: 0.5em;
+  white-space: nowrap;
+  line-height: 1.5em;
+  font-size: 120%;
+}
+
+.sense-ix {
+  font-size: 12pt;
+  border-radius: 12pt;
+  -moz-border-radius: 12pt;
+  -webkit-border-radius: 12pt;
+  border: 1px solid;
+  display: inline-block;
+  line-height: 12pt;
+  text-align: center;
+  width: 12pt;
+}
+
+.sense {
+  white-space: normal;
+  margin-right: 0.3em;
+}
+
+.sense-nobr {
+  white-space: nowrap;
+}
+
+.sense-meta {
+  font-style: italic;
 }
 
 /* ------------------------------- LOADING ------------------------------- */
