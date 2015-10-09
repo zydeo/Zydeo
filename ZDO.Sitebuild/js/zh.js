@@ -35,6 +35,7 @@ function showStrokeInput() {
   canvasElement.width = strokeCanvasWidth;
   canvasElement.height = strokeCanvasWidth;
   $("#suggestions").css("height", $("#suggestions").height());
+  clearcanvas();
 }
 
 function hideStrokeInput() {

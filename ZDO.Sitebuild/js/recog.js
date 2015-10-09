@@ -26,7 +26,6 @@ var lastTouchY = -1;
 function initStrokes() {
   canvas = document.getElementById('stroke-input-canvas');
   ctx = canvas.getContext("2d");
-  clearcanvas();
 
   $('#stroke-input-canvas').mousemove(function (e) {
     if (!clicking)return;
@@ -75,6 +74,32 @@ function initStrokes() {
 
 function clearcanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.setLineDash([1, 1]);
+  ctx.lineWidth = 0.5;
+  ctx.strokeStyle = "grey";
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(canvas.width, 0);
+  ctx.lineTo(canvas.width, canvas.height);
+  ctx.lineTo(0, canvas.height);
+  ctx.lineTo(0, 0);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(canvas.width, canvas.height);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(canvas.width, 0);
+  ctx.lineTo(0, canvas.height);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(canvas.width / 2, 0);
+  ctx.lineTo(canvas.width / 2, canvas.height);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height / 2);
+  ctx.lineTo(canvas.width, canvas.height / 2);
+  ctx.stroke();
   mousestrokes = [];
   strokeDescriptor = [];
 }
@@ -90,6 +115,7 @@ function startClick(x, y) {
   lastPt = {x: x, y: y};
   strokeXYs.push(lastPt);
   ctx.strokeStyle = "black";
+  ctx.setLineDash([]);
   ctx.lineWidth = strokeWidthDesktop;
   if (isMobile) ctx.lineWidth = strokeWidthMobile;
   ctx.beginPath();
@@ -136,6 +162,7 @@ function analyze(stroke) {
 
   if (drawAnalyzedStrokes) {
     ctx.strokeStyle = "red";
+    ctx.setLineDash([]);
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(corners[0].x, corners[0].y);
