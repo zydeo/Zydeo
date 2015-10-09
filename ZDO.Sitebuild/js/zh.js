@@ -35,7 +35,7 @@ function showStrokeInput() {
   canvasElement.width = strokeCanvasWidth;
   canvasElement.height = strokeCanvasWidth;
   $("#suggestions").css("height", $("#suggestions").height());
-  clearcanvas();
+  clearCanvas();
 }
 
 function hideStrokeInput() {
@@ -54,7 +54,7 @@ function eventWireup() {
       $("#btn-write").attr("class", "active");
     }
   });
-  $("#stroke-clear").click(clearcanvas);
+  $("#stroke-clear").click(clearCanvas);
   $("#stroke-undo").click(undoStroke);
 }
 

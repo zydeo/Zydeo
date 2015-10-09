@@ -1,20 +1,34 @@
+// Hanzi handwriting recognition code from http://www.lab4games.net/zz85/blog/2010/02/17/js-%E4%B8%AD%E6%96%87%E7%AC%94%E7%94%BB%E8%BE%93%E5%85%A5%E6%B3%95-javascript-chinese-stroke-input/
+// Joshua Koo (zz85nus -at- gmail -dot- com)
+//
+// Adapted by Gabor L Ugray 2015 (zydeodict -at- gmail -dot- com)
+// Released under MIT license: http://www.opensource.org/licenses/mit-license.php
+//
+//
+// Before you start:
+// - jQuery must be included before this file
+// - File with declaration of strokes in strokesData variable must be included before this file
+// - Variable isMobile must say if current environment is a mobile browser (true/false)
+
+
+// Global options ******************************
+// Width of strokes drawn on screen, for desktop browsers
 var strokeWidthDesktop = 5;
+// Width of strokes drawn on screen, for mobile browsers
 var strokeWidthMobile = 15;
+// If "true", results of corner detection are drawn on top of strokes in red
 var drawAnalyzedStrokes = false;
+// If not null, diagnostic messages are logged to element with the provided ID
+var debugId = null; // #something
+// ID of canvas element where user draws input. Without the # symbol!
+var canvasId = "stroke-input-canvas";
+// ID of element where suggestions are displayed.
+var suggestionsId = "#suggestions";
+// Class of spans with retrieved suggestions.
+var suggestionClass = "sugItem";
+// ID of text input element that receives character when suggestion is clicked.
+var insertionTargedId = "#txt-search";
 
-function c1() {
-  d = new Date();
-}
-
-function c2(r) {
-  d2 = new Date();
-  $('#word').html(r + " " + (d2.getTime() - d.getTime()) + "ms");
-}
-
-c1();
-
-c2('Okay! Data files loaded in ');
-$('#word').append('. Please draw a chinese character in the left box.');
 
 var canvas;
 var ctx;
@@ -22,31 +36,33 @@ var clicking = false;
 var mousestrokes = [];
 var lastTouchX = -1;
 var lastTouchY = -1;
+var tstamp;
 
+// Initializes stroke recognition. To be called when page has fully loaded: $(document).ready
 function initStrokes() {
-  canvas = document.getElementById('stroke-input-canvas');
+  canvas = document.getElementById(canvasId);
   ctx = canvas.getContext("2d");
 
-  $('#stroke-input-canvas').mousemove(function (e) {
+  $('#' + canvasId).mousemove(function (e) {
     if (!clicking)return;
     var x = e.pageX - $(this).offset().left;
     var y = e.pageY - $(this).offset().top;
     dragClick(x, y);
-    $('#omw_debug').html("moving X: " + x + " Y: " + y);
+    debugOnScreen("MouseMove X: " + x + " Y: " + y);
   });
-  $('#stroke-input-canvas').mousedown(function (e) {
+  $('#' + canvasId).mousedown(function (e) {
     var x = e.pageX - $(this).offset().left;
     var y = e.pageY - $(this).offset().top;
     startClick(x, y);
-    $('#omw_debug').html("Clicked--> X: " + x + " Y: " + y);
+    debugOnScreen("MouseDown X: " + x + " Y: " + y);
   }).mouseup(function (e) {
     var x = e.pageX - $(this).offset().left;
     var y = e.pageY - $(this).offset().top;
     endClick(x, y);
-    //$('#omw_debug').html("Done Clicking");
+    debugOnScreen("MouseUp");
   });
 
-  $('#stroke-input-canvas').bind("touchmove", function (e) {
+  $('#' + canvasId).bind("touchmove", function (e) {
     if (!clicking)return;
     e.preventDefault();
     var x = e.originalEvent.touches[0].pageX - $(this).offset().left;
@@ -54,25 +70,27 @@ function initStrokes() {
     var y = e.originalEvent.touches[0].pageY - $(this).offset().top;
     lastTouchY = y;
     dragClick(x, y);
-    $('#omw_debug').html("Moving X: " + x + " Y: " + y);
+    debugOnScreen("TouchMove X: " + x + " Y: " + y);
   });
-  $('#stroke-input-canvas').bind("touchstart", function (e) {
+  $('#' + canvasId).bind("touchstart", function (e) {
     e.preventDefault();
     document.activeElement.blur();
     var x = e.originalEvent.touches[0].pageX - $(this).offset().left;
     var y = e.originalEvent.touches[0].pageY - $(this).offset().top;
     startClick(x, y);
-    $('#omw_debug').html("Touched--> X: " + x + " Y: " + y);
+    debugOnScreen("TouchStart X: " + x + " Y: " + y);
   }).bind("touchend", function (e) {
     e.preventDefault();
     document.activeElement.blur();
     endClick(lastTouchX, lastTouchY);
     lastTouchX = lastTouchY = -1;
-    //$('#omw_debug').html("Done Touching");
+    debugOnScreen("TouchEnd");
   });
 }
 
-function clearcanvas() {
+// Clear canvas and resets gathered strokes data for new input.
+function clearCanvas() {
+  // Redraw canvas (gridlines)
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.setLineDash([1, 1]);
   ctx.lineWidth = 0.5;
@@ -100,13 +118,21 @@ function clearcanvas() {
   ctx.moveTo(0, canvas.height / 2);
   ctx.lineTo(canvas.width, canvas.height / 2);
   ctx.stroke();
+  // Clear previous suggestions
+  $(suggestionsId).html('');
+  // Reset gathered strokes input
   mousestrokes = [];
   strokeDescriptor = [];
 }
 
+// Logs diagnostic message to designated element, or keeps quiet.
+function debugOnScreen(msg) {
+  if (debugId === null) return;
+  $(debugId).html(msg);
+}
+
 var strokeXYs;
 var lastPt;
-var minx, miny, maxx, maxy;
 var strokeDescriptor = [];
 
 function startClick(x, y) {
@@ -120,14 +146,12 @@ function startClick(x, y) {
   if (isMobile) ctx.lineWidth = strokeWidthMobile;
   ctx.beginPath();
   ctx.moveTo(x, y);
-  d = new Date();
+  tstamp = new Date();
 }
 
-var d;
-
 function dragClick(x, y) {
-  if ((new Date().getTime() - d) < 50)return;
-  d = new Date();
+  if ((new Date().getTime() - tstamp) < 50)return;
+  tstamp = new Date();
   var pt = {x: x, y: y};
   if ((pt.x == lastPt.x) && (pt.y == lastPt.y))return;
   strokeXYs.push(pt);
@@ -156,7 +180,7 @@ function getEntity(a) {
 }
 
 function analyze(stroke) {
-  $('#omw_debug').html("Analysis start");
+  debugOnScreen("Analysis starts");
 
   var corners = shortStraw(stroke);
 
@@ -197,7 +221,6 @@ function analyze(stroke) {
     var direction = Math.PI - Math.atan2(dy, dx);
     strokeDescriptor.push({d: direction, l: normalized});
   }
-  c1();
   var score;
   var possible = [];
   var bestmatch = '';
@@ -223,43 +246,17 @@ function analyze(stroke) {
   }
 
   possible.sort(sortByLength);
-  $('#suggestions').html('');
+  $(suggestionsId).html('');
   for (var i = 0; ((i < 8) && possible[i]); i++) {
     var sug = document.createElement('span');
     $(sug).click(function () {
-      $('#txt-search').val($('#txt-search').val() + $(this).html());
-      clearcanvas();
-      $('#suggestions').html('');
-    }).append(getEntity(possible[i].w)).attr('class', 'sugItem');
-    $('#suggestions').append(sug);
+      $(insertionTargedId).val($(insertionTargedId).val() + $(this).html());
+      clearCanvas();
+      $(suggestionsId).html('');
+    }).append(getEntity(possible[i].w)).attr('class', suggestionClass);
+    $(suggestionsId).append(sug);
   }
-  c2('Matched character in ');
-  $('#omw_debug').html("Analysis end");
-}
-
-function analyzeBestMatch(bestmatch) {
-  cdi = [];
-  var ctx2 = document.getElementById('stroke-input-canvas').getContext("2d");
-  ctx2.clearRect(0, 0, 800, 600);
-  for (var i = 1; i < bestmatch.length; i++) {
-    cdi.push({d: bestmatch[i][0], l: bestmatch[i][1]});
-    var d = bestmatch[i][0];
-    var o = {x: 100, y: i / bestmatch.length * 300};
-    ctx2.beginPath();
-    ctx2.arc(o.x, o.y, 5, 0, Math.PI * 2, true);
-    ctx2.closePath();
-    ctx2.fill();
-    ctx2.fillText($('#c').html() + i, o.x - 20, o.y - 20);
-    ctx2.beginPath();
-    ctx2.moveTo(o.x, o.y);
-    var h = bestmatch[i][1] * 100;
-    var d = -bestmatch[i][0];
-    var x = Math.cos(d) * h;
-    var y = Math.sin(d) * h;
-    ctx2.lineTo(o.x + x, o.y + y);
-    ctx2.closePath();
-    ctx2.stroke();
-  }
+  debugOnScreen("Analysis done");
 }
 
 function match(strokeDescriptor, charDescriptor) {
@@ -267,7 +264,7 @@ function match(strokeDescriptor, charDescriptor) {
   if (strokeDescriptor.length != charDescriptor.length)return -1;
   for (var i in strokeDescriptor) {
     var ls = Math.abs(strokeDescriptor[i].l - charDescriptor[i].l);
-    dl = (1 - ls);
+    var dl = (1 - ls);
     var ds = Math.abs(strokeDescriptor[i].d - charDescriptor[i].d);
     if (ds > Math.PI)ds = 2 * Math.PI - ds;
     ds = 100 * (Math.PI * 2 - ds) / (Math.PI * 2);
