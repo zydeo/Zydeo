@@ -42,6 +42,11 @@ body {
   background-color: #c7d9b3;
 }
 
+.hei {
+  font-family: Tahoma, Helvetica, Verdana, SimHei, "Microsoft Yahei","????", STXihei, STHeitiSC-Medium, DengXian, "????", sans-serif;
+}
+
+
 #search-bar {
   position: fixed;
   left: 0;
@@ -228,8 +233,8 @@ input:focus {
   float: left;
   cursor: pointer;
   text-align: center;
-  width: calc(25% - 2px);
-  border: 1px solid red;
+  width: 25%;
+  background-color: white;
 }
 
 .sugItem:hover {
@@ -292,11 +297,11 @@ body.mobile #stroke-inner {
 }
 
 body.mobile #stroke-commands {
-  font-size: 200%;
+  font-size: 300%;
 }
 
 body.mobile #suggestions {
-  font-size: 350%;
+  font-size: 450%;
 }
 
 body.mobile .sugItem {
