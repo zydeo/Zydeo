@@ -2,11 +2,12 @@
 <html>
 <head>
   <meta charset="utf-8"/>
-  <meta name="description" content="CHDICT kínai-magyar szótár: nyílt forrású, ingyenes, bárki által szerkeszthető."/>
+  <meta name="description" content="Search the HanDeDict open-source Chinese-German dictionary online."/>
   <meta name="viewport" content="user-scalable=0" />
-  <title>CHDICT kínai-magyar szótár</title>
+  <title>HanDeDict Chinese-German dictionary</title>
   <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Ubuntu:700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="static/tooltipster.css">
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body class="loading">
@@ -16,10 +17,9 @@
 <nav id="menu">
   <div id="menu-horiz">
     <ul>
-      <li class="active">Szótár</li>
-      <li>Tudnivalók</li>
-      <li>Beállítások</li>
-      <li>Letöltés</li>
+      <li class="active">Search</li>
+      <li>Settings</li>
+      <li>About</li>
     </ul>
   </div>
 </nav>
@@ -29,7 +29,7 @@
       <table id="search-panel">
         <tr>
           <td id="cell-input">
-            <input type="text" name="txt-search" id="txt-search" placeholder="Hanzi, pinyin vagy magyar szó" autofocus/>
+            <input type="text" name="txt-search" id="txt-search" placeholder="Hanzi, Pinyin or German word" autofocus/>
           </td>
           <td id="cell-clear">
             <span id="btn-clear"><img id="img-clear" src="static/clear.svg" alt="Clear text"/></span>
@@ -177,6 +177,7 @@
   </div>
 </div>
 <script src="lib/jquery-2.1.4.min.js"></script>
+<script src="lib/jquery.tooltipster.min.js"></script>
 <script src="lib/shortstraw.js"></script>
 <script src="lib/chinesestrokes.js"></script>
 <script src="js/recog.js"></script>
