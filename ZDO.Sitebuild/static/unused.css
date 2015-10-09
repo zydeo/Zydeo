@@ -1,0 +1,50 @@
+body {
+  background-color: #eee;
+  font: 16px Helvetica, Arial;
+  color: #000;
+  width: 820px
+}
+
+#stroke_input_canvas, #c2 {
+  border: solid 1px #000;
+  background: #fff;
+  cursor: pointer
+}
+
+#suggestions {
+  border: solid 1px #000;
+  width: 300px;
+  height: 300px;
+  display: block;
+  font-size: 90px
+}
+
+#wordsOut {
+  width: 600px;
+  height: 100px;
+  padding: 5px;
+  margin: 10px;
+  font-size: 32px
+}
+
+#word {
+}
+
+.smallContainer {
+  margin: 10px;
+  padding: 10px;
+  float: left;
+  font-size: small;
+  background-color: #bbb;
+  padding-top: 25px
+}
+
+.sugItem {
+  display: block;
+  float: left;
+  cursor: pointer
+}
+
+.sugItem:hover {
+  background: #fff
+}

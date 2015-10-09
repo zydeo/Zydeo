@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="description" content="CHDICT kínai-magyar szótár: nyílt forrású, ingyenes, bárki által szerkeszthető."/>
+  <meta name="viewport" content="user-scalable=0" />
+  <title>CHDICT kínai-magyar szótár</title>
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body class="loading">
+<div id="loading-box">
+  <div class="loading-anim">...</div>
+</div>
+<nav id="menu">
+  <div id="menu-horiz">
+    <ul>
+      <li class="active">Szótár</li>
+      <li>Tudnivalók</li>
+      <li>Beállítások</li>
+      <li>Letöltés</li>
+    </ul>
+  </div>
+</nav>
+<div id="content">
+  <div id="content-core">
+    <div id="search-bar">
+      <table id="search-panel">
+        <tr>
+          <td id="cell-input">
+            <input type="text" name="txt-search" id="txt-search" placeholder="Hanzi, pinyin vagy magyar szó" autofocus/>
+          </td>
+          <td id="cell-clear">
+            <span id="btn-clear"><img id="img-clear" src="static/clear.svg"/></span>
+          </td>
+          <td id="cell-write">
+            <span id="btn-write"><img id="img-write" src="static/brush.svg"/></span>
+          </td>
+          <td id="cell-search">
+            <span id="btn-search"><img id="img-search" src="static/search.svg"/></span>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="stroke-input">
+      <div id="stroke-inner">
+        <canvas id="stroke-input-canvas"></canvas>
+        <div id="stroke-commands">
+          <div id="stroke-clear">Clear</div>
+          <div id="stroke-undo">Undo</div>
+        </div>
+        <div id="suggestions"></div>
+       </div>
+     </div>
+    <!--
+    <div id="results">
+      <div style="padding:5px; margin:5px;">
+        <div id="omw_debug">Debug?</div>
+        <div id="word" style="font-size:20px"><span style="color:red; font-weight:bold">Loading...</span> Please wait while the huge data files get downloaded the first time.</div>
+        <textarea id="wordsOut"></textarea>
+      </div>
+    </div>
+    -->
+  </div>
+</div>
+</body>
+<script src="lib/jquery-2.1.4.min.js"></script>
+<script src="lib/shortstraw.js"></script>
+<script src="lib/chinesestrokes.js"></script>
+<script src="js/recog.js"></script>
+<script src="js/zh.js"></script>
+</html>
