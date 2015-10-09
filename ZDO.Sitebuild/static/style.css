@@ -37,6 +37,10 @@ body {
   cursor: default;
 }
 
+#menu li.imprint {
+  display: none;
+}
+
 #menu li.active,
 #menu li:hover {
   background-color: #c7d9b3;
@@ -49,7 +53,7 @@ body {
 #search-bar {
   position: fixed;
   left: 0;
-  top: 2.4em;
+  top: 2.3em;
   width: 100%;
   background-color: #c7d9b3;
   padding: 0.5em 0 0.5em 0;
@@ -79,7 +83,7 @@ td#cell-input {
   width: 100% ;
   border: 0;
   margin: 0;
-  padding: 0 0.3em 0 0.3em;
+  padding: 0 0.3em 0 0;
   font-size: 200%;
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
@@ -95,6 +99,7 @@ input:focus {
   outline: none;
 }
 
+#cell-menu,
 #cell-search,
 #cell-write,
 #cell-clear {
@@ -105,6 +110,7 @@ input:focus {
   background-color: white;
 }
 
+#btn-menu,
 #btn-search,
 #btn-write {
   cursor: pointer;
@@ -129,6 +135,7 @@ input:focus {
   background-color: #b4ca65;
 }
 
+#img-menu,
 #img-search,
 #img-write {
   display: block;
@@ -244,6 +251,45 @@ body.mobile {
 
 body.mobile #menu {
   display: none;
+  background-color: #f0f0f0;
+  text-align: left;
+  top: 105pt;
+  width: auto;
+  padding-left: 20pt;
+  padding-right: 5pt;
+  padding-bottom: 1em;
+  font-size: 250%;
+  -webkit-box-shadow: 0 5pt 15pt 0 #ccc;  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+  -moz-box-shadow: 0 5pt 15pt 0 #ccc;  /* Firefox 3.5 - 3.6 */
+  box-shadow: 0 5pt 15pt 0 #ccc;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+}
+
+body.mobile #menu ul {
+  margin: 0;
+  padding: 0;
+}
+
+body.mobile #menu li {
+  width: 100%;
+  display: block;
+  position: relative;
+  float: left;
+  clear: both;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-right: 3em;
+}
+
+body.mobile #menu li.imprint {
+  border-top: 1px dotted #303030;
+  padding-top: 1em;
+  padding-bottom: 0;
+  text-transform: none;
+}
+
+body.mobile #menu li.active,
+body.mobile #menu li:hover {
+  background-color: #f0f0f0;
 }
 
 body.mobile #search-bar {
