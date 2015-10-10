@@ -46,6 +46,39 @@ body {
   background-color: #c7d9b3;
 }
 
+#bittercookie {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  background-color: #5a5a5a;
+  color: white;
+  margin-bottom: -1px;
+  border: 0;
+  padding: 4pt;
+  font-size: 10pt;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+#bittercookie a {
+  background-color: #272727;
+  color: white;
+  text-decoration: none;
+  padding: 2pt 4pt 2pt 4pt;
+  margin-left: 3pt;
+  margin-right: 3pt;
+  cursor: default;
+  border-radius: 3pt;
+  -moz-border-radius: 3pt;
+  -webkit-border-radius: 3pt;
+  white-space: nowrap;
+}
+
+#bittercookie a:hover {
+  color: #d9d9d9;
+}
+
 .hei {
   font-family: "Noto Sans", SimHei, "Microsoft Yahei","????", STXihei, STHeitiSC-Medium, DengXian, "????", sans-serif;
 }
@@ -247,6 +280,16 @@ input:focus {
 
 body.mobile {
   font-size: 18pt;
+}
+
+body.mobile #bittercookie {
+  white-space: normal;
+  padding-left: 8pt;
+  padding-right: 8pt;
+  padding-bottom: 16pt;
+  width: calc(100% - 16pt);
+  font-size: 32pt;
+  line-height: 120%;
 }
 
 body.mobile #menu {
@@ -452,6 +495,10 @@ body.mobile .sense-ix {
 
 body.loading {
   background-color: #c7d9b3;
+}
+
+body.loading #bittercookie {
+  display: none;
 }
 
 body.loading #menu,

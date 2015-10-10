@@ -2,8 +2,8 @@ var isMobile = false;
 
 $(document).ready(function () {
   mobileOrFull();
-  initStrokes();
   initGui();
+  initStrokes();
   //showStrokeInput();
   eventWireup();
 });
@@ -22,12 +22,19 @@ function mobileOrFull() {
 }
 
 function initGui() {
-  $("#img-write").tooltipster({
-    content: $("<span>Show or hide handwriting recognition</span>")
-  });
-  $("#img-search").tooltipster({
-    content: $("<span>Search in HanDeDict. You can also just press Enter.</span>")
-  });
+  if (!isMobile) {
+    $("#img-write").tooltipster({
+      content: $("<span>Show or hide handwriting recognition</span>")
+    });
+    $("#img-search").tooltipster({
+      content: $("<span>Search in HanDeDict. You can also just press Enter.</span>")
+    });
+  }
+  var cookies = localStorage.getItem("cookies");
+  if (cookies == "go") {
+    $("#bittercookie").css("display", "none");
+  }
+
 }
 
 function showStrokeInput() {
@@ -73,6 +80,12 @@ function eventWireup() {
   });
   $("#stroke-clear").click(clearCanvas);
   $("#stroke-undo").click(undoStroke);
+  $("#swallowbitterpill").click(acceptCookies);
+}
+
+function acceptCookies() {
+  $("#bittercookie").css("display", "none");
+  localStorage.setItem("cookies", "go");
 }
 
 function clearSearch() {
