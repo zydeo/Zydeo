@@ -57,7 +57,7 @@ namespace Site
             }
             writer.RenderEndTag(); // <span class="hw-pinyin">
 
-            writer.AddAttribute(HtmlTextWriterAttribute.Class, "entry");
+            writer.AddAttribute(HtmlTextWriterAttribute.Class, "senses");
             writer.RenderBeginTag(HtmlTextWriterTag.Div); // <div class="senses">
             for (int i = 0; i != entry.SenseCount; ++i)
             {
