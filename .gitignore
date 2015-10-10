@@ -35,6 +35,7 @@ _work_chdict_prepare/*
 # Bin folders: ignore altogether
 _bin/*
 _install/*
+_deploy/*
 
 # WebStorm project files
 */.idea/workspace.xml

@@ -1,0 +1,49 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.Master.cs" Inherits="Site.Site" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+  <meta charset="utf-8"/>
+  <meta name="description" content="Search the HanDeDict open-source Chinese-German dictionary online."/>
+  <meta name="viewport" content="user-scalable=0" />
+  <title>HanDeDict Chinese-German dictionary</title>
+  <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Ubuntu:700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  <style>
+    @import '<%=ResolveUrl("~/static/tooltipster.css") %>';
+    @import '<%=ResolveUrl("~/static/style.css") %>';
+  </style>
+</head>
+<body class="loading" id="theBody" runat="server">
+<div id="loading-box">
+  <div class="loading-anim">...</div>
+</div>
+<nav id="menu">
+  <div id="menu-horiz">
+    <ul>
+      <li runat="server" id="navSearch">Search</li>
+      <li runat="server" id="navSettings">Settings</li>
+      <li runat="server" id="navAbout">About</li>
+      <li runat="server" id="navImprint" class="imprint">Imprint</li>
+    </ul>
+  </div>
+</nav>
+<div id="content" class="hei">
+  <div id="content-core">
+    <asp:ContentPlaceHolder ID="mainContentPlaceholder" runat="server" />
+  </div>
+</div>
+<div id="bittercookie">
+  This website relies on cookies for some of its functionality.
+  By using the site, you agree to its use of cookies.
+  <a id="swallowbitterpill" href="#">Got it</a>
+  <a id="cookierecipe" href="#">Learn more</a>
+</div>
+<script src='<%=ResolveUrl("~/lib/jquery-2.1.4.min.js") %>'></script>
+<script src='<%=ResolveUrl("~/lib/jquery.tooltipster.min.js") %>'></script>
+<script src='<%=ResolveUrl("~/lib/shortstraw.js") %>'></script>
+<script src='<%=ResolveUrl("~/lib/chinesestrokes.js") %>'></script>
+<script src='<%=ResolveUrl("~/js/recog.js") %>'></script>
+<script src='<%=ResolveUrl("~/js/zh.js") %>'></script>
+</body>
+</html>
