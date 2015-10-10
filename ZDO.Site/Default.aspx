@@ -1,4 +1,5 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Site.Default" %>
+<%@ Register Src="~/OneResultCtrl.ascx" TagPrefix="ZDO" TagName="OneResultControl" %> 
 
 <asp:Content ID="content" ContentPlaceHolderID="mainContentPlaceholder" runat="server">
     <div id="search-bar">
@@ -32,4 +33,8 @@
         <div id="suggestions"></div>
        </div>
      </div>
+     <div id="results">
+      <div id="resultsHolder" runat="server">
+      </div>
+    </div>
 </asp:Content>

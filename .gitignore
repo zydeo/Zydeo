@@ -36,6 +36,7 @@ _work_chdict_prepare/*
 _bin/*
 _install/*
 _deploy/*
+ZDO.Site/_data/*
 
 # WebStorm project files
 */.idea/workspace.xml
