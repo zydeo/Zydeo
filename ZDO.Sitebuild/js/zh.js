@@ -17,7 +17,7 @@ function mobileOrFull() {
   $("#btn-clear").css("display", isMobile ? "block" : "none");
   if (!isMobile) {
     $("#cell-menu").remove();
-    $("#txt-search").css("padding-left", "0.3em");
+    $("#txtSearch").css("padding-left", "0.3em");
   }
 }
 
@@ -89,8 +89,8 @@ function acceptCookies() {
 }
 
 function clearSearch() {
-  $("#txt-search").val("");
-  $("#txt-search").focus();
+  $("#txtSearch").val("");
+  $("#txtSearch").focus();
 }
 
 function toggleMenu() {

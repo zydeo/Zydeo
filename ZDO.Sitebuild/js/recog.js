@@ -27,7 +27,7 @@ var suggestionsId = "#suggestions";
 // Class of spans with retrieved suggestions.
 var suggestionClass = "sugItem";
 // ID of text input element that receives character when suggestion is clicked.
-var insertionTargedId = "#txt-search";
+var insertionTargedId = "#txtSearch";
 
 
 var canvas;
