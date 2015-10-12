@@ -112,7 +112,7 @@ td#cell-input {
   background-color: white;
 }
 
-#txt-search {
+#txtSearch {
   width: 100% ;
   border: 0;
   margin: 0;
@@ -123,7 +123,7 @@ td#cell-input {
   box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-#txt-search::-ms-clear {
+#txtSearch::-ms-clear {
   width: 0;
   height: 0;
 }

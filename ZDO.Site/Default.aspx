@@ -1,4 +1,5 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Site.Default" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs"
+  Inherits="Site.Default" ClientIDMode="Static" %>
 <%@ Register Src="~/OneResultCtrl.ascx" TagPrefix="ZDO" TagName="OneResultControl" %> 
 
 <asp:Content ID="content" ContentPlaceHolderID="mainContentPlaceholder" runat="server">
@@ -9,7 +10,7 @@
             <span id="btn-menu"><img id="img-menu" src="static/hamburger.svg" alt="Menu"/></span>
           </td>
           <td id="cell-input">
-            <input type="text" name="txt-search" id="txt-search" placeholder="Hanzi, Pinyin or German word" autofocus/>
+            <input type="text" name="txt-search" id="txtSearch" placeholder="Hanzi, Pinyin or German word" autofocus runat="server"/>
           </td>
           <td id="cell-clear">
             <span id="btn-clear"><img id="img-clear" src="static/clear.svg" alt="Clear text"/></span>

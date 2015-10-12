@@ -24,7 +24,7 @@ namespace Site
         {
             string dictFilePath = HttpRuntime.AppDomainAppPath;
             dictFilePath = Path.Combine(dictFilePath, "_data");
-            dictFilePath = Path.Combine(dictFilePath, "cedict-zydeo.bin");
+            dictFilePath = Path.Combine(dictFilePath, "handedict-zydeo.bin");
             dict = new DictEngine(dictFilePath, new FontCoverageFull());
         }
 

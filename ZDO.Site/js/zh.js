@@ -6,6 +6,8 @@ $(document).ready(function () {
   initStrokes();
   //showStrokeInput();
   eventWireup();
+  $("#txtSearch").focus();
+  $("#txtSearch").select();
 });
 
 function mobileOrFull() {
@@ -17,7 +19,7 @@ function mobileOrFull() {
   $("#btn-clear").css("display", isMobile ? "block" : "none");
   if (!isMobile) {
     $("#cell-menu").remove();
-    $("#txt-search").css("padding-left", "0.3em");
+    $("#txtSearch").css("padding-left", "0.3em");
   }
 }
 
@@ -94,7 +96,7 @@ function eventWireup() {
     window.location = "https://zydeo.net/imprint";
   });
   $("#btn-search").click(submitSearch);
-  $("#txt-search").keyup(function (e) {
+  $("#txtSearch").keyup(function (e) {
     if (e.keyCode == 13) {
       submitSearch();
       return false;
@@ -108,8 +110,8 @@ function acceptCookies() {
 }
 
 function clearSearch() {
-  $("#txt-search").val("");
-  $("#txt-search").focus();
+  $("#txtSearch").val("");
+  $("#txtSearch").focus();
 }
 
 function toggleMenu() {
@@ -137,7 +139,7 @@ function submitSearch() {
   $('<input />', {
     type: 'hidden',
     name: 'query',
-    value: $('#txt-search').val()
+    value: $('#txtSearch').val()
   }).appendTo(form);
   form.appendTo('body').submit();
 }

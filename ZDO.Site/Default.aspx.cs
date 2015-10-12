@@ -18,14 +18,17 @@ namespace Site
             string query = Request["query"];
             if (query != null)
             {
-                var lr = Global.Dict.Lookup(query, SearchScript.Both, SearchLang.Target);
+                var lr = Global.Dict.Lookup(query, SearchScript.Both, SearchLang.Chinese);
                 prov = lr.EntryProvider;
                 resultsHolder.Visible = true;
-                foreach (var res in lr.Results)
+                for (int i = 0; i != lr.Results.Count; ++i)
                 {
+                    if (i >= 256) break;
+                    var res = lr.Results[i];
                     OneResultCtrl resCtrl = new OneResultCtrl(res, lr.EntryProvider);
                     resultsHolder.Controls.Add(resCtrl);
                 }
+                txtSearch.Value = query;
             }
         }
 
