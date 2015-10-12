@@ -16,11 +16,17 @@ namespace Site
         {
             resultsHolder.Visible = false;
             string query = Request["query"];
-            if (query != null)
+            if (query == null)
             {
+                resultsHolder.Visible = false;
+                welcomeScreen.Visible = true;
+            }
+            else
+            {
+                resultsHolder.Visible = true;
+                welcomeScreen.Visible = false;
                 var lr = Global.Dict.Lookup(query, SearchScript.Both, SearchLang.Chinese);
                 prov = lr.EntryProvider;
-                resultsHolder.Visible = true;
                 for (int i = 0; i != lr.Results.Count; ++i)
                 {
                     if (i >= 256) break;

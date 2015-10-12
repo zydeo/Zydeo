@@ -9,6 +9,7 @@
   <title>HanDeDict Chinese-German dictionary</title>
   <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Ubuntu:700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Neuton&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
   <style>
     @import '<%=ResolveUrl("~/static/tooltipster.css") %>';
     @import '<%=ResolveUrl("~/static/style.css") %>';
@@ -21,10 +22,7 @@
 <nav id="menu">
   <div id="menu-horiz">
     <ul>
-      <li runat="server" id="navSearch">Search</li>
-      <li runat="server" id="navSettings">Settings</li>
-      <li runat="server" id="navAbout">About</li>
-      <li runat="server" id="navImprint" class="imprint">Imprint</li>
+      <li runat="server" id="navSearch">Search</li><li runat="server" id="navSettings">Settings</li><li runat="server" id="navAbout">About</li><li runat="server" id="navImprint" class="imprint">Imprint</li>
     </ul>
   </div>
 </nav>
