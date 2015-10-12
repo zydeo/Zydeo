@@ -4,8 +4,17 @@ $(document).ready(function () {
   mobileOrFull();
   initGui();
   initStrokes();
+
+  // Debug: to work on strokes input
   //showStrokeInput();
+
   eventWireup();
+
+  $("#txtSearch").focus();
+  $("#txtSearch").select();
+
+  // Debug: to work on opening screen
+
 });
 
 function mobileOrFull() {
