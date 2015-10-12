@@ -3,11 +3,13 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="description" content="Search the HanDeDict open-source Chinese-German dictionary online."/>
-  <meta name="viewport" content="user-scalable=0" />
+  <meta name="viewport" content="user-scalable=0"/>
   <title>HanDeDict Chinese-German dictionary</title>
-  <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-  <link href='https://fonts.googleapis.com/css?family=Ubuntu:700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="static/tooltipster.css">
+  <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,400italic&subset=latin,latin-ext' rel='stylesheet'
+        type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Ubuntu:700&subset=latin,latin-ext' rel='stylesheet'
+        type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Neuton&subset=latin,latin-ext' rel='stylesheet' type='text/css'>  <link rel="stylesheet" href="static/tooltipster.css">
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body class="loading">
@@ -55,126 +57,167 @@
           <div id="stroke-undo">Undo</div>
         </div>
         <div id="suggestions"></div>
-       </div>
-     </div>
+      </div>
+    </div>
     <div id="results">
-      <div class="entry">
-        <span class="hw-simp">狗窦</span>
-        <span class="hw-sep">&bull;</span>
-        <span class="hw-trad">狗竇</span>
-        <span class="hw-pinyin">gǒu dòu</span>
-        <div class="senses">
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> <span class="sense-hl">hole</span></span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused <span class="sense-hl">by missing</span> teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> <span class="sense-hl">dog hole</span></span></span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
-          <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
-        </div>
+      <div id="welcomeScreen">
+        <h1>HanDeDict @ Zydeo</h1>
+        <img id="img-welcome" src="static/zydeo-owl.svg" alt="Welcome"/>
+        <p>
+          Enter German word, Pinyin or Hanzi to search the dictionary.
+        </p><p>
+          Pinyin syllables can include tone mark, but don't need to:<br/>
+          <i>zhongwen</i> and <i>zhong1wen2</i> both work.
+        </p><p>
+          You can separate Pinyin syllables with spaces, but you don't need to:<br/>
+          <i>zhongwen</i> and <i>zhong wen</i> both work. So do <i>xi an</i> and <i>xi'an</i>.
+        </p><p>
+          Click on the brush icon for handwriting recognition.
+        </p>
       </div>
-      <div class="entry">
-        <span class="hw-simp">狗窦</span>
-        <span class="hw-sep">&bull;</span>
-        <span class="hw-trad">狗竇</span>
-        <span class="hw-pinyin">gǒu dòu</span>
-        <div class="senses">
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
-          <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+      <div id="resultsHolder">
+        <div class="entry">
+          <span class="hw-simp">狗窦</span>
+          <span class="hw-sep">&bull;</span>
+          <span class="hw-trad">狗竇</span>
+          <span class="hw-pinyin">gǒu dòu</span>
+
+          <div class="senses">
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> <span
+              class="sense-hl">hole</span></span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused <span
+              class="sense-hl">by missing</span> teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> <span
+              class="sense-hl">dog hole</span></span></span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
+            <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+          </div>
         </div>
-      </div>
-      <div class="entry">
-        <span class="hw-simp">狗窦</span>
-        <span class="hw-sep">&bull;</span>
-        <span class="hw-trad">狗竇</span>
-        <span class="hw-pinyin">gǒu dòu</span>
-        <div class="senses">
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
-          <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+        <div class="entry">
+          <span class="hw-simp">狗窦</span>
+          <span class="hw-sep">&bull;</span>
+          <span class="hw-trad">狗竇</span>
+          <span class="hw-pinyin">gǒu dòu</span>
+
+          <div class="senses">
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
+            <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+          </div>
         </div>
-      </div>
-      <div class="entry">
-        <span class="hw-simp">狗窦</span>
-        <span class="hw-sep">&bull;</span>
-        <span class="hw-trad">狗竇</span>
-        <span class="hw-pinyin">gǒu dòu</span>
-        <div class="senses">
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
-          <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+        <div class="entry">
+          <span class="hw-simp">狗窦</span>
+          <span class="hw-sep">&bull;</span>
+          <span class="hw-trad">狗竇</span>
+          <span class="hw-pinyin">gǒu dòu</span>
+
+          <div class="senses">
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
+            <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+          </div>
         </div>
-      </div>
-      <div class="entry">
-        <span class="hw-simp">狗窦</span>
-        <span class="hw-sep">&bull;</span>
-        <span class="hw-trad">狗竇</span>
-        <span class="hw-pinyin">gǒu dòu</span>
-        <div class="senses">
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
-          <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+        <div class="entry">
+          <span class="hw-simp">狗窦</span>
+          <span class="hw-sep">&bull;</span>
+          <span class="hw-trad">狗竇</span>
+          <span class="hw-pinyin">gǒu dòu</span>
+
+          <div class="senses">
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
+            <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+          </div>
         </div>
-      </div>
-      <div class="entry">
-        <span class="hw-simp">狗窦</span>
-        <span class="hw-sep">&bull;</span>
-        <span class="hw-trad">狗竇</span>
-        <span class="hw-pinyin">gǒu dòu</span>
-        <div class="senses">
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
-          <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+        <div class="entry">
+          <span class="hw-simp">狗窦</span>
+          <span class="hw-sep">&bull;</span>
+          <span class="hw-trad">狗竇</span>
+          <span class="hw-pinyin">gǒu dòu</span>
+
+          <div class="senses">
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
+            <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+          </div>
         </div>
-      </div>
-      <div class="entry">
-        <span class="hw-simp">狗窦</span>
-        <span class="hw-sep">&bull;</span>
-        <span class="hw-trad">狗竇</span>
-        <span class="hw-pinyin">gǒu dòu</span>
-        <div class="senses">
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
-          <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
-          <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+        <div class="entry">
+          <span class="hw-simp">狗窦</span>
+          <span class="hw-sep">&bull;</span>
+          <span class="hw-trad">狗竇</span>
+          <span class="hw-pinyin">gǒu dòu</span>
+
+          <div class="senses">
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
+            <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+          </div>
+        </div>
+        <div class="entry">
+          <span class="hw-simp">狗窦</span>
+          <span class="hw-sep">&bull;</span>
+          <span class="hw-trad">狗竇</span>
+          <span class="hw-pinyin">gǒu dòu</span>
+
+          <div class="senses">
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">3</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">4</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">5</span> gap</span> caused by missing teeth</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">6</span> <span
+              class="sense-meta">(fig.)</span></span> den of thieves</span><br/>
+            <span class="sense"><span class="sense-meta">Classifier: </span>个 • 個 [gè], 位 • 位 [wèi]</span><br/>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">7</span> dog</span> hole</span>
+            <span class="sense"><span class="sense-nobr"><span class="sense-ix">8</span> gap</span> caused by missing teeth</span>
+          </div>
         </div>
       </div>
     </div>

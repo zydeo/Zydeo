@@ -407,7 +407,48 @@ body.mobile .sense-ix {
   width: 24pt;
 }
 
+body.mobile #welcomeScreen {
+  font-size: 32pt;
+}
 
+body.mobile #img-welcome {
+  width: 60%;
+  margin-top: 0;
+}
+
+body.mobile #welcomeScreen h1 {
+  font-size: 250%;
+  margin-top: 2em;
+}
+
+body.mobile #welcomeScreen p {
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+/* ------------------------------- WELCOME SCREEN ------------------------------- */
+
+#welcomeScreen {
+  text-align: center;
+  margin-bottom: 5em;
+  font-size: 16pt;
+}
+
+#img-welcome {
+  width: 30%;
+  margin-bottom: -2em;
+}
+
+#welcomeScreen h1 {
+  font-family: Neuton;
+  font-size: 300%;
+  color: #607026;
+  margin-bottom: 0.3em;
+}
+
+#welcomeScreen p {
+  font-size: 90%;
+}
 
 /* ------------------------------- LOOKUP RESULTS ------------------------------- */
 

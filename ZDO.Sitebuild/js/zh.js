@@ -14,7 +14,8 @@ $(document).ready(function () {
   $("#txtSearch").select();
 
   // Debug: to work on opening screen
-
+  $("#resultsHolder").css("display", "none");
+  $("#welcomeScreen").css("display", "block");
 });
 
 function mobileOrFull() {
