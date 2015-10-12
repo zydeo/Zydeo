@@ -67,6 +67,21 @@ namespace ZD.CedictEngine
             tokenizer = new Tokenizer(index.WordHolder);
         }
 
+        private bool surrogateCheck(string line, StreamWriter logStream)
+        {
+            bool surrFound = false;
+            foreach (char c in line)
+            {
+                int val = (int)c;
+                if (val >= 0xd800 && val <= 0xdfff) { surrFound = true; break; }
+            }
+            if (!surrFound) return true;
+            string msg = "Line {0}: ERROR: Unicode surrogate found";
+            msg = string.Format(msg, lineNum);
+            logStream.WriteLine(msg);
+            return false;
+        }
+
         /// <summary>
         /// Parses an entry (line) that has been separated into headword and rest.
         /// </summary>
@@ -268,12 +283,22 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Processes one line of the text-based Cedict input file.
         /// </summary>
-        public void ProcessLine(string line, StreamWriter logStream)
+        public void ProcessLine(string line, StreamWriter logStream, StreamWriter swKept, StreamWriter swDrop)
         {
+            string origLine = line;
+
             // Must not parse new lines once results have been written
             if (resultsWritten) throw new Exception("WriteResults already called, cannot parse additional lines.");
 
             ++lineNum;
+
+            // Cannot handle code points about 0xffff
+            if (!surrogateCheck(origLine, logStream))
+            {
+                swDrop.WriteLine(origLine);
+                return;
+            }
+
             // Comments, empty lines, some basic normalization
             line = line.Replace(' ', ' '); // NBSP
             line = line.Replace('“', '"'); // Curly quote
@@ -285,12 +310,24 @@ namespace ZD.CedictEngine
             string strHead = line.Substring(0, firstSlash).Trim();
             string strBody = line.Substring(firstSlash + 1).Trim(new char[] { ' ', '/' });
             // Parse entry. If failed, we be done here.
-            CedictEntry entry = parseEntry(strHead, strBody, logStream);
+            CedictEntry entry;
+            try
+            {
+                entry = parseEntry(strHead, strBody, logStream);
+            }
+            catch
+            {
+                // Failed to parse: dropped
+                swDrop.WriteLine(origLine);
+                return;
+            }
             if (entry == null) return;
             // Store and index entry
             int id = entries.Count;
             entries.Add(entry);
             indexEntry(entry, id);
+            // Log as kept
+            swKept.WriteLine(origLine);
             // Update statistics
             stats.CalculateEntryStats(entry);
         }
