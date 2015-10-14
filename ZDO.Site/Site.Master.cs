@@ -33,6 +33,11 @@ namespace Site
             else if (uiLang == "jian") langselJian.Attributes["class"] = langselJian.Attributes["class"] + " active";
             else if (uiLang == "fan") langselFan.Attributes["class"] = langselFan.Attributes["class"] + " active";
 
+            // Server-side localized UI in master
+            TextProvider prov = TextProvider.Instance;
+            navSearch.InnerText = prov.GetString(uiLang, "MenuSearch");
+            navAbout.InnerText = prov.GetString(uiLang, "MenuInfo");
+
             // Disable "loading" class on body unless loading Default.aspx for the first time
             bool isDefault = Request.Path == @"/Default.aspx";
             if (!isDefault)
@@ -44,8 +49,6 @@ namespace Site
                 navSearch.Attributes["class"] = navSearch.Attributes["class"] + " active";
             else if (Request.Path == @"/About.aspx")
                 navAbout.Attributes["class"] = navAbout.Attributes["class"] + " active";
-            else if (Request.Path == @"/Settings.aspx")
-                navSettings.Attributes["class"] = navSettings.Attributes["class"] + " active";
         }
     }
 }

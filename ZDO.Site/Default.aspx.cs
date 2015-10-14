@@ -14,14 +14,13 @@ namespace Site
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            var x = this.Master.UILang;
-
             resultsHolder.Visible = false;
             string query = Request["query"];
             if (query == null)
             {
                 resultsHolder.Visible = false;
                 welcomeScreen.Visible = true;
+                welcomeScreen.InnerHtml = TextProvider.Instance.GetSnippet(Master.UILang, "welcome");
             }
             else
             {

@@ -1,0 +1,4 @@
+﻿# Page framework: menus etc.
+MenuSearch					Search
+MenuInfo					About
+

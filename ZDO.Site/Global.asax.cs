@@ -22,10 +22,14 @@ namespace Site
 
         void Application_Start(object sender, EventArgs e)
         {
+            // Load dictionary
             string dictFilePath = HttpRuntime.AppDomainAppPath;
             dictFilePath = Path.Combine(dictFilePath, "_data");
             dictFilePath = Path.Combine(dictFilePath, "handedict-zydeo.bin");
             dict = new DictEngine(dictFilePath, new FontCoverageFull());
+
+            // Initialize text provider
+            TextProvider.Init();
         }
 
         void Application_End(object sender, EventArgs e)

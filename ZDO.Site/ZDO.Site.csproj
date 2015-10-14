@@ -69,7 +69,9 @@
     <Content Include="lib\jquery.tooltipster.min.js" />
     <Content Include="lib\shortstraw.js" />
     <Content Include="OneResultCtrl.ascx" />
-    <Content Include="Settings.aspx" />
+    <EmbeddedResource Include="Resources\en.txt" />
+    <EmbeddedResource Include="Resources\de.txt" />
+    <EmbeddedResource Include="Resources\welcome_en.txt" />
     <Content Include="static\brush.svg" />
     <Content Include="static\clear.svg" />
     <Content Include="static\close.svg" />
@@ -111,6 +113,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Logic\TextProvider.cs" />
     <Compile Include="OneResultCtrl.ascx.cs">
       <DependentUpon>OneResultCtrl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -119,13 +122,6 @@
       <DependentUpon>OneResultCtrl.ascx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.aspx.cs">
-      <DependentUpon>Settings.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Settings.aspx.designer.cs">
-      <DependentUpon>Settings.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -134,9 +130,7 @@
       <DependentUpon>Site.Master</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Logic\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\ZD.CedictEngine\ZD.CedictEngine.csproj">
       <Project>{5c3bd324-3b92-4f78-86a4-77dad6801bd2}</Project>

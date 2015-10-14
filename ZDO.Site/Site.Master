@@ -22,7 +22,7 @@
 <nav id="menu">
   <div id="menu-horiz">
     <ul>
-      <li runat="server" id="navSearch">Search</li><li runat="server" id="navSettings">Settings</li><li runat="server" id="navAbout">About</li><li runat="server" id="navImprint" class="imprint">Imprint</li>
+      <li runat="server" id="navSearch">Search</li><li runat="server" id="navAbout">About</li><li runat="server" id="navImprint" class="imprint">Imprint</li>
     </ul>
     <div id="langsel">
       <div id="langsel-inner">

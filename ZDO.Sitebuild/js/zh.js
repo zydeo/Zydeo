@@ -45,8 +45,8 @@ $(document).ready(function () {
   $("#txtSearch").select();
 
   // Debug: to work on opening screen
-  $("#resultsHolder").css("display", "none");
-  $("#welcomeScreen").css("display", "block");
+  //$("#resultsHolder").css("display", "none");
+  //$("#welcomeScreen").css("display", "block");
 });
 
 function mobileOrFull() {
@@ -78,6 +78,8 @@ function initGui() {
 
   // Get cookie with language preference, if present
   // *SET* cookie with language preference (so we keep extending cookie)
+  var uiFromCookie = getCookie("uilang");
+  if (uiFromCookie !== null) uiLang = uiFromCookie;
   createCookie("uilang", uiLang, 365);
 }
 
@@ -125,6 +127,14 @@ function eventWireup() {
   $("#stroke-clear").click(clearCanvas);
   $("#stroke-undo").click(undoStroke);
   $("#swallowbitterpill").click(acceptCookies);
+
+  $("#navSearch").click(function () {
+    window.location = "/";
+  });
+  $("#navAbout").click(function () {
+    window.location = "/about";
+  });
+
   $("#langselEn").click(function () {
     selectLang("en");
   });
@@ -137,15 +147,26 @@ function eventWireup() {
   $("#langselFan").click(function () {
     selectLang("fan");
   });
+  $("#btn-search").click(submitSearch);
+  $("#txtSearch").keyup(function (e) {
+    if (e.keyCode == 13) {
+      submitSearch();
+      return false;
+    }
+  });
 }
 
 function selectLang(lang) {
-  if (lang == "en") uiLang = "en";
-  else if (lang == "de") uiLang = "de";
-  else if (lang == "jian") uiLang = "jian";
-  else if (lang == "fan") uiLang = "fan";
-  else uiLang = "de";
+  var newLang = "de";
+  if (lang == "en") newLang = "en";
+  else if (lang == "de") newLang = "de";
+  else if (lang == "jian") newLang = "jian";
+  else if (lang == "fan") newLang = "fan";
+  if (newLang == uiLang) return;
+  uiLang = newLang;
   createCookie("uilang", uiLang, 365);
+  //location.reload(); // This sends POST again, but we prefer no post (when switching language after a query)
+  window.location.href = window.location.protocol + '//' + window.location.host + window.location.pathname;
 }
 
 function acceptCookies() {
@@ -170,4 +191,20 @@ function toggleMenu() {
     $("#img-menu").attr("src", imagePath + "/close.svg");
     $("#btn-menu").css("background-color", "#b4ca65");
   }
+}
+
+function submitSearch() {
+  'use strict';
+  var form;
+  form = $('<form />', {
+    action: '/',
+    method: 'post',
+    style: 'display: none;'
+  });
+  $('<input />', {
+    type: 'hidden',
+    name: 'query',
+    value: $('#txtSearch').val()
+  }).appendTo(form);
+  form.appendTo('body').submit();
 }
