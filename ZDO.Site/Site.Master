@@ -1,4 +1,4 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.Master.cs" Inherits="Site.Site" %>
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.Master.cs" Inherits="Site.Master" %>
 
 <!DOCTYPE html>
 <html>
@@ -24,6 +24,11 @@
     <ul>
       <li runat="server" id="navSearch">Search</li><li runat="server" id="navSettings">Settings</li><li runat="server" id="navAbout">About</li><li runat="server" id="navImprint" class="imprint">Imprint</li>
     </ul>
+    <div id="langsel">
+      <div id="langsel-inner">
+        <span id="langselDe" runat="server">DE</span> <span id="langselEn" runat="server">EN</span> <span class="zho" id="langselJian" runat="server">简体中文</span> <span class="zho" id="langselFan" runat="server">繁体中文</span>
+      </div>
+    </div>
   </div>
 </nav>
 <div id="content" class="hei">

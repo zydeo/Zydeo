@@ -10,7 +10,7 @@
 namespace Site {
     
     
-    public partial class Site {
+    public partial class Master {
         
         /// <summary>
         /// theBody control.
@@ -56,6 +56,42 @@ namespace Site {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl navImprint;
+        
+        /// <summary>
+        /// langselDe control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl langselDe;
+        
+        /// <summary>
+        /// langselEn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl langselEn;
+        
+        /// <summary>
+        /// langselJian control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl langselJian;
+        
+        /// <summary>
+        /// langselFan control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl langselFan;
         
         /// <summary>
         /// mainContentPlaceholder control.

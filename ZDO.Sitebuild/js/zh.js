@@ -125,16 +125,16 @@ function eventWireup() {
   $("#stroke-clear").click(clearCanvas);
   $("#stroke-undo").click(undoStroke);
   $("#swallowbitterpill").click(acceptCookies);
-  $("#langsel-en").click(function () {
+  $("#langselEn").click(function () {
     selectLang("en");
   });
-  $("#langsel-de").click(function () {
+  $("#langselDe").click(function () {
     selectLang("de");
   });
-  $("#langsel-jian").click(function () {
+  $("#langselJian").click(function () {
     selectLang("jian");
   });
-  $("#langsel-fan").click(function () {
+  $("#langselFan").click(function () {
     selectLang("fan");
   });
 }
@@ -143,7 +143,7 @@ function selectLang(lang) {
   if (lang == "en") uiLang = "en";
   else if (lang == "de") uiLang = "de";
   else if (lang == "jian") uiLang = "jian";
-  else if (lang == "fan") uiLang = "jian";
+  else if (lang == "fan") uiLang = "fan";
   else uiLang = "de";
   createCookie("uilang", uiLang, 365);
 }

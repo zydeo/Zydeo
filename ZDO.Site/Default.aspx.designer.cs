@@ -38,5 +38,17 @@ namespace Site {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl welcomeScreen;
+        
+        /// <summary>
+        /// Master property.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated property.
+        /// </remarks>
+        public new Site.Master Master {
+            get {
+                return ((Site.Master)(base.Master));
+            }
+        }
     }
 }

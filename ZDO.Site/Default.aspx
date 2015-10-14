@@ -1,6 +1,7 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs"
   Inherits="Site.Default" ClientIDMode="Static" %>
-<%@ Register Src="~/OneResultCtrl.ascx" TagPrefix="ZDO" TagName="OneResultControl" %> 
+<%@ Register Src="~/OneResultCtrl.ascx" TagPrefix="ZDO" TagName="OneResultControl" %>
+<%@ MasterType VirtualPath="~/Site.master" %>
 
 <asp:Content ID="content" ContentPlaceHolderID="mainContentPlaceholder" runat="server">
     <div id="search-bar">
