@@ -46,6 +46,34 @@ body {
   background-color: #c7d9b3;
 }
 
+#langsel {
+  font-family: Noto-Sans, sans-serif;
+  display: block;
+  position: fixed;
+  right: 0;
+  top: 0;
+  padding: 0.5em 0.4em 0.3em 0;
+  color: #607026;
+}
+
+#langsel span {
+  border: 1px solid #607026;
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  padding: 0.2em;
+  cursor: default;
+}
+
+#langsel span:hover,
+#langsel span.active {
+  background-color: #c7d9b3;
+}
+
+#langsel .zho {
+  font-family: SimHei, "Microsoft Yahei","????", STXihei, STHeitiSC-Medium, DengXian, "????", sans-serif;
+}
+
 #bittercookie {
   position: fixed;
   bottom: 0;
@@ -301,7 +329,7 @@ body.mobile #menu {
   padding-left: 20pt;
   padding-right: 5pt;
   padding-bottom: 1em;
-  font-size: 250%;
+  font-size: 45pt;
   -webkit-box-shadow: 0 5pt 15pt 0 #ccc;  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
   -moz-box-shadow: 0 5pt 15pt 0 #ccc;  /* Firefox 3.5 - 3.6 */
   box-shadow: 0 5pt 15pt 0 #ccc;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
@@ -310,6 +338,11 @@ body.mobile #menu {
 body.mobile #menu ul {
   margin: 0;
   padding: 0;
+  display: block;
+  float: left;
+  clear: both;
+  width: 100%;
+  margin-bottom: 1.2em;
 }
 
 body.mobile #menu li {
@@ -320,7 +353,7 @@ body.mobile #menu li {
   clear: both;
   padding-top: 0.5em;
   padding-bottom: 0.5em;
-  padding-right: 3em;
+  padding-right: 2em;
 }
 
 body.mobile #menu li.imprint {
@@ -333,6 +366,29 @@ body.mobile #menu li.imprint {
 body.mobile #menu li.active,
 body.mobile #menu li:hover {
   background-color: #f0f0f0;
+}
+
+body.mobile #langsel {
+  display: block;
+  position: relative;
+  clear: both;
+  border-top: 1px dotted #303030;
+}
+
+body.mobile #langsel-inner {
+  width: 100%;
+  padding-top: 32pt;
+  font-size: 0;
+}
+
+body.mobile #langsel span {
+  font-size: 45pt;
+  border: 0;
+  border-radius: 0;
+  padding-left: 20pt;
+  padding-right: 20pt;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
 }
 
 body.mobile #search-bar {

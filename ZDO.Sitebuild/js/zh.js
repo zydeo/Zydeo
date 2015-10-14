@@ -1,4 +1,35 @@
+// ----------------- HELPERS ------------------------
+
+function createCookie(name, value, expires, path, domain) {
+  var cookie = name + "=" + escape(value) + ";";
+  if (expires) {
+    // If it's a date
+    if (expires instanceof Date) {
+      // If it isn't a valid date
+      if (isNaN(expires.getTime()))
+        expires = new Date();
+    }
+    else
+      expires = new Date(new Date().getTime() + parseInt(expires) * 1000 * 60 * 60 * 24);
+    cookie += "expires=" + expires.toGMTString() + ";";
+  }
+  if (path)
+    cookie += "path=" + path + ";";
+  if (domain)
+    cookie += "domain=" + domain + ";";
+  document.cookie = cookie;
+}
+
+function getCookie(name) {
+  var regexp = new RegExp("(?:^" + name + "|;\s*" + name + ")=(.*?)(?:;|$)", "g");
+  var result = regexp.exec(document.cookie);
+  return (result === null) ? null : result[1];
+}
+
+// --------------- END HELPERS ----------------------
+
 var isMobile = false;
+var uiLang = "de";
 
 $(document).ready(function () {
   mobileOrFull();
@@ -45,6 +76,9 @@ function initGui() {
     $("#bittercookie").css("display", "none");
   }
 
+  // Get cookie with language preference, if present
+  // *SET* cookie with language preference (so we keep extending cookie)
+  createCookie("uilang", uiLang, 365);
 }
 
 function showStrokeInput() {
@@ -91,6 +125,27 @@ function eventWireup() {
   $("#stroke-clear").click(clearCanvas);
   $("#stroke-undo").click(undoStroke);
   $("#swallowbitterpill").click(acceptCookies);
+  $("#langsel-en").click(function () {
+    selectLang("en");
+  });
+  $("#langsel-de").click(function () {
+    selectLang("de");
+  });
+  $("#langsel-jian").click(function () {
+    selectLang("jian");
+  });
+  $("#langsel-fan").click(function () {
+    selectLang("fan");
+  });
+}
+
+function selectLang(lang) {
+  if (lang == "en") uiLang = "en";
+  else if (lang == "de") uiLang = "de";
+  else if (lang == "jian") uiLang = "jian";
+  else if (lang == "fan") uiLang = "jian";
+  else uiLang = "de";
+  createCookie("uilang", uiLang, 365);
 }
 
 function acceptCookies() {
