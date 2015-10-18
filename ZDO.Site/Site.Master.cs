@@ -48,11 +48,16 @@ namespace Site
             }
         }
 
-        protected void Page_Load(object sender, EventArgs e)
+        protected override void OnInit(EventArgs e)
         {
+            base.OnInit(e);
+
             // What UI language are we going by?
             determineLanguage();
+        }
 
+        protected void Page_Load(object sender, EventArgs e)
+        {
             // Hilite language in selector
             if (uiLang == "de") langselDe.Attributes["class"] = langselDe.Attributes["class"] + " active";
             else if (uiLang == "en") langselEn.Attributes["class"] = langselEn.Attributes["class"] + " active";
@@ -61,8 +66,14 @@ namespace Site
 
             // Server-side localized UI in master
             TextProvider prov = TextProvider.Instance;
+            Page.MetaDescription = prov.GetString(uiLang, "MetaDescription");
+            Page.MetaKeywords = prov.GetString(uiLang, "MetaKeywords");
             navSearch.InnerText = prov.GetString(uiLang, "MenuSearch");
             navAbout.InnerText = prov.GetString(uiLang, "MenuInfo");
+            navImprint.InnerText = prov.GetString(uiLang, "MenuImprint");
+            bitterCookieTalks.Text = prov.GetString(uiLang, "CookieNotice");
+            swallowbitterpill.InnerText = prov.GetString(uiLang, "CookieAccept");
+            cookierecipe.InnerText = prov.GetString(uiLang, "CookieLearnMore");
 
             // Disable "loading" class on body unless loading Default.aspx for the first time
             bool isDefault = Request.Path == @"/Default.aspx";

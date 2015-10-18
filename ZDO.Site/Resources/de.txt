@@ -1,3 +1,7 @@
 ﻿# Page framework: menus etc.
 MenuSearch					Durchsuchen
+MenuInfo					Infos
 
+
+# Main search box
+TxtSearchPlacholder			Hanzi, Pinyin oder deutsches Wort

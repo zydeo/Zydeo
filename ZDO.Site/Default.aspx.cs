@@ -14,13 +14,20 @@ namespace Site
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // Server-side inline localization
+            strokeClear.InnerText = TextProvider.Instance.GetString(Master.UILang, "BtnStrokeClear");
+            strokeUndo.InnerText = TextProvider.Instance.GetString(Master.UILang, "BtnStrokeUndo");
+            txtSearch.Attributes["placeholder"] = TextProvider.Instance.GetString(Master.UILang, "TxtSearchPlacholder");
+
             resultsHolder.Visible = false;
             string query = Request["query"];
-            if (query == null)
+            if (query != null) query = query.Trim();
+            if (string.IsNullOrEmpty(query))
             {
                 resultsHolder.Visible = false;
                 welcomeScreen.Visible = true;
                 welcomeScreen.InnerHtml = TextProvider.Instance.GetSnippet(Master.UILang, "welcome");
+                Title = TextProvider.Instance.GetString(Master.UILang, "TitleMain");
             }
             else
             {
@@ -36,6 +43,18 @@ namespace Site
                     resultsHolder.Controls.Add(resCtrl);
                 }
                 txtSearch.Value = query;
+                if (lr.Results.Count == 0)
+                    Title = TextProvider.Instance.GetString(Master.UILang, "TitleMain");
+                else
+                {
+                    string title;
+                    if (lr.ActualSearchLang == SearchLang.Chinese)
+                        title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchChinese");
+                    else
+                        title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchGerman");
+                    title = string.Format(title, query);
+                    Title = title;
+                }
             }
         }
 

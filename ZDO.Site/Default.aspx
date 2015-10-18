@@ -11,7 +11,7 @@
             <span id="btn-menu"><img id="img-menu" src="static/hamburger.svg" alt="Menu"/></span>
           </td>
           <td id="cell-input">
-            <input type="text" name="txt-search" id="txtSearch" placeholder="Hanzi, Pinyin or German word" autofocus runat="server"/>
+            <input type="text" name="txt-search" id="txtSearch" placeholder="*Hanzi, Pinyin or German word" autofocus runat="server"/>
           </td>
           <td id="cell-clear">
             <span id="btn-clear"><img id="img-clear" src="static/clear.svg" alt="Clear text"/></span>
@@ -29,8 +29,8 @@
       <div id="stroke-inner">
         <canvas id="stroke-input-canvas"></canvas>
         <div id="stroke-commands">
-          <div id="stroke-clear">Clear</div>
-          <div id="stroke-undo">Undo</div>
+          <div id="strokeClear" runat="server">*Clear</div>
+          <div id="strokeUndo" runat="server">*Undo</div>
         </div>
         <div id="suggestions"></div>
        </div>

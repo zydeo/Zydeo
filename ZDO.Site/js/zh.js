@@ -131,8 +131,8 @@ function eventWireup() {
       $("#btn-write").attr("class", "active");
     }
   });
-  $("#stroke-clear").click(clearCanvas);
-  $("#stroke-undo").click(undoStroke);
+  $("#strokeClear").click(clearCanvas);
+  $("#strokeUndo").click(undoStroke);
   $("#swallowbitterpill").click(acceptCookies);
 
   $("#navSearch").click(function () {

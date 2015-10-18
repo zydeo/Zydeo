@@ -12,15 +12,15 @@ namespace Site
     public partial class StaticContentCtrl : System.Web.UI.UserControl
     {
         private readonly string page;
-
-        public string UILang;
+        private readonly string lang;
 
         public StaticContentCtrl()
         { }
 
-        public StaticContentCtrl(string page)
+        public StaticContentCtrl(string page, string lang)
         {
             this.page = page;
+            this.lang = lang;
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -30,7 +30,7 @@ namespace Site
         protected override void Render(HtmlTextWriter writer)
         {
             Assembly a = Assembly.GetExecutingAssembly();
-            string fileName = "Site.Statics." + UILang + "." + page + ".txt";
+            string fileName = "Site.Statics." + lang + "." + page + ".txt";
             using (Stream s = a.GetManifestResourceStream(fileName))
             using (StreamReader sr = new StreamReader(s))
             {
