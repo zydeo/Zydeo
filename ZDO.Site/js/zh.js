@@ -30,6 +30,7 @@ function getCookie(name) {
 
 var isMobile = false;
 var uiLang = "de";
+var uiArr = uiDe;
 
 $(document).ready(function () {
   mobileOrFull();
@@ -63,14 +64,7 @@ function mobileOrFull() {
 }
 
 function initGui() {
-  if (!isMobile) {
-    $("#img-write").tooltipster({
-      content: $("<span>Show or hide handwriting recognition</span>")
-    });
-    $("#img-search").tooltipster({
-      content: $("<span>Search in HanDeDict. You can also just press Enter.</span>")
-    });
-  }
+  // Cookie warning / opt-in pest
   var cookies = localStorage.getItem("cookies");
   if (cookies == "go") {
     $("#bittercookie").css("display", "none");
@@ -80,6 +74,20 @@ function initGui() {
   // *SET* cookie with language preference (so we keep extending cookie)
   var uiFromCookie = getCookie("uilang");
   if (uiFromCookie !== null) uiLang = uiFromCookie;
+  // Select UI strings to use from JS
+  if (uiLang === "en") uiArr = uiEn;
+  else if (uiLang === "jian") uiArr = uiJian;
+  else if (uiLang === "fan") uiArr = uiFan;
+
+  if (!isMobile) {
+    $("#img-write").tooltipster({
+      content: $("<span>" + uiArr["tooltip-btn-brush"] + "</span>")
+    });
+    $("#img-search").tooltipster({
+      content: $("<span>" + uiArr["tooltip-btn-search"] + "</span>")
+    });
+  }
+
 }
 
 function showStrokeInput() {

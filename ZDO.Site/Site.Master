@@ -47,6 +47,10 @@
 <script src='<%=ResolveUrl("~/lib/shortstraw.js") %>'></script>
 <script src='<%=ResolveUrl("~/lib/chinesestrokes.js") %>'></script>
 <script src='<%=ResolveUrl("~/js/recog.js") %>'></script>
+<script src='<%=ResolveUrl("~/js/ui-en.js") %>'></script>
+<script src='<%=ResolveUrl("~/js/ui-de.js") %>'></script>
+<script src='<%=ResolveUrl("~/js/ui-jian.js") %>'></script>
+<script src='<%=ResolveUrl("~/js/ui-fan.js") %>'></script>
 <script src='<%=ResolveUrl("~/js/zh.js") %>'></script>
 </body>
 </html>
