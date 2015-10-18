@@ -31,8 +31,6 @@ namespace Site
         {
             Assembly a = Assembly.GetExecutingAssembly();
 
-            string[] x = a.GetManifestResourceNames();
-
             string fileName = "Site.Resources." + snippetName + "_" + langCode + ".txt";
             using (Stream s = a.GetManifestResourceStream(fileName))
             {

@@ -11,7 +11,7 @@ namespace Site
 {
 
 
-    public partial class About
+    public partial class StaticContentCtrl
     {
     }
 }

@@ -47,8 +47,12 @@ namespace Site
             // Make relevant menu item "active"
             if (Request.Path == @"/Default.aspx")
                 navSearch.Attributes["class"] = navSearch.Attributes["class"] + " active";
-            else if (Request.Path == @"/About.aspx")
-                navAbout.Attributes["class"] = navAbout.Attributes["class"] + " active";
+            else if (Request.Path == @"/Statics.aspx")
+            {
+                string page = Request.Params["page"];
+                if (page == "about")
+                    navAbout.Attributes["class"] = navAbout.Attributes["class"] + " active";
+            }
         }
     }
 }
