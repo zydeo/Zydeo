@@ -55,7 +55,7 @@ namespace Site {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl langselDe;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor langselDe;
         
         /// <summary>
         /// langselEn control.
@@ -64,7 +64,7 @@ namespace Site {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl langselEn;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor langselEn;
         
         /// <summary>
         /// langselJian control.
@@ -73,7 +73,7 @@ namespace Site {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl langselJian;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor langselJian;
         
         /// <summary>
         /// langselFan control.
@@ -82,7 +82,7 @@ namespace Site {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl langselFan;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor langselFan;
         
         /// <summary>
         /// mainContentPlaceholder control.

@@ -56,18 +56,22 @@ body {
   color: #607026;
 }
 
-#langsel span {
+#langsel a {
   border: 1px solid #607026;
   border-radius: 0.3em;
   -moz-border-radius: 0.3em;
   -webkit-border-radius: 0.3em;
   padding: 0.2em;
   cursor: default;
+  text-decoration: none;
+  color: #607026;
 }
 
-#langsel span:hover,
-#langsel span.active {
+#langsel a:hover,
+#langsel a.active {
   background-color: #c7d9b3;
+  text-decoration: none;
+  color: #607026;
 }
 
 #langsel .zho {
@@ -381,7 +385,7 @@ body.mobile #langsel-inner {
   font-size: 0;
 }
 
-body.mobile #langsel span {
+body.mobile #langsel a {
   font-size: 45pt;
   border: 0;
   border-radius: 0;
@@ -389,6 +393,8 @@ body.mobile #langsel span {
   padding-right: 20pt;
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
+  color: #607026;
+  text-decoration: none;
 }
 
 body.mobile #search-bar {

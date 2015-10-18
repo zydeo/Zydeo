@@ -26,7 +26,7 @@
     </ul>
     <div id="langsel">
       <div id="langsel-inner">
-        <span id="langselDe" runat="server">DE</span> <span id="langselEn" runat="server">EN</span> <span class="zho" id="langselJian" runat="server">简体中文</span> <span class="zho" id="langselFan" runat="server">繁体中文</span>
+        <a id="langselDe" runat="server" href="?ui=de">DE</a> <a id="langselEn" runat="server" href="?ui=en">EN</a> <a class="zho" id="langselJian" runat="server" href="?ui=jian">简体中文</a> <a class="zho" id="langselFan" runat="server" href="?ui=fan">繁体中文</a>
       </div>
     </div>
   </div>

@@ -80,7 +80,6 @@ function initGui() {
   // *SET* cookie with language preference (so we keep extending cookie)
   var uiFromCookie = getCookie("uilang");
   if (uiFromCookie !== null) uiLang = uiFromCookie;
-  createCookie("uilang", uiLang, 365);
 }
 
 function showStrokeInput() {
@@ -135,18 +134,6 @@ function eventWireup() {
     window.location = "/about";
   });
 
-  $("#langselEn").click(function () {
-    selectLang("en");
-  });
-  $("#langselDe").click(function () {
-    selectLang("de");
-  });
-  $("#langselJian").click(function () {
-    selectLang("jian");
-  });
-  $("#langselFan").click(function () {
-    selectLang("fan");
-  });
   $("#btn-search").click(submitSearch);
   $("#txtSearch").keyup(function (e) {
     if (e.keyCode == 13) {
@@ -154,19 +141,6 @@ function eventWireup() {
       return false;
     }
   });
-}
-
-function selectLang(lang) {
-  var newLang = "de";
-  if (lang == "en") newLang = "en";
-  else if (lang == "de") newLang = "de";
-  else if (lang == "jian") newLang = "jian";
-  else if (lang == "fan") newLang = "fan";
-  if (newLang == uiLang) return;
-  uiLang = newLang;
-  createCookie("uilang", uiLang, 365);
-  //location.reload(); // This sends POST again, but we prefer no post (when switching language after a query)
-  window.location.href = window.location.protocol + '//' + window.location.host + window.location.pathname;
 }
 
 function acceptCookies() {

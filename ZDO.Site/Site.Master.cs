@@ -16,17 +16,43 @@ namespace Site
             get { return uiLang; }
         }
 
+        private void determineLanguage()
+        {
+            // Got language parameter?
+            string uiParam = Request.Params["ui"];
+            string uiFromParam = null;
+            if (uiParam == "de") uiFromParam = "de";
+            else if (uiParam == "en") uiFromParam = "en";
+            else if (uiParam == "jian") uiFromParam = "jian";
+            else if (uiParam == "fan") uiFromParam = "fan";
+            // We have a language from a parameter: set cookie now
+            if (uiFromParam != null)
+            {
+                uiLang = uiFromParam;
+                HttpCookie uilangCookie = new HttpCookie("uilang");
+                uilangCookie.Value = uiFromParam;
+                uilangCookie.Expires = DateTime.UtcNow.AddDays(365);
+                Response.Cookies.Add(uilangCookie);
+            }
+            // Nothing from a param: see if we have a cookie
+            else
+            {
+                if (Request.Cookies["uilang"] != null)
+                {
+                    string langFromCookie = Request.Cookies["uilang"].Value;
+                    if (langFromCookie == "de") uiLang = "de";
+                    else if (langFromCookie == "en") uiLang = "en";
+                    else if (langFromCookie == "jian") uiLang = "jian";
+                    else if (langFromCookie == "fan") uiLang = "fan";
+                }
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Check language (from cookie)
-            if (Request.Cookies["uilang"] != null)
-            {
-                string langFromCookie = Request.Cookies["uilang"].Value;
-                if (langFromCookie == "de") uiLang = "de";
-                else if (langFromCookie == "en") uiLang = "en";
-                else if (langFromCookie == "jian") uiLang = "jian";
-                else if (langFromCookie == "fan") uiLang = "fan";
-            }
+            // What UI language are we going by?
+            determineLanguage();
+
             // Hilite language in selector
             if (uiLang == "de") langselDe.Attributes["class"] = langselDe.Attributes["class"] + " active";
             else if (uiLang == "en") langselEn.Attributes["class"] = langselEn.Attributes["class"] + " active";
