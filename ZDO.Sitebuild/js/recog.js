@@ -28,6 +28,8 @@ var suggestionsId = "#suggestions";
 var suggestionClass = "sugItem";
 // ID of text input element that receives character when suggestion is clicked.
 var insertionTargedId = "#txtSearch";
+// If true, selected hanzi is appended, instead of overwriting existing text.
+var appendNotOverwrite = false;
 
 
 var canvas;
@@ -41,6 +43,7 @@ var tstamp;
 // Initializes stroke recognition. To be called when page has fully loaded: $(document).ready
 function initStrokes() {
   canvas = document.getElementById(canvasId);
+  if (canvas === null) return;
   ctx = canvas.getContext("2d");
 
   $('#' + canvasId).mousemove(function (e) {
@@ -250,7 +253,11 @@ function analyze(stroke) {
   for (var i = 0; ((i < 8) && possible[i]); i++) {
     var sug = document.createElement('span');
     $(sug).click(function () {
-      $(insertionTargedId).val($(insertionTargedId).val() + $(this).html());
+      if (appendNotOverwrite)
+        $(insertionTargedId).val($(insertionTargedId).val() + $(this).html());
+      else
+        $(insertionTargedId).val($(this).html());
+      appendNotOverwrite = true;
       clearCanvas();
       $(suggestionsId).html('');
     }).append(getEntity(possible[i].w)).attr('class', suggestionClass);

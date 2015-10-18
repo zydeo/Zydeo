@@ -149,6 +149,9 @@ function eventWireup() {
       return false;
     }
   });
+  $("#txtSearch").change(function () {
+    appendNotOverwrite = true;
+  });
 }
 
 function acceptCookies() {
