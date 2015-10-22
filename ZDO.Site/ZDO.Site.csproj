@@ -107,6 +107,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <Content Include="_data\cedict-zydeo.bin" />
+    <Content Include="_data\Private.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Default.aspx.cs">

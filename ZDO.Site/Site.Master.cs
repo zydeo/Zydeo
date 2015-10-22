@@ -91,5 +91,10 @@ namespace Site
                     navAbout.Attributes["class"] = navAbout.Attributes["class"] + " active";
             }
         }
+
+        public string GetGACode()
+        {
+            return "gaga";
+        }
     }
 }

@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Routing;
 using System.Web.Security;
 using System.IO;
+using System.Configuration;
+
 using Site;
 using ZD.Common;
 using ZD.CedictEngine;
@@ -20,6 +22,13 @@ namespace Site
             get { return dict; }
         }
 
+        private static string gaCode;
+        
+        public static string GACode
+        {
+            get { return gaCode; }
+        }
+
         void Application_Start(object sender, EventArgs e)
         {
             // Load dictionary
@@ -30,6 +39,10 @@ namespace Site
 
             // Initialize text provider
             TextProvider.Init();
+
+            // Some static config parameters
+            AppSettingsReader asr = new AppSettingsReader();
+            gaCode = asr.GetValue("gaCode", typeof(string)).ToString();
         }
 
         void Application_End(object sender, EventArgs e)
