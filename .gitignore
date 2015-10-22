@@ -38,6 +38,9 @@ _install/*
 _deploy/*
 ZDO.Site/_data/*
 
+# But, from data, include sample config files
+!ZDO.Site/_data/Private.config
+
 # WebStorm project files
 */.idea/workspace.xml
 */.idea/tasks.xml

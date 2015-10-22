@@ -94,7 +94,7 @@ namespace Site
 
         public string GetGACode()
         {
-            return "gaga";
+            return Global.GACode;
         }
     }
 }
