@@ -115,13 +115,35 @@ body {
   font-family: "Noto Sans", SimHei, "Microsoft Yahei","????", STXihei, STHeitiSC-Medium, DengXian, "????", sans-serif;
 }
 
-#search-bar {
+#search-bar,
+#page-header {
   position: fixed;
   left: 0;
   top: 2.3em;
   width: 100%;
   background-color: #c7d9b3;
   padding: 0.5em 0 0.5em 0;
+}
+
+#page-header {
+  text-align: center;
+}
+
+#page-header h1 {
+  margin: 0;
+  font-size: 1.5em;
+  color: #607026;
+  font-family: "Noto Sans", sans-serif;
+  font-weight: normal;
+}
+
+#staticContent {
+  color: #303030;
+}
+
+#staticContent h2 {
+  font-family: Neuton;
+  font-size: 1.5em;
 }
 
 #search-panel {
@@ -401,6 +423,52 @@ body.mobile #search-bar {
   top: 0;
   padding: 0;
   width: 100%;
+}
+
+
+body.mobile #page-header {
+  top: 0;
+  padding: 0;
+  width: 100%;
+  height: 6em;
+  text-align: left;
+}
+
+body.mobile #page-header #cell-menu {
+  position: fixed;
+  width: 5em;
+  height: 5em;
+  top: 0.5em;
+  left: 0.5em;
+}
+
+body.mobile #page-header #btn-menu {
+  width: 5em;
+  height: 5em;
+  border: 0;
+  background-color: #c7d9b3;
+}
+
+body.mobile #page-header #img-menu {
+  width: 5em;
+  height: 5em;
+  margin: -0.3em 0 0 0.3em;
+}
+
+body.mobile #page-header h1 {
+  position: fixed;
+  left: 120pt;
+  font-size: 2em;
+  overflow: hidden;
+  white-space: nowrap;
+  top: 30pt;
+  margin: 0;
+}
+
+body.mobile #staticContent {
+  margin-top: 120pt;
+  padding: 0 30pt 50pt 30pt;
+  font-size: 40pt;
 }
 
 body.mobile #search-panel {

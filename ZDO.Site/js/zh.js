@@ -165,12 +165,14 @@ function clearSearch() {
 }
 
 function toggleMenu() {
+  var elmInput = document.getElementById("txtSearch");
   var srcBase = $("#img-menu").attr("src");
   var imagePath = srcBase.slice(0, srcBase.lastIndexOf("/"));
   if ($("#menu").css("display") == "block") {
     $("#menu").css("display", "none");
     $("#img-menu").attr("src", imagePath + "/hamburger.svg");
-    $("#btn-menu").css("background-color", "white");
+    var clr = elmInput === null ? "#c7d9b3" : "white";
+    $("#btn-menu").css("background-color", clr);
   } else {
     $("#menu").css("display", "block");
     $("#img-menu").attr("src", imagePath + "/close.svg");

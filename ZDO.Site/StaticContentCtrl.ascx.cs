@@ -34,8 +34,9 @@ namespace Site
             using (Stream s = a.GetManifestResourceStream(fileName))
             using (StreamReader sr = new StreamReader(s))
             {
-                string line = sr.ReadLine();
-                writer.WriteLine(line);
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                    writer.WriteLine(line);
             }
         }
     }
