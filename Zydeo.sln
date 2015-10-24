@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZD.AU", "ZD.AU\ZD.AU.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZDO.Site", "ZDO.Site\ZDO.Site.csproj", "{48E00908-2F7A-49EF-9165-B81D1F12A1F5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZDO.IpResolve", "ZDO.IpResolve\ZDO.IpResolve.csproj", "{A64D1FC3-16EE-4E3D-B9F2-30C199D9D34D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,12 @@ Global
 		{48E00908-2F7A-49EF-9165-B81D1F12A1F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48E00908-2F7A-49EF-9165-B81D1F12A1F5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{48E00908-2F7A-49EF-9165-B81D1F12A1F5}.Release|Force32.ActiveCfg = Release|Any CPU
+		{A64D1FC3-16EE-4E3D-B9F2-30C199D9D34D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A64D1FC3-16EE-4E3D-B9F2-30C199D9D34D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A64D1FC3-16EE-4E3D-B9F2-30C199D9D34D}.Debug|Force32.ActiveCfg = Debug|Any CPU
+		{A64D1FC3-16EE-4E3D-B9F2-30C199D9D34D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A64D1FC3-16EE-4E3D-B9F2-30C199D9D34D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A64D1FC3-16EE-4E3D-B9F2-30C199D9D34D}.Release|Force32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

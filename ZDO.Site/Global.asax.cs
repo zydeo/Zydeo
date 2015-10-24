@@ -31,6 +31,9 @@ namespace Site
 
         void Application_Start(object sender, EventArgs e)
         {
+            // Init query logger
+            QueryLogger.Init();
+
             // Load dictionary
             string dictFilePath = HttpRuntime.AppDomainAppPath;
             dictFilePath = Path.Combine(dictFilePath, "_data");
@@ -47,14 +50,16 @@ namespace Site
 
         void Application_End(object sender, EventArgs e)
         {
-            //  Code that runs on application shutdown
-
+            // Shut down query logger
+            QueryLogger.Shutdown();
         }
 
         void Application_Error(object sender, EventArgs e)
         {
-            // Code that runs when an unhandled error occurs
-
+            HttpContext context = HttpContext.Current;
+            DiagLogger.LogError("Unhandled exception; details follow in next entry");
+            Exception ex = context.Server.GetLastError().GetBaseException();
+            DiagLogger.LogError(ex);
         }
     }
 }
