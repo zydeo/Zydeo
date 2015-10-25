@@ -1,0 +1,12 @@
+﻿<MemoQResource ResourceType="PathRules" Version="1.0">
+  <Resource>
+    <Guid>0861c269-d129-4d2c-a842-18aedff62307</Guid>
+    <FileName>File#ZDO.mqres</FileName>
+    <Name>ZDO</Name>
+    <Description />
+    <RuleType>File</RuleType>
+  </Resource>
+</MemoQResource>
+<ExporPathRule>
+  <Rule>&lt;OrigPathAbs&gt;\&lt;TrgLangIso2&gt;\&lt;OrigFileNameExt&gt;</Rule>
+</ExporPathRule>

@@ -8,6 +8,8 @@ mkdir ..\_localization
 echo Copying content
 copy Resources\en.txt               ..\_localization\en.txt
 copy Resources\welcome_en.txt       ..\_localization\welcome.html
+
 copy Statics.en\about.txt           ..\_localization\about.html
 copy Statics.en\cookies.txt         ..\_localization\cookies.html
 
+copy js\ui-en.js                    ..\_localization\ui.json

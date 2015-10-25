@@ -1,0 +1,36 @@
+﻿<MemoQResource ResourceType="FilterConfigs" Version="1.0">
+  <Resource>
+    <Guid>1c6eaabe-3692-4ca1-af04-9ebe64036bec</Guid>
+    <FileName>ChainedConverter#ZDO-res-full</FileName>
+    <Name>ZDO-res-full</Name>
+    <Description />
+    <FilterName>MemoQ.DocConverters.ChainedConverter.ChainedConverter</FilterName>
+  </Resource>
+</MemoQResource>
+<MemoQChainedFilterConfiguration filtername="Chained Filter" version="V1">
+  <ChainedFilterConfigurationElement convertername="MemoQ.DocConverters.RegexText.RegexTextConverter">
+<MemoQFilterConfiguration filtername="Regex Text Filter" Version="V1">
+  <GeneralSettings ImportEncoding="Unicode (UTF-8)" OverrideImportCodepageFromBOM="yes" NewLineType="Any" ParagraphSeparatorType="NewLine" />
+  <ParagraphSettings>
+    <ParagraphRule RuleIndex="0" Rule="([^\t]+)\t+([^\n]+)">
+      <ContentGroups>
+        <ContentGroup GroupId="2" Context="$1" Comment="" LengthGroupId="" />
+      </ContentGroups>
+    </ParagraphRule>
+  </ParagraphSettings>
+  <IncludeExcludeSettings IncludeContent="no" />
+  <ReferenceFiles />
+</MemoQFilterConfiguration>
+</ChainedFilterConfigurationElement>
+  <ChainedFilterConfigurationElement convertername="MemoQ.DocConverters.RegexTagger.RegexConverter">
+<MemoQFilterConfiguration filtername="Regex Filter" version="V1">
+  <TaggerRules handlestabsandnewlines="False">
+    <TaggerRule tagtype="Empty" required="True" displaytext="$1">
+      <Expression>\{([^\}]+)\}</Expression>
+    </TaggerRule>
+  </TaggerRules>
+  <ExampleText>
+  </ExampleText>
+</MemoQFilterConfiguration>
+</ChainedFilterConfigurationElement>
+</MemoQChainedFilterConfiguration>

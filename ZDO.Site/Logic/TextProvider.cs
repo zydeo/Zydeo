@@ -79,6 +79,8 @@ namespace Site
         {
             initForLang("en");
             initForLang("de");
+            initForLang("jian");
+            initForLang("fan");
         }
 
         public string GetString(string langCode, string id)

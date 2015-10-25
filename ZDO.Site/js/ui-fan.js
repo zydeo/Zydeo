@@ -1,5 +1,5 @@
 ﻿var uiFan = {
-  "tooltip-btn-brush": "Show or hide handwriting recognition",
-  "tooltip-btn-search": "Search in HanDeDict. You can also just press Enter.",
+  "tooltip-btn-brush": "Wohs ro edih gnitirwdnah noitingocer",
+  "tooltip-btn-search": "Hcraes ni TciDeDnah. Uoy nac osla tsuj sserp Retne.",
   "empty-str": ""
 };

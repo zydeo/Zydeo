@@ -1,27 +1,27 @@
 ﻿# Page titles
-TitleMain					HanDeDict @ Zydeo Chinese-German dictionary
-TitleSearchChinese			{0} - German translation - HanDeDict @ Zydeo Chinese-German dictionary
-TitleSearchGerman			{0} - Chinese translation - HanDeDict @ Zydeo Chinese-German dictionary
-TitleAbout					About HanDeDict @ Zydeo
-TitleCookies				How HanDeDict @ Zydeo uses cookies
+TitleMain					TciDeDnah @ Oedyz Namreg-eSenihc yranoitcid
+TitleSearchChinese			{0} - Namreg noitalsnart - TciDeDnah @ Oedyz Namreg-eSenihc yranoitcid
+TitleSearchGerman			{0} - Esenihc noitalsnart - TciDeDnah @ Oedyz Namreg-eSenihc yranoitcid
+TitleAbout					Tuoba TciDeDnah @ Oedyz
+TitleCookies				Woh TciDeDnah @ Oedyz sesu seikooc
 
 # Metainformation: description and keywords
-MetaDescription				HanDeDict @ Zydeo:Search the HanDeDict open-source Chinese-German dictionary online.
-MetaKeywords				HanDeDict, Zydeo, Chinese, German, dictionary, free, open-source
+MetaDescription				TciDeDnah @ Oedyz: Hcraes eht TciDeDnah ecruos-nepo Namreg-eSenihc yranoitcid enilno.
+MetaKeywords				TciDeDnah, Oedyz, Esenihc, Namreg, yranoitcid, eerf, ecruos-nepo
 
 # Page framework: menus etc.
-MenuSearch					Search
-MenuInfo					About
-MenuImprint					Imprint
-CookieNotice				This website relies on cookies for some of its functionality.By using the site, you agree to its use of cookies.
-CookieAccept				Got it
-CookieLearnMore				Learn more
+MenuSearch					Hcraes
+MenuInfo					Tuoba
+MenuImprint					Tnirpmi
+CookieNotice				Siht etisbew seiler no seikooc rof emos fo sti ytilanoitcnuf. Yb gnisu eht etis, uoy eerga ot sti esu fo seikooc.
+CookieAccept				Tog ti
+CookieLearnMore				Nrael erom
 
 # Handwriting recognition box
-BtnStrokeClear				Clear
-BtnStrokeUndo				Undo
+BtnStrokeClear				Raelc
+BtnStrokeUndo				Odnu
 
 # Main search box
-TxtSearchPlacholder			Hanzi, Pinyin or German word
+TxtSearchPlacholder			Iznah, Niynip ro Namreg drow
 
 
