@@ -36,6 +36,7 @@ _work_chdict_prepare/*
 _bin/*
 _install/*
 _deploy/*
+_localization/*
 ZDO.Site/_data/*
 
 # But, from data, include sample config files

@@ -75,6 +75,11 @@
     <EmbeddedResource Include="Resources\en.txt" />
     <EmbeddedResource Include="Resources\de.txt" />
     <EmbeddedResource Include="Resources\welcome_en.txt" />
+    <EmbeddedResource Include="Resources\fan.txt" />
+    <EmbeddedResource Include="Resources\jian.txt" />
+    <EmbeddedResource Include="Resources\welcome_de.txt" />
+    <EmbeddedResource Include="Resources\welcome_fan.txt" />
+    <EmbeddedResource Include="Resources\welcome_jian.txt" />
     <Content Include="StaticContentCtrl.ascx" />
     <Content Include="Statics.aspx" />
     <EmbeddedResource Include="Statics.en\about.txt" />

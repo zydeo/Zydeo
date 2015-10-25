@@ -17,6 +17,7 @@ namespace Site
                 Title = TextProvider.Instance.GetString(Master.UILang, "TitleAbout");
             else if (page == "cookies")
                 Title = TextProvider.Instance.GetString(Master.UILang, "TitleCookies");
+            pageHeader.Text = Title;
         }
     }
 }

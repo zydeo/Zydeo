@@ -13,6 +13,15 @@ namespace Site {
     public partial class Statics {
         
         /// <summary>
+        /// pageHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label pageHeader;
+        
+        /// <summary>
         /// staticContent control.
         /// </summary>
         /// <remarks>

@@ -1,42 +1,21 @@
 ﻿<h2>What is HanDeDict?</h2>
-<p>HanDeDict is an open-source, community-edited Chinese-German dictionary, licensed under Create Commons
-(<a href="http://creativecommons.org/licenses/by-sa/2.0/de/" target="_blank">CC BY-SA 2.0 DE</a>).
-It started out as a translation of the CEDICT Chinese-English dictionary, and was
-actively maintained with the support of the
-<a href="http://www.chinaboard.de/willkommen.html" target="_blank">Chinesisch-Deutschen Gesellschaft e.V.
-Hamburg</a> between 2006 and 2011. In August 2015, the website of HanDeDict went offline; the
-<a href="https://web.archive.org/web/20150325174145/http:/www.handedict.de/chinesisch_deutsch.php?mode=about" target="_blank">last snapshot</a>
-on the Internet Archive’s Wayback Machine is from August 1, 2015. The text file that contains the
-entire dictionary in its most recent form can be
-<a href="https://github.com/zydeo/HanDeDict/" target="_blank">downloaded from Github.</a>
-The website you are viewing now is based on this file.</p>
+
+<p>HanDeDict is an open-source, collaboratively edited Chinese-German dictionary, licensed under Create Commons (<a href="http://creativecommons.org/licenses/by-sa/2.0/de/" target="_blank">CC BY-SA 2.0 DE</a>). It started out as a translation of the CEDICT Chinese-English dictionary, and was actively maintained with the support of the <a href="http://www.chinaboard.de/willkommen.html" target="_blank">Chinesisch-Deutsche Gesellschaft e.V. Hamburg</a> between 2006 and 2011. In August 2015, the website of HanDeDict went offline; the <a href="https://web.archive.org/web/20150325174145/http:/www.handedict.de/chinesisch_deutsch.php?mode=about" target="_blank">last snapshot</a> on the Internet Archive’s Wayback Machine is from August 1, 2015. The text file that contains the entire dictionary in its most recent form can be <a href="https://github.com/zydeo/HanDeDict/" target="_blank">downloaded from Github.</a> The website you are viewing now is based on this file.</p>
+
 <h2>What is Zydeo?</h2>
-<p>In its original form, <a href="https://zydeo.net/" target="_blank">Zydeo</a>
-is an open-source Chinese-English dictionary for Windows, based on
-<a href="http://cc-cedict.org/wiki/" target="_blank">CC-CEDICT</a>.
-I created it for my own delight, as a hobby project that allowed me to explore
-a minimalist user interface. Occasionally, I post about it over on the
-<a href="https://blog.zydeo.net/" target="_blank">Zydeo blog</a>. You can find the
-<a href="https://github.com/zydeo/Zydeo" target="_blank">source code</a> on Github.</p>
-<p>I did not consider creating an online version for its own sake; there are countless websites
-built on CEDICT out there. Yet I will soon launch a project similar to HanDeDict: a translation
-of CEDICT into a different language, open for collaborative editing. When I learned that the
-HanDeDict website disappeared, I realized I could repurpose what was already there and launch
-this site to make HanDeDict available online again. The result is HanDeDict @ Zydeo.</p>
+
+<p>In its original form, <a href="https://zydeo.net/" target="_blank">Zydeo</a> is an open-source Chinese-English dictionary for Windows, based on <a href="http://cc-cedict.org/wiki/" target="_blank">CC-CEDICT</a>. I created it for my own delight, as a hobby project that allowed me to explore a minimalist approach to user interfaces. Occasionally, I post about it over on the <a href="https://blog.zydeo.net/" target="_blank">Zydeo blog</a>. You can find the <a href="https://github.com/zydeo/Zydeo" target="_blank">source code</a> on Github.</p>
+
+<p>I did not consider creating an online version for its own sake; there are countless websites built on CEDICT out there. But I will soon launch a project similar to HanDeDict: a translation of CEDICT into a different language, open for collaborative editing. When I learned that the HanDeDict website disappeared, I realized I could repurpose existing work and launch this site to make HanDeDict available online again. The result is HanDeDict @ Zydeo.</p>
+
 <h2>The future</h2>
-<p>In its current, initial form, this website allows you to search HanDeDict. I will be releasing
-small improvements over the next months. In particular, the handwriting recognition component
-(based on a port of Jordan Kiang's
-<a href="http://www.kiang.org/jordan/software/hanzilookup/" target="_blank">HanziLookup</a>
-by <a href="http://jabtunes.com/notation/chinesestroke.html" target="_blank">Zz85</a>)
-needs a lot of improvement.
-</p>
-<p>Eventually the site will include an online editor that allows everyone to improve translations
-and add new headwords. I hope to attract contributors who will “resurrect” HanDeDict and continue
-to expand and improve it from where the original team of creators left off in 2011.</p>
-<h2>How to get in touch</h2>
-<p>
-E-mail: zydeodict - at - gmail - dot - com<br/>
-Twitter: <a href="https://twitter.com/ZydeoDict" target="_blank">@ZydeoDict</a>
+
+<p>In its current, initial form, this website allows you to search HanDeDict. I will be releasing small improvements over the next months. In particular, the handwriting recognition component (based on a port of Jordan Kiang's <a href="http://www.kiang.org/jordan/software/hanzilookup/" target="_blank">HanziLookup</a> by <a href="http://jabtunes.com/notation/chinesestroke.html" target="_blank">Zz85</a>) could use some love.
 </p>
 
+<p>Eventually the site will include an online editor that allows everyone to improve translations and add new headwords. I hope to attract contributors who will resurrect HanDeDict and continue to expand and improve it from where the original team of creators left off in 2011.</p>
+
+<h2>How to get in touch</h2>
+<p>
+E-mail: zydeodict-[at]-gmail-[dot]-com<br /> Twitter: <a href="https://twitter.com/ZydeoDict" target="_blank">@ZydeoDict</a>
+</p> 

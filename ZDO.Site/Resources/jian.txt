@@ -6,14 +6,14 @@ TitleAbout					About HanDeDict @ Zydeo
 TitleCookies				How HanDeDict @ Zydeo uses cookies
 
 # Metainformation: description and keywords
-MetaDescription				HanDeDict @ Zydeo: Search the HanDeDict open-source Chinese-German dictionary online.
+MetaDescription				HanDeDict @ Zydeo:Search the HanDeDict open-source Chinese-German dictionary online.
 MetaKeywords				HanDeDict, Zydeo, Chinese, German, dictionary, free, open-source
 
 # Page framework: menus etc.
 MenuSearch					Search
 MenuInfo					About
 MenuImprint					Imprint
-CookieNotice				This website relies on cookies for some of its functionality. By using the site, you agree to its use of cookies.
+CookieNotice				This website relies on cookies for some of its functionality.By using the site, you agree to its use of cookies.
 CookieAccept				Got it
 CookieLearnMore				Learn more
 
