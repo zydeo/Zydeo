@@ -146,6 +146,19 @@ body {
   font-size: 1.5em;
 }
 
+#staticContent p {
+  line-height: 1.5em;
+}
+
+#staticContent a,
+#staticContent a:hover,
+#staticContent a:visited {
+  color: #607026;
+  text-decoration: none;
+  border-bottom: 1.1pt dotted #ccc;
+}
+
+
 #search-panel {
   margin-left: auto;
   margin-right: auto;
@@ -468,7 +481,7 @@ body.mobile #page-header h1 {
 body.mobile #staticContent {
   margin-top: 120pt;
   padding: 0 30pt 50pt 30pt;
-  font-size: 40pt;
+  font-size: 30pt;
 }
 
 body.mobile #search-panel {
