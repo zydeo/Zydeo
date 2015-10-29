@@ -1,9 +1,9 @@
-﻿<h2>How HanDeDict @ Zydeo uses cookies</h2>
+﻿<h2>Wie werden Cookies auf HanDeDict @ Zydeo verwendet?</h2>
 
-<p>A cookie is a small piece of text sent to your browser by a website you visit. It helps the website to remember information about your preferences, such as the display language or your search options. This website does not include any information in cookies that can be used to identify visitors, and it does not collect any personal information through cookies.</p>
+<p>Cookies sind kleine Textdateien, die der Server Ihrem Browser zuschickt, wenn Sie eine Webseite besuchen. Durch Cookies kann Ihr Browser Informationen über Ihre Einstellungen speichern, wie z.B. die Sprache der Benutzeroberfläche oder Ihre Suchoptionen. Diese Webseite verwendet keine Cookies, die Sie persönlich identifizieren könnten, und speichert keine persönlichen Informationen mithilfe von Cookies.</p>
 
-<p>You can choose to accept or decline cookies. Most web browsers automatically accept cookies, but you can modify your browser’s settings to decline them. Doing so will reduce your experience of HanDeDict @ Zydeo.</p>
+<p>Sie können entscheiden, ob Sie Cookies zulassen oder blockieren. Die meisten Browser lassen Cookies automatisch zu, aber Sie können Ihre Browser-Einstellungen verändern, um Sie zu blockieren. Ohne Cookies kann HanDeDict @ Zydeo manche Funktionen nicht anbieten.</p>
 
-<h2>Third-party cookies</h2>
+<h2>Cookies von Drittanbietern</h2>
 
-<p>This website uses Google Analytics for usage statistics; this service relies on cookies to record visits. For more information, please refer to <a href="http://www.google.com/policies/privacy/" target="_blank">Google’s privacy policy</a> and their <a href="https://www.google.com/intl/en/policies/technologies/cookies/" target="_blank">statement about cookies</a>.</p> 
+<p>Diese Webseite verwendet Google Analytics für Nutzungsstatistiken, ein Service, der Cookies verwendet, um Besucherzahlen zu erfassen. Wenn Sie mehr Informationen brauchen, lesen Sie bitte die <a href="http://www.google.com/policies/privacy/" target="_blank">Datenschutzerklärung</a> und die <a href="https://www.google.com/intl/en/policies/technologies/cookies/" target="_blank">Verwendung von Cookies</a> auf der Website von Google.</p> 

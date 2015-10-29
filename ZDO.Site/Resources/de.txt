@@ -1,27 +1,27 @@
 ﻿# Page titles
-TitleMain					HanDeDict @ Zydeo Chinese-German dictionary
-TitleSearchChinese			{0} - German translation - HanDeDict @ Zydeo Chinese-German dictionary
-TitleSearchGerman			{0} - Chinese translation - HanDeDict @ Zydeo Chinese-German dictionary
-TitleAbout					About HanDeDict @ Zydeo
-TitleCookies				How HanDeDict @ Zydeo uses cookies
+TitleMain					HanDeDict @ Zydeo Chinesisch-deutsches Wörterbuch
+TitleSearchChinese			{0} - deutsche Übersetzung - HanDeDict @ Zydeo Chinesisch-deutsches Wörterbuch
+TitleSearchGerman			{0} - chinesische Übersetzung - HanDeDict @ Zydeo Chinesisch-deutsches Wörterbuch
+TitleAbout					Über HanDeDict @ Zydeo
+TitleCookies				Wie werden Cookies auf HanDeDict @ Zydeo verwendet?
 
 # Metainformation: description and keywords
-MetaDescription				HanDeDict @ Zydeo: Search the HanDeDict open-source Chinese-German dictionary online.
-MetaKeywords				HanDeDict, Zydeo, Chinese, German, dictionary, free, open-source
+MetaDescription				HanDeDict @ Zydeo: Das HanDeDict Open Source chinesisch-deutsches Wörterbuch online durchsuchen.
+MetaKeywords				HanDeDict, Zydeo, Chinesisch, Deutsch, Wörterbuch, kostenlos, Open Source
 
 # Page framework: menus etc.
-MenuSearch					Search
-MenuInfo					About
-MenuImprint					Imprint
-CookieNotice				This website relies on cookies for some of its functionality. By using the site, you agree to its use of cookies.
-CookieAccept				Got it
-CookieLearnMore				Learn more
+MenuSearch					Durchsuchen
+MenuInfo					Infos
+MenuImprint					Impressum
+CookieNotice				Diese Webseite verwendet Cookies für einige Funktionen. Indem Sie die Webseite benutzen, stimmen Sie der Nutzung von Cookies zu.
+CookieAccept				OK
+CookieLearnMore				Mehr erfahren
 
 # Handwriting recognition box
-BtnStrokeClear				Clear
-BtnStrokeUndo				Undo
+BtnStrokeClear				Löschen
+BtnStrokeUndo				Rückgängig
 
 # Main search box
-TxtSearchPlacholder			Hanzi, Pinyin or German word
+TxtSearchPlacholder			Hanzi, Pinyin oder deutsches Wort
 
 
