@@ -35,10 +35,23 @@ var appendNotOverwrite = false;
 var canvas;
 var ctx;
 var clicking = false;
-var mousestrokes = [];
 var lastTouchX = -1;
 var lastTouchY = -1;
 var tstamp;
+var lastPt;
+
+// An array of arrays; each element is the coordinate sequence for one stroke from the canvas
+// Where "stroke" is everything between button press - move - button release
+var rawStrokes = [];
+
+// Canvas coordinates of each point in current stroke, in raw (unanalyzed) form.
+var currentStroke;
+
+// Analyzed substrokes, collected in flat array from all strokes input so far.
+var analyzedSubstrokes = [];
+
+// Indexes within analyzedSubstrokes where a stroke starts.
+var strokeIndexes = [];
 
 // Initializes stroke recognition. To be called when page has fully loaded: $(document).ready
 function initStrokes() {
@@ -91,9 +104,8 @@ function initStrokes() {
   });
 }
 
-// Clear canvas and resets gathered strokes data for new input.
-function clearCanvas() {
-  // Redraw canvas (gridlines)
+// Draws a clear canvas, with gridlines
+function drawClearCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.setLineDash([1, 1]);
   ctx.lineWidth = 0.5;
@@ -121,11 +133,18 @@ function clearCanvas() {
   ctx.moveTo(0, canvas.height / 2);
   ctx.lineTo(canvas.width, canvas.height / 2);
   ctx.stroke();
+}
+
+// Clear canvas and resets gathered strokes data for new input.
+function clearCanvas() {
+  // Redraw canvas (gridlines)
+  drawClearCanvas();
   // Clear previous suggestions
   $(suggestionsId).html('');
   // Reset gathered strokes input
-  mousestrokes = [];
-  strokeDescriptor = [];
+  rawStrokes = [];
+  analyzedSubstrokes = [];
+  strokeIndexes = [];
 }
 
 // Logs diagnostic message to designated element, or keeps quiet.
@@ -134,15 +153,11 @@ function debugOnScreen(msg) {
   $(debugId).html(msg);
 }
 
-var strokeXYs;
-var lastPt;
-var strokeDescriptor = [];
-
 function startClick(x, y) {
   clicking = true;
-  strokeXYs = [];
+  currentStroke = [];
   lastPt = {x: x, y: y};
-  strokeXYs.push(lastPt);
+  currentStroke.push(lastPt);
   ctx.strokeStyle = "black";
   ctx.setLineDash([]);
   ctx.lineWidth = strokeWidthDesktop;
@@ -157,7 +172,7 @@ function dragClick(x, y) {
   tstamp = new Date();
   var pt = {x: x, y: y};
   if ((pt.x == lastPt.x) && (pt.y == lastPt.y))return;
-  strokeXYs.push(pt);
+  currentStroke.push(pt);
   lastPt = pt;
   ctx.lineTo(x, y);
   ctx.stroke();
@@ -168,21 +183,54 @@ function endClick(x, y) {
   if (x == -1) return;
   ctx.lineTo(x, y);
   ctx.stroke();
-  strokeXYs.push({x: x, y: y});
-  mousestrokes.push(strokeXYs);
-  analyze(strokeXYs);
+  currentStroke.push({x: x, y: y});
+  rawStrokes.push(currentStroke);
+  analyzeStroke(currentStroke);
+  findChars();
 }
 
+// Undoes the last stroke input by the user.
 function undoStroke() {
-  // TO-DO
+  // Sanity check: nothing to do if input is empty (no strokes yet)
+  if (rawStrokes.length == 0) return;
+
+  // Remove last stroke
+  rawStrokes.length = rawStrokes.length - 1;
+  var lastIX = strokeIndexes[strokeIndexes.length - 1];
+  strokeIndexes.length = strokeIndexes.length - 1;
+  analyzedSubstrokes.length = lastIX;
+
+  // Clear canvas
+  drawClearCanvas();
+  // Redraw input (raw strokes) from scratch
+  redrawInput();
+
+  // Lookup best matching characters for what's left on canvas now
+  findChars();
 }
 
-
-function getEntity(a) {
-  return ('\&#0' + parseInt(a, 16) + ';');
+// Redraws raw strokes on the canvas.
+function redrawInput() {
+  for (var i1 in rawStrokes) {
+    ctx.strokeStyle = "black";
+    ctx.setLineDash([]);
+    ctx.lineWidth = strokeWidthDesktop;
+    if (isMobile) ctx.lineWidth = strokeWidthMobile;
+    ctx.beginPath();
+    ctx.moveTo(rawStrokes[i1][0].x, rawStrokes[i1][0].y);
+    var len = rawStrokes[i1].length;
+    for (var i2 = 0; i2 < len - 1; i2++) {
+      ctx.lineTo(rawStrokes[i1][i2].x, rawStrokes[i1][i2].y);
+      ctx.stroke();
+    }
+    ctx.lineTo(rawStrokes[i1][len - 1].x, rawStrokes[i1][len - 1].y);
+    ctx.stroke();
+  }
 }
 
-function analyze(stroke) {
+// Analyzes a new "raw" stroke and appends to analyzed substrokes.
+// Includes re-normalizing the square that the drawn character occupies within the canvas.
+function analyzeStroke(stroke) {
   debugOnScreen("Analysis starts");
 
   var corners = shortStraw(stroke);
@@ -202,18 +250,19 @@ function analyze(stroke) {
   var xmin = Number.POSITIVE_INFINITY;
   var ymax = Number.NEGATIVE_INFINITY;
   var xmax = Number.NEGATIVE_INFINITY;
-  for (var i1 in mousestrokes) {
-    for (var i2 in mousestrokes[i1]) {
-      if (mousestrokes[i1][i2].x > xmax)xmax = mousestrokes[i1][i2].x;
-      if (mousestrokes[i1][i2].x < xmin)xmin = mousestrokes[i1][i2].x;
-      if (mousestrokes[i1][i2].y > ymax)ymax = mousestrokes[i1][i2].y;
-      if (mousestrokes[i1][i2].y < ymin)ymin = mousestrokes[i1][i2].y;
+  for (var i1 in rawStrokes) {
+    for (var i2 in rawStrokes[i1]) {
+      if (rawStrokes[i1][i2].x > xmax)xmax = rawStrokes[i1][i2].x;
+      if (rawStrokes[i1][i2].x < xmin)xmin = rawStrokes[i1][i2].x;
+      if (rawStrokes[i1][i2].y > ymax)ymax = rawStrokes[i1][i2].y;
+      if (rawStrokes[i1][i2].y < ymin)ymin = rawStrokes[i1][i2].y;
     }
   }
   var w = xmax - xmin;
   var h = ymax - ymin;
   var dimensionSquared = (w > h) ? w * w : h * h;
   var normalizer = Math.pow(dimensionSquared * 2, 1 / 2);
+  strokeIndexes.push(analyzedSubstrokes.length);
   for (var i = 1; i < corners.length; i++) {
     var p1 = corners[i - 1];
     var p2 = corners[i];
@@ -222,8 +271,15 @@ function analyze(stroke) {
     var length = Math.pow(dy * dy + dx * dx, 1 / 2);
     var normalized = length / normalizer;
     var direction = Math.PI - Math.atan2(dy, dx);
-    strokeDescriptor.push({d: direction, l: normalized});
+    analyzedSubstrokes.push({d: direction, l: normalized});
   }
+  debugOnScreen("Analysis done");
+}
+
+// Finds characters whose substroke list best matches current anaylized substrokes.
+function findChars() {
+  debugOnScreen("Character lookup starts");
+
   var score;
   var possible = [];
   var bestmatch = '';
@@ -235,7 +291,7 @@ function analyze(stroke) {
     for (var i = 1; i < cd.length; i++) {
       cdi.push({d: cd[i][0], l: cd[i][1]});
     }
-    score = match(strokeDescriptor, cdi);
+    score = getCharScore(analyzedSubstrokes, cdi);
     if (score > -1) {
       possible.push({w: cd, s: score, huh: cdi});
     }
@@ -260,13 +316,14 @@ function analyze(stroke) {
       appendNotOverwrite = true;
       clearCanvas();
       $(suggestionsId).html('');
-    }).append(getEntity(possible[i].w)).attr('class', suggestionClass);
+    }).append('\&#0' + parseInt(possible[i].w, 16) + ';').attr('class', suggestionClass);
     $(suggestionsId).append(sug);
   }
-  debugOnScreen("Analysis done");
+  debugOnScreen("Character lookup done");
 }
 
-function match(strokeDescriptor, charDescriptor) {
+// Calculates score (match rate) of input against one know character.
+function getCharScore(strokeDescriptor, charDescriptor) {
   var score = 0;
   if (strokeDescriptor.length != charDescriptor.length)return -1;
   for (var i in strokeDescriptor) {
