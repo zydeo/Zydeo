@@ -71,6 +71,7 @@ namespace Site
             linkSearch.InnerText = prov.GetString(uiLang, "MenuSearch");
             linkAbout.InnerText = prov.GetString(uiLang, "MenuInfo");
             navImprint.InnerText = prov.GetString(uiLang, "MenuImprint");
+            linkFooterImprint.InnerText = prov.GetString(uiLang, "MenuImprint");
             bitterCookieTalks.Text = prov.GetString(uiLang, "CookieNotice");
             swallowbitterpill.InnerText = prov.GetString(uiLang, "CookieAccept");
             cookierecipe.InnerText = prov.GetString(uiLang, "CookieLearnMore");

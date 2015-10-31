@@ -70,6 +70,16 @@ function initGui() {
     $("#bittercookie").css("display", "none");
   }
 
+  // Nudge footer to bottom of short pages
+  if (!isMobile) {
+    $("#footer").css("display", "block");
+    var footerBottom = $("#footer").position().top + $("#footer").outerHeight(true);
+    var winHeight = $(window).height();
+    if (footerBottom < winHeight) {
+      $("#footer").css("top", winHeight - footerBottom);
+    }
+  }
+
   // Get cookie with language preference, if present
   // *SET* cookie with language preference (so we keep extending cookie)
   var uiFromCookie = getCookie("uilang");

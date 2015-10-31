@@ -36,6 +36,11 @@
     <asp:ContentPlaceHolder ID="mainContentPlaceholder" runat="server" />
   </div>
 </div>
+<div id="footer">
+  <div id="footer-inside">
+    <span>HanDeDict @ Zydeo v1.0 &bull; ©2015 Gábor L Ugray &bull; <a id="linkFooterImprint" href="http://zydeo.net/imprint" runat="server">*Imprint</a></span>
+  </div>
+</div>
 <div id="bittercookie">
   <asp:Label ID="bitterCookieTalks" runat="server"></asp:Label>
   <a id="swallowbitterpill" href="#" runat="server">*Got it</a>

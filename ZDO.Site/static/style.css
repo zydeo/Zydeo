@@ -120,6 +120,31 @@ body {
   font-family: "Noto Sans", SimHei, "Microsoft Yahei","????", STXihei, STHeitiSC-Medium, DengXian, "????", sans-serif;
 }
 
+#footer {
+  display: none;
+  width: 100%;
+  position: relative;
+  bottom: 0;
+  clear: both;
+  text-align: center;
+  font-size: 0.8em;
+  padding: 0.5em 0 1em 0;
+  color: #aaa;
+  top: 0;
+}
+
+#footer-inside {
+  display: inline-block;
+  border-top: 1px solid #c7d9b3;
+  padding: 0.5em 2em 0 2em;
+}
+
+#footer a,
+#footer a:visited {
+  text-decoration: none;
+  color: #607026;
+}
+
 #search-bar,
 #page-header {
   position: fixed;
@@ -363,6 +388,10 @@ body.mobile #bittercookie {
   width: calc(100% - 16pt);
   font-size: 32pt;
   line-height: 120%;
+}
+
+body.mobile #footer {
+  display: none;
 }
 
 body.mobile #menu {
