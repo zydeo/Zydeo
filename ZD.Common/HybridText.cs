@@ -9,6 +9,7 @@ namespace ZD.Common
     /// <summary>
     /// Represents text that contains a mixture of Latin characters and embedded, structured Chinese.
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("{GetPlainText()}")]
     public class HybridText : IBinSerializable
     {
         /// <summary>

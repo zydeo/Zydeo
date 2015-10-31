@@ -8,6 +8,7 @@ namespace ZD.Common
     /// <summary>
     /// One pinyin syllable, normalized into text and tone.
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("{GetDisplayString(true)}")]
     public partial class PinyinSyllable : IBinSerializable, IComparable<PinyinSyllable>
     {
         /// <summary>
