@@ -135,11 +135,8 @@ function eventWireup() {
   $("#strokeUndo").click(undoStroke);
   $("#swallowbitterpill").click(acceptCookies);
 
-  $("#navSearch").click(function () {
-    window.location = "/";
-  });
-  $("#navAbout").click(function () {
-    window.location = "/about";
+  $("#navImprint").click(function () {
+    window.location = "https://zydeo.net/imprint";
   });
 
   $("#btn-search").click(submitSearch);

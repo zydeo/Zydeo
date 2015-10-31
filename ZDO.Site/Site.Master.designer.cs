@@ -31,6 +31,15 @@ namespace Site {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl navSearch;
         
         /// <summary>
+        /// linkSearch control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor linkSearch;
+        
+        /// <summary>
         /// navAbout control.
         /// </summary>
         /// <remarks>
@@ -38,6 +47,15 @@ namespace Site {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl navAbout;
+        
+        /// <summary>
+        /// linkAbout control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor linkAbout;
         
         /// <summary>
         /// navImprint control.

@@ -30,6 +30,15 @@ body {
 #menu li {
   display: inline-block;
   list-style-type: none;
+}
+
+#menu li.imprint {
+  display: none;
+}
+
+#menu li a {
+  display: inline-block;
+  text-decoration: none;
   color: #607026;
   text-transform: uppercase;
   font-size: 120%;
@@ -37,12 +46,8 @@ body {
   cursor: default;
 }
 
-#menu li.imprint {
-  display: none;
-}
-
-#menu li.active,
-#menu li:hover {
+#menu li.active a,
+#menu li a:hover {
   background-color: #c7d9b3;
 }
 

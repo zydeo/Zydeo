@@ -23,10 +23,6 @@ function createCookie(name, value, expires, path, domain) {
 function getCookie(name) {
   var regexp = new RegExp("(?:^" + name + "|;\s*" + name + ")=(.*?)(?:;|$)", "g");
   var result = regexp.exec(document.cookie);
-  if (result === null) {
-    regexp = new RegExp(name + "=([^;]+)");
-    result = regexp.exec(document.cookie);
-  }
   return (result === null) ? null : result[1];
 }
 
@@ -139,11 +135,8 @@ function eventWireup() {
   $("#strokeUndo").click(undoStroke);
   $("#swallowbitterpill").click(acceptCookies);
 
-  $("#navSearch").click(function () {
-    window.location = "/";
-  });
-  $("#navAbout").click(function () {
-    window.location = "/about";
+  $("#navImprint").click(function () {
+    window.location = "https://zydeo.net/imprint";
   });
 
   $("#btn-search").click(submitSearch);

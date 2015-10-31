@@ -68,8 +68,8 @@ namespace Site
             TextProvider prov = TextProvider.Instance;
             Page.MetaDescription = prov.GetString(uiLang, "MetaDescription");
             Page.MetaKeywords = prov.GetString(uiLang, "MetaKeywords");
-            navSearch.InnerText = prov.GetString(uiLang, "MenuSearch");
-            navAbout.InnerText = prov.GetString(uiLang, "MenuInfo");
+            linkSearch.InnerText = prov.GetString(uiLang, "MenuSearch");
+            linkAbout.InnerText = prov.GetString(uiLang, "MenuInfo");
             navImprint.InnerText = prov.GetString(uiLang, "MenuImprint");
             bitterCookieTalks.Text = prov.GetString(uiLang, "CookieNotice");
             swallowbitterpill.InnerText = prov.GetString(uiLang, "CookieAccept");
