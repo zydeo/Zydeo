@@ -119,7 +119,7 @@ namespace Site
                 {
                     writer.AddAttribute(HtmlTextWriterAttribute.Class, "sense-meta");
                     writer.RenderBeginTag(HtmlTextWriterTag.Span);
-                    writer.WriteEncodedText(firstAndRest[0]);
+                    writer.WriteEncodedText(firstAndRest[1]);
                     writer.RenderEndTag(); // sense-meta
                 }
                 needToSplit = false;
@@ -152,7 +152,7 @@ namespace Site
                     {
                         writer.AddAttribute(HtmlTextWriterAttribute.Class, "sense-meta");
                         writer.RenderBeginTag(HtmlTextWriterTag.Span);
-                        writer.WriteEncodedText(firstAndRest[0]);
+                        writer.WriteEncodedText(firstAndRest[1]);
                         writer.RenderEndTag(); // sense-meta
                     }
                     needToSplit = false;
