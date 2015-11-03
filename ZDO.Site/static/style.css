@@ -519,6 +519,14 @@ body.mobile #staticContent {
   font-size: 30pt;
 }
 
+body.mobile #staticContent h2 {
+  font-size: 45pt;
+}
+
+body.mobile #staticContent p {
+  font-size: 30pt;
+}
+
 body.mobile #search-panel {
   margin: 0.5em;
   width: calc(100% - 1em);
