@@ -23,6 +23,10 @@ function createCookie(name, value, expires, path, domain) {
 function getCookie(name) {
   var regexp = new RegExp("(?:^" + name + "|;\s*" + name + ")=(.*?)(?:;|$)", "g");
   var result = regexp.exec(document.cookie);
+  if (result === null) {
+    regexp = new RegExp(name + "=([^;]+)");
+    result = regexp.exec(document.cookie);
+  }
   return (result === null) ? null : result[1];
 }
 
