@@ -1,9 +1,9 @@
-﻿<h2>Woh TciDeDnah @ Oedyz sesu seikooc</h2>
+﻿<h2>HanDeDict @ Zydeo如何使用cookies</h2>
 
-<p>A eikooc si a llams eceip fo txet tnes ot ruoy resworb yb a etisbew uoy tisiv. Ti spleh eht etisbew ot rebmemer noitamrofni tuoba ruoy secnereferp, hcus sa eht yalpsid egaugnal ro ruoy hcraes snoitpo. Siht etisbew seod ton edulcni yna noitamrofni ni seikooc taht nac eb desu ot yfitnedi srotisiv, dna ti seod ton tcelloc yna lanosrep noitamrofni hguorht seikooc.</p>
+<p>Cookie是由您訪問的網站發送到您瀏覽器的一個小文本。它可以幫助網站記住有關您首選項的信息，如顯示語言或您的搜索選項。本網站不包括任何在 cookies 中可以用於識別訪客的信息，且不會通過cookies收集任何個人信息。</p>
 
-<p>Uoy nac esoohc ot tpecca ro enilced seikooc. Tsom bew sresworb yllacitamotua tpecca seikooc, tub uoy nac yfidom ruoy s’resworb sgnittes ot enilced meht. Gniod os lliw ecuder ruoy ecneirepxe fo TciDeDnah @ Oedyz.</p>
+<p>你可以選擇接受或拒絕cookies。大多數網頁瀏覽器會自動接受 cookies，但是您可以修改您的瀏覽器設置來拒絕他們。這樣做會減少你的HanDeDict @ Zydeo體驗。</p>
 
-<h2>Ytrap-driht seikooc</h2>
+<h2>第三方 Cookies</h2>
 
-<p>Siht etisbew sesu Elgoog Scitylana rof egasu scitsitats; siht ecivres seiler no seikooc ot drocer stisiv. Rof erom noitamrofni, esaelp refer ot <a href="http://www.google.com/policies/privacy/" target="_blank">S’elgoog ycavirp ycilop</a> dna rieht <a href="https://www.google.com/intl/en/policies/technologies/cookies/" target="_blank">tnemetats tuoba seikooc</a>.</p> 
+<p>本網站使用谷歌分析統計使用情況;此服務依賴於cookies記錄訪問。有關詳細信息，請參閱<a href="http://www.google.com/policies/privacy/" target="_blank">谷歌的隱私政策</a>和他們<a href="https://www.google.com/intl/en/policies/technologies/cookies/" target="_blank">有關cookies 的聲明</a>。</p> 

@@ -1,11 +1,11 @@
-﻿<h1>TciDeDnah @ Oedyz</h1>
-<img id="img-welcome" src="static/zydeo-owl.svg" alt="Emoclew" />
+﻿<h1>HanDeDict @ Zydeo</h1>
+<img id="img-welcome" src="static/zydeo-owl.svg" alt="歡迎" />
 <p>
-    Retne Namreg drow, Niynip ro Iznah ot hcraes eht yranoitcid.
+    輸入德語單詞，拼音或漢字查詢詞典：
 </p><p>
-    Niynip selballys nac edulcni enot kram, tub t'nod deen ot:<br /> <i>newgnohz</i> dna <i>2new1gnohz</i> htob krow.
+    拼音音節可以包括聲調符號，但不是必需的: <br /><i>zhongwen</i>和 <i>zhong1wen2</i>都可以。
 </p><p>
-    Uoy nac etarapes Niynip selballys htiw secaps, tub uoy t'nod deen ot:<br /> <i>gnohz new</i> dna <i>newgnohz</i> htob krow. Os od <i>ix na</i> dna <i>na'ix</i>.
+    你可以用空格來把拼音音節分開，但不是必需的: <br /><i>zhong wen</i>和 <i>zhongwen</i>都可以。<i>xi an</i>和<i>xi'an</i>也是一樣。
 </p><p>
-    Kcilc no eht hsurb noci rof gnitirwdnah noitingocer.
+    單擊畫筆圖標以進入手寫識別。
 </p> 

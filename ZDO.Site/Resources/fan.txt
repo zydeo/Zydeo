@@ -1,27 +1,27 @@
 ﻿# Page titles
-TitleMain					TciDeDnah @ Oedyz Namreg-eSenihc yranoitcid
-TitleSearchChinese			{0} - Namreg noitalsnart - TciDeDnah @ Oedyz Namreg-eSenihc yranoitcid
-TitleSearchGerman			{0} - Esenihc noitalsnart - TciDeDnah @ Oedyz Namreg-eSenihc yranoitcid
-TitleAbout					Tuoba TciDeDnah @ Oedyz
-TitleCookies				Woh TciDeDnah @ Oedyz sesu seikooc
+TitleMain					HanDeDict @ Zydeo漢德詞典
+TitleSearchChinese			{0}-德語翻譯-HanDeDict @ Zydeo漢德詞典
+TitleSearchGerman			{0}-漢語翻譯-HanDeDict @ Zydeo漢德詞典
+TitleAbout					關於HanDeDict @ Zydeo
+TitleCookies				HanDeDict @ Zydeo如何使用cookies
 
 # Metainformation: description and keywords
-MetaDescription				TciDeDnah @ Oedyz: Hcraes eht TciDeDnah ecruos-nepo Namreg-eSenihc yranoitcid enilno.
-MetaKeywords				TciDeDnah, Oedyz, Esenihc, Namreg, yranoitcid, eerf, ecruos-nepo
+MetaDescription				HanDeDict @ Zydeo：在線搜索HanDeDict開源漢德詞典。
+MetaKeywords				HanDeDict，Zydeo，漢語，德語，詞典，免費、 開源
 
 # Page framework: menus etc.
-MenuSearch					Hcraes
-MenuInfo					Tuoba
-MenuImprint					Tnirpmi
-CookieNotice				Siht etisbew seiler no seikooc rof emos fo sti ytilanoitcnuf. Yb gnisu eht etis, uoy eerga ot sti esu fo seikooc.
-CookieAccept				Tog ti
-CookieLearnMore				Nrael erom
+MenuSearch					搜索
+MenuInfo					關於
+MenuImprint					版本說明
+CookieNotice				本網站因其部分功能而依賴於cookies。通過使用我們的網站，您同意我們使用Cookies。
+CookieAccept				知道了
+CookieLearnMore				瞭解更多
 
 # Handwriting recognition box
-BtnStrokeClear				Raelc
-BtnStrokeUndo				Odnu
+BtnStrokeClear				清除
+BtnStrokeUndo				撤銷
 
 # Main search box
-TxtSearchPlacholder			Iznah, Niynip ro Namreg drow
+TxtSearchPlacholder			漢字、 拼音或德語詞語
 
 

@@ -1,11 +1,11 @@
 ﻿<h1>HanDeDict @ Zydeo</h1>
-<img id="img-welcome" src="static/zydeo-owl.svg" alt="Welcome" />
+<img id="img-welcome" src="static/zydeo-owl.svg" alt="欢迎" />
 <p>
-    Enter German word, Pinyin or Hanzi to search the dictionary.
+    输入德语单词，拼音或汉字查询词典：
 </p><p>
-    Pinyin syllables can include tone mark, but don't need to:<br /> <i>zhongwen</i> and <i>zhong1wen2</i> both work.
+    拼音音节可以包括声调符号，但不是必需的: <br /><i>zhongwen</i>和 <i>zhong1wen2</i>都可以。
 </p><p>
-    You can separate Pinyin syllables with spaces, but you don't need to:<br /> <i>zhong wen</i> and <i>zhongwen</i> both work.So do <i>xi an</i> and <i>xi'an</i>.
+    你可以用空格来把拼音音节分开，但不是必需的: <br /><i>zhong wen</i>和 <i>zhongwen</i>都可以。<i>xi an</i>和<i>xi'an</i>也是一样。
 </p><p>
-    Click on the brush icon for handwriting recognition.
+    单击画笔图标以进入手写识别。
 </p> 

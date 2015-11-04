@@ -1,9 +1,9 @@
-﻿<h2>How HanDeDict @ Zydeo uses cookies</h2>
+﻿<h2>HanDeDict @ Zydeo如何使用cookies</h2>
 
-<p>A cookie is a small piece of text sent to your browser by a website you visit.It helps the website to remember information about your preferences, such as the display language or your search options.This website does not include any information in cookies that can be used to identify visitors, and it does not collect any personal information through cookies.</p>
+<p>Cookie是由您访问的网站发送到您浏览器的一个小文本。它可以帮助网站记住有关您首选项的信息，如显示语言或您的搜索选项。本网站不包括任何在 cookies 中可以用于识别访客的信息，且不会通过cookies收集任何个人信息。</p>
 
-<p>You can choose to accept or decline cookies.Most web browsers automatically accept cookies, but you can modify your browser’s settings to decline them.Doing so will reduce your experience of HanDeDict @ Zydeo.</p>
+<p>你可以选择接受或拒绝cookies。大多数网页浏览器会自动接受 cookies，但是您可以修改您的浏览器设置来拒绝他们。这样做会减少你的HanDeDict @ Zydeo体验。</p>
 
-<h2>Third-party cookies</h2>
+<h2>第三方 Cookies</h2>
 
-<p>This website uses Google Analytics for usage statistics; this service relies on cookies to record visits.For more information, please refer to <a href="http://www.google.com/policies/privacy/" target="_blank">Google’s privacy policy</a> and their <a href="https://www.google.com/intl/en/policies/technologies/cookies/" target="_blank">statement about cookies</a>.</p> 
+<p>本网站使用谷歌分析统计使用情况;此服务依赖于cookies记录访问。有关详细信息，请参阅<a href="http://www.google.com/policies/privacy/" target="_blank">谷歌的隐私政策</a>和他们<a href="https://www.google.com/intl/en/policies/technologies/cookies/" target="_blank">有关cookies 的声明</a>。</p> 

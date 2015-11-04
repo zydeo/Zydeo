@@ -1,21 +1,21 @@
-﻿<h2>What is HanDeDict?</h2>
+﻿<h2>什么是HanDeDict?</h2>
 
-<p>HanDeDict is an open-source, collaboratively edited Chinese-German dictionary, licensed under Create Commons (<a href="http://creativecommons.org/licenses/by-sa/2.0/de/" target="_blank">CC BY-SA 2.0 DE</a>).It started out as a translation of the CEDICT Chinese-English dictionary, and was actively maintained with the support of the <a href="http://www.chinaboard.de/willkommen.html" target="_blank">Chinesisch-Deutsche Gesellschaft e.V. Hamburg</a> between 2006 and 2011.In August 2015, the website of HanDeDict went offline; the <a href="https://web.archive.org/web/20150325174145/http:/www.handedict.de/chinesisch_deutsch.php?mode=about" target="_blank">last snapshot</a> on the Internet Archive’s Wayback Machine is from August 1, 2015.The text file that contains the entire dictionary in its most recent form can be <a href="https://github.com/zydeo/HanDeDict/" target="_blank">downloaded from Github.</a>The website you are viewing now is based on this file.</p>
+<p>HanDeDict是一种开源的，协作编辑而成的汉语-德语词典,由Create Commons批准（<a href="http://creativecommons.org/licenses/by-sa/2.0/de/" target="_blank">CC BY-SA 2.0 DE</a>）它从作为CEDICT 汉英词典的一种翻译开始，2006年至 2011 年间在<a href="http://www.chinaboard.de/willkommen.html" target="_blank">Chinesisch-Deutsche Gesellschaft e.V. Hamburg</a>的支持下被积极地保持下来。2015 年 8 月，HanDeDict的网站下线;互联网档案馆倒流机器上的<a href="https://web.archive.org/web/20150325174145/http:/www.handedict.de/chinesisch_deutsch.php?mode=about" target="_blank">最后一个快照</a>来自2015 年 8 月 1 日。包含有最新形式的整个词典的文本文件可以<a href="https://github.com/zydeo/HanDeDict/" target="_blank">在Github上下载。</a>您正在查看的网站基于这个文件。</p>
 
-<h2>What is Zydeo?</h2>
+<h2>什么是Zydeo?</h2>
 
-<p>In its original form, <a href="https://zydeo.net/" target="_blank">Zydeo</a> is an open-source Chinese-English dictionary for Windows, based on <a href="http://cc-cedict.org/wiki/" target="_blank">CC-CEDICT</a>.I created it for my own delight, as a hobby project that allowed me to explore a minimalist approach to user interfaces.Occasionally, I post about it over on the <a href="https://blog.zydeo.net/" target="_blank">Zydeo blog</a>.You can find the <a href="https://github.com/zydeo/Zydeo" target="_blank">source code</a> on Github.</p>
+<p>在其原本的形式，<a href="https://zydeo.net/" target="_blank">Zydeo</a>是一种基于 <a href="http://cc-cedict.org/wiki/" target="_blank">CC CEDICT </a>的适合Windows的开放源码的汉英词典。我为了自己开心而创建了它，作为一个爱好项目，它让我探索到了用户界面的极简办法。偶尔，我会在<a href="https://blog.zydeo.net/" target="_blank">Zydeo博客</a>上发布关于它的内容 。你可以在 Github 上找到<a href="https://github.com/zydeo/Zydeo" target="_blank">源代码</a>。</p>
 
-<p>I did not consider creating an online version for its own sake; there are countless websites built on CEDICT out there.But I will soon launch a project similar to HanDeDict: a translation of CEDICT into a different language, open for collaborative editing.When I learned that the HanDeDict website disappeared, I realized I could repurpose existing work and launch this site to make HanDeDict available online again.The result is HanDeDict @ Zydeo.</p>
+<p>我并不考虑为其自身的缘故而创建一个在线版本;已经有无数的网站建立在CEDICT上。但我很快就会发行一个类似于HanDeDict的项目: 一种将CEDICT译成不同语言的翻译，为协同编辑开放。当我得知HanDeDict网站消失了时，我意识到我可以重新利用现有的工作发行这个网站，使HanDeDict可以再次在线使用。其结果便是HanDeDict @ Zydeo。</p>
 
-<h2>The future</h2>
+<h2>未来</h2>
 
-<p>In its current, initial form, this website allows you to search HanDeDict.I will be releasing small improvements over the next months.In particular, the handwriting recognition component (based on a port of Jordan Kiang's <a href="http://www.kiang.org/jordan/software/hanzilookup/" target="_blank">HanziLookup</a> by <a href="http://jabtunes.com/notation/chinesestroke.html" target="_blank">Zz85</a>) could use some love.
+<p>在其目前最初的形式，本网站允许您搜索HanDeDict。我将在后面几个月发布小的改进。尤其是手写识别组件 (基于由Zz85编辑的有关Jordan Kiang的<a href="http://www.kiang.org/jordan/software/hanzilookup/" target="_blank">HanziLookup</a>的端口)仍然需要倾注更多的努力。
 </p>
 
-<p>Eventually the site will include an online editor that allows everyone to improve translations and add new headwords.I hope to attract contributors who will resurrect HanDeDict and continue to expand and improve it from where the original team of creators left off in 2011.</p>
+<p>最终该网站将包括一个在线编辑器，它允许每个人来改进翻译并添加新的词目。我希望能吸引到可以复兴HanDeDict，并从2011年创作者的原始团队离开的地方开始对其进行继续扩大和改善的参与者们。</p>
 
-<h2>How to get in touch</h2>
+<h2>联系方式</h2>
 <p>
-E-mail: zydeodict-[at]-gmail-[dot]-com<br /> Twitter: <a href="https://twitter.com/ZydeoDict" target="_blank">@ZydeoDict</a>
+电子邮件: zydeodict-[at]-gmail-[dot]-com<br /> Twitter: <a href="https://twitter.com/ZydeoDict" target="_blank">@ZydeoDict</a>
 </p> 
