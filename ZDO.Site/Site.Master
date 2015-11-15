@@ -22,7 +22,7 @@
 <nav id="menu">
   <div id="menu-horiz">
     <ul>
-      <li runat="server" id="navSearch"><a href="/" id="linkSearch" runat="server">*Search</a></li><li runat="server" id="navAbout"><a href="/about" id="linkAbout" runat="server">*About</a></li><li runat="server" id="navImprint" class="imprint">*Imprint</li>
+      <li runat="server" id="navSearch"><a href="/" id="linkSearch" runat="server">*Search</a></li><li runat="server" id="navOptions"><a href="/options" id="lnkOptions" runat="server">*Options</a></li><li runat="server" id="navAbout"><a href="/about" id="linkAbout" runat="server">*About</a></li><li runat="server" id="navImprint" class="imprint">*Imprint</li>
     </ul>
     <div id="langsel">
       <div id="langsel-inner">
@@ -46,16 +46,26 @@
   <a id="swallowbitterpill" href="#" runat="server">*Got it</a>
   <a id="cookierecipe" href="~/cookies" target="_blank" runat="server">*Learn more</a>
 </div>
+<!-- Includes for every page -->
 <script src='<%=ResolveUrl("~/lib/jquery-2.1.4.min.js") %>'></script>
 <script src='<%=ResolveUrl("~/lib/jquery.tooltipster.min.js") %>'></script>
-<script src='<%=ResolveUrl("~/lib/shortstraw.js") %>'></script>
-<script src='<%=ResolveUrl("~/lib/chinesestrokes.js") %>'></script>
-<script src='<%=ResolveUrl("~/js/recog.js") %>'></script>
-<script src='<%=ResolveUrl("~/js/ui-en.js") %>'></script>
-<script src='<%=ResolveUrl("~/js/ui-de.js") %>'></script>
-<script src='<%=ResolveUrl("~/js/ui-jian.js") %>'></script>
-<script src='<%=ResolveUrl("~/js/ui-fan.js") %>'></script>
-<script src='<%=ResolveUrl("~/js/zh.js") %>'></script>
+<script src='<%=ResolveUrl("~/js-1.1/ui-en.js") %>'></script>
+<script src='<%=ResolveUrl("~/js-1.1/ui-de.js") %>'></script>
+<script src='<%=ResolveUrl("~/js-1.1/ui-jian.js") %>'></script>
+<script src='<%=ResolveUrl("~/js-1.1/ui-fan.js") %>'></script>
+<script src='<%=ResolveUrl("~/js-1.1/common.js") %>'></script>
+<!-- Page-specific includes -->
+<% if(PageName == "search") %>
+<% { %>
+<script src='<%=ResolveUrl("~/js-1.1/shortstraw.js") %>'></script>
+<script src='<%=ResolveUrl("~/js-1.1/chinesestrokes.js") %>'></script>
+<script src='<%=ResolveUrl("~/js-1.1/recog.js") %>'></script>
+<script src='<%=ResolveUrl("~/js-1.1/lookup.js") %>'></script>
+<% } %>
+<% else if(PageName == "options") %>
+<% { %>
+<script src='<%=ResolveUrl("~/js-1.1/options.js") %>'></script>
+<% } %>
 
 <script>
   (function (i, s, o, g, r, a, m) {

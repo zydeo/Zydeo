@@ -10,11 +10,7 @@ namespace Site
     public partial class Master : System.Web.UI.MasterPage
     {
         private string uiLang = "de";
-
-        public string UILang
-        {
-            get { return uiLang; }
-        }
+        public string UILang { get { return uiLang; } }
 
         private void determineLanguage()
         {
@@ -48,12 +44,29 @@ namespace Site
             }
         }
 
+        private string pageName = null;
+        public string PageName { get { return pageName; } }
+
+        private void determinePage(string requestPath)
+        {
+            if (requestPath == @"/Default.aspx") pageName = "search";
+            else if (requestPath == @"/Statics.aspx")
+            {
+                string page = Request.Params["page"];
+                if (page == "about") pageName = "about";
+                else if (page == "options") pageName = "options";
+                else if (page == "cookies") pageName = "cookies";
+            }
+        }
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
 
             // What UI language are we going by?
             determineLanguage();
+            // Which page are we showing?
+            determinePage(Request.Path);
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -77,20 +90,15 @@ namespace Site
             cookierecipe.InnerText = prov.GetString(uiLang, "CookieLearnMore");
 
             // Disable "loading" class on body unless loading Default.aspx for the first time
-            bool isDefault = Request.Path == @"/Default.aspx";
-            if (!isDefault)
-            {
+            if (pageName != "search")
                 theBody.Attributes["class"] = theBody.Attributes["class"].Replace("loading", "");
-            }
             // Make relevant menu item "active"
-            if (Request.Path == @"/Default.aspx")
+            if (pageName == "search")
                 navSearch.Attributes["class"] = navSearch.Attributes["class"] + " active";
-            else if (Request.Path == @"/Statics.aspx")
-            {
-                string page = Request.Params["page"];
-                if (page == "about")
-                    navAbout.Attributes["class"] = navAbout.Attributes["class"] + " active";
-            }
+            else if (pageName == "about")
+                navAbout.Attributes["class"] = navAbout.Attributes["class"] + " active";
+            else if (pageName == "options")
+                navOptions.Attributes["class"] = navAbout.Attributes["class"] + " active";
         }
 
         public string GetGACode()

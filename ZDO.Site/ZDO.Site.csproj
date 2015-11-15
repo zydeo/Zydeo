@@ -61,16 +61,14 @@
   <ItemGroup>
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
-    <Content Include="js\recog.js" />
-    <Content Include="js\ui-de.js" />
-    <Content Include="js\ui-en.js" />
-    <Content Include="js\ui-jian.js" />
-    <Content Include="js\ui-fan.js" />
-    <Content Include="js\zh.js" />
-    <Content Include="lib\chinesestrokes.js" />
+    <Content Include="js-1.1\recog.js" />
+    <Content Include="js-1.1\ui-de.js" />
+    <Content Include="js-1.1\ui-en.js" />
+    <Content Include="js-1.1\ui-jian.js" />
+    <Content Include="js-1.1\ui-fan.js" />
+    <Content Include="js-1.1\zh.js" />
     <Content Include="lib\jquery-2.1.4.min.js" />
     <Content Include="lib\jquery.tooltipster.min.js" />
-    <Content Include="lib\shortstraw.js" />
     <Content Include="OneResultCtrl.ascx" />
     <EmbeddedResource Include="Resources\en.txt" />
     <EmbeddedResource Include="Resources\de.txt" />
