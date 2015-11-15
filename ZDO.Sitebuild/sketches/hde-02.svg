@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1200"
+   height="1000"
+   viewBox="0 0 1200.0001 1000"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   style="shape-rendering:crispEdges"
+   sodipodi:docname="hde-02.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.0874958"
+     inkscape:cx="628.32498"
+     inkscape:cy="747.14087"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer3"
+     showgrid="false"
+     units="px"
+     objecttolerance="20"
+     inkscape:showpageshadow="false"
+     inkscape:window-width="1217"
+     inkscape:window-height="697"
+     inkscape:window-x="55"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:snap-page="true"
+     inkscape:snap-global="true" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Backround"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-52.362216)"
+     sodipodi:insensitive="true">
+    <rect
+       style="fill:#b4ca65;fill-opacity:1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect4136"
+       width="1199.9999"
+       height="39.000004"
+       x="-1.5273006e-005"
+       y="50.059399" />
+    <rect
+       style="fill:#c7d9b3;fill-opacity:1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect4142"
+       width="112.41329"
+       height="38.923309"
+       x="545.94391"
+       y="50.059399" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="463.79132"
+       y="77.993156"
+       id="text4138"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4140"
+         x="463.79132"
+         y="77.993156"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20.00000191px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#607026;fill-opacity:1">SEARCH    SETTINGS    ABOUT</tspan></text>
+    <rect
+       style="fill:#c7d9b3;fill-opacity:1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect4144"
+       width="1200"
+       height="44.046005"
+       x="-6.8069608e-006"
+       y="89.050087" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="480.27097"
+       y="122.08692"
+       id="text4146"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4148"
+         x="480.27097"
+         y="122.08692"
+         style="font-size:30.00000381px;fill:#607026;fill-opacity:1">Lookup settings</tspan></text>
+    <rect
+       style="fill:#fafafa;fill-opacity:1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect4150"
+       width="1200"
+       height="919.26611"
+       x="-2.3448142e-006"
+       y="133.09608" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="ContentFrame"
+     sodipodi:insensitive="true"
+     style="display:none">
+    <rect
+       style="fill:#fafafa;fill-opacity:1;stroke:#000000;stroke-width:0.90619516;stroke-miterlimit:4;stroke-dasharray:0.9061952, 3.62478082;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4153"
+       width="639.09387"
+       height="919.35992"
+       x="280.45306"
+       y="80.686989" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Content">
+    <text
+       sodipodi:linespacing="125%"
+       id="text4198"
+       y="139.55093"
+       x="346.81702"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.00000381px;font-family:Georgia;-inkscape-font-specification:Georgia;fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-opacity:0"
+         y="139.55093"
+         x="346.81702"
+         id="tspan4200"
+         sodipodi:role="line">Script</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4210"
+       y="146.49605"
+       x="559.26965"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.00000381px;font-family:Georgia;-inkscape-font-specification:Georgia;fill:#303030;fill-opacity:1"
+         y="146.49605"
+         x="559.26965"
+         id="tspan4212"
+         sodipodi:role="line">Script</tspan></text>
+    <g
+       id="g4267"
+       transform="translate(-39.999997,13.725473)">
+      <text
+         sodipodi:linespacing="125%"
+         id="text4214"
+         y="179.91794"
+         x="367.14304"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20.00000191px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1"
+           y="179.91794"
+           x="367.14304"
+           id="tspan4216"
+           sodipodi:role="line">Simplified</tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4226"
+         y="220.3119"
+         x="381.8266"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.00000381px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1"
+           y="220.3119"
+           x="381.8266"
+           id="tspan4228"
+           sodipodi:role="line">汉语</tspan></text>
+    </g>
+    <g
+       id="g4261"
+       transform="translate(-36.072275,13.725473)">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="535.65533"
+         y="179.91794"
+         id="text4218"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4220"
+           x="535.65533"
+           y="179.91794"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20.00000191px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1">Traditional</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="553.7583"
+         y="220.3119"
+         id="text4230"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4232"
+           x="553.7583"
+           y="220.3119"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.00000381px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1">漢語</tspan></text>
+    </g>
+    <g
+       id="g4478"
+       transform="translate(0,13.725473)">
+      <rect
+         y="152.50945"
+         x="667.29681"
+         height="86.394913"
+         width="249.50648"
+         id="rect4238"
+         style="fill:#ffe4cc;fill-opacity:1;stroke:#ffffff;stroke-width:0.99275458;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0" />
+      <g
+         transform="translate(-16.09853,0)"
+         id="g4278">
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="788.29205"
+           y="179.91794"
+           id="text4222"
+           sodipodi:linespacing="125%"><tspan
+             sodipodi:role="line"
+             id="tspan4224"
+             x="788.29205"
+             y="179.91794"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20.00000191px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1">Both</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="736.26764"
+           y="220.3119"
+           id="text4234"
+           sodipodi:linespacing="125%"><tspan
+             sodipodi:role="line"
+             id="tspan4236"
+             x="736.26764"
+             y="220.3119"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.00000381px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1">汉语 • 漢語</tspan></text>
+      </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="522.75342"
+       y="344.56052"
+       id="text4298"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4300"
+         x="522.75342"
+         y="344.56052"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.00000381px;font-family:Georgia;-inkscape-font-specification:Georgia;fill:#303030;fill-opacity:1">Tone colors</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4316"
+       y="394.20325"
+       x="349.19958"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20.00000191px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1"
+         y="394.20325"
+         x="349.19958"
+         id="tspan4318"
+         sodipodi:role="line">None</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4320"
+       y="434.59717"
+       x="300.68912"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.00000381px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1"
+         y="434.59717"
+         x="300.68912"
+         id="tspan4322"
+         sodipodi:role="line">天人很大了</tspan></text>
+    <rect
+       y="363.3989"
+       x="491.03967"
+       height="86.138901"
+       width="216.97656"
+       id="rect4476"
+       style="fill:#ffe4cc;fill-opacity:1;stroke:#ffffff;stroke-width:0.92440641;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0"
+       onclick="" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="521.25452"
+       y="434.59717"
+       id="text4328"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4330"
+         x="521.25452"
+         y="434.59717"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.00000381px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1"><tspan
+   style="fill:#e30000;fill-opacity:1"
+   id="tspan4346">天</tspan><tspan
+   style="fill:#02b31c;fill-opacity:1"
+   id="tspan4376">人</tspan><tspan
+   style="fill:#1510f0;fill-opacity:1"
+   id="tspan4390">很</tspan><tspan
+   style="fill:#8b00bf;fill-opacity:1"
+   id="tspan4404">大</tspan>了</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4332"
+       y="434.59717"
+       x="741.82001"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.00000381px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1"
+         y="434.59717"
+         x="741.82001"
+         id="tspan4334"
+         sodipodi:role="line"><tspan
+   style="fill:#ff0000;fill-opacity:1"
+   id="tspan4418">天</tspan><tspan
+   style="fill:#d89000;fill-opacity:1"
+   id="tspan4432">人</tspan><tspan
+   style="fill:#00a000;fill-opacity:1"
+   id="tspan4446">很</tspan><tspan
+   style="fill:#0000ff;fill-opacity:1"
+   id="tspan4462">大</tspan>了</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="569.13971"
+       y="394.20325"
+       id="text4336"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4338"
+         x="569.13971"
+         y="394.20325"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20.00000191px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1">Pleco</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4340"
+       y="394.20325"
+       x="787.13251"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20.00000191px;font-family:'Noto Sans S Chinese';-inkscape-font-specification:'Noto Sans S Chinese';fill:#303030;fill-opacity:1"
+         y="394.20325"
+         x="787.13251"
+         id="tspan4342"
+         sodipodi:role="line">MDBG</tspan></text>
+    <rect
+       style="fill:#ffc898;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4486"
+       width="635.97461"
+       height="6.4047966"
+       x="280.91284"
+       y="159.66457"
+       ry="0" />
+    <rect
+       ry="0"
+       y="357.09518"
+       x="280.91284"
+       height="6.4047966"
+       width="635.97461"
+       id="rect4488"
+       style="fill:#ffc898;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+  </g>
+</svg>
