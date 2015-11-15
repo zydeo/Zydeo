@@ -39,19 +39,7 @@ var uiArr = uiDe;
 $(document).ready(function () {
   mobileOrFull();
   initGui();
-  initStrokes();
-
-  // Debug: to work on strokes input
-  //showStrokeInput();
-
-  eventWireup();
-
-  $("#txtSearch").focus();
-  $("#txtSearch").select();
-
-  // Debug: to work on opening screen
-  //$("#resultsHolder").css("display", "none");
-  //$("#welcomeScreen").css("display", "block");
+  globalEventWireup();
 });
 
 function mobileOrFull() {
@@ -92,77 +80,6 @@ function initGui() {
   if (uiLang === "en") uiArr = uiEn;
   else if (uiLang === "jian") uiArr = uiJian;
   else if (uiLang === "fan") uiArr = uiFan;
-
-  if (!isMobile) {
-    $("#img-write").tooltipster({
-      content: $("<span>" + uiArr["tooltip-btn-brush"] + "</span>")
-    });
-    $("#img-search").tooltipster({
-      content: $("<span>" + uiArr["tooltip-btn-search"] + "</span>")
-    });
-  }
-
-}
-
-function showStrokeInput() {
-  if (!isMobile) {
-    var searchPanelOfs = $("#search-panel").offset();
-    var searchPanelWidth = $("#search-panel").width();
-    var searchPanelHeight = $("#search-panel").height();
-    var strokeInputWidth = $("#stroke-input").outerWidth();
-    $("#stroke-input").css("top", searchPanelOfs.top + searchPanelHeight + 1);
-    $("#stroke-input").css("left", searchPanelOfs.left + searchPanelWidth - strokeInputWidth + 2);
-    $("#stroke-input").css("display", "block");
-    $("#suggestions").html("<br/><br/>");
-  }
-  else {
-    $("#stroke-input").css("display", "block");
-    $("#suggestions").html("<br/>");
-  }
-  var strokeCanvasWidth = $("#stroke-input-canvas").width();
-  $("#stroke-input-canvas").css("height", strokeCanvasWidth);
-  var canvasElement = document.getElementById("stroke-input-canvas");
-  canvasElement.width = strokeCanvasWidth;
-  canvasElement.height = strokeCanvasWidth;
-  $("#suggestions").css("height", $("#suggestions").height());
-  clearCanvas();
-}
-
-function hideStrokeInput() {
-  $("#stroke-input").css("display", "none");
-}
-
-function eventWireup() {
-  $("#btn-menu").click(toggleMenu);
-  $("#btn-clear").click(clearSearch);
-  $("#btn-write").click(function () {
-    if ($("#stroke-input").css("display") == "block") {
-      hideStrokeInput();
-      $("#btn-write").attr("class", "");
-    }
-    else {
-      showStrokeInput();
-      $("#btn-write").attr("class", "active");
-    }
-  });
-  $("#strokeClear").click(clearCanvas);
-  $("#strokeUndo").click(undoStroke);
-  $("#swallowbitterpill").click(acceptCookies);
-
-  $("#navImprint").click(function () {
-    window.location = "https://zydeo.net/imprint";
-  });
-
-  $("#btn-search").click(submitSearch);
-  $("#txtSearch").keyup(function (e) {
-    if (e.keyCode == 13) {
-      submitSearch();
-      return false;
-    }
-  });
-  $("#txtSearch").change(function () {
-    appendNotOverwrite = true;
-  });
 }
 
 function acceptCookies() {
@@ -170,9 +87,12 @@ function acceptCookies() {
   localStorage.setItem("cookies", "go");
 }
 
-function clearSearch() {
-  $("#txtSearch").val("");
-  $("#txtSearch").focus();
+function globalEventWireup() {
+  $("#btn-menu").click(toggleMenu);
+  $("#swallowbitterpill").click(acceptCookies);
+  $("#navImprint").click(function () {
+    window.location = "https://zydeo.net/imprint";
+  });
 }
 
 function toggleMenu() {
@@ -189,20 +109,4 @@ function toggleMenu() {
     $("#img-menu").attr("src", imagePath + "/close.svg");
     $("#btn-menu").css("background-color", "#b4ca65");
   }
-}
-
-function submitSearch() {
-  'use strict';
-  var form;
-  form = $('<form />', {
-    action: '/',
-    method: 'post',
-    style: 'display: none;'
-  });
-  $('<input />', {
-    type: 'hidden',
-    name: 'query',
-    value: $('#txtSearch').val()
-  }).appendTo(form);
-  form.appendTo('body').submit();
 }
