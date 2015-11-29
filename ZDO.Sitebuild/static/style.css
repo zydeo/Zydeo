@@ -219,10 +219,15 @@ body {
   font-size: 1.5em;
 }
 
-.optionItem.selected,
+.optionItem.selected {
+  background-color: #ffe4cc;
+}
+
+/* Interferes with explicit animation from JS
 .optionItem:hover {
   background-color: #ffe4cc;
 }
+*/
 
 #search-panel {
   margin-left: auto;
