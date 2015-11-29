@@ -189,6 +189,45 @@ body {
   border-bottom: 1.1pt dotted #ccc;
 }
 
+.optionHead {
+  width: 100%;
+  position: relative;
+  float: left;
+  clear: left;
+  text-align: center;
+  font-family: Neuton;
+  font-size: 2.5em;
+  margin-top: 30pt;
+  border-bottom: 4pt solid #ffc898;
+}
+
+.optionBody {
+  display: table;
+  width: 100%;
+  margin-bottom: 10pt;
+}
+
+.optionItem {
+  display: table-cell;
+  text-align: center;
+  padding: 5pt 0 5pt 0;
+  font-size: 1.5em;
+  cursor: default;
+}
+
+.optionItem .optionExampleHan {
+  font-size: 1.5em;
+}
+
+.optionItem.selected {
+  background-color: #ffe4cc;
+}
+
+/* Interferes with explicit animation from JS
+.optionItem:hover {
+  background-color: #ffe4cc;
+}
+*/
 
 #search-panel {
   margin-left: auto;
@@ -723,6 +762,38 @@ body.mobile #welcomeScreen p {
   border-radius: 0.3em;
   -moz-border-radius: 0.3em;
   -webkit-border-radius: 0.3em;
+}
+
+.toneColorsPleco .tone1 {
+  color: #e30000;
+}
+
+.toneColorsPleco .tone2 {
+  color: #02b31c;
+}
+
+.toneColorsPleco .tone3 {
+  color: #1510f0;
+}
+
+.toneColorsPleco .tone4 {
+  color: #8b00bf;
+}
+
+.toneColorsDummitt .tone1 {
+  color: #f41d2f;
+}
+
+.toneColorsDummitt .tone2 {
+  color: #f9761b;
+}
+
+.toneColorsDummitt .tone3 {
+  color: #97cd5d;
+}
+
+.toneColorsDummitt .tone4 {
+  color: #589bc8;
 }
 
 /* ------------------------------- LOADING ------------------------------- */

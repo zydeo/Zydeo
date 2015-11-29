@@ -12,14 +12,18 @@ namespace Site
     {
         private readonly CedictResult res;
         private readonly ICedictEntryProvider prov;
+        private readonly UiScript script;
+        private readonly UiTones tones;
 
         public OneResultCtrl()
         { }
 
-        public OneResultCtrl(CedictResult res, ICedictEntryProvider prov)
+        public OneResultCtrl(CedictResult res, ICedictEntryProvider prov, UiScript script, UiTones tones)
         {
             this.res = res;
             this.prov = prov;
+            this.script = script;
+            this.tones = tones;
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -31,21 +35,33 @@ namespace Site
         {
             CedictEntry entry = prov.GetEntry(res.EntryId);
 
-            writer.AddAttribute(HtmlTextWriterAttribute.Class, "entry");
+            string entryClass = "entry";
+            if (tones == UiTones.Pleco) entryClass += " toneColorsPleco";
+            else if (tones == UiTones.Dummitt) entryClass += " toneColorsDummitt";
+            writer.AddAttribute(HtmlTextWriterAttribute.Class, entryClass);
             writer.RenderBeginTag(HtmlTextWriterTag.Div); // <div class="entry">
 
-            writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-simp");
-            writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-simp">
-            writer.WriteEncodedText(entry.ChSimpl);
-            writer.RenderEndTag(); // <span class="hw-simp">
-            writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-sep");
-            writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-sep">
-            writer.WriteEncodedText("•");
-            writer.RenderEndTag(); // <span class="hw-sep">
-            writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-trad");
-            writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-trad">
-            writer.WriteEncodedText(entry.ChTrad);
-            writer.RenderEndTag(); // <span class="hw-trad">
+            if (script != UiScript.Trad)
+            {
+                writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-simp");
+                writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-simp">
+                renderHanzi(entry, true, writer);
+                writer.RenderEndTag(); // <span class="hw-simp">
+            }
+            if (script == UiScript.Both)
+            {
+                writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-sep");
+                writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-sep">
+                writer.WriteEncodedText("•");
+                writer.RenderEndTag(); // <span class="hw-sep">
+            }
+            if (script != UiScript.Simp)
+            {
+                writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-trad");
+                writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-trad">
+                renderHanzi(entry, false, writer);
+                writer.RenderEndTag(); // <span class="hw-trad">
+            }
             writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-pinyin");
             writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-pinyin">
             bool firstSyll = true;
@@ -66,6 +82,37 @@ namespace Site
             writer.RenderEndTag(); // <div class="senses">
 
             writer.RenderEndTag(); // <div class="entry">
+        }
+
+        private void renderHanzi(CedictEntry entry, bool simp, HtmlTextWriter writer)
+        {
+            string hzStr = simp ? entry.ChSimpl : entry.ChTrad;
+            for (int i = 0; i != hzStr.Length; ++i)
+            {
+                char c = hzStr[i];
+                int pyIx = entry.HanziPinyinMap[i];
+                PinyinSyllable py = null;
+                if (pyIx != -1) py = entry.Pinyin[pyIx];
+                // Class to put on hanzi
+                string cls = "";
+                // We mark up tones if needed
+                if (tones != UiTones.None && py != null)
+                {
+                    if (py.Tone == 1) cls = "tone1";
+                    else if (py.Tone == 2) cls = "tone2";
+                    else if (py.Tone == 3) cls = "tone3";
+                    else if (py.Tone == 4) cls = "tone4";
+                    // -1 for unknown, and 0 for neutral: we don't mark up anything
+                }
+                // Render with enclosing span if we have a relevant class
+                if (!string.IsNullOrEmpty(cls))
+                {
+                    writer.AddAttribute("class", cls);
+                    writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                }
+                writer.WriteEncodedText(c.ToString());
+                if (!string.IsNullOrEmpty(cls)) writer.RenderEndTag();
+            }
         }
 
         private static string[] ixStrings = new string[]

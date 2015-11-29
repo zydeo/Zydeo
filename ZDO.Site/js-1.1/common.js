@@ -30,6 +30,14 @@ function getCookie(name) {
   return (result === null) ? null : result[1];
 }
 
+function rgb2hex(col) {
+  col = col.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+  function hex(x) {
+    return ("0" + parseInt(x).toString(16)).slice(-2);
+  }
+  return "#" + hex(col[1]) + hex(col[2]) + hex(col[3]);
+}
+
 // --------------- END HELPERS ----------------------
 
 var isMobile = false;

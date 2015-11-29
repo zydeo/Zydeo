@@ -61,13 +61,18 @@
   <ItemGroup>
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="js-1.1\chinesestrokes.js" />
+    <Content Include="js-1.1\common.js" />
+    <Content Include="js-1.1\lookup.js" />
+    <Content Include="js-1.1\options.js" />
     <Content Include="js-1.1\recog.js" />
+    <Content Include="js-1.1\shortstraw.js" />
     <Content Include="js-1.1\ui-de.js" />
     <Content Include="js-1.1\ui-en.js" />
     <Content Include="js-1.1\ui-jian.js" />
     <Content Include="js-1.1\ui-fan.js" />
-    <Content Include="js-1.1\zh.js" />
     <Content Include="lib\jquery-2.1.4.min.js" />
+    <Content Include="lib\jquery.color-2.1.2.min.js" />
     <Content Include="lib\jquery.tooltipster.min.js" />
     <Content Include="OneResultCtrl.ascx" />
     <EmbeddedResource Include="Resources\en.txt" />
@@ -88,6 +93,10 @@
     <EmbeddedResource Include="Statics.fan\cookies.txt" />
     <EmbeddedResource Include="Statics.jian\about.txt" />
     <EmbeddedResource Include="Statics.jian\cookies.txt" />
+    <EmbeddedResource Include="Statics.de\options.txt" />
+    <EmbeddedResource Include="Statics.en\options.txt" />
+    <EmbeddedResource Include="Statics.fan\options.txt" />
+    <EmbeddedResource Include="Statics.jian\options.txt" />
     <Content Include="static\brush.svg" />
     <Content Include="static\clear.svg" />
     <Content Include="static\close.svg" />
@@ -125,6 +134,7 @@
     </Compile>
     <Compile Include="Logic\DiagLogger.cs" />
     <Compile Include="Logic\QueryLogger.cs" />
+    <Compile Include="Logic\SearchOptions.cs" />
     <Compile Include="Logic\TextProvider.cs" />
     <Compile Include="OneResultCtrl.ascx.cs">
       <DependentUpon>OneResultCtrl.ascx</DependentUpon>

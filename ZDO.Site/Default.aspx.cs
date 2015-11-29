@@ -63,7 +63,7 @@ namespace Site
             {
                 if (i >= 256) break;
                 var res = lr.Results[i];
-                OneResultCtrl resCtrl = new OneResultCtrl(res, lr.EntryProvider);
+                OneResultCtrl resCtrl = new OneResultCtrl(res, lr.EntryProvider, Master.UiScript, Master.UiTones);
                 resultsHolder.Controls.Add(resCtrl);
             }
             txtSearch.Value = query;

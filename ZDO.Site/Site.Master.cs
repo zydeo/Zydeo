@@ -59,6 +59,28 @@ namespace Site
             }
         }
 
+        private UiScript uiScript = UiScript.Both;
+        private UiTones uiTones = UiTones.Dummitt;
+        public UiScript UiScript { get { return uiScript; } }
+        public UiTones UiTones { get { return uiTones; } }
+
+        private void determineCookieOptions()
+        {
+            if (Request.Cookies["uiscript"] != null)
+            {
+                if (Request.Cookies["uiscript"].Value == "both") uiScript = UiScript.Both;
+                else if (Request.Cookies["uiscript"].Value == "simp") uiScript = UiScript.Simp;
+                else if (Request.Cookies["uiscript"].Value == "trad") uiScript = UiScript.Trad;
+            }
+            if (Request.Cookies["uitones"] != null)
+            {
+                if (Request.Cookies["uitones"].Value == "none") uiTones = UiTones.None;
+                else if (Request.Cookies["uitones"].Value == "pleco") uiTones = UiTones.Pleco;
+                else if (Request.Cookies["uitones"].Value == "dummitt") uiTones = UiTones.Dummitt;
+            }
+
+        }
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -67,6 +89,8 @@ namespace Site
             determineLanguage();
             // Which page are we showing?
             determinePage(Request.Path);
+            // Search options (from cookies)
+            determineCookieOptions();
         }
 
         protected void Page_Load(object sender, EventArgs e)
