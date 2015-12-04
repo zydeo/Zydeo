@@ -50,6 +50,8 @@ namespace Site
             }
 
             // From here on ---> lookup
+            string strMobile = Request["mobile"];
+            bool isMobile = strMobile == "yes";
             queryInfo = new QueryInfo(Request.UserHostAddress, query);
             resultsHolder.Visible = true;
             welcomeScreen.Visible = false;
@@ -63,7 +65,7 @@ namespace Site
             {
                 if (i >= 256) break;
                 var res = lr.Results[i];
-                OneResultCtrl resCtrl = new OneResultCtrl(res, lr.EntryProvider, Master.UiScript, Master.UiTones);
+                OneResultCtrl resCtrl = new OneResultCtrl(res, lr.EntryProvider, Master.UiScript, Master.UiTones, isMobile);
                 resultsHolder.Controls.Add(resCtrl);
             }
             txtSearch.Value = query;

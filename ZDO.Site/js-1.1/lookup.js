@@ -70,6 +70,11 @@ function submitSearch() {
     name: 'query',
     value: $('#txtSearch').val()
   }).appendTo(form);
+  $('<input />', {
+    type: 'hidden',
+    name: 'mobile',
+    value: isMobile ? "yes" : "no"
+  }).appendTo(form);
   form.appendTo('body').submit();
 }
 

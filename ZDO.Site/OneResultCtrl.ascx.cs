@@ -14,16 +14,19 @@ namespace Site
         private readonly ICedictEntryProvider prov;
         private readonly UiScript script;
         private readonly UiTones tones;
+        private readonly bool isMobile;
 
         public OneResultCtrl()
         { }
 
-        public OneResultCtrl(CedictResult res, ICedictEntryProvider prov, UiScript script, UiTones tones)
+        public OneResultCtrl(CedictResult res, ICedictEntryProvider prov,
+            UiScript script, UiTones tones, bool isMobile)
         {
             this.res = res;
             this.prov = prov;
             this.script = script;
             this.tones = tones;
+            this.isMobile = isMobile;
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -33,6 +36,7 @@ namespace Site
 
         protected override void Render(HtmlTextWriter writer)
         {
+            int hanziLimit = isMobile ? 4 : 6;
             CedictEntry entry = prov.GetEntry(res.EntryId);
 
             string entryClass = "entry";
@@ -51,7 +55,7 @@ namespace Site
             if (script == UiScript.Both)
             {
                 // Up to 6 hanzi: on a single line
-                if (entry.ChSimpl.Length <= 6)
+                if (entry.ChSimpl.Length <= hanziLimit)
                 {
                     string clsSep = "hw-sep";
                     if (tones != UiTones.None) clsSep = "hw-sep faint";
@@ -71,7 +75,8 @@ namespace Site
             {
                 string clsTrad = "hw-trad";
                 // Need special class so traditional floats left after line break
-                if (script == UiScript.Both && entry.ChSimpl.Length > 6) clsTrad = "hw-trad break";
+                if (script == UiScript.Both && entry.ChSimpl.Length > hanziLimit)
+                    clsTrad = "hw-trad break";
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, clsTrad);
                 writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-trad">
                 renderHanzi(entry, false, script == UiScript.Both, writer);
