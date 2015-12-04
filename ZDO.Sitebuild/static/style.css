@@ -215,12 +215,31 @@ body {
   cursor: default;
 }
 
+.optionItem .optionExampleHan:before {
+  content: '\A';
+  white-space: pre;
+}
+
 .optionItem .optionExampleHan {
   font-size: 1.5em;
 }
 
 .optionItem.selected {
   background-color: #ffe4cc;
+}
+
+.optionsBack {
+  margin-top: 2em;
+  text-align: center;
+  font-size: 1.8em;
+}
+
+#staticContent .optionsBack a {
+  border-bottom: 0;
+}
+
+#staticContent .optionsBack a img {
+  margin-bottom: -0.05em;
 }
 
 /* Interferes with explicit animation from JS
@@ -434,6 +453,7 @@ body.mobile #footer {
 }
 
 body.mobile #menu {
+  z-index: 2;
   display: none;
   background-color: #f0f0f0;
   text-align: left;
@@ -514,6 +534,7 @@ body.mobile #search-bar {
 
 
 body.mobile #page-header {
+  z-index: 1;
   top: 0;
   padding: 0;
   width: 100%;
@@ -588,6 +609,43 @@ body.mobile #content-core {
   width: 100%;
   padding: 0;
   margin: 0;
+}
+
+body.mobile .optionHead {
+  text-align: left;
+}
+
+body.mobile .optionItem {
+  width: 100%;
+  display: block;
+  position: relative;
+  clear: both;
+  text-align: left;
+  padding-top: 0;
+}
+
+body.mobile .optionItem .optionLabel {
+  text-align: left;
+  display: inline-block;
+  width: 45%;
+}
+
+body.mobile .optionItem .optionExampleHan {
+  font-size: 120%;
+}
+
+body.mobile .optionItem .optionExampleHan:before {
+  content: '';
+}
+
+body.mobile #staticContent .optionsBack {
+  margin-top: 1.5em;
+  text-align: left;
+}
+
+body.mobile #staticContent .optionsBack img {
+  width: 1em;
+  margin-bottom: -0.15em;
 }
 
 body.mobile #stroke-input {

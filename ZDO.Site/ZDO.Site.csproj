@@ -101,6 +101,7 @@
     <Content Include="static\clear.svg" />
     <Content Include="static\close.svg" />
     <Content Include="static\hamburger.svg" />
+    <Content Include="static\nav-back.svg" />
     <Content Include="static\search.svg" />
     <Content Include="static\style.css" />
     <Content Include="static\tooltipster.css" />

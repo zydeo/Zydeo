@@ -25,7 +25,8 @@ function parseOptionCookies() {
 }
 
 function optionsEventWireup() {
-  var handlers = {
+  // Event handlers for mouse (desktop)
+  var handlersMouse = {
     mousedown: function(e) {
       $(this).animate({backgroundColor: clrEmph}, 200);
     },
@@ -41,6 +42,14 @@ function optionsEventWireup() {
       $(this).animate({backgroundColor: clr}, 400);
     }
   };
+  // Event handlers for mobile (touch)
+  var handlersTouch = {
+    click: function(e) {
+      $(this).animate({backgroundColor: clrSel}, 400);
+      selectOption(this.id);
+    }
+  };
+  var handlers = isMobile ? handlersTouch : handlersMouse;
   // Script option set
   $("#optScriptSimplified").on(handlers);
   $("#optScriptTraditional").on(handlers);
