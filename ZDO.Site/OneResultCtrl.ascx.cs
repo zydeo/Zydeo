@@ -45,21 +45,36 @@ namespace Site
             {
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-simp");
                 writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-simp">
-                renderHanzi(entry, true, writer);
+                renderHanzi(entry, true, false, writer);
                 writer.RenderEndTag(); // <span class="hw-simp">
             }
             if (script == UiScript.Both)
             {
-                writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-sep");
-                writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-sep">
-                writer.WriteEncodedText("•");
-                writer.RenderEndTag(); // <span class="hw-sep">
+                // Up to 6 hanzi: on a single line
+                if (entry.ChSimpl.Length <= 6)
+                {
+                    string clsSep = "hw-sep";
+                    if (tones != UiTones.None) clsSep = "hw-sep faint";
+                    writer.AddAttribute(HtmlTextWriterAttribute.Class, clsSep);
+                    writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-sep">
+                    writer.WriteEncodedText("•");
+                    writer.RenderEndTag(); // <span class="hw-sep">
+                }
+                // Otherwise, line break
+                else
+                {
+                    writer.RenderBeginTag(HtmlTextWriterTag.Br);
+                    writer.RenderEndTag();
+                }
             }
             if (script != UiScript.Simp)
             {
-                writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-trad");
+                string clsTrad = "hw-trad";
+                // Need special class so traditional floats left after line break
+                if (script == UiScript.Both && entry.ChSimpl.Length > 6) clsTrad = "hw-trad break";
+                writer.AddAttribute(HtmlTextWriterAttribute.Class, clsTrad);
                 writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-trad">
-                renderHanzi(entry, false, writer);
+                renderHanzi(entry, false, script == UiScript.Both, writer);
                 writer.RenderEndTag(); // <span class="hw-trad">
             }
             writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-pinyin");
@@ -84,7 +99,7 @@ namespace Site
             writer.RenderEndTag(); // <div class="entry">
         }
 
-        private void renderHanzi(CedictEntry entry, bool simp, HtmlTextWriter writer)
+        private void renderHanzi(CedictEntry entry, bool simp, bool faintIdentTrad, HtmlTextWriter writer)
         {
             string hzStr = simp ? entry.ChSimpl : entry.ChTrad;
             for (int i = 0; i != hzStr.Length; ++i)
@@ -104,6 +119,8 @@ namespace Site
                     else if (py.Tone == 4) cls = "tone4";
                     // -1 for unknown, and 0 for neutral: we don't mark up anything
                 }
+                // If we're rendering both scripts, then show faint traditional chars where same as simp
+                if (faintIdentTrad && c == entry.ChSimpl[i]) cls += " faint";
                 // Render with enclosing span if we have a relevant class
                 if (!string.IsNullOrEmpty(cls))
                 {
