@@ -68,7 +68,12 @@ namespace Site
             }
             txtSearch.Value = query;
             if (lr.Results.Count == 0)
+            {
+                resultsHolder.Visible = false;
+                welcomeScreen.Visible = true;
+                welcomeScreen.InnerHtml = TextProvider.Instance.GetSnippet(Master.UILang, "noresults");
                 Title = TextProvider.Instance.GetString(Master.UILang, "TitleMain");
+            }
             else
             {
                 string title;

@@ -83,6 +83,10 @@
     <EmbeddedResource Include="Resources\welcome_de.txt" />
     <EmbeddedResource Include="Resources\welcome_fan.txt" />
     <EmbeddedResource Include="Resources\welcome_jian.txt" />
+    <EmbeddedResource Include="Resources\noresults_de.txt" />
+    <EmbeddedResource Include="Resources\noresults_en.txt" />
+    <EmbeddedResource Include="Resources\noresults_fan.txt" />
+    <EmbeddedResource Include="Resources\noresults_jian.txt" />
     <Content Include="StaticContentCtrl.ascx" />
     <Content Include="Statics.aspx" />
     <EmbeddedResource Include="Statics.en\about.txt" />
@@ -105,6 +109,7 @@
     <Content Include="static\search.svg" />
     <Content Include="static\style.css" />
     <Content Include="static\tooltipster.css" />
+    <Content Include="static\zydeo-owl-sad.svg" />
     <Content Include="static\zydeo-owl.svg" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

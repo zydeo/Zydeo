@@ -72,6 +72,7 @@ namespace Site
             dict[langCode] = newStrings;
             // Init HTML snippets
             initSnippet(langCode, "welcome");
+            initSnippet(langCode, "noresults");
         }
 
 
