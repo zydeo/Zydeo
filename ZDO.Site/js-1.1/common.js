@@ -96,25 +96,49 @@ function acceptCookies() {
 }
 
 function globalEventWireup() {
-  $("#btn-menu").click(toggleMenu);
+  $("#btn-menu").click(function (event) {
+    event.stopPropagation();
+    toggleMenu();
+  });
   $("#swallowbitterpill").click(acceptCookies);
   $("#navImprint").click(function () {
     window.location = "https://zydeo.net/imprint";
   });
+  // On mobile: hide menu when tapping outside of it
+  if (isMobile) {
+    $('html').click(function () {
+      hideShowHamburger(false);
+    });
+
+    $('#menu').click(function (event) {
+      event.stopPropagation();
+    });
+  }
 }
 
-function toggleMenu() {
+function hideShowHamburger(show) {
   var elmInput = document.getElementById("txtSearch");
   var srcBase = $("#img-menu").attr("src");
   var imagePath = srcBase.slice(0, srcBase.lastIndexOf("/"));
-  if ($("#menu").css("display") == "block") {
+
+  if (show) {
+    // ** Show
+    $("#menu").css("display", "block");
+    $("#img-menu").attr("src", imagePath + "/close.svg");
+    $("#btn-menu").css("background-color", "#b4ca65");
+  } else {
+    // ** Hide
+    // If not visible, don't touch anything.
+    if ($("#menu").css("display") != "block") return;
+
     $("#menu").css("display", "none");
     $("#img-menu").attr("src", imagePath + "/hamburger.svg");
     var clr = elmInput === null ? "#c7d9b3" : "white";
     $("#btn-menu").css("background-color", clr);
-  } else {
-    $("#menu").css("display", "block");
-    $("#img-menu").attr("src", imagePath + "/close.svg");
-    $("#btn-menu").css("background-color", "#b4ca65");
   }
+}
+
+function toggleMenu() {
+  if ($("#menu").css("display") == "block") hideShowHamburger(false);
+  else hideShowHamburger(true);
 }

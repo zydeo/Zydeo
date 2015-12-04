@@ -355,6 +355,7 @@ input:focus {
 }
 
 #stroke-input {
+  z-index: 2;
   display: none;
   position: fixed;
   background-color: #c7d9b3;
