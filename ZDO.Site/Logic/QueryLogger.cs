@@ -53,18 +53,28 @@ namespace Site
             private readonly IpResolver ipr;
             private readonly DateTime time;
             private readonly string hostAddr;
+            private readonly bool isMobile;
+            private readonly string uiLang;
+            private readonly UiScript script;
+            private readonly UiTones tones;
             private readonly int resCount;
             private readonly int msecLookup;
             private readonly int msecTotal;
             private readonly SearchLang lang;
             private readonly string query;
 
-            public QueryItem(IpResolver ipr, string hostAddr, int resCount, int msecLookup, int msecTotal,
+            public QueryItem(IpResolver ipr, string hostAddr, bool isMobile, string uiLang,
+                UiScript script, UiTones tones,
+                int resCount, int msecLookup, int msecTotal,
                 SearchLang lang, string query)
             {
                 this.ipr = ipr;
                 this.time = DateTime.UtcNow;
                 this.hostAddr = hostAddr;
+                this.isMobile = isMobile;
+                this.uiLang = uiLang;
+                this.script = script;
+                this.tones = tones;
                 this.resCount = resCount;
                 this.msecLookup = msecLookup;
                 this.msecTotal = msecTotal;
@@ -79,6 +89,20 @@ namespace Site
                     IPAddress addr = null;
                     if (!IPAddress.TryParse(hostAddr, out addr)) addr = null;
                     string country = addr == null ? ipr.GetNoCountry() : ipr.GetContryCode(addr);
+                    country += '-';
+                    if (isMobile) country += 'M';
+                    else country += 'D';
+                    if (uiLang == "en") country += 'E';
+                    else if (uiLang == "de") country += 'D';
+                    else if (uiLang == "jian") country += 'J';
+                    else if (uiLang == "fan") country += 'F';
+                    else country += 'X';
+                    if (script == UiScript.Simp) country += 'S';
+                    else if (script == UiScript.Trad) country += 'T';
+                    else country += 'B';
+                    if (tones == UiTones.None) country += 'N';
+                    else if (tones == UiTones.Dummitt) country += 'D';
+                    else country += 'P';
 
                     StringBuilder sb = new StringBuilder();
                     sb.Append(QueryLogger.FormatTime(time));
@@ -153,10 +177,11 @@ namespace Site
             }
         }
 
-        public void LogQuery(string hostAddr, int resCount, int msecLookup, int msecTotal, SearchLang lang, string query)
+        public void LogQuery(string hostAddr, bool isMobile, string uiLang, UiScript script, UiTones tones,
+            int resCount, int msecLookup, int msecTotal, SearchLang lang, string query)
         {
-            QueryItem itm = new QueryItem(ipResolver, hostAddr, resCount,
-                msecLookup, msecTotal, lang, query);
+            QueryItem itm = new QueryItem(ipResolver, hostAddr, isMobile, uiLang, script, tones,
+                resCount, msecLookup, msecTotal, lang, query);
             lock (ilist)
             {
                 ilist.Add(itm);

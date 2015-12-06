@@ -11,6 +11,7 @@ namespace Site
     public partial class Default : System.Web.UI.Page
     {
         private ICedictEntryProvider prov = null;
+        private bool isMobile = false;
 
         private class QueryInfo
         {
@@ -51,7 +52,7 @@ namespace Site
 
             // From here on ---> lookup
             string strMobile = Request["mobile"];
-            bool isMobile = strMobile == "yes";
+            isMobile = strMobile == "yes";
             queryInfo = new QueryInfo(Request.UserHostAddress, query);
             resultsHolder.Visible = true;
             welcomeScreen.Visible = false;
@@ -98,8 +99,9 @@ namespace Site
             {
                 TimeSpan tsLookup = queryInfo.DTLookup.Subtract(queryInfo.DTStart);
                 TimeSpan tsTotal = DateTime.UtcNow.Subtract(queryInfo.DTStart);
-                QueryLogger.Instance.LogQuery(queryInfo.HostAddr, queryInfo.ResCount,
-                    (int)tsLookup.TotalMilliseconds, (int)tsTotal.TotalMilliseconds,
+                QueryLogger.Instance.LogQuery(queryInfo.HostAddr, isMobile,
+                    Master.UILang, Master.UiScript, Master.UiTones,
+                    queryInfo.ResCount, (int)tsLookup.TotalMilliseconds, (int)tsTotal.TotalMilliseconds,
                     queryInfo.Lang, queryInfo.Query);
             }
         }
