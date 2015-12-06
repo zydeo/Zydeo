@@ -45,6 +45,8 @@ body {
   font-size: 120%;
   padding: 8px 10px 8px 10px;
   cursor: default;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 #menu li.active a,
@@ -71,6 +73,8 @@ body {
   cursor: default;
   text-decoration: none;
   color: #607026;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 #langsel a:hover,
@@ -310,6 +314,12 @@ input:focus {
   height: 3em;
   border: 1px solid white;
   background-color: white;
+}
+
+#btn-search,
+#btn-write {
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 #btn-clear {
@@ -829,45 +839,24 @@ body.mobile #welcomeScreen p {
   -webkit-border-radius: 0.3em;
 }
 
-.hw-sep.faint {
-  opacity: 0.7;
-}
-
-.faint {
-  opacity: 0.2;
-}
-
-.toneColorsPleco .tone1 {
-  color: #e30000;
-}
-
-.toneColorsPleco .tone2 {
-  color: #02b31c;
-}
-
-.toneColorsPleco .tone3 {
-  color: #1510f0;
-}
-
-.toneColorsPleco .tone4 {
-  color: #8b00bf;
-}
-
-.toneColorsDummitt .tone1 {
-  color: #f41d2f;
-}
-
-.toneColorsDummitt .tone2 {
-  color: #f9761b;
-}
-
-.toneColorsDummitt .tone3 {
-  color: #97cd5d;
-}
-
-.toneColorsDummitt .tone4 {
-  color: #589bc8;
-}
+.hw-trad .faint { color: #d2d2d2; }
+.hw-sep.faint { color: #818181; }
+.toneColorsPleco .tone1 { color: #e30000; }
+.toneColorsPleco .tone1.faint { color: #f5c8c8; }
+.toneColorsPleco .tone2 { color: #02b31c; }
+.toneColorsPleco .tone2.faint { color: #c8ecce; }
+.toneColorsPleco .tone3 { color: #1510f0; }
+.toneColorsPleco .tone3.faint { color: #cccbf8; }
+.toneColorsPleco .tone4 { color: #8b00bf; }
+.toneColorsPleco .tone4.faint { color: #e4c8ee; }
+.toneColorsDummitt .tone1 { color: #f41d2f; }
+.toneColorsDummitt .tone1.faint { color: #f8c3ce; }
+.toneColorsDummitt .tone2 { color: #f9761b; }
+.toneColorsDummitt .tone2.faint { color: #fad2b7; }
+.toneColorsDummitt .tone3 { color: #97cd5d; }
+.toneColorsDummitt .tone3.faint { color: #dcedcb; }
+.toneColorsDummitt .tone4 { color: #589bc8; }
+.toneColorsDummitt .tone4.faint { color: #d9e5ee; }
 
 /* ------------------------------- LOADING ------------------------------- */
 

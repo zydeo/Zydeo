@@ -2,7 +2,7 @@ var clrSel = "#ffe4cc"; // Same as background-color of .optionItem.selected in C
 var clrEmph = "#ffc898"; // Same as border-bottom of .optionHead in CSS
 
 var optScript = "both";
-var optTones = "dummitt";
+var optTones = "pleco";
 
 $(document).ready(function () {
   parseOptionCookies();
