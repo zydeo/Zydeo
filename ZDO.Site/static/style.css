@@ -45,6 +45,8 @@ body {
   font-size: 120%;
   padding: 8px 10px 8px 10px;
   cursor: default;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 #menu li.active a,
@@ -71,6 +73,8 @@ body {
   cursor: default;
   text-decoration: none;
   color: #607026;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 #langsel a:hover,
@@ -310,6 +314,12 @@ input:focus {
   height: 3em;
   border: 1px solid white;
   background-color: white;
+}
+
+#btn-search,
+#btn-write {
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 #btn-clear {

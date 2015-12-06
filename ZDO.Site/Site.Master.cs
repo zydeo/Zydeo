@@ -60,7 +60,7 @@ namespace Site
         }
 
         private UiScript uiScript = UiScript.Both;
-        private UiTones uiTones = UiTones.Dummitt;
+        private UiTones uiTones = UiTones.Pleco;
         public UiScript UiScript { get { return uiScript; } }
         public UiTones UiTones { get { return uiTones; } }
 
