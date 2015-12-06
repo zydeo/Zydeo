@@ -16,8 +16,11 @@ $(document).ready(function () {
 
   lookupEventWireup();
 
-  $("#txtSearch").focus();
-  $("#txtSearch").select();
+  // Do not focus input field on mobile: shows keyboard, annoying
+  if (!isMobile) {
+    $("#txtSearch").focus();
+    $("#txtSearch").select();
+  }
 
   // Debug: to work on opening screen
   //$("#resultsHolder").css("display", "none");
@@ -46,10 +49,17 @@ function showStrokeInput() {
   canvasElement.height = strokeCanvasWidth;
   $("#suggestions").css("height", $("#suggestions").height());
   clearCanvas();
+  $("#btn-write").attr("class", "active");
+  // Must do this explicitly: if hamburger menu is shown, got to hide it
+  if (isMobile) hideShowHamburger(false);
 }
 
 function hideStrokeInput() {
+  // Nothing to hide?
+  if ($("#stroke-input").css("display") != "block") return;
+  // Hide.
   $("#stroke-input").css("display", "none");
+  $("#btn-write").attr("class", "");
 }
 
 function clearSearch() {
@@ -81,15 +91,24 @@ function submitSearch() {
 function lookupEventWireup() {
   $("#btn-clear").click(clearSearch);
   $("#btn-write").click(function () {
-    if ($("#stroke-input").css("display") == "block") {
-      hideStrokeInput();
-      $("#btn-write").attr("class", "");
-    }
-    else {
-      showStrokeInput();
-      $("#btn-write").attr("class", "active");
-    }
+    if ($("#stroke-input").css("display") == "block") hideStrokeInput();
+    else  showStrokeInput();
   });
+  // Auto-hide stroke input when tapping away
+  $('html').click(function () {
+    hideStrokeInput();
+  });
+  // Must do explicitly for hamburger menu, b/c that stops event propagation
+  if (isMobile) $('#btn-menu').click(function () {
+    hideStrokeInput();
+  });
+  $('#btn-write').click(function (event) {
+    event.stopPropagation();
+  });
+  $('#stroke-input').click(function (event) {
+    event.stopPropagation();
+  });
+
   $("#strokeClear").click(clearCanvas);
   $("#strokeUndo").click(undoStroke);
   $("#btn-search").click(submitSearch);

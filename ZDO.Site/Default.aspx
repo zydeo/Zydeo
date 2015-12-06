@@ -11,7 +11,7 @@
             <span id="btn-menu"><img id="img-menu" src="static/hamburger.svg" alt="Menu"/></span>
           </td>
           <td id="cell-input">
-            <input type="text" name="txt-search" id="txtSearch" placeholder="*Hanzi, Pinyin or German word" autofocus maxlength="64" runat="server"/>
+            <input type="text" name="txt-search" id="txtSearch" placeholder="*Hanzi, Pinyin or German word" maxlength="64" runat="server"/>
           </td>
           <td id="cell-clear">
             <span id="btn-clear"><img id="img-clear" src="static/clear.svg" alt="Clear text"/></span>

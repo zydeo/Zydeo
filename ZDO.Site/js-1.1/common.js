@@ -109,6 +109,9 @@ function globalEventWireup() {
     $('html').click(function () {
       hideShowHamburger(false);
     });
+    $('#results').click(function () {
+      hideShowHamburger(false);
+    });
 
     $('#menu').click(function (event) {
       event.stopPropagation();
