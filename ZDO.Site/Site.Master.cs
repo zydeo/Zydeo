@@ -106,6 +106,7 @@ namespace Site
             Page.MetaDescription = prov.GetString(uiLang, "MetaDescription");
             Page.MetaKeywords = prov.GetString(uiLang, "MetaKeywords");
             linkSearch.InnerText = prov.GetString(uiLang, "MenuSearch");
+            linkOptions.InnerText = prov.GetString(uiLang, "MenuOptions");
             linkAbout.InnerText = prov.GetString(uiLang, "MenuInfo");
             navImprint.InnerText = prov.GetString(uiLang, "MenuImprint");
             linkFooterImprint.InnerText = prov.GetString(uiLang, "MenuImprint");

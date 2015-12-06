@@ -15,6 +15,8 @@ namespace Site
             staticContent.Controls.Add(new StaticContentCtrl(page, Master.UILang));
             if (page == "about")
                 Title = TextProvider.Instance.GetString(Master.UILang, "TitleAbout");
+            else if (page == "options")
+                Title = TextProvider.Instance.GetString(Master.UILang, "TitleOptions");
             else if (page == "cookies")
                 Title = TextProvider.Instance.GetString(Master.UILang, "TitleCookies");
             pageHeader.Text = Title;

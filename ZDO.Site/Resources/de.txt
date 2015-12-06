@@ -3,6 +3,7 @@ TitleMain					HanDeDict @ Zydeo Chinesisch-deutsches Wörterbuch
 TitleSearchChinese			{0} - deutsche Übersetzung - HanDeDict @ Zydeo Chinesisch-deutsches Wörterbuch
 TitleSearchGerman			{0} - chinesische Übersetzung - HanDeDict @ Zydeo Chinesisch-deutsches Wörterbuch
 TitleAbout					Über HanDeDict @ Zydeo
+TitleOptions				Suchoptionen
 TitleCookies				Wie werden Cookies auf HanDeDict @ Zydeo verwendet?
 
 # Metainformation: description and keywords
@@ -11,6 +12,7 @@ MetaKeywords				HanDeDict, Zydeo, Chinesisch, Deutsch, Wörterbuch, kostenlos, O
 
 # Page framework: menus etc.
 MenuSearch					Durchsuchen
+MenuOptions					Optionen
 MenuInfo					Infos
 MenuImprint					Impressum
 CookieNotice				Diese Webseite verwendet Cookies für einige Funktionen. Indem Sie die Webseite benutzen, stimmen Sie der Nutzung von Cookies zu.

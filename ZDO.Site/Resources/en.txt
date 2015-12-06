@@ -3,6 +3,7 @@ TitleMain					HanDeDict @ Zydeo Chinese-German dictionary
 TitleSearchChinese			{0} - German translation - HanDeDict @ Zydeo Chinese-German dictionary
 TitleSearchGerman			{0} - Chinese translation - HanDeDict @ Zydeo Chinese-German dictionary
 TitleAbout					About HanDeDict @ Zydeo
+TitleOptions				Search options
 TitleCookies				How HanDeDict @ Zydeo uses cookies
 
 # Metainformation: description and keywords
@@ -11,6 +12,7 @@ MetaKeywords				HanDeDict, Zydeo, Chinese, German, dictionary, free, open-source
 
 # Page framework: menus etc.
 MenuSearch					Search
+MenuOptions					Options
 MenuInfo					About
 MenuImprint					Imprint
 CookieNotice				This website relies on cookies for some of its functionality. By using the site, you agree to its use of cookies.

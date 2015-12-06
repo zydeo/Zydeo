@@ -1,33 +1,27 @@
-﻿      <div class="optionHead">Script</div>
+﻿ <div class="optionHead">Schriftform</div>
       <div class="optionBody">
         <div class="optionItem" id="optScriptSimplified">
-          <span class="optionLabel">Simplified</span>
-          <span class="optionExampleHan">汉语</span>
+          <span class="optionLabel">Vereinfacht</span> <span class="optionExampleHan">汉语</span>
         </div>
         <div class="optionItem" id="optScriptTraditional">
-          <span class="optionLabel">Traditional</span>
-          <span class="optionExampleHan">漢語</span>
+          <span class="optionLabel">Traditionell</span> <span class="optionExampleHan">漢語</span>
         </div>
         <div class="optionItem" id="optScriptBoth">
-          <span class="optionLabel">Both</span>
-          <span class="optionExampleHan">汉语 • 漢語</span>
+          <span class="optionLabel">Beides</span> <span class="optionExampleHan">汉语 • 漢語</span>
         </div>
       </div>
-      <div class="optionHead">Tone colors</div>
+      <div class="optionHead">Tonfarben</div>
       <div class="optionBody">
         <div class="optionItem toneColorsNone" id="optToneColorsNone">
-          <span class="optionLabel">None</span>
-          <span class="optionExampleHan"><span class="tone1">天</span><span class="tone2">人</span><span class="tone3">很</span><span class="tone4">大</span>了</span>
+          <span class="optionLabel">Keine</span> <span class="optionExampleHan"><span class="tone1">天</span><span class="tone2">人</span><span class="tone3">很</span><span class="tone4">大</span>了</span>
         </div>
         <div class="optionItem toneColorsPleco" id="optToneColorsPleco">
-          <span class="optionLabel">Pleco</span>
-          <span class="optionExampleHan"><span class="tone1">天</span><span class="tone2">人</span><span class="tone3">很</span><span class="tone4">大</span>了</span>
+          <span class="optionLabel">Pleco</span> <span class="optionExampleHan"><span class="tone1">天</span><span class="tone2">人</span><span class="tone3">很</span><span class="tone4">大</span>了</span>
         </div>
         <div class="optionItem toneColorsDummitt" id="optToneColorsDummitt">
-          <span class="optionLabel">Dummitt</span>
-          <span class="optionExampleHan"><span class="tone1">天</span><span class="tone2">人</span><span class="tone3">很</span><span class="tone4">大</span>了</span>
+          <span class="optionLabel">Dummitt</span> <span class="optionExampleHan"><span class="tone1">天</span><span class="tone2">人</span><span class="tone3">很</span><span class="tone4">大</span>了</span>
         </div>
       </div>
       <div class="optionsBack">
-        <a href="/"><img src="/static/nav-back.svg" alt="Return to search"/> Return to search</a>
-      </div>
+        <a href="/"><img src="/static/nav-back.svg" alt="Zurück zur Suche" /> Zurück zur Suche</a>
+      </div> 

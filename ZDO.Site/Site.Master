@@ -22,7 +22,7 @@
 <nav id="menu">
   <div id="menu-horiz">
     <ul>
-      <li runat="server" id="navSearch"><a href="/" id="linkSearch" runat="server">*Search</a></li><li runat="server" id="navOptions"><a href="/options" id="lnkOptions" runat="server">*Options</a></li><li runat="server" id="navAbout"><a href="/about" id="linkAbout" runat="server">*About</a></li><li runat="server" id="navImprint" class="imprint">*Imprint</li>
+      <li runat="server" id="navSearch"><a href="/" id="linkSearch" runat="server">*Search</a></li><li runat="server" id="navOptions"><a href="/options" id="linkOptions" runat="server">*Options</a></li><li runat="server" id="navAbout"><a href="/about" id="linkAbout" runat="server">*About</a></li><li runat="server" id="navImprint" class="imprint">*Imprint</li>
     </ul>
     <div id="langsel">
       <div id="langsel-inner">

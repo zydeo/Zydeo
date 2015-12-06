@@ -1,5 +1,5 @@
-﻿<h1>No results</h1>
-<img id="img-welcome" src="static/zydeo-owl-sad.svg" alt="No results"/>
+﻿<h1>Keine Resultate</h1>
+<img id="img-welcome" src="static/zydeo-owl-sad.svg" alt="Keine Resultate" />
 <p>
-    We're sorry. The word you are looking for doesn't seem to be in HanDeDict.
-</p>
+    Ihre Suche hat keine Resultate ergeben. Das gesuchte Wort scheint nicht in HanDeDict vorhanden zu sein.
+</p> 
