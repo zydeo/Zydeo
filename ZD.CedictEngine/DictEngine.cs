@@ -29,6 +29,11 @@ namespace ZD.CedictEngine
         private readonly Index index;
 
         /// <summary>
+        /// Hanzi repository: loaded from file when object is created.
+        /// </summary>
+        private readonly HanziRepo hrepo;
+
+        /// <summary>
         /// Tokenizer for target text (query strings).
         /// </summary>
         private readonly Tokenizer tokenizer;
@@ -47,11 +52,16 @@ namespace ZD.CedictEngine
                 // Skip release date and entry count
                 br.ReadLong();
                 br.ReadInt();
-                // Skip to position where index starts
+                // Read position where index starts
                 int idxPos = br.ReadInt();
+                // Read position where hanzi repo starts
+                int hrepoPos = br.ReadInt();
+                // Skip to index start; load index
                 br.Position = idxPos;
-                // Load index
                 index = new Index(br);
+                // Skip to hanzi repo start; initi hanzi repo
+                br.Position = hrepoPos;
+                hrepo = new HanziRepo(br);
             }
             // Now, initialize tokenizer with index's word holder
             tokenizer = new Tokenizer(index.WordHolder);
@@ -545,6 +555,19 @@ namespace ZD.CedictEngine
             {
                 br.Position = entryId;
                 return new CedictEntry(br);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves hanzi information (stroke order etc.) for the provided Unicode code point, or null if no info available.
+        /// </summary>
+        /// <param name="c">The Hanzi as a Unicode character.</param>
+        /// <returns>Information about the Hanzi, or null.</returns>
+        public HanziInfo GetHanziInfo(char c)
+        {
+            using (BinReader br = new BinReader(dictFileName))
+            {
+                return hrepo.GetHanziInfo(c, br);
             }
         }
 

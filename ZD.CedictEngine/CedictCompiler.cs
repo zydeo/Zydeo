@@ -13,7 +13,7 @@ namespace ZD.CedictEngine
     /// <summary>
     /// Parses Cedict text file and compiles indexed dictionary in binary format.
     /// </summary>
-    public partial class CedictCompiler
+    public partial class CedictCompiler : IDisposable
     {
         /// <summary>
         /// Current line number, so we can indicate errors/warnings
@@ -65,8 +65,23 @@ namespace ZD.CedictEngine
             // At this stage, index will have been initialized in-line.
             // I can refer to its word holder to initialize my tokenizer.
             tokenizer = new Tokenizer(index.WordHolder);
+            // Init temp file for hanzi data
+            hanziTempFileName = Path.GetTempFileName();
+            hanziTempWriter = new BinWriter(hanziTempFileName);
         }
 
+        /// <summary>
+        /// Dispose object: clean up temporary files etc.
+        /// </summary>
+        public void Dispose()
+        {
+            if (hanziTempWriter != null) hanziTempWriter.Dispose();
+            File.Delete(hanziTempFileName);
+        }
+
+        /// <summary>
+        /// Verifies that line contains no Unicode surrogates. Needed for data hygiene if input is dirty.
+        /// </summary>
         private bool surrogateCheck(string line, StreamWriter logStream)
         {
             bool surrFound = false;
@@ -471,6 +486,9 @@ namespace ZD.CedictEngine
             // First, statistics
             stats.WriteStats(statsFolder);
 
+            // Start index of Hanzi repository in file
+            int hrepoIdxPos;
+
             // ID to file position
             Dictionary<int, int> entryIdToPos = new Dictionary<int, int>();
             Dictionary<int, int> senseIdToPos = new Dictionary<int, int>();
@@ -481,6 +499,9 @@ namespace ZD.CedictEngine
                 bw.WriteInt(entries.Count);
                 int returnPos = bw.Position;
                 // Placeholder: will return here to save start position of index at end
+                bw.WriteInt(-1);
+                // Placeholder for hanzi repo position: will return here at very end
+                hrepoIdxPos = bw.Position;
                 bw.WriteInt(-1);
                 // Serialize all entries; fill entry ID -> file pos map
                 for (int i = 0; i != entries.Count; ++i)
@@ -532,6 +553,8 @@ namespace ZD.CedictEngine
                 }
                 // Serialize index
                 index.Serialize(bw);
+                // Copy serialized hanzi repository from temp file
+                writeHanziRepo(bw, hrepoIdxPos);
             }
         }
     }

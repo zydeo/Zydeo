@@ -29,7 +29,6 @@ _work/*
 !_work/*.ttf
 !_work/*.otf
 !_work/*.bin
-_work/makemeahanzi.*
 
 _work_chdict_prepare/*
 

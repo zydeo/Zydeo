@@ -29,6 +29,11 @@ namespace ZD.Common
             if (stream != null) stream.Dispose();
         }
 
+        public void MoveToEnd()
+        {
+            stream.Seek(0, SeekOrigin.End);
+        }
+
         public void WriteChar(char c)
         {
             writer.Write(c);
@@ -52,6 +57,11 @@ namespace ZD.Common
         public void WriteByte(byte b)
         {
             writer.Write(b);
+        }
+
+        public void WriteBytes(byte[] buf)
+        {
+            writer.Write(buf);
         }
 
         public void WriteString(string str)

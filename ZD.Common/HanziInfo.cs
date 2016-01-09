@@ -41,8 +41,27 @@ namespace ZD.Common
             StringBuilder sb = new StringBuilder(svgLen);
             for (int i = 0; i != svgLen; ++i)
             {
-                byte b = br.ReadByte();
-                sb.Append((char)b);
+                if (sb.Length != 0) sb.Append(' ');
+                short val = br.ReadShort();
+                // Character
+                if (val > 16384) sb.Append((char)(val - 16384));
+                // Value
+                else
+                {
+                    string strVal = val.ToString();
+                    if (strVal.Length == 1) sb.Append(strVal);
+                    else
+                    {
+                        // Up to decimal point
+                        sb.Append(strVal.Substring(0, strVal.Length - 1));
+                        // Has fraction
+                        if (strVal.Length > 1 && strVal[strVal.Length - 1] != '0')
+                        {
+                            sb.Append('.');
+                            sb.Append(strVal[strVal.Length - 1]);
+                        }
+                    }
+                }
             }
             SVG = sb.ToString();
             short mLen = br.ReadShort();
@@ -61,26 +80,28 @@ namespace ZD.Common
         /// </summary>
         public void Serialize(BinWriter bw)
         {
-            if (SVG.Length > short.MaxValue) throw new Exception("SVG too long for serialization.");
-            bw.WriteShort((short)SVG.Length);
             string[] svgParts = SVG.Split(' ');
+            if (svgParts.Length > short.MaxValue) throw new Exception("SVG too long for serialization.");
+            bw.WriteShort((short)svgParts.Length);
             foreach (string sp in svgParts)
             {
+                if (string.IsNullOrEmpty(sp)) throw new Exception("Empty string inside split SVG.");
                 float val;
-                if (float.TryParse(sp, out val)) bw.WriteShort((short)val);
+                if (float.TryParse(sp, out val))
+                {
+                    short sVal = (short)(val * 10);
+                    if (sVal > 16384) throw new Exception("Value in SVG path too large for serialization.");
+                    bw.WriteShort(sVal);
+                }
                 else
                 {
                     if (sp.Length != 1) throw new Exception("Invalid SVG.");
                     int ival = (int)sp[0];
                     if (ival > byte.MaxValue) throw new Exception("Invalid character in SVG.");
-                    bw.WriteShort((short)(ival + 4096));
+                    ival += 16384;
+                    bw.WriteShort((short)ival);
                 }
             }
-            //foreach (char c in SVG)
-            //{
-            //    if (((int)c) > (int)byte.MaxValue) throw new Exception("Non-ASCII character in SVG.");
-            //    bw.WriteByte((byte)(int)c);
-            //}
             if (Median.Count > short.MaxValue) throw new Exception("Median too long for serialization.");
             bw.WriteShort((short)Median.Count);
             foreach (var x in Median)
