@@ -31,7 +31,7 @@ namespace Site
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("{");
-                sb.AppendLine("  strokes:");
+                sb.AppendLine("  \"strokes\":");
                 sb.AppendLine("  [");
                 for (int i = 0; i != hi.Strokes.Count; ++i)
                 {
@@ -44,7 +44,7 @@ namespace Site
                     sb.AppendLine();
                 }
                 sb.AppendLine("  ],");
-                sb.Append("  medians: [");
+                sb.Append("  \"medians\": [");
                 for (int i = 0; i != hi.Strokes.Count; ++i)
                 {
                     OneStroke stroke = hi.Strokes[i];

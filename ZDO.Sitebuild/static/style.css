@@ -1,3 +1,21 @@
+#strokeAnimCanvas {
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+}
+
+#strokeAnimCanvas input {
+  font-size: 3em;
+  text-align: center;
+}
+
+#strokeAnimSVG {
+  width: 300px;
+  height: 300px;
+  border: 1px solid magenta;
+}
+
 body {
   font-family: Noto-Sans, sans-serif;
   margin: 0;

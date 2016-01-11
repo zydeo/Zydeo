@@ -35,6 +35,10 @@ namespace Site
             }
             catch (ApiException ex)
             {
+                context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+                context.Response.AddHeader("Access-Control-Allow-Headers", "*");
+                context.Response.AddHeader("Access-Control-Allow-Credentials", "true");
+
                 context.Response.ContentType = "text/plain";
                 context.Response.StatusCode = ex.StatusCode;
                 context.Response.Charset = "utf-8";
@@ -45,6 +49,10 @@ namespace Site
             }
             catch (Exception)
             {
+                context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+                context.Response.AddHeader("Access-Control-Allow-Headers", "*");
+                context.Response.AddHeader("Access-Control-Allow-Credentials", "true");
+
                 context.Response.ContentType = "text/plain";
                 context.Response.StatusCode = 500;
                 context.Response.Charset = "utf-8";
