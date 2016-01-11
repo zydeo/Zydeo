@@ -23,6 +23,13 @@ namespace ZD.Common
         /// <param name="entryId">The ID of the requested entry.</param>
         /// <returns>The retrieved entry.</returns>
         CedictEntry GetEntry(int entryId);
+
+        /// <summary>
+        /// Retrieves hanzi information (stroke order etc.) for the provided Unicode code point, or null if no info available.
+        /// </summary>
+        /// <param name="c">The Hanzi as a Unicode character.</param>
+        /// <returns>Information about the Hanzi, or null.</returns>
+        HanziInfo GetHanziInfo(char c);
     }
 
     /// <summary>

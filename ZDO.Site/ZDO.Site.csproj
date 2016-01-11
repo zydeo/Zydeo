@@ -118,6 +118,7 @@
   <ItemGroup>
     <Content Include="Site.Master" />
     <Content Include="PingHandler.ashx" />
+    <Content Include="ApiHandler.ashx" />
     <None Include="Properties\PublishProfiles\LocalDeploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -129,6 +130,9 @@
     <Content Include="_data\Private.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiHandler.ashx.cs">
+      <DependentUpon>ApiHandler.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -139,6 +143,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Logic\ApiAction.cs" />
+    <Compile Include="Logic\ActionHanzi.cs" />
     <Compile Include="Logic\DiagLogger.cs" />
     <Compile Include="Logic\QueryLogger.cs" />
     <Compile Include="Logic\SearchOptions.cs" />
