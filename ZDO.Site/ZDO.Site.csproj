@@ -67,6 +67,7 @@
     <Content Include="js-1.1\options.js" />
     <Content Include="js-1.1\recog.js" />
     <Content Include="js-1.1\shortstraw.js" />
+    <Content Include="js-1.1\strokeanim.js" />
     <Content Include="js-1.1\ui-de.js" />
     <Content Include="js-1.1\ui-en.js" />
     <Content Include="js-1.1\ui-jian.js" />
@@ -106,6 +107,7 @@
     <Content Include="static\close.svg" />
     <Content Include="static\hamburger.svg" />
     <Content Include="static\nav-back.svg" />
+    <Content Include="static\ripple.svg" />
     <Content Include="static\search.svg" />
     <Content Include="static\style.css" />
     <Content Include="static\tooltipster.css" />

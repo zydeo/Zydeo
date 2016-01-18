@@ -38,6 +38,7 @@ namespace Site
             txtSearch.Attributes["placeholder"] = TextProvider.Instance.GetString(Master.UILang, "TxtSearchPlacholder");
 
             resultsHolder.Visible = false;
+            soaBox.Visible = false;
             string query = Request["query"];
             if (query != null) query = query.Trim();
             // No query: show welcome screen, and we're done.
@@ -86,6 +87,7 @@ namespace Site
                     title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchGerman");
                 title = string.Format(title, query);
                 Title = title;
+                soaBox.Visible = true;
             }
         }
 

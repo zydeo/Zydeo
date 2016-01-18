@@ -88,6 +88,26 @@ function submitSearch() {
   form.appendTo('body').submit();
 }
 
+function hanziClicked(event) {
+  $("#soaBox").css("display", "block");
+  var hanziOfs = $(this).offset();
+  var onRight = hanziOfs.left < $(document).width() / 2;
+  var left = hanziOfs.left + $(this).width() + 20;
+  if (onRight) $("#soaBox").removeClass("soaBoxLeft");
+  else {
+    $("#soaBox").addClass("soaBoxLeft");
+    left = hanziOfs.left - $("#soaBox").width() - 20;
+  }
+  var top = hanziOfs.top;
+  $("#soaBox").offset({ left: left, top: top });
+  soaRenderBG();
+  soaStartQuery($(this).text());
+}
+
+function closeStrokeAnim() {
+  $("#soaBox").css("display", "none");
+}
+
 function lookupEventWireup() {
   $("#btn-clear").click(clearSearch);
   $("#btn-write").click(function () {
@@ -121,5 +141,8 @@ function lookupEventWireup() {
   $("#txtSearch").change(function () {
     appendNotOverwrite = true;
   });
+
+  $(".hanim").click(hanziClicked);
+  $("#soaClose").click(closeStrokeAnim);
 }
 

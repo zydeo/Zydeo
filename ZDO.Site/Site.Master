@@ -61,6 +61,7 @@
 <script src='<%=ResolveUrl("~/js-1.1/shortstraw.js") %>'></script>
 <script src='<%=ResolveUrl("~/js-1.1/chinesestrokes.js") %>'></script>
 <script src='<%=ResolveUrl("~/js-1.1/recog.js") %>'></script>
+<script src='<%=ResolveUrl("~/js-1.1/strokeanim.js") %>'></script>
 <script src='<%=ResolveUrl("~/js-1.1/lookup.js") %>'></script>
 <% } %>
 <% else if(PageName == "options") %>
