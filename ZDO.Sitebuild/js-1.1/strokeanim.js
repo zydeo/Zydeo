@@ -17,6 +17,9 @@ var soa_strokepause = 20;
 var soa_msec = 20;
 
 var soa_gridcolor = "#607026";
+var soa_ghostcolor = "#d3d3d3";
+var soa_finishedcolor = "#303030";
+var soa_activecolor = "#606060";
 
 var _svgNS = 'http://www.w3.org/2000/svg';
 
@@ -61,58 +64,50 @@ function soaPrepareGlyph(strokes, medians) {
   }
 }
 
+function svgRect(x, y, width, height, fill, stroke, strokeWidth, strokeDasharray) {
+  var rect = document.createElementNS(_svgNS, 'rect');
+  rect.setAttributeNS(null, "x", x);
+  rect.setAttributeNS(null, "y", y);
+  rect.setAttributeNS(null, "width", width);
+  rect.setAttributeNS(null, "height", height);
+  rect.setAttributeNS(null, "fill", fill);
+  rect.setAttributeNS(null, "stroke", stroke);
+  rect.setAttributeNS(null, "stroke-width", strokeWidth);
+  rect.setAttributeNS(null, "stroke-dasharray", strokeDasharray);
+  return rect;
+}
+
+function svgLine(x1, y1, x2, y2, stroke, strokeWidth, strokeDasharray) {
+  var line = document.createElementNS(_svgNS, 'line');
+  line.setAttributeNS(null, "x1", x1);
+  line.setAttributeNS(null, "y1", y1);
+  line.setAttributeNS(null, "x2", x2);
+  line.setAttributeNS(null, "y2", y2);
+  line.setAttributeNS(null, "stroke", stroke);
+  line.setAttributeNS(null, "stroke-width", strokeWidth);
+  line.setAttributeNS(null, "stroke-dasharray", strokeDasharray);
+  return line;
+}
+
+function svgPath(fill, stroke, d) {
+  var p = document.createElementNS(_svgNS, "path");
+  p.setAttributeNS(null, "fill", fill);
+  p.setAttributeNS(null, "stroke", stroke);
+  p.setAttributeNS(null, "d", d);
+  return p;
+}
+
 function soaRenderBG() {
   // The SVG element
   var r = document.getElementById('strokeAnimSVG');
   // Remove all children
   while (r.hasChildNodes()) r.removeChild(r.lastChild);
   // Grid with dashed lines
-  var rect = document.createElementNS(_svgNS, 'rect');
-  rect.setAttributeNS(null, "x", "2");
-  rect.setAttributeNS(null, "y", "2");
-  rect.setAttributeNS(null, "width", "1022");
-  rect.setAttributeNS(null, "height", "1022");
-  rect.setAttributeNS(null, "fill", "none");
-  rect.setAttributeNS(null, "stroke", soa_gridcolor);
-  rect.setAttributeNS(null, "stroke-width", "2");
-  rect.setAttributeNS(null, "stroke-dasharray", "10, 5");
-  r.appendChild(rect);
-  var line = document.createElementNS(_svgNS, 'line');
-  line.setAttributeNS(null, "x1", "0");
-  line.setAttributeNS(null, "y1", "512");
-  line.setAttributeNS(null, "x2", "1024");
-  line.setAttributeNS(null, "y2", "512");
-  line.setAttributeNS(null, "stroke", soa_gridcolor);
-  line.setAttributeNS(null, "stroke-width", "2");
-  line.setAttributeNS(null, "stroke-dasharray", "10, 5");
-  r.appendChild(line);
-  line = document.createElementNS(_svgNS, 'line');
-  line.setAttributeNS(null, "x1", "512");
-  line.setAttributeNS(null, "y1", "0");
-  line.setAttributeNS(null, "x2", "512");
-  line.setAttributeNS(null, "y2", "1024");
-  line.setAttributeNS(null, "stroke", soa_gridcolor);
-  line.setAttributeNS(null, "stroke-width", "2");
-  line.setAttributeNS(null, "stroke-dasharray", "10, 5");
-  r.appendChild(line);
-  line = document.createElementNS(_svgNS, 'line');
-  line.setAttributeNS(null, "x1", "0");
-  line.setAttributeNS(null, "y1", "0");
-  line.setAttributeNS(null, "x2", "1024");
-  line.setAttributeNS(null, "y2", "1024");
-  line.setAttributeNS(null, "stroke", soa_gridcolor);
-  line.setAttributeNS(null, "stroke-width", "2");
-  line.setAttributeNS(null, "stroke-dasharray", "10, 5");
-  r.appendChild(line);
-  line = document.createElementNS(_svgNS, 'line');
-  line.setAttributeNS(null, "x1", "1024");
-  line.setAttributeNS(null, "y1", "0");
-  line.setAttributeNS(null, "x2", "0");
-  line.setAttributeNS(null, "y2", "1024");
-  line.setAttributeNS(null, "stroke", soa_gridcolor);
-  line.setAttributeNS(null, "stroke-width", "2");
-  line.setAttributeNS(null, "stroke-dasharray", "10, 5");
-  r.appendChild(line);
+  r.appendChild(svgRect(2, 2, 1022, 1022, "none", soa_gridcolor, 2, "10, 5"));
+  r.appendChild(svgLine(0, 512, 1024, 512, soa_gridcolor, 2, "10, 5"));
+  r.appendChild(svgLine(512, 0, 512, 1024, soa_gridcolor, 2, "10, 5"));
+  r.appendChild(svgLine(0, 0, 1024, 1024, soa_gridcolor, 2, "10, 5"));
+  r.appendChild(svgLine(1024, 0, 0, 1024, soa_gridcolor, 2, "10, 5"));
   // Group containing all the graphics
   var g = document.createElementNS(_svgNS, 'g');
   g.setAttributeNS(null, "id", "strokeAnimGroup");
@@ -136,10 +131,7 @@ function soaPreRender() {
   // Render all strokes as unfinished, each within a named group
   for (var i = 0; i < soa_glyph.strokes.length; i++) {
     // Build stroke's path
-    var p = document.createElementNS(_svgNS, "path");
-    p.setAttributeNS(null, "fill", "lightgrey");
-    p.setAttributeNS(null, "stroke", "lightgrey");
-    p.setAttributeNS(null, "d", soa_glyph.strokes[i]);
+    var p = svgPath(soa_ghostcolor, soa_ghostcolor, soa_glyph.strokes[i]);
     // Create group
     var sg = document.createElementNS(_svgNS, 'g');
     sg.setAttributeNS(null, "id", "strokeGroup" + i);
@@ -166,11 +158,7 @@ function soaRender() {
     var ag = document.getElementById("strokeGroupActive");
     ag.appendChild(sg);
     // Re-render ghost in active group
-    var pghost = document.createElementNS(_svgNS, "path");
-    pghost.setAttributeNS(null, "fill", "lightgrey");
-    pghost.setAttributeNS(null, "stroke", "lightgrey");
-    pghost.setAttributeNS(null, "d", stroke);
-    sg.appendChild(pghost);
+    sg.appendChild(svgPath(soa_ghostcolor, soa_ghostcolor, stroke));
     // Clip path: the stroke itself
     var cl = document.createElementNS(_svgNS, 'clipPath');
     cl.setAttributeNS(null, "id", "strokeClip");
@@ -179,18 +167,12 @@ function soaRender() {
     cl.appendChild(cp);
     sg.appendChild(cl);
     // Big fat line, with dash offset
-    var p = document.createElementNS(_svgNS, 'path');
+    var p = svgPath("none", soa_activecolor, medianPath);
     p.setAttributeNS(null, "clip-path", "url(#strokeClip)");
-    p.setAttributeNS(null, "d", medianPath);
-    p.setAttributeNS(null, "fill", "none");
-    p.setAttributeNS(null, "stroke", "#505050");
     p.setAttributeNS(null, "stroke-linecap", "round");
     p.setAttributeNS(null, "stroke-width", "128");
-    var dashArr = medianLength + ' ' + 2 * medianLength;
-    p.setAttributeNS(null, "stroke-dasharray", dashArr);
-    //var dashOfs = 128 + 0.5 * medianLength;
-    var dashOfs = medianLength - soa_animstate.currLength;
-    p.setAttributeNS(null, "stroke-dashoffset", dashOfs);
+    p.setAttributeNS(null, "stroke-dasharray", medianLength + ' ' + 2 * medianLength);
+    p.setAttributeNS(null, "stroke-dashoffset", medianLength - soa_animstate.currLength);
     sg.appendChild(p);
   }
   // If we're past active stroke's length, draw it as finished - this is our post-anim delay
@@ -205,11 +187,7 @@ function soaRender() {
       var ag = document.getElementById("strokeGroupFinished");
       ag.appendChild(sg);
       // Draw finished stroke
-      var p = document.createElementNS(_svgNS, "path");
-      p.setAttributeNS(null, "fill", "black");
-      p.setAttributeNS(null, "stroke", "black");
-      p.setAttributeNS(null, "d", stroke);
-      sg.appendChild(p);
+      sg.appendChild(svgPath(soa_finishedcolor, soa_finishedcolor, stroke));
     }
   }
 }
