@@ -54,6 +54,10 @@ namespace Site
             // From here on ---> lookup
             string strMobile = Request["mobile"];
             isMobile = strMobile == "yes";
+
+            // Auto-add "mobile" class to body if we know it already
+            if (isMobile) Master.SetMobile();
+
             queryInfo = new QueryInfo(Request.UserHostAddress, query);
             resultsHolder.Visible = true;
             welcomeScreen.Visible = false;

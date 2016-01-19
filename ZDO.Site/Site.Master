@@ -16,9 +16,6 @@
   </style>
 </head>
 <body id="theBody" runat="server">
-<div id="loading-box">
-  <div class="loading-anim">...</div>
-</div>
 <nav id="menu">
   <div id="menu-horiz">
     <ul>

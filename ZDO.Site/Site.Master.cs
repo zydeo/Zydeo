@@ -125,6 +125,11 @@ namespace Site
             return Global.GACode;
         }
 
+        public void SetMobile()
+        {
+            theBody.Attributes["class"] = theBody.Attributes["class"] + " mobile";
+        }
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -162,9 +167,6 @@ namespace Site
             swallowbitterpill.InnerText = prov.GetString(uiLang, "CookieAccept");
             cookierecipe.InnerText = prov.GetString(uiLang, "CookieLearnMore");
 
-            // Disable "loading" class on body unless loading Default.aspx for the first time
-            //if (pageName != "search")
-            //    theBody.Attributes["class"] = theBody.Attributes["class"].Replace("loading", "");
             // Make relevant menu item "active"
             if (pageName == "search")
                 navSearch.Attributes["class"] = navSearch.Attributes["class"] + " active";
