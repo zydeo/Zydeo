@@ -45,7 +45,6 @@ namespace Site
                 context.Response.ContentEncoding = Encoding.UTF8;
                 context.Response.Write(ex.Message);
                 context.Response.Flush();
-                context.Response.End();
             }
             catch (Exception)
             {
@@ -59,7 +58,6 @@ namespace Site
                 context.Response.ContentEncoding = Encoding.UTF8;
                 context.Response.Write("Internal server error.");
                 context.Response.Flush();
-                context.Response.End();
             }
         }
     }

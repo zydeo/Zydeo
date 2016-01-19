@@ -12,7 +12,7 @@ body {
 }
 
 #menu {
-  z-index: 2;
+  z-index: 3;
   background-color: #b4ca65;
   margin: 0;
   overflow: hidden;
@@ -152,7 +152,7 @@ body {
 
 #search-bar,
 #page-header {
-  z-index: 2;
+  z-index: 3;
   position: fixed;
   left: 0;
   top: 2.3em;
@@ -365,7 +365,7 @@ input:focus {
 }
 
 #stroke-input {
-  z-index: 2;
+  z-index: 3;
   display: none;
   position: fixed;
   background-color: #c7d9b3;
@@ -466,7 +466,7 @@ body.mobile #footer {
 }
 
 body.mobile #menu {
-  z-index: 2;
+  z-index: 3;
   display: none;
   background-color: #f0f0f0;
   text-align: left;
@@ -547,7 +547,7 @@ body.mobile #search-bar {
 
 
 body.mobile #page-header {
-  z-index: 1;
+  z-index: 2;
   top: 0;
   padding: 0;
   width: 100%;
@@ -858,19 +858,14 @@ body.mobile #welcomeScreen p {
 .toneColorsDummitt .tone4 { color: #589bc8; }
 .toneColorsDummitt .tone4.faint { color: #d9e5ee; }
 
-.hanim,
-.nohanim {
-  -webkit-transition: all 0.5s ease;
-  transition: all 0.5s ease;
-  border: 1pt solid #fafafa;
-  border-radius: 3pt;
+.hanim {
+  cursor: pointer;
 }
 
-.hanim:hover,
-.nohanim:hover {
-  border: 1pt solid #607026;
-  cursor: default;
-  background-color: #F4FFE8;
+.hanim:hover {
+  background-image: url('hhover.png');
+  background-size: 1px 100%;
+  background-repeat: repeat-x;
 }
 
 /* --------------------------- STROKE ORDER ANIMATIONS -------------------------- */
@@ -934,10 +929,16 @@ body.mobile #welcomeScreen p {
   color: #607026;
   -webkit-transition: all 0.5s ease;
   transition: all 0.5s ease;
+  z-index: 2;
 }
 
 #soaClose:hover {
   background-color: #c7d9b3;
+}
+
+#soaGraphics {
+  position: relative;
+  z-index: 1;
 }
 
 #strokeAnimSVG {
@@ -945,17 +946,6 @@ body.mobile #welcomeScreen p {
   margin-left: 9px;
   width: 300px;
   height: 300px;
-}
-
-#soaHourglass {
-  position: absolute;
-  top: 92px;
-  left: 60px;
-  width: 200px;
-}
-
-#soaHourglass img {
-  width: 100%;
 }
 
 #soaError {

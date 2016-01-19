@@ -67,7 +67,6 @@ namespace Site
                 Resp.Write(Json);
                 Resp.Flush();
             }
-            Resp.End();
         }
     }
 

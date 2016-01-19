@@ -38,6 +38,43 @@ function rgb2hex(col) {
   return "#" + hex(col[1]) + hex(col[2]) + hex(col[3]);
 }
 
+// Gets the current selection's bounding element (start), or null if page has no selection.
+function getSelBoundElm() {
+  var range, sel, container;
+  if (document.selection) {
+    range = document.selection.createRange();
+    range.collapse(true);
+    if (range.toString() == "") return null;
+    return range.parentElement();
+  } else {
+    sel = window.getSelection();
+    if (sel.toString() == "") return null;
+    if (sel.getRangeAt) {
+      if (sel.rangeCount > 0) {
+        range = sel.getRangeAt(0);
+      }
+    } else {
+      // Old WebKit
+      range = document.createRange();
+      range.setStart(sel.anchorNode, sel.anchorOffset);
+      range.setEnd(sel.focusNode, sel.focusOffset);
+
+      // Handle the case when the selection was selected backwards (from the end to the start in the document)
+      if (range.collapsed !== sel.isCollapsed) {
+        range.setStart(sel.focusNode, sel.focusOffset);
+        range.setEnd(sel.anchorNode, sel.anchorOffset);
+      }
+    }
+
+    if (range) {
+      container = range["startContainer"];
+
+      // Check if the container is a text node and return its parent if so
+      return container.nodeType === 3 ? container.parentNode : container;
+    }
+  }
+}
+
 // --------------- END HELPERS ----------------------
 
 var isMobile = false;
@@ -90,9 +127,10 @@ function initGui() {
   else if (uiLang === "fan") uiArr = uiFan;
 }
 
-function acceptCookies() {
+function acceptCookies(e) {
   $("#bittercookie").css("display", "none");
   localStorage.setItem("cookies", "go");
+  e.preventDefault();
 }
 
 function globalEventWireup() {

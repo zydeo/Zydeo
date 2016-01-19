@@ -27,6 +27,7 @@ $(document).ready(function () {
   //$("#welcomeScreen").css("display", "block");
 });
 
+// Shows the handwriting recognition pop-up.
 function showStrokeInput() {
   if (!isMobile) {
     var searchPanelOfs = $("#search-panel").offset();
@@ -54,6 +55,7 @@ function showStrokeInput() {
   if (isMobile) hideShowHamburger(false);
 }
 
+// Hides the handwriting recognition popup
 function hideStrokeInput() {
   // Nothing to hide?
   if ($("#stroke-input").css("display") != "block") return;
@@ -62,11 +64,13 @@ function hideStrokeInput() {
   $("#btn-write").attr("class", "");
 }
 
+// Clears the search field
 function clearSearch() {
   $("#txtSearch").val("");
   $("#txtSearch").focus();
 }
 
+// Submits a dictionary search as a POST request.
 function submitSearch() {
   'use strict';
   var form;
@@ -88,7 +92,21 @@ function submitSearch() {
   form.appendTo('body').submit();
 }
 
+// Positions and shows the stroke animation pop-up for the clicked hanzi.
 function hanziClicked(event) {
+  // We get click event when mouse button is released after selecting a single hanzi
+  // Don't want to show pop-up in this edge case
+  var sbe = getSelBoundElm();
+  if (sbe != null && sbe.textContent == $(this).text())
+    return;
+  // OK, so we're actually showing. Stop propagation so we don't get auto-hidden.
+  event.stopPropagation();
+  // If previous show's in progress, kill it
+  // Also kill stroke input, in case it's shown
+  soaKill();
+  hideStrokeInput();
+  // Start the whole spiel
+  // First, decide if we're showing box to left or right of character
   $("#soaBox").css("display", "block");
   var hanziOfs = $(this).offset();
   var onRight = hanziOfs.left < $(document).width() / 2;
@@ -98,13 +116,28 @@ function hanziClicked(event) {
     $("#soaBox").addClass("soaBoxLeft");
     left = hanziOfs.left - $("#soaBox").width() - 20;
   }
-  var top = hanziOfs.top;
+  // Decide about Y position. Box wants char to be at vertical middle
+  // But is willing to move up/down to fit in content area
+  var charY = hanziOfs.top + $(this).height() / 2;
+  var boxH = $("#soaBox").height();
+  var top = charY - boxH / 2;
+  // First, nudge up if we stretch beyond viewport bottom
+  var wBottom = window.pageYOffset + window.innerHeight - 10;
+  if (top + boxH > wBottom) top = wBottom - boxH;
+  // Then, nudge down if we're over the ceiling
+  var wTop = $("#search-bar").position().top + $("#search-bar").height() + window.pageYOffset + 20;
+  if (top < wTop) top = wTop;
+  // Position box, and tail
   $("#soaBox").offset({ left: left, top: top });
+  $("#soaBoxTail").css("top", (charY - top - 10) + "px");
+  // Render grid, issue AJAX query for animation data
   soaRenderBG();
   soaStartQuery($(this).text());
 }
 
+// Closes the stroke animation pop-up (if shown).
 function closeStrokeAnim() {
+  soaKill();
   $("#soaBox").css("display", "none");
 }
 
@@ -115,15 +148,19 @@ function lookupEventWireup() {
     else  showStrokeInput();
   });
   // Auto-hide stroke input when tapping away
+  // Also for stroke animation pop-up
   $('html').click(function () {
     hideStrokeInput();
+    closeStrokeAnim();
   });
   // Must do explicitly for hamburger menu, b/c that stops event propagation
   if (isMobile) $('#btn-menu').click(function () {
     hideStrokeInput();
+    closeStrokeAnim();
   });
   $('#btn-write').click(function (event) {
     event.stopPropagation();
+    closeStrokeAnim();
   });
   $('#stroke-input').click(function (event) {
     event.stopPropagation();
@@ -144,5 +181,8 @@ function lookupEventWireup() {
 
   $(".hanim").click(hanziClicked);
   $("#soaClose").click(closeStrokeAnim);
+  $("#soaBox").click(function (e) {
+    e.stopPropagation();
+  });
 }
 

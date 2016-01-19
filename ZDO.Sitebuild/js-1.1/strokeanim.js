@@ -1,19 +1,27 @@
+// The glyph currently being animated.
 var soa_glyph = {
-  strokes: null,
-  medians: null,
-  medianPaths: [],
-  medianLengths: [],
+  strokes: null, // Received info about glyph
+  medians: null, // Received info about glyph
+  medianPaths: [], // Calculated locally
+  medianLengths: [], // Calculated locally
 };
 
+// Current animation state; updated in timer callback, before each new frame render.
 var soa_animstate = {
   currFinished: false,
   currStroke: 0,
   currLength: 0,
 };
 
+// ID of lookup we're currently waiting for. (So we can discard moot lookups just completing.)
+var soa_lookupid = parseInt((Math.random() * 1000), 10);
+// Animation timer.
 var soa_timer = null;
+// Length to advance at each frame, along median path.
 var soa_increment = 20;
+// Show finished stroke for this number of frames, before moving on to animation of next stroke.
 var soa_strokepause = 20;
+// Frame interval.
 var soa_msec = 20;
 
 var soa_gridcolor = "#607026";
@@ -23,6 +31,7 @@ var soa_activecolor = "#606060";
 
 var _svgNS = 'http://www.w3.org/2000/svg';
 
+// Gets an SVG path from a stroke's median points.
 function soaGetMedianPath(median) {
   const result = [];
   for (var i = 0; i != median.length; i++) {
@@ -34,6 +43,7 @@ function soaGetMedianPath(median) {
   return result.join(' ');
 }
 
+// Calculates length of a stroke's median.
 function soaGetMedianLength(median) {
   var result = 0;
   for (var i = 0; i < median.length - 1; i++) {
@@ -46,12 +56,13 @@ function soaGetMedianLength(median) {
   return result;
 }
 
+// Prepares new glyph (median paths and lengths), clears animation state
 function soaPrepareGlyph(strokes, medians) {
   if (soa_timer != null) {
     clearInterval(soa_timer);
     soa_timer = null;
   }
-  soa_animstate.lastAnimating = -1;
+  soa_animstate.currFinished = false;
   soa_animstate.currStroke = 0;
   soa_animstate.currLength = 0;
   soa_glyph.strokes = strokes;
@@ -64,6 +75,7 @@ function soaPrepareGlyph(strokes, medians) {
   }
 }
 
+// Creates a <rect> that can be inserted into an SVG's DOM.
 function svgRect(x, y, width, height, fill, stroke, strokeWidth, strokeDasharray) {
   var rect = document.createElementNS(_svgNS, 'rect');
   rect.setAttributeNS(null, "x", x);
@@ -77,6 +89,7 @@ function svgRect(x, y, width, height, fill, stroke, strokeWidth, strokeDasharray
   return rect;
 }
 
+// Creates a <line> that can be inserted into an SVG's DOM.
 function svgLine(x1, y1, x2, y2, stroke, strokeWidth, strokeDasharray) {
   var line = document.createElementNS(_svgNS, 'line');
   line.setAttributeNS(null, "x1", x1);
@@ -89,6 +102,7 @@ function svgLine(x1, y1, x2, y2, stroke, strokeWidth, strokeDasharray) {
   return line;
 }
 
+// Creates a <path> that can be inserted into an SVG's DOM.
 function svgPath(fill, stroke, d) {
   var p = document.createElementNS(_svgNS, "path");
   p.setAttributeNS(null, "fill", fill);
@@ -97,10 +111,10 @@ function svgPath(fill, stroke, d) {
   return p;
 }
 
+// Renders the background (grid) of the SVG, ready to receive strokes.
 function soaRenderBG() {
   // No error message; animation on
   $("#soaError").css("display", "none");
-  $("#soaHourglass").css("display", "block");
   // The SVG element
   var r = document.getElementById('strokeAnimSVG');
   // Remove all children
@@ -128,6 +142,7 @@ function soaRenderBG() {
   g.appendChild(subg);
 }
 
+// Pre-renders a glyph before animation: all strokes are "ghosts"; groups for each.
 function soaPreRender() {
   // Transform group
   var g = document.getElementById('strokeGroupGhost');
@@ -143,6 +158,7 @@ function soaPreRender() {
   }
 }
 
+// Renders the glyph corresponding to the current anim state.
 function soaRender() {
   if (soa_animstate.currStroke >= soa_glyph.strokes.length)
     return;
@@ -195,6 +211,18 @@ function soaRender() {
   }
 }
 
+// Kills anything in progress (ongoing queries will be ignored; animation is stopped).
+function soaKill() {
+  // If a previous request completes, we'll discard it
+  ++soa_lookupid;
+  // If we're just animating, stop it
+  if (soa_timer != null) {
+    clearInterval(soa_timer);
+    soa_timer = null;
+  }
+}
+
+// Animation timer callback: advances anim state, and renders.
 function soaTimerFun() {
   // All strokes done? Exit now, stop timer.
   if (soa_animstate.currStroke == soa_glyph.strokes.length) {
@@ -214,29 +242,37 @@ function soaTimerFun() {
   soaRender();
 }
 
-function onSoaReqDone(res) {
+// AJAX request success
+function onSoaReqDone(id, res) {
+  // This is a different request just completing.
+  if (id != soa_lookupid) return;
+  // No result
   if (res == null) {
-    $("#soaHourglass").css("display", "none");
     $("#soaError").css("display", "block");
     $("#soaErrorContent").text(uiArr["no-animation-for-char"]);
   }
+  // Render result
   else {
     soaPrepareGlyph(res.strokes, res.medians);
     soaRenderBG();
-    $("#soaHourglass").css("display", "none");
     soaPreRender();
     soa_timer = setInterval(soaTimerFun, soa_msec);
   }
 }
 
-
-function onSoaReqFail(xhr, status, error) {
-  $("#soaHourglass").css("display", "none");
+// AJAX request failure
+function onSoaReqFail(id, xhr, status, error) {
+  // This is a different request just failing; don't care
+  if (id != soa_lookupid) return;
   $("#soaError").css("display", "block");
   $("#soaErrorContent").text(uiArr["anim-query-failed"]);
 }
 
+// Prepare an issue AJAX query for a Hanzi's stroke order info.
 function soaStartQuery(hanzi) {
+  soaPrepareGlyph([], []);
+  ++soa_lookupid;
+  var id = soa_lookupid;
   // Query URL: localhost for sandboxing only
   var url = "/ApiHandler.ashx";
   if (window.location.protocol == "file:")
@@ -245,27 +281,25 @@ function soaStartQuery(hanzi) {
     url: url,
     type: "POST",
     contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-    data: {action: "hanzi", hanzi: hanzi}
+    data: {action: "hanzi", hanzi: hanzi, lookupid: soa_lookupid}
   });
   req.done(function(res) {
-      onSoaReqDone(res);
-    });
-  req.fail(function(xhr, status, error) {
-    onSoaReqFail(xhr, status, error);
+    onSoaReqDone(id, res);
   });
-  $("#txtHanzi").focus();
-  $("#txtHanzi").select();
+  req.fail(function(xhr, status, error) {
+    onSoaReqFail(id, xhr, status, error);
+  });
 }
 
-//$(document).ready(function () {
-//  //$('#txtHanzi').val();
-//  soaRenderBG();
-//  $("#btnHanzi").click(soaStartQuery);
-//  $("#txtHanzi").keyup(function (e) {
-//    if (e.keyCode == 13) {
-//      soaStartQuery();
-//      return false;
-//    }
-//  });
-//});
-
+// Init at load
+$(document).ready(function () {
+  $("#soaGraphics").click(function() {
+    // Restart animation if we have a glyph but no timer anymore
+    if (soa_timer == null && soa_glyph.strokes != null && soa_glyph.strokes.length >0) {
+      soaPrepareGlyph(soa_glyph.strokes, soa_glyph.medians);
+      soaRenderBG();
+      soaPreRender();
+      soa_timer = setInterval(soaTimerFun, soa_msec);
+    }
+  });
+});

@@ -47,7 +47,6 @@
           <div id="soaGraphics">
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewbox='0 0 1024 1024' id="strokeAnimSVG"></svg>
             <div id="soaError"><div id="soaErrorContent"></div></div>
-            <div id="soaHourglass"><img src="static/ripple.svg" alt="Loading"/></div>
           </div>
           <div id="soaFooter">
             Animation by <a href="https://github.com/skishore/makemeahanzi" target="_blank">makemeahanzi</a>
