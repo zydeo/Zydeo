@@ -53,7 +53,6 @@ namespace Site
             private readonly IpResolver ipr;
             private readonly DateTime time;
             private readonly string hostAddr;
-            private readonly bool isMobile;
             private readonly char hanzi;
             private readonly bool found;
 

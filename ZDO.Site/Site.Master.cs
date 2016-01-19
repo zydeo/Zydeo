@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Reflection;
 
 namespace Site
 {
@@ -81,6 +82,49 @@ namespace Site
 
         }
 
+        /// <summary>
+        /// The executing assembly's version, as string.
+        /// </summary>
+        private static string verStr = null;
+
+        /// <summary>
+        /// Gets the executing assembly's version, as string.
+        /// </summary>
+        public static string VerStr
+        {
+            get
+            {
+                if (verStr == null)
+                {
+                    string s = Assembly.GetExecutingAssembly().GetName().Version.Major.ToString();
+                    s += ".";
+                    s += Assembly.GetExecutingAssembly().GetName().Version.Minor.ToString();
+                    verStr = s;
+                }
+                return verStr;
+            }
+        }
+
+        /// <summary>
+        /// Resolve the URL of a JS file, taking into account current site version.
+        /// </summary>
+        /// <param name="namePure">Name of the JS file, without folder etc.</param>
+        /// <returns>The resolved URL to be included in page.</returns>
+        public string ResolveMyJS(string namePure)
+        {
+            string res = "~/js-{0}/{1}";
+            res = string.Format(res, VerStr, namePure);
+            return ResolveUrl(res);
+        }
+
+        /// <summary>
+        /// Gets the GA code to be inserted into page. Comes from config file so staging site doesn't interfere.
+        /// </summary>
+        protected string GetGACode()
+        {
+            return Global.GACode;
+        }
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -95,6 +139,10 @@ namespace Site
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // Current version and year in footer
+            footerVer.InnerText = VerStr;
+            footerYear.InnerText = DateTime.Now.Year.ToString();
+
             // Hilite language in selector
             if (uiLang == "de") langselDe.Attributes["class"] = langselDe.Attributes["class"] + " active";
             else if (uiLang == "en") langselEn.Attributes["class"] = langselEn.Attributes["class"] + " active";
@@ -124,11 +172,6 @@ namespace Site
                 navAbout.Attributes["class"] = navAbout.Attributes["class"] + " active";
             else if (pageName == "options")
                 navOptions.Attributes["class"] = navAbout.Attributes["class"] + " active";
-        }
-
-        public string GetGACode()
-        {
-            return Global.GACode;
         }
     }
 }

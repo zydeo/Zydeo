@@ -130,6 +130,24 @@ namespace Site {
         protected global::System.Web.UI.WebControls.ContentPlaceHolder mainContentPlaceholder;
         
         /// <summary>
+        /// footerVer control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl footerVer;
+        
+        /// <summary>
+        /// footerYear control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl footerYear;
+        
+        /// <summary>
         /// linkFooterImprint control.
         /// </summary>
         /// <remarks>

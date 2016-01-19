@@ -38,7 +38,7 @@
 </div>
 <div id="footer">
   <div id="footer-inside">
-    <span>HanDeDict @ Zydeo v1.1 &bull; ©2015 Gábor L Ugray &bull; <a id="linkFooterImprint" href="http://zydeo.net/imprint" runat="server">*Imprint</a></span>
+    <span>HanDeDict @ Zydeo <span runat="server" id="footerVer"></span> &bull; ©2015-<span runat="server" id="footerYear"></span> Gábor L Ugray &bull; <a id="linkFooterImprint" href="http://zydeo.net/imprint" runat="server">*Imprint</a></span>
   </div>
 </div>
 <div id="bittercookie">
@@ -47,26 +47,27 @@
   <a id="cookierecipe" href="~/cookies" target="_blank" runat="server">*Learn more</a>
 </div>
 <!-- Includes for every page -->
-<script src='<%=ResolveUrl("~/lib/jquery-2.1.4.min.js") %>'></script>
-<script src='<%=ResolveUrl("~/lib/jquery.tooltipster.min.js") %>'></script>
-<script src='<%=ResolveUrl("~/lib/jquery.color-2.1.2.min.js") %>'></script>
-<script src='<%=ResolveUrl("~/js-1.1/ui-en.js") %>'></script>
-<script src='<%=ResolveUrl("~/js-1.1/ui-de.js") %>'></script>
-<script src='<%=ResolveUrl("~/js-1.1/ui-jian.js") %>'></script>
-<script src='<%=ResolveUrl("~/js-1.1/ui-fan.js") %>'></script>
-<script src='<%=ResolveUrl("~/js-1.1/common.js") %>'></script>
+<script src='<%=ResolveUrl("~/lib/jquery-2.1.4.min.js")%>'></script>
+<script src='<%=ResolveUrl("~/lib/jquery.tooltipster.min.js")%>'></script>
+<script src='<%=ResolveUrl("~/lib/jquery.color-2.1.2.min.js")%>'></script>
+<script src='<%=ResolveMyJS("ui-en.js")%>'></script>
+<script src='<%=ResolveMyJS("ui-en.js")%>'></script>
+<script src='<%=ResolveMyJS("ui-de.js")%>'></script>
+<script src='<%=ResolveMyJS("ui-jian.js")%>'></script>
+<script src='<%=ResolveMyJS("ui-fan.js")%>'></script>
+<script src='<%=ResolveMyJS("common.js")%>'></script>
 <!-- Page-specific includes -->
-<% if(PageName == "search") %>
+<% if (PageName == "search") %>
 <% { %>
-<script src='<%=ResolveUrl("~/js-1.1/shortstraw.js") %>'></script>
-<script src='<%=ResolveUrl("~/js-1.1/chinesestrokes.js") %>'></script>
-<script src='<%=ResolveUrl("~/js-1.1/recog.js") %>'></script>
-<script src='<%=ResolveUrl("~/js-1.1/strokeanim.js") %>'></script>
-<script src='<%=ResolveUrl("~/js-1.1/lookup.js") %>'></script>
+<script src='<%=ResolveMyJS("shortstraw.js")%>'></script>
+<script src='<%=ResolveMyJS("chinesestrokes.js")%>'></script>
+<script src='<%=ResolveMyJS("recog.js")%>'></script>
+<script src='<%=ResolveMyJS("strokeanim.js")%>'></script>
+<script src='<%=ResolveMyJS("lookup.js")%>'></script>
 <% } %>
-<% else if(PageName == "options") %>
+<% else if (PageName == "options") %>
 <% { %>
-<script src='<%=ResolveUrl("~/js-1.1/options.js") %>'></script>
+<script src='<%=ResolveMyJS("options.js")%>'></script>
 <% } %>
 
 <script>
@@ -77,7 +78,7 @@
     m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
   })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-  ga('create', '<%=GetGACode() %>', 'auto');
+  ga('create', '<%=GetGACode()%>', 'auto');
   ga('send', 'pageview');
 
 </script>
