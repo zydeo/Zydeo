@@ -15,7 +15,7 @@
     @import '<%=ResolveUrl("~/static/style.css") %>';
   </style>
 </head>
-<body class="loading" id="theBody" runat="server">
+<body id="theBody" runat="server">
 <div id="loading-box">
   <div class="loading-anim">...</div>
 </div>
@@ -55,12 +55,11 @@
 <script src='<%=ResolveMyJS("ui-de.js")%>'></script>
 <script src='<%=ResolveMyJS("ui-jian.js")%>'></script>
 <script src='<%=ResolveMyJS("ui-fan.js")%>'></script>
-<script src='<%=ResolveMyJS("common.js")%>'></script>
+<script src='<%=ResolveMyJS("common.js")%>' id="elmCommonJS"></script>
 <!-- Page-specific includes -->
 <% if (PageName == "search") %>
 <% { %>
 <script src='<%=ResolveMyJS("shortstraw.js")%>'></script>
-<script src='<%=ResolveMyJS("chinesestrokes.js")%>'></script>
 <script src='<%=ResolveMyJS("recog.js")%>'></script>
 <script src='<%=ResolveMyJS("strokeanim.js")%>'></script>
 <script src='<%=ResolveMyJS("lookup.js")%>'></script>

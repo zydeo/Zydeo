@@ -163,8 +163,8 @@ namespace Site
             cookierecipe.InnerText = prov.GetString(uiLang, "CookieLearnMore");
 
             // Disable "loading" class on body unless loading Default.aspx for the first time
-            if (pageName != "search")
-                theBody.Attributes["class"] = theBody.Attributes["class"].Replace("loading", "");
+            //if (pageName != "search")
+            //    theBody.Attributes["class"] = theBody.Attributes["class"].Replace("loading", "");
             // Make relevant menu item "active"
             if (pageName == "search")
                 navSearch.Attributes["class"] = navSearch.Attributes["class"] + " active";

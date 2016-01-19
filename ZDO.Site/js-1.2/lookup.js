@@ -1,4 +1,12 @@
 $(document).ready(function () {
+  // If session storage says we've already loaded strokes, append script right now
+  // This will happen from browser cache, i.e., page load doesn't suffer
+  if (sessionStorage.getItem("strokesLoaded")) {
+    var elmStrokes = document.createElement('script');
+    document.getElementsByTagName("head")[0].appendChild(elmStrokes);
+    elmStrokes.setAttribute("type","text/javascript");
+    elmStrokes.setAttribute("src", getStrokeDataUrl());
+  }
   // Add tooltips in desktop version only
   if (!isMobile) {
     $("#img-write").tooltipster({
@@ -27,8 +35,36 @@ $(document).ready(function () {
   //$("#welcomeScreen").css("display", "block");
 });
 
+function getStrokeDataUrl() {
+  // Figure out URL by stealing from "common.js" - which is always there. Right?!
+  var elmCommonJS = document.getElementById("elmCommonJS");
+  var urlCommonJS = elmCommonJS.getAttribute("src");
+  var re = /common\.js/;
+  var urlStrokes = urlCommonJS.replace(re, "chinesestrokes.js");
+  return urlStrokes;
+}
+
 // Shows the handwriting recognition pop-up.
 function showStrokeInput() {
+  // Firsty first: load the stroke data if missing
+  if (typeof strokesData === 'undefined') {
+    // Add element, and also event handler for completion
+    var elmStrokes = document.createElement('script');
+    document.getElementsByTagName("head")[0].appendChild(elmStrokes);
+    var funEnabler = function() {
+      setRecogEnabled(true);
+      sessionStorage.setItem("strokesLoaded", true);
+    }
+    elmStrokes.onload = function() { funEnabler(); };
+    elmStrokes.onreadystatechange = function() {
+      if (this.readyState == 'complete') funEnabler();
+    }
+    elmStrokes.setAttribute("type","text/javascript");
+    elmStrokes.setAttribute("src", getStrokeDataUrl());
+    // Make input disabled
+    setRecogEnabled(false);
+  }
+  // Position and show panel
   if (!isMobile) {
     var searchPanelOfs = $("#search-panel").offset();
     var searchPanelWidth = $("#search-panel").width();

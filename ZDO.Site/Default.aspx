@@ -27,6 +27,7 @@
     </div>
     <div id="stroke-input">
       <div id="stroke-inner">
+        <div id="strokeDataLoading">Loading...</div>
         <canvas id="stroke-input-canvas"></canvas>
         <div id="stroke-commands">
           <div id="strokeClear" runat="server">*Clear</div>

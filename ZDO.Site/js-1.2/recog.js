@@ -39,6 +39,7 @@ var lastTouchX = -1;
 var lastTouchY = -1;
 var tstamp;
 var lastPt;
+var recogEnabled = true;
 
 // An array of arrays; each element is the coordinate sequence for one stroke from the canvas
 // Where "stroke" is everything between button press - move - button release
@@ -60,18 +61,20 @@ function initStrokes() {
   ctx = canvas.getContext("2d");
 
   $('#' + canvasId).mousemove(function (e) {
-    if (!clicking)return;
+    if (!clicking || !recogEnabled) return;
     var x = e.pageX - $(this).offset().left;
     var y = e.pageY - $(this).offset().top;
     dragClick(x, y);
     debugOnScreen("MouseMove X: " + x + " Y: " + y);
   });
   $('#' + canvasId).mousedown(function (e) {
+    if (!recogEnabled) return;
     var x = e.pageX - $(this).offset().left;
     var y = e.pageY - $(this).offset().top;
     startClick(x, y);
     debugOnScreen("MouseDown X: " + x + " Y: " + y);
   }).mouseup(function (e) {
+    if (!recogEnabled) return;
     var x = e.pageX - $(this).offset().left;
     var y = e.pageY - $(this).offset().top;
     endClick(x, y);
@@ -79,7 +82,7 @@ function initStrokes() {
   });
 
   $('#' + canvasId).bind("touchmove", function (e) {
-    if (!clicking)return;
+    if (!clicking || !recogEnabled) return;
     e.preventDefault();
     var x = e.originalEvent.touches[0].pageX - $(this).offset().left;
     lastTouchX = x;
@@ -89,6 +92,7 @@ function initStrokes() {
     debugOnScreen("TouchMove X: " + x + " Y: " + y);
   });
   $('#' + canvasId).bind("touchstart", function (e) {
+    if (!recogEnabled) return;
     e.preventDefault();
     document.activeElement.blur();
     var x = e.originalEvent.touches[0].pageX - $(this).offset().left;
@@ -96,12 +100,25 @@ function initStrokes() {
     startClick(x, y);
     debugOnScreen("TouchStart X: " + x + " Y: " + y);
   }).bind("touchend", function (e) {
+    if (!recogEnabled) return;
     e.preventDefault();
     document.activeElement.blur();
     endClick(lastTouchX, lastTouchY);
     lastTouchX = lastTouchY = -1;
     debugOnScreen("TouchEnd");
   });
+}
+
+function setRecogEnabled(enabled) {
+  recogEnabled = enabled;
+  if (!enabled) {
+    $("#stroke-input-canvas").addClass("loading");
+    $("#strokeDataLoading").css("display", "block");
+  }
+  else {
+    $("#stroke-input-canvas").removeClass("loading");
+    $("#strokeDataLoading").css("display", "none");
+  }
 }
 
 // Draws a clear canvas, with gridlines
