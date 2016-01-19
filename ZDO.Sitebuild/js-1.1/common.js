@@ -103,8 +103,8 @@ function mobileOrFull() {
 function initGui() {
   // Cookie warning / opt-in pest
   var cookies = localStorage.getItem("cookies");
-  if (cookies == "go") {
-    $("#bittercookie").css("display", "none");
+  if (cookies != "go") {
+    $("#bittercookie").css("display", "block");
   }
 
   // Nudge footer to bottom of short pages
