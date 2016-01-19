@@ -109,7 +109,7 @@
     <Content Include="static\hhover.png" />
     <Content Include="static\nav-back.svg" />
     <Content Include="static\search.svg" />
-    <Content Include="static\style.css" />
+    <Content Include="static\style-v1.2.css" />
     <Content Include="static\tooltipster.css" />
     <Content Include="static\zydeo-owl-sad.svg" />
     <Content Include="static\zydeo-owl.svg" />
