@@ -126,7 +126,7 @@ namespace Site
                 }
                 // If we're rendering both scripts, then show faint traditional chars where same as simp
                 if (faintIdentTrad && c == entry.ChSimpl[i]) cls += " faint";
-                // Mark up existence of stroke order animation
+                // Mark up character for stroke order animation
                 cls += " hanim";
                 // Render with enclosing span if we have a relevant class
                 if (!string.IsNullOrEmpty(cls))

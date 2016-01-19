@@ -25,7 +25,11 @@ namespace Site
             string hanzi = Req.Params["hanzi"];
             if (hanzi == null) throw new ApiException(400, "Missing 'hanzi' parameter.");
             if (hanzi.Length != 1) throw new ApiException(400, "'hanzi' parameter must contain a single character.");
+            // Look up hanzi
             HanziInfo hi = Global.Dict.GetHanziInfo(hanzi[0]);
+            // Log query
+            QueryLogger.Instance.LogHanzi(Req.UserHostAddress, hanzi[0], hi != null);
+            // Produce response
             if (hi == null) Json = "null";
             else
             {

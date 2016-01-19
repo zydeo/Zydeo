@@ -48,6 +48,49 @@ namespace Site
             string LogLine { get; }
         }
 
+        private class HanziItem : IAuditItem
+        {
+            private readonly IpResolver ipr;
+            private readonly DateTime time;
+            private readonly string hostAddr;
+            private readonly bool isMobile;
+            private readonly char hanzi;
+            private readonly bool found;
+
+            public HanziItem(IpResolver ipr, string hostAddr, char hanzi, bool found)
+            {
+                this.time = DateTime.UtcNow;
+                this.ipr = ipr;
+                this.hostAddr = hostAddr;
+                this.hanzi = hanzi;
+                this.found = found;
+            }
+            public string LogLine
+            {
+                get
+                {
+                    IPAddress addr = null;
+                    if (!IPAddress.TryParse(hostAddr, out addr)) addr = null;
+                    string country = addr == null ? ipr.GetNoCountry() : ipr.GetContryCode(addr);
+                    country += "-HANZI";
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(QueryLogger.FormatTime(time));
+                    sb.Append('\t');
+                    sb.Append(country);
+                    sb.Append('\t');
+                    sb.Append('\t');
+                    sb.Append('\t');
+                    sb.Append('\t');
+                    sb.Append(found ? "1" : "0");
+                    sb.Append('\t');
+                    sb.Append(hanzi);
+
+                    return sb.ToString();
+                }
+            }
+        }
+
         private class QueryItem : IAuditItem
         {
             private readonly IpResolver ipr;
@@ -171,6 +214,7 @@ namespace Site
                     foreach (IAuditItem itm in myList)
                     {
                         if (itm is QueryItem) swQueryLog.WriteLine(itm.LogLine);
+                        else if (itm is HanziItem) swQueryLog.WriteLine(itm.LogLine);
                     }
                     swQueryLog.Flush();
                 }
@@ -182,6 +226,16 @@ namespace Site
         {
             QueryItem itm = new QueryItem(ipResolver, hostAddr, isMobile, uiLang, script, tones,
                 resCount, msecLookup, msecTotal, lang, query);
+            lock (ilist)
+            {
+                ilist.Add(itm);
+                evt.Set();
+            }
+        }
+
+        public void LogHanzi(string hostAddr, char hanzi, bool found)
+        {
+            HanziItem itm = new HanziItem(ipResolver, hostAddr, hanzi, found);
             lock (ilist)
             {
                 ilist.Add(itm);
