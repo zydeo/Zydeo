@@ -70,7 +70,8 @@ function showStrokeInput() {
     var searchPanelWidth = $("#search-panel").width();
     var searchPanelHeight = $("#search-panel").height();
     var strokeInputWidth = $("#stroke-input").outerWidth();
-    $("#stroke-input").css("top", searchPanelOfs.top + searchPanelHeight + 1);
+    //$("#stroke-input").position({left: 0, top: searchPanelOfs.top + searchPanelHeight + 390});
+    $("#stroke-input").css("margin-top", searchPanelOfs.top - window.pageYOffset + searchPanelHeight);
     $("#stroke-input").css("left", searchPanelOfs.left + searchPanelWidth - strokeInputWidth + 2);
     $("#stroke-input").css("display", "block");
     $("#suggestions").html("<br/><br/>");
@@ -104,6 +105,12 @@ function hideStrokeInput() {
 function clearSearch() {
   $("#txtSearch").val("");
   $("#txtSearch").focus();
+}
+
+// When the search input field receives focus
+function txtSearchFocus(event) {
+  if (isMobile) return;
+  $("#txtSearch").select();
 }
 
 // Submits a dictionary search as a POST request.
@@ -205,7 +212,7 @@ function lookupEventWireup() {
   $("#btn-clear").click(clearSearch);
   $("#btn-write").click(function () {
     if ($("#stroke-input").css("display") == "block") hideStrokeInput();
-    else  showStrokeInput();
+    else showStrokeInput();
   });
   // Auto-hide stroke input when tapping away
   // Also for stroke animation pop-up
@@ -235,6 +242,7 @@ function lookupEventWireup() {
       return false;
     }
   });
+  $("#txtSearch").focus(txtSearchFocus);
   $("#txtSearch").change(function () {
     appendNotOverwrite = true;
   });
