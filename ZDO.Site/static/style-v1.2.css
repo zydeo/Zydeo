@@ -456,6 +456,119 @@ input:focus {
 }
 
 
+/* --------------------------- STROKE ORDER ANIMATIONS -------------------------- */
+
+#soaBox {
+  position: absolute;
+  width:  320px;
+  height: 375px;
+  background-color: #fafafa;
+  border: 1px solid #607026;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, .7);
+  cursor: default;
+  display: none;
+}
+
+#soaBoxTail {
+  display: block;
+  position: absolute;
+  left: -14px;
+  top: 15px;
+  width: 24px;
+  height: 24px;
+  border-color: #607026;
+  border-width: 2px;
+  border-style: none none solid solid;
+  background-color: #fafafa;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+}
+
+.soaBoxLeft #soaBoxTail {
+  left: 308px;
+  border-style: solid solid none none;
+}
+
+#soaHead {
+  position: relative;
+  float: left;
+  width: 100%;
+  background-color: #607026;
+  border-bottom: 1px solid #607026;
+  color: #fafafa;
+  font-size: 16pt;
+}
+
+#soaTitle {
+  padding-left: 5pt;
+  position: relative;
+  float: left;
+  height: 24pt;
+}
+
+#soaClose {
+  position: relative;
+  float: right;
+  width: 24pt;
+  height: 24pt;
+  background-color: #b4ca65;
+  text-align: center;
+  color: #607026;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+  z-index: 2;
+}
+
+#soaClose:hover {
+  background-color: #c7d9b3;
+}
+
+#soaGraphics {
+  position: relative;
+  z-index: 1;
+}
+
+#strokeAnimSVG {
+  margin-top: 10px;
+  margin-left: 9px;
+  width: 300px;
+  height: 300px;
+}
+
+#soaError {
+  position: absolute;
+  top: 150px;
+  width: 100%;
+  display: none;
+}
+
+#soaErrorContent {
+  background-color: #ffe4cc;
+  max-width: 240px;
+  min-height: 50px;
+  border-radius: 5pt;
+  padding: 8pt;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  vertical-align: middle;
+}
+
+#soaFooter {
+  text-align: right;
+  font-style: italic;
+  font-size: 10pt;
+  padding-right: 8pt;
+}
+
+#soaFooter a,
+#soaFooter a:hover,
+#soaFooter a:visited {
+  color: #607026;
+  text-decoration: none;
+}
+
 /* ------------------------------- MOBILE -------------------------------- */
 
 body.mobile {
@@ -733,6 +846,56 @@ body.mobile #welcomeScreen p {
   padding-right: 10%;
 }
 
+body.mobile #soaBox {
+  height: auto;
+}
+
+body.mobile #soaHead {
+  font-size: 50pt;
+}
+
+body.mobile #soaTitle {
+  height: 80pt;
+  padding-left: 20pt;
+  padding-top: 5pt;
+}
+
+body.mobile #soaClose {
+  height: 80pt;
+  width: 80pt;
+  padding-top: 5pt;
+}
+
+body.mobile #soaBoxTail {
+  display: none;
+}
+
+body.mobile #strokeAnimSVG {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+body.mobile #soaFooter {
+  font-size: 24pt;
+  padding-right: 20pt;
+  margin-bottom: 14pt;
+}
+
+body.mobile #soaError {
+  top: 0;
+  width: auto;
+}
+
+body.mobile #soaErrorContent {
+  background-color: #ffe4cc;
+  max-width: none;
+  min-height: none;
+  border-radius: 5pt;
+  margin: none;
+  font-size: 36pt;
+}
+
+
 /* ------------------------------- WELCOME SCREEN ------------------------------- */
 
 #welcomeScreen {
@@ -877,117 +1040,4 @@ body.mobile #welcomeScreen p {
   background-image: url('hhover.png');
   background-size: 1px 100%;
   background-repeat: repeat-x;
-}
-
-/* --------------------------- STROKE ORDER ANIMATIONS -------------------------- */
-
-#soaBox {
-  position: absolute;
-  width:  320px;
-  height: 375px;
-  background-color: #fafafa;
-  border: 1px solid #607026;
-  box-shadow: 0px 0px 6px rgba(0, 0, 0, .7);
-  cursor: default;
-  display: none;
-}
-
-#soaBoxTail {
-  display: block;
-  position: absolute;
-  left: -14px;
-  top: 15px;
-  width: 24px;
-  height: 24px;
-  border-color: #607026;
-  border-width: 2px;
-  border-style: none none solid solid;
-  background-color: #fafafa;
-  transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
-  -moz-transform: rotate(45deg);
-}
-
-.soaBoxLeft #soaBoxTail {
-  left: 308px;
-  border-style: solid solid none none;
-}
-
-#soaHead {
-  position: relative;
-  float: left;
-  width: 100%;
-  background-color: #607026;
-  border-bottom: 1px solid #607026;
-  color: #fafafa;
-  font-size: 16pt;
-}
-
-#soaTitle {
-  padding-left: 5pt;
-  position: relative;
-  float: left;
-  height: 24pt;
-}
-
-#soaClose {
-  position: relative;
-  float: right;
-  width: 24pt;
-  height: 24pt;
-  background-color: #b4ca65;
-  text-align: center;
-  color: #607026;
-  -webkit-transition: all 0.5s ease;
-  transition: all 0.5s ease;
-  z-index: 2;
-}
-
-#soaClose:hover {
-  background-color: #c7d9b3;
-}
-
-#soaGraphics {
-  position: relative;
-  z-index: 1;
-}
-
-#strokeAnimSVG {
-  margin-top: 10px;
-  margin-left: 9px;
-  width: 300px;
-  height: 300px;
-}
-
-#soaError {
-  position: absolute;
-  top: 150px;
-  width: 100%;
-  display: none;
-}
-
-#soaErrorContent {
-  background-color: #ffe4cc;
-  max-width: 240px;
-  min-height: 50px;
-  border-radius: 5pt;
-  padding: 8pt;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  vertical-align: middle;
-}
-
-#soaFooter {
-  text-align: right;
-  font-style: italic;
-  font-size: 10pt;
-  padding-right: 8pt;
-}
-
-#soaFooter a,
-#soaFooter a:hover,
-#soaFooter a:visited {
-  color: #607026;
-  text-decoration: none;
 }

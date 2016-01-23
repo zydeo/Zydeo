@@ -42,7 +42,7 @@
         <div id="soaBox" class="soaBoxLeft" runat="server">
           <div id="soaBoxTail">&nbsp;</div>
           <div id="soaHead">
-            <div id="soaTitle">Stroke order animation</div>
+            <div id="soaTitle">Stroke order</div>
             <div id="soaClose">X</div>
           </div>
           <div id="soaGraphics">

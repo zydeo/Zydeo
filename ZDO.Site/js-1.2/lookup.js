@@ -128,22 +128,9 @@ function submitSearch() {
   form.appendTo('body').submit();
 }
 
-// Positions and shows the stroke animation pop-up for the clicked hanzi.
-function hanziClicked(event) {
-  // We get click event when mouse button is released after selecting a single hanzi
-  // Don't want to show pop-up in this edge case
-  var sbe = getSelBoundElm();
-  if (sbe != null && sbe.textContent == $(this).text())
-    return;
-  // OK, so we're actually showing. Stop propagation so we don't get auto-hidden.
-  event.stopPropagation();
-  // If previous show's in progress, kill it
-  // Also kill stroke input, in case it's shown
-  soaKill();
-  hideStrokeInput();
-  // Start the whole spiel
+// Dynamically position stroke order animation popup in Desktop
+function dynPosSOA() {
   // First, decide if we're showing box to left or right of character
-  $("#soaBox").css("display", "block");
   var hanziOfs = $(this).offset();
   var onRight = hanziOfs.left < $(document).width() / 2;
   var left = hanziOfs.left + $(this).width() + 20;
@@ -164,8 +151,45 @@ function hanziClicked(event) {
   var wTop = $("#search-bar").position().top + $("#search-bar").height() + window.pageYOffset + 20;
   if (top < wTop) top = wTop;
   // Position box, and tail
-  $("#soaBox").offset({ left: left, top: top });
+  $("#soaBox").offset({left: left, top: top});
   $("#soaBoxTail").css("top", (charY - top - 10) + "px");
+}
+
+// Position and size SAO box in mobile UI
+function mobilePosSOA() {
+  var dw = $(document).width();
+  var soaW = dw * 0.8;
+  var top = $("#search-bar").position().top + $("#search-bar").height() + window.pageYOffset + 60;
+  $("#soaBox").width(soaW);
+  $("#soaBox").offset({left: (dw - soaW) / 2, top: top});
+  var graphW = $("#soaGraphics").innerWidth();
+  var svgW = graphW - 40;
+  $("#strokeAnimSVG").width(svgW);
+  $("#strokeAnimSVG").height(svgW);
+  var errW = svgW * 0.8;
+  $("#soaError").width(errW);
+  $("#soaError").css("margin-left", (graphW - errW)/2);
+  $("#soaError").css("margin-top", graphW / 3);
+}
+
+// Positions and shows the stroke animation pop-up for the clicked hanzi.
+function hanziClicked(event) {
+  // We get click event when mouse button is released after selecting a single hanzi
+  // Don't want to show pop-up in this edge case
+  var sbe = getSelBoundElm();
+  if (sbe != null && sbe.textContent == $(this).text())
+    return;
+  // OK, so we're actually showing. Stop propagation so we don't get auto-hidden.
+  event.stopPropagation();
+  // If previous show's in progress, kill it
+  // Also kill stroke input, in case it's shown
+  soaKill();
+  hideStrokeInput();
+  // Start the whole spiel
+  $("#soaBox").css("display", "block");
+  // We only position dynamically in desktop version; in mobile, it's fixed
+  if (!isMobile) dynPosSOA();
+  else mobilePosSOA();
   // Render grid, issue AJAX query for animation data
   soaRenderBG();
   soaStartQuery($(this).text());
