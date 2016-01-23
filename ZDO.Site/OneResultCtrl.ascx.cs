@@ -39,6 +39,10 @@ namespace Site
             int hanziLimit = isMobile ? 4 : 6;
             CedictEntry entry = prov.GetEntry(res.EntryId);
 
+            Dictionary<int, CedictTargetHighlight> senseHLs = new Dictionary<int, CedictTargetHighlight>();
+            foreach (CedictTargetHighlight hl in res.TargetHilites)
+                senseHLs[hl.SenseIx] = hl;
+
             string entryClass = "entry";
             if (tones == UiTones.Pleco) entryClass += " toneColorsPleco";
             else if (tones == UiTones.Dummitt) entryClass += " toneColorsDummitt";
@@ -97,7 +101,9 @@ namespace Site
             writer.RenderBeginTag(HtmlTextWriterTag.Div); // <div class="senses">
             for (int i = 0; i != entry.SenseCount; ++i)
             {
-                renderSense(writer, entry.GetSenseAt(i), i, res.TargetHilites);
+                CedictTargetHighlight thl = null;
+                if (senseHLs.ContainsKey(i)) thl = senseHLs[i];
+                renderSense(writer, entry.GetSenseAt(i), i, thl);
             }
             writer.RenderEndTag(); // <div class="senses">
 
@@ -162,7 +168,7 @@ namespace Site
             return res;
         }
 
-        private void renderSense(HtmlTextWriter writer, CedictSense sense, int ix, IEnumerable<CedictTargetHighlight> hls)
+        private void renderSense(HtmlTextWriter writer, CedictSense sense, int ix, CedictTargetHighlight hl)
         {
             writer.AddAttribute(HtmlTextWriterAttribute.Class, "sense");
             writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="sense">
@@ -198,15 +204,38 @@ namespace Site
             if (equiv != string.Empty)
             {
                 if (domain != string.Empty) writer.WriteEncodedText(" ");
+                renderEquiv(writer, sense.Equiv, hl, needToSplit);
+                needToSplit = false;
+                /*
                 if (needToSplit)
                 {
                     string[] firstAndRest = splitFirstWord(equiv);
+                    bool hlStarted = false;
+                    if (hl != null && hl.RunIx == 0 && hl.HiliteStart == 0)
+                    {
+                        // sense hilite
+                        if (hl.HiliteLength == firstAndRest[0].Length)
+                            writer.AddAttribute(HtmlTextWriterAttribute.Class, "sense-hl");
+                        else
+                        {
+                            writer.AddAttribute(HtmlTextWriterAttribute.Class, "sense-hl-start");
+                            hlStarted = true;
+                        }
+                        writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                    }
                     writer.WriteEncodedText(firstAndRest[0]);
+                    if (hl != null && hl.RunIx == 0 && hl.HiliteStart == 0)
+                        writer.RenderEndTag(); // sense hilite
                     writer.RenderEndTag(); // sense-nobr
-                    if (firstAndRest.Length > 1) writer.WriteEncodedText(firstAndRest[1]);
+                    if (firstAndRest.Length > 1)
+                    {
+                        if (hl == null) writer.WriteEncodedText(firstAndRest[1]);
+                        else renderHLEquivRest(writer, hl, hlStarted, sense.Equiv, firstAndRest[0].Length);
+                    }
                     needToSplit = false;
                 }
                 else writer.WriteEncodedText(equiv);
+                */
             }
             if (note != string.Empty)
             {
@@ -237,6 +266,105 @@ namespace Site
 
             writer.RenderEndTag(); // <span class="sense">
 
+        }
+
+        private class HybridTextConsumer
+        {
+            private readonly HybridText txt;
+            private readonly CedictTargetHighlight hl;
+            private int runIX = 0;
+            private int runPos = 0;
+            private string runTxt;
+            public HybridTextConsumer(HybridText txt, CedictTargetHighlight hl)
+            {
+                this.txt = txt;
+                this.hl = hl;
+                runTxt = txt.GetRunAt(0).GetPlainText();
+            }
+            public void GetNext(out char c, out bool inHL)
+            {
+                if (runPos >= runTxt.Length)
+                {
+                    ++runIX;
+                    runPos = 0;
+                    if (runIX < txt.RunCount) runTxt = txt.GetRunAt(runIX).GetPlainText();
+                    else runTxt = null;
+                }
+                if (runTxt == null)
+                {
+                    c = (char)0;
+                    inHL = false;
+                    return;
+                }
+                c = runTxt[runPos];
+                if (hl == null || hl.RunIx != runIX) inHL = false;
+                else inHL = runPos >= hl.HiliteStart && runPos < hl.HiliteStart + hl.HiliteLength;
+                ++runPos;
+            }
+            public bool IsNextSpaceInHilite()
+            {
+                int nextSpaceIX = -1;
+                for (int i = runIX; i < runTxt.Length; ++i)
+                {
+                    if (runTxt[i] == ' ') { nextSpaceIX = i; break; }
+                }
+                if (nextSpaceIX == -1) return false;
+                return nextSpaceIX >= hl.HiliteStart && nextSpaceIX < hl.HiliteStart + hl.HiliteLength;
+            }
+        }
+
+        private void renderEquiv(HtmlTextWriter writer, HybridText equiv, CedictTargetHighlight hl, bool nobr)
+        {
+            HybridTextConsumer htc = new HybridTextConsumer(equiv, hl);
+            bool firstWordOver = false;
+            bool hlOn = false;
+            char c;
+            bool inHL;
+            while (true)
+            {
+                htc.GetNext(out c, out inHL);
+                if (c == (char)0) break;
+                // Highlight starts?
+                if (inHL && !hlOn)
+                {
+                    // Very first word gets special highlight if hilite goes beyond first space, and we're in nobr mode
+                    if (!firstWordOver && nobr && htc.IsNextSpaceInHilite())
+                    {
+                        writer.AddAttribute(HtmlTextWriterAttribute.Class, "sense-hl-start");
+                        writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                    }
+                    // Plain old hilite start everywhere else
+                    else
+                    {
+                        writer.AddAttribute(HtmlTextWriterAttribute.Class, "sense-hl");
+                        writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                    }
+                    hlOn = true;
+                }
+                // Highlight ends?
+                else if (!inHL && hlOn)
+                {
+                    writer.RenderEndTag();
+                    hlOn = false;
+                }
+                // Space - close "nobr" span if first word's just over
+                if (c == ' ' && !firstWordOver && nobr)
+                {
+                    firstWordOver = true;
+                    writer.RenderEndTag();
+                    if (hlOn)
+                    {
+                        writer.RenderEndTag();
+                        writer.AddAttribute(HtmlTextWriterAttribute.Class, "sense-hl-end");
+                        writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                    }
+                }
+                // Render character
+                writer.WriteEncodedText(c.ToString());
+            }
+            // Close hilite and nobr that we may have open
+            if (!firstWordOver && nobr) writer.RenderEndTag();
+            if (hlOn) writer.RenderEndTag();
         }
     }
 }
