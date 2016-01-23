@@ -263,6 +263,7 @@ namespace ZD.CedictEngine
             // What this function does:
             // - Separates tone mark from text (unless it's a "weird" syllable
             // - Replaces "u:" with "v"
+            // - Replaces "ü" with "v"
             // - Maps every non-weird input syllable to r5-merged output syllables
             //   List has as many values as there are non-weird input syllables
             //   Values in list point into "sylls" output array
@@ -284,8 +285,11 @@ namespace ZD.CedictEngine
                 // Neutral tone for us is 0, not five
                 if (tone == 5) tone = 0;
                 // "u:" is for us "v"
+                // "ü" is for us "v"
                 text = text.Replace("u:", "v");
                 text = text.Replace("U:", "V");
+                text = text.Replace("ü", "v");
+                text = text.Replace("Ü", "V");
                 // Store new syllable
                 sylls.Add(new PinyinSyllable(text, tone));
                 // Add to map
