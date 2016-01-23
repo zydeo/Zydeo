@@ -75,6 +75,7 @@ namespace Site
                 resultsHolder.Controls.Add(resCtrl);
             }
             txtSearch.Value = query;
+            // No results
             if (lr.Results.Count == 0)
             {
                 resultsHolder.Visible = false;
@@ -82,8 +83,10 @@ namespace Site
                 welcomeScreen.InnerHtml = TextProvider.Instance.GetSnippet(Master.UILang, "noresults");
                 Title = TextProvider.Instance.GetString(Master.UILang, "TitleMain");
             }
+            // We got results
             else
             {
+                // Page title
                 string title;
                 if (lr.ActualSearchLang == SearchLang.Chinese)
                     title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchChinese");
@@ -91,7 +94,14 @@ namespace Site
                     title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchGerman");
                 title = string.Format(title, query);
                 Title = title;
+                // SOA BOX
                 soaBox.Visible = true;
+                soaTitle.InnerText = TextProvider.Instance.GetString(Master.UILang, "AnimPopupTitle");
+                string attrLink = "<a href='https://github.com/skishore/makemeahanzi' target='_blank'>{0}</a>";
+                attrLink = string.Format(attrLink, TextProvider.Instance.GetString(Master.UILang, "AnimPopupMMAH"));
+                string attrHtml = TextProvider.Instance.GetString(Master.UILang, "AnimPopupAttr");
+                attrHtml = string.Format(attrHtml, attrLink);
+                soaFooter.InnerHtml = attrHtml;
             }
         }
 

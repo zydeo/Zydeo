@@ -42,15 +42,15 @@
         <div id="soaBox" class="soaBoxLeft" runat="server">
           <div id="soaBoxTail">&nbsp;</div>
           <div id="soaHead">
-            <div id="soaTitle">Stroke order</div>
+            <div id="soaTitle" runat="server">*Stroke order</div>
             <div id="soaClose">X</div>
           </div>
           <div id="soaGraphics">
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewbox='0 0 1024 1024' id="strokeAnimSVG"></svg>
             <div id="soaError"><div id="soaErrorContent"></div></div>
           </div>
-          <div id="soaFooter">
-            Animation by <a href="https://github.com/skishore/makemeahanzi" target="_blank">makemeahanzi</a>
+          <div id="soaFooter" runat="server">
+            *Animation by <a href="https://github.com/skishore/makemeahanzi" target="_blank">makemeahanzi</a>
           </div>
         </div>
        <div id="welcomeScreen" runat="server">

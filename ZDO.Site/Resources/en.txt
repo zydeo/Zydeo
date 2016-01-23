@@ -26,4 +26,10 @@ BtnStrokeUndo				Undo
 # Main search box
 TxtSearchPlacholder			Hanzi, Pinyin or German word
 
+# Stroke order animation popup
+AnimPopupTitle				Stroke order
+AnimPopupAttr				Animation by {0}
+AnimPopupMMAH				makemeahanzi
+
+
 

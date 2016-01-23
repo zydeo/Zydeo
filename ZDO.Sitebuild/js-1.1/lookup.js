@@ -129,11 +129,11 @@ function submitSearch() {
 }
 
 // Dynamically position stroke order animation popup in Desktop
-function dynPosSOA() {
+function dynPosSOA(zis) {
   // First, decide if we're showing box to left or right of character
-  var hanziOfs = $(this).offset();
+  var hanziOfs = zis.offset();
   var onRight = hanziOfs.left < $(document).width() / 2;
-  var left = hanziOfs.left + $(this).width() + 20;
+  var left = hanziOfs.left + zis.width() + 20;
   if (onRight) $("#soaBox").removeClass("soaBoxLeft");
   else {
     $("#soaBox").addClass("soaBoxLeft");
@@ -141,7 +141,7 @@ function dynPosSOA() {
   }
   // Decide about Y position. Box wants char to be at vertical middle
   // But is willing to move up/down to fit in content area
-  var charY = hanziOfs.top + $(this).height() / 2;
+  var charY = hanziOfs.top + zis.height() / 2;
   var boxH = $("#soaBox").height();
   var top = charY - boxH / 2;
   // First, nudge up if we stretch beyond viewport bottom
@@ -188,7 +188,7 @@ function hanziClicked(event) {
   // Start the whole spiel
   $("#soaBox").css("display", "block");
   // We only position dynamically in desktop version; in mobile, it's fixed
-  if (!isMobile) dynPosSOA();
+  if (!isMobile) dynPosSOA($(this));
   else mobilePosSOA();
   // Render grid, issue AJAX query for animation data
   soaRenderBG();
