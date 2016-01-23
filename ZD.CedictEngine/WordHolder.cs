@@ -98,5 +98,45 @@ namespace ZD.CedictEngine
             tokenToIdMap[token] = id;
             return id;
         }
+
+        /// <summary>
+        /// Gets the first real (non-placeholder) token.
+        /// </summary>
+        internal string GetFirstRealToken()
+        {
+            foreach (string tok in tokenToIdMap.Keys)
+            {
+                if (tok == TokenNum) continue;
+                if (tok == TokenZho) continue;
+                return tok;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets preceding and following words; null at edges.
+        /// </summary>
+        internal void GetPrevNext(string str, out string prev, out string next)
+        {
+            prev = next = null;
+            string x = null;
+            bool nextIsNext = false;
+            foreach (string tok in tokenToIdMap.Keys)
+            {
+                if (tok == TokenNum) continue;
+                if (tok == TokenZho) continue;
+                if (nextIsNext)
+                {
+                    next = tok;
+                    break;
+                }
+                if (tok == str)
+                {
+                    prev = x;
+                    nextIsNext = true;
+                }
+                x = tok;
+            }
+        }
     }
 }

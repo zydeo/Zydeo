@@ -8,7 +8,15 @@ TitleCookies				How HanDeDict @ Zydeo uses cookies
 
 # Metainformation: description and keywords
 MetaDescription				HanDeDict @ Zydeo: Search the HanDeDict open-source Chinese-German dictionary online.
+MetaDescriptionZho			German translation for "{0}" in the HanDeDict open-source Chinese-German dictionary.
+MetaDescriptionTrg			Chinese translation for "{0}" in the HanDeDict open-source Chinese-German dictionary.
 MetaKeywords				HanDeDict, Zydeo, Chinese, German, dictionary, free, open-source
+MetaKeywordsZho				{0}, German, translation, dictionary
+MetaKeywordsTrg				{0}, Chinese, translation, dictionary
+
+# Invisible walkthrough links
+WalkthroughZho				German translation for "{0}" in the HanDeDict open-source Chinese-German dictionary.
+WalkthroughTrg				Chinese translation for "{0}" in the HanDeDict open-source Chinese-German dictionary.
 
 # Page framework: menus etc.
 MenuSearch					Search

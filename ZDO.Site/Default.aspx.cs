@@ -39,6 +39,8 @@ namespace Site
 
             resultsHolder.Visible = false;
             soaBox.Visible = false;
+            bool isStaticQuery = Request.RawUrl.StartsWith("/search/");
+            string qlang = Request["lang"];
             string query = Request["query"];
             if (query != null) query = query.Trim();
             // No query: show welcome screen, and we're done.
@@ -48,6 +50,8 @@ namespace Site
                 welcomeScreen.Visible = true;
                 welcomeScreen.InnerHtml = TextProvider.Instance.GetSnippet(Master.UILang, "welcome");
                 Title = TextProvider.Instance.GetString(Master.UILang, "TitleMain");
+                // Seed walkthrough
+                Master.SetStaticQuery(null, SearchLang.Chinese);
                 return;
             }
 
@@ -61,7 +65,8 @@ namespace Site
             queryInfo = new QueryInfo(Request.UserHostAddress, query);
             resultsHolder.Visible = true;
             welcomeScreen.Visible = false;
-            var lr = Global.Dict.Lookup(query, SearchScript.Both, SearchLang.Chinese);
+            SearchLang slang = qlang == "trg" ? SearchLang.Target : SearchLang.Chinese;
+            var lr = Global.Dict.Lookup(query, SearchScript.Both, slang);
 
             queryInfo.ResCount = lr.Results.Count;
             queryInfo.Lang = lr.ActualSearchLang;
@@ -102,6 +107,8 @@ namespace Site
                 string attrHtml = TextProvider.Instance.GetString(Master.UILang, "AnimPopupAttr");
                 attrHtml = string.Format(attrHtml, attrLink);
                 soaFooter.InnerHtml = attrHtml;
+                // Seed walkthrough
+                Master.SetStaticQuery(query, slang);
             }
         }
 

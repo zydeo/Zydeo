@@ -39,6 +39,11 @@ namespace ZD.CedictEngine
         private readonly Tokenizer tokenizer;
 
         /// <summary>
+        /// All hanzi headwords. Once loaded, stays forever.
+        /// </summary>
+        private readonly List<string> allHeads = new List<string>();
+
+        /// <summary>
         /// Ctor: initialize from binary dictionary file.
         /// </summary>
         /// <param name="dictFileName">Name of the compiled binary dictionary.</param>
@@ -73,6 +78,89 @@ namespace ZD.CedictEngine
         static DictEngine()
         {
             loadSyllabary();
+        }
+
+        /// <summary>
+        /// Loads all Hanzi headwords. Expensive.
+        /// </summary>
+        private List<string> getAllHeads()
+        {
+            lock (allHeads)
+            {
+                if (allHeads.Count != 0) return allHeads;
+                // Load all known entry positions
+                HashSet<int> poss = new HashSet<int>();
+                foreach (var iix in index.IdeoIndex)
+                {
+                    foreach (int pos in iix.Value.EntriesHeadwordSimp)
+                    {
+                        poss.Add(pos);
+                    }
+                }
+                // Collect all the different headwords
+                HashSet<string> hws = new HashSet<string>();
+                using (BinReader br = new BinReader(dictFileName))
+                {
+                    foreach (int pos in poss)
+                    {
+                        br.Position = pos;
+                        CedictEntry entry = new CedictEntry(br);
+                        hws.Add(entry.ChSimpl);
+                        hws.Add(entry.ChTrad);
+                    }
+                }
+                // Transform to list
+                List<string> hwList = new List<string>(hws.Count);
+                foreach (string hw in hws) hwList.Add(hw);
+                // This is our list now
+                allHeads.AddRange(hwList);
+                return allHeads;
+            }
+        }
+
+        /// <summary>
+        /// Gets the first Hanzi headword and the first target-language word in the dictionary, to start a complete walkthrough.
+        /// </summary>
+        public void GetFirstWords(out string hanzi, out string target)
+        {
+            // First Latin word
+            target = index.WordHolder.GetFirstRealToken();
+            // First Hanzi headword - something we can put our dirty paws on quickly.
+            int entryId = -1;
+            foreach (var iix in index.IdeoIndex)
+            {
+                if (iix.Value.EntriesHeadwordSimp.Count == 0) continue;
+                entryId = iix.Value.EntriesHeadwordSimp[0];
+                break;
+            }
+            using (BinReader br = new BinReader(dictFileName))
+            {
+                br.Position = entryId;
+                CedictEntry entry = new CedictEntry(br);
+                hanzi = entry.ChSimpl;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves preceding and following word for full walkthrough.
+        /// </summary>
+        public void GetPrevNextWords(string curr, bool isTarget, out string prev, out string next)
+        {
+            // Latin: let word holder do this
+            if (isTarget)
+            {
+                index.WordHolder.GetPrevNext(curr, out prev, out next);
+            }
+            // (Sigh) get all heads.
+            else
+            {
+                List<string> heads = getAllHeads();
+                int ix = heads.IndexOf(curr);
+                if (ix > 0) prev = heads[ix - 1];
+                else prev = null;
+                if (ix < heads.Count - 1) next = heads[ix + 1];
+                else next = null;
+            }
         }
 
         /// <summary>

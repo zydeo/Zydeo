@@ -48,6 +48,36 @@ namespace Site
             string LogLine { get; }
         }
 
+        private class SQItem : IAuditItem
+        {
+            private readonly DateTime time;
+            private readonly string lang;
+            private readonly string query;
+            private readonly string userAgent;
+            public SQItem(string lang, string query, string userAgent)
+            {
+                this.time = DateTime.UtcNow;
+                this.lang = lang;
+                this.query = query;
+                this.userAgent = userAgent;
+            }
+            public string LogLine
+            {
+                get
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(QueryLogger.FormatTime(time));
+                    sb.Append('\t');
+                    sb.Append(lang);
+                    sb.Append('\t');
+                    sb.Append(query);
+                    sb.Append('\t');
+                    sb.Append(userAgent);
+                    return sb.ToString();
+                }
+            }
+        }
+
         private class HanziItem : IAuditItem
         {
             private readonly IpResolver ipr;
@@ -209,13 +239,16 @@ namespace Site
                 }
                 if (myList.Count == 0) continue;
                 using (StreamWriter swQueryLog = new StreamWriter(Path.Combine(logPath, "queries.txt"), true))
+                using (StreamWriter swStaticLog = new StreamWriter(Path.Combine(logPath, "statics.txt"), true))
                 {
                     foreach (IAuditItem itm in myList)
                     {
                         if (itm is QueryItem) swQueryLog.WriteLine(itm.LogLine);
                         else if (itm is HanziItem) swQueryLog.WriteLine(itm.LogLine);
+                        else if (itm is SQItem) swStaticLog.WriteLine(itm.LogLine);
                     }
                     swQueryLog.Flush();
+                    swStaticLog.Flush();
                 }
             }
         }
@@ -235,6 +268,17 @@ namespace Site
         public void LogHanzi(string hostAddr, char hanzi, bool found)
         {
             HanziItem itm = new HanziItem(ipResolver, hostAddr, hanzi, found);
+            lock (ilist)
+            {
+                ilist.Add(itm);
+                evt.Set();
+            }
+        }
+
+        public void LogStatic(string query, SearchLang lang, string userAgent)
+        {
+            string strLang = lang == SearchLang.Chinese ? "ZHO" : "TRG";
+            SQItem itm = new SQItem(strLang, query, userAgent);
             lock (ilist)
             {
                 ilist.Add(itm);

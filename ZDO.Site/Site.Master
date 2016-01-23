@@ -37,6 +37,7 @@
   <div id="footer-inside">
     <span>HanDeDict @ Zydeo <span runat="server" id="footerVer"></span> &bull; ©2015-<span runat="server" id="footerYear"></span> Gábor L Ugray &bull; <a id="linkFooterImprint" href="http://zydeo.net/imprint" runat="server">*Imprint</a></span>
   </div>
+  <div style="display: none;" id="walkthroughDiv" runat="server"></div>
 </div>
 <div id="bittercookie">
   <asp:Label ID="bitterCookieTalks" runat="server"></asp:Label>

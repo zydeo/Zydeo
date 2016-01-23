@@ -157,6 +157,15 @@ namespace Site {
         protected global::System.Web.UI.HtmlControls.HtmlAnchor linkFooterImprint;
         
         /// <summary>
+        /// walkthroughDiv control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl walkthroughDiv;
+        
+        /// <summary>
         /// bitterCookieTalks control.
         /// </summary>
         /// <remarks>

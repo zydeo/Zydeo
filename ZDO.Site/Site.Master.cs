@@ -5,6 +5,9 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Reflection;
+using System.Text;
+
+using ZD.Common;
 
 namespace Site
 {
@@ -142,6 +145,8 @@ namespace Site
             determineCookieOptions();
         }
 
+        private bool descrAndKeywSet = false;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             // Current version and year in footer
@@ -156,8 +161,11 @@ namespace Site
 
             // Server-side localized UI in master
             TextProvider prov = TextProvider.Instance;
-            Page.MetaDescription = prov.GetString(uiLang, "MetaDescription");
-            Page.MetaKeywords = prov.GetString(uiLang, "MetaKeywords");
+            if (!descrAndKeywSet)
+            {
+                Page.MetaDescription = prov.GetString(uiLang, "MetaDescription");
+                Page.MetaKeywords = prov.GetString(uiLang, "MetaKeywords");
+            }
             linkSearch.InnerText = prov.GetString(uiLang, "MenuSearch");
             linkOptions.InnerText = prov.GetString(uiLang, "MenuOptions");
             linkAbout.InnerText = prov.GetString(uiLang, "MenuInfo");
@@ -174,6 +182,65 @@ namespace Site
                 navAbout.Attributes["class"] = navAbout.Attributes["class"] + " active";
             else if (pageName == "options")
                 navOptions.Attributes["class"] = navAbout.Attributes["class"] + " active";
+        }
+
+        private string getWalkPara(string query, bool isZho)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("<a href='/");
+            sb.Append("search/");
+            sb.Append(isZho ? "zho/" : "trg/");
+            sb.Append(HttpUtility.UrlEncode(query));
+            sb.Append("'>");
+            sb.Append(HttpUtility.HtmlEncode(query));
+            sb.Append("</a>");
+            string walkLink = sb.ToString();
+
+            string str = HttpUtility.HtmlEncode(TextProvider.Instance.GetString(uiLang, isZho ? "WalkthroughZho" : "WalkthroughTrg"));
+            str = string.Format(str, walkLink);
+            str = "<p>" + str + "</p>\r\n";
+
+            return str;
+        }
+
+        /// <summary>
+        /// Infuses walkthrough links at bottom of page.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="slang"></param>
+        public void SetStaticQuery(string query, SearchLang slang)
+        {
+            // No query: seeding walkthrough from start page
+            if (query == null)
+            {
+                string hanzi, target;
+                Global.Dict.GetFirstWords(out hanzi, out target);
+                string inner = getWalkPara(hanzi, true);
+                inner += getWalkPara(target, false);
+                walkthroughDiv.InnerHtml = inner;
+            }
+            // This was a static query; walk down hanzi headwords or german words
+            else
+            {
+                // Log that we've been crawled
+                QueryLogger.Instance.LogStatic(query, slang, Request.UserAgent);
+                // Link back and forth
+                bool isTarget = slang == SearchLang.Target;
+                string prev, next;
+                Global.Dict.GetPrevNextWords(query, isTarget, out prev, out next);
+                string inner = "";
+                if (prev != null) inner += getWalkPara(prev, !isTarget);
+                if (next != null) inner += getWalkPara(next, !isTarget);
+                walkthroughDiv.InnerHtml = inner;
+                // Keywords and decription
+                string keyw = TextProvider.Instance.GetString(uiLang, isTarget ? "MetaKeywordsTrg" : "MetaKeywordsZho");
+                keyw = string.Format(keyw, query);
+                Page.MetaKeywords = keyw;
+                string desc = TextProvider.Instance.GetString(uiLang, isTarget ? "MetaDescriptionTrg" : "MetaDescriptionZho");
+                desc = string.Format(desc, query);
+                Page.MetaDescription = desc;
+                descrAndKeywSet = true;
+            }
         }
     }
 }

@@ -30,6 +30,15 @@ namespace ZD.Common
         /// <param name="c">The Hanzi as a Unicode character.</param>
         /// <returns>Information about the Hanzi, or null.</returns>
         HanziInfo GetHanziInfo(char c);
+
+        void GetFirstWords(out string hanzi, out string target);        /// <summary>
+        /// Gets the first Hanzi headword and the first target-language word in the dictionary, to start a complete walkthrough.
+        /// </summary>
+
+        /// <summary>
+        /// Retrieves preceding and following word for full walkthrough.
+        /// </summary>
+        void GetPrevNextWords(string curr, bool isTarget, out string prev, out string next);
     }
 
     /// <summary>
