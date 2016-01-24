@@ -2,17 +2,26 @@
 TitleMain					HanDeDict @ Zydeo汉德词典
 TitleSearchChinese			{0}-德语翻译-HanDeDict @ Zydeo汉德词典
 TitleSearchGerman			{0}-汉语翻译-HanDeDict @ Zydeo汉德词典
+TitleSearchAnnotation		{0} - Annotated German translations - HanDeDict @ Zydeo Chinese-German dictionary
 TitleAbout					关于HanDeDict @ Zydeo
 TitleOptions				Search options
 TitleCookies				HanDeDict @ Zydeo如何使用cookies
 
 # Metainformation: description and keywords
 MetaDescription				HanDeDict @ Zydeo：在线搜索HanDeDict开源汉德词典。
+MetaDescriptionZho			German translation for "{0}" in the HanDeDict open-source Chinese-German dictionary.
+MetaDescriptionTrg			Chinese translation for "{0}" in the HanDeDict open-source Chinese-German dictionary.
 MetaKeywords				HanDeDict，Zydeo，汉语，德语，词典，免费、 开源
+MetaKeywordsZho				{0}, German, translation, dictionary
+MetaKeywordsTrg				{0}, Chinese, translation, dictionary
+
+# Invisible walkthrough links
+WalkthroughZho				German translation for "{0}" in the HanDeDict open-source Chinese-German dictionary.
+WalkthroughTrg				Chinese translation for "{0}" in the HanDeDict open-source Chinese-German dictionary.
 
 # Page framework: menus etc.
 MenuSearch					搜索
-MenuOptions					选项
+MenuOptions					Options
 MenuInfo					关于
 MenuImprint					版本说明
 CookieNotice				本网站因其部分功能而依赖于cookies。通过使用我们的网站，您同意我们使用Cookies。
@@ -26,4 +35,11 @@ BtnStrokeUndo				撤销
 # Main search box
 TxtSearchPlacholder			汉字、 拼音或德语词语
 
+# Stroke order animation popup
+AnimPopupTitle				Stroke order
+AnimPopupAttr				Animation by {0}
+AnimPopupMMAH				makemeahanzi
 
+# Message about annotation mode
+AnnotationTitle				Annotation mode
+AnnotationMessage			The text you submitted is not a word in HanDeDict, but Zydeo did find parts of it in the dictionary.Instead of normal lookup results, you can find an annotated version of your text below.

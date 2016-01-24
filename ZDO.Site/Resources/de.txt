@@ -1,14 +1,23 @@
 ﻿# Page titles
 TitleMain					HanDeDict @ Zydeo Chinesisch-deutsches Wörterbuch
-TitleSearchChinese			{0} - deutsche Übersetzung - HanDeDict @ Zydeo Chinesisch-deutsches Wörterbuch
-TitleSearchGerman			{0} - chinesische Übersetzung - HanDeDict @ Zydeo Chinesisch-deutsches Wörterbuch
+TitleSearchChinese			{0} - deutsche Übersetzung - HanDeDict @ Zydeo Chinesisch-Deutsches Wörterbuch
+TitleSearchGerman			{0} - chinesische Übersetzung - HanDeDict @ Zydeo Chinesisch-Deutsches Wörterbuch
+TitleSearchAnnotation		{0} - annotiert mit deutschen Übersetzungen - HanDeDict @ Zydeo Chinesisch-Deutsches Wörterbuch
 TitleAbout					Über HanDeDict @ Zydeo
 TitleOptions				Suchoptionen
 TitleCookies				Wie werden Cookies auf HanDeDict @ Zydeo verwendet?
 
 # Metainformation: description and keywords
-MetaDescription				HanDeDict @ Zydeo: Das HanDeDict Open Source chinesisch-deutsches Wörterbuch online durchsuchen.
+MetaDescription				HanDeDict @ Zydeo: Das HanDeDict Open Source Wörterbuch Chinesisch-Deutsch online durchsuchen.
+MetaDescriptionZho			Deutsche Übersetzung für "{0}" im HanDeDict Open Source Wörterbuch Chinesisch-Deutsch.
+MetaDescriptionTrg			Chinesische Übersetzung für "{0}" im HanDeDict Open Source Wörterbuch Chinesisch-Deutsch.
 MetaKeywords				HanDeDict, Zydeo, Chinesisch, Deutsch, Wörterbuch, kostenlos, Open Source
+MetaKeywordsZho				{0}, Deutsch, Übersetzung, Wörterbuch
+MetaKeywordsTrg				{0}, Chinesisch, Übersetzung, Wörterbuch
+
+# Invisible walkthrough links
+WalkthroughZho				Deutsche Übersetzung für "{0}" im HanDeDict Open Source Wörterbuch Chinesisch-Deutsch.
+WalkthroughTrg				Chinesische Übersetzung für "{0}" im HanDeDict Open Source Wörterbuch Chinesisch-Deutsch.
 
 # Page framework: menus etc.
 MenuSearch					Durchsuchen
@@ -26,4 +35,11 @@ BtnStrokeUndo				Rückgängig
 # Main search box
 TxtSearchPlacholder			Hanzi, Pinyin oder deutsches Wort
 
+# Stroke order animation popup
+AnimPopupTitle				Strichfolge
+AnimPopupAttr				Animation von {0}
+AnimPopupMMAH				makemeahanzi
 
+# Message about annotation mode
+AnnotationTitle				Annotationsmodus
+AnnotationMessage			Der eingegebene Text ist nicht als Stichwort in HanDeDict vorhanden, aber Zydeo hat Teile davon im Wörterbuch gefunden. Anstatt von normalen Suchergebnissen sehen Sie unten eine annotierte Version Ihres Textes.
