@@ -850,7 +850,7 @@ namespace ZD.CedictEngine
                     // OK, try opposite (target)
                     res = doTargetLookup(br, query);
                     // We got fish: override
-                    if (res.Count > 0) new CedictLookupResult(ep, query, res, anns, SearchLang.Target);
+                    if (res.Count > 0) return new CedictLookupResult(ep, query, res, anns, SearchLang.Target);
                 }
                 else
                 {

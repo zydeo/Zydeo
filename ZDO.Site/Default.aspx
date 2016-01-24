@@ -38,6 +38,13 @@
      </div>
      <div id="results">
        <div id="resultsHolder" runat="server">
+         <div id="topNotice" runat="server" visible="false">
+           <p class="tnTitle" id="tnTitle" runat="server">*Annotation mode</p>
+           <p class="tnMessage" id="tnMessage" runat="server">
+             *The text you submitted is not a word in HanDeDict, but Zydeo did find parts of it in the dictionary.
+             Instead of normal lookup results, you can find an annotated version of your text below.
+           </p>
+        </div>
        </div>
         <div id="soaBox" class="soaBoxLeft" runat="server">
           <div id="soaBoxTail">&nbsp;</div>

@@ -20,6 +20,7 @@ namespace Site
             public readonly string Query;
             public DateTime DTLookup = DateTime.UtcNow;
             public int ResCount = -1;
+            public int AnnCount = -1;
             public SearchLang Lang;
             public QueryInfo(string hostAddr, string query)
             {
@@ -32,10 +33,12 @@ namespace Site
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            var tprov = TextProvider.Instance;
+
             // Server-side inline localization
-            strokeClear.InnerText = TextProvider.Instance.GetString(Master.UILang, "BtnStrokeClear");
-            strokeUndo.InnerText = TextProvider.Instance.GetString(Master.UILang, "BtnStrokeUndo");
-            txtSearch.Attributes["placeholder"] = TextProvider.Instance.GetString(Master.UILang, "TxtSearchPlacholder");
+            strokeClear.InnerText = tprov.GetString(Master.UILang, "BtnStrokeClear");
+            strokeUndo.InnerText = tprov.GetString(Master.UILang, "BtnStrokeUndo");
+            txtSearch.Attributes["placeholder"] = tprov.GetString(Master.UILang, "TxtSearchPlacholder");
 
             resultsHolder.Visible = false;
             soaBox.Visible = false;
@@ -48,8 +51,8 @@ namespace Site
             {
                 resultsHolder.Visible = false;
                 welcomeScreen.Visible = true;
-                welcomeScreen.InnerHtml = TextProvider.Instance.GetSnippet(Master.UILang, "welcome");
-                Title = TextProvider.Instance.GetString(Master.UILang, "TitleMain");
+                welcomeScreen.InnerHtml = tprov.GetSnippet(Master.UILang, "welcome");
+                Title = tprov.GetString(Master.UILang, "TitleMain");
                 // Seed walkthrough
                 Master.SetStaticQuery(null, SearchLang.Chinese);
                 return;
@@ -69,6 +72,7 @@ namespace Site
             var lr = Global.Dict.Lookup(query, SearchScript.Both, slang);
 
             queryInfo.ResCount = lr.Results.Count;
+            queryInfo.AnnCount = lr.Annotations.Count;
             queryInfo.Lang = lr.ActualSearchLang;
             queryInfo.DTLookup = DateTime.UtcNow;
             prov = lr.EntryProvider;
@@ -93,8 +97,8 @@ namespace Site
             {
                 resultsHolder.Visible = false;
                 welcomeScreen.Visible = true;
-                welcomeScreen.InnerHtml = TextProvider.Instance.GetSnippet(Master.UILang, "noresults");
-                Title = TextProvider.Instance.GetString(Master.UILang, "TitleMain");
+                welcomeScreen.InnerHtml = tprov.GetSnippet(Master.UILang, "noresults");
+                Title = tprov.GetString(Master.UILang, "TitleMain");
             }
             // We got results
             else
@@ -105,20 +109,27 @@ namespace Site
                 if (lr.Results.Count != 0)
                 {
                     if (lr.ActualSearchLang == SearchLang.Chinese)
-                        title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchChinese");
+                        title = tprov.GetString(Master.UILang, "TitleSearchChinese");
                     else
-                        title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchGerman");
+                        title = tprov.GetString(Master.UILang, "TitleSearchGerman");
                 }
                 // Annotation
-                else title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchAnnotation");
+                else title = tprov.GetString(Master.UILang, "TitleSearchAnnotation");
                 title = string.Format(title, query);
                 Title = title;
+                // For annotatio mode, show notice at top
+                if (lr.Annotations.Count != 0)
+                {
+                    topNotice.Visible = true;
+                    tnTitle.InnerText = tprov.GetString(Master.UILang, "AnnotationTitle");
+                    tnMessage.InnerText = tprov.GetString(Master.UILang, "AnnotationMessage");
+                }
                 // SOA BOX
                 soaBox.Visible = true;
-                soaTitle.InnerText = TextProvider.Instance.GetString(Master.UILang, "AnimPopupTitle");
+                soaTitle.InnerText = tprov.GetString(Master.UILang, "AnimPopupTitle");
                 string attrLink = "<a href='https://github.com/skishore/makemeahanzi' target='_blank'>{0}</a>";
-                attrLink = string.Format(attrLink, TextProvider.Instance.GetString(Master.UILang, "AnimPopupMMAH"));
-                string attrHtml = TextProvider.Instance.GetString(Master.UILang, "AnimPopupAttr");
+                attrLink = string.Format(attrLink, tprov.GetString(Master.UILang, "AnimPopupMMAH"));
+                string attrHtml = tprov.GetString(Master.UILang, "AnimPopupAttr");
                 attrHtml = string.Format(attrHtml, attrLink);
                 soaFooter.InnerHtml = attrHtml;
                 // Seed walkthrough - if query is static and we have regular results (not annotations)
@@ -136,10 +147,15 @@ namespace Site
             {
                 TimeSpan tsLookup = queryInfo.DTLookup.Subtract(queryInfo.DTStart);
                 TimeSpan tsTotal = DateTime.UtcNow.Subtract(queryInfo.DTStart);
+                QueryLogger.SearchMode smode;
+                if (queryInfo.Lang == SearchLang.Target) smode = QueryLogger.SearchMode.Target;
+                else if (queryInfo.ResCount > 0) smode = QueryLogger.SearchMode.Source;
+                else smode = QueryLogger.SearchMode.Annotate;
+                int cnt = smode == QueryLogger.SearchMode.Annotate ? queryInfo.AnnCount : queryInfo.ResCount;
                 QueryLogger.Instance.LogQuery(queryInfo.HostAddr, isMobile,
                     Master.UILang, Master.UiScript, Master.UiTones,
-                    queryInfo.ResCount, (int)tsLookup.TotalMilliseconds, (int)tsTotal.TotalMilliseconds,
-                    queryInfo.Lang, queryInfo.Query);
+                    cnt, (int)tsLookup.TotalMilliseconds, (int)tsTotal.TotalMilliseconds,
+                    smode, queryInfo.Query);
             }
         }
     }

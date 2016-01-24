@@ -49,6 +49,33 @@ namespace Site {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl resultsHolder;
         
         /// <summary>
+        /// topNotice control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl topNotice;
+        
+        /// <summary>
+        /// tnTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl tnTitle;
+        
+        /// <summary>
+        /// tnMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl tnMessage;
+        
+        /// <summary>
         /// soaBox control.
         /// </summary>
         /// <remarks>

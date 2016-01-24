@@ -896,6 +896,12 @@ body.mobile #soaErrorContent {
   font-size: 36pt;
 }
 
+body.mobile #topNotice {
+  margin-top: 20pt;
+  margin-bottom: 30pt;
+  font-size: 32pt;
+}
+
 
 /* ------------------------------- WELCOME SCREEN ------------------------------- */
 
@@ -929,18 +935,47 @@ body.mobile #soaErrorContent {
 }
 
 .entry {
-  padding-top: 1em;
+  padding-top: 0;
   padding-bottom: 1em;
   display: block;
   float: left;
   width: 100%;
   clear: right;
+  border-top: 0;
+}
+
+#resultsHolder > .entry ~ .entry {
+  padding-top: 1em;
   border-top: 1px dotted #303030;
 }
 
-.entry:first-of-type {
-  padding-top: 0;
-  border-top: 0;
+
+#topNotice {
+  display: block;
+  float: left;
+  width: 100%;
+  clear: right;
+  background-color: #c7d9b3;
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  padding: 0;
+  margin-bottom: 10pt;
+  margin-top: 5pt;
+  color: #303030;
+}
+
+.tnTitle {
+  text-align: center;
+  font-size: 120%;
+  font-weight: bold;
+  margin: 5pt 0 0 0;
+}
+
+.tnMessage {
+  text-align: center;
+  font-size: 90%;
+  margin: 5pt 10pt 10pt 10pt;
 }
 
 .hw-ann,

@@ -14,6 +14,13 @@ namespace Site
 {
     public class QueryLogger
     {
+        public enum SearchMode
+        {
+            Source,
+            Target,
+            Annotate,
+        }
+
         #region Singleton management
 
         private static QueryLogger instance;
@@ -132,13 +139,13 @@ namespace Site
             private readonly int resCount;
             private readonly int msecLookup;
             private readonly int msecTotal;
-            private readonly SearchLang lang;
+            private readonly SearchMode smode;
             private readonly string query;
 
             public QueryItem(IpResolver ipr, string hostAddr, bool isMobile, string uiLang,
                 UiScript script, UiTones tones,
                 int resCount, int msecLookup, int msecTotal,
-                SearchLang lang, string query)
+                SearchMode smode, string query)
             {
                 this.ipr = ipr;
                 this.time = DateTime.UtcNow;
@@ -150,7 +157,7 @@ namespace Site
                 this.resCount = resCount;
                 this.msecLookup = msecLookup;
                 this.msecTotal = msecTotal;
-                this.lang = lang;
+                this.smode = smode;
                 this.query = query;
             }
 
@@ -181,7 +188,11 @@ namespace Site
                     sb.Append('\t');
                     sb.Append(country);
                     sb.Append('\t');
-                    sb.Append(lang == SearchLang.Chinese ? "ZHO" : "TRG");
+                    string sModeStr;
+                    if (smode == SearchMode.Source) sModeStr = "ZHO";
+                    else if (smode == SearchMode.Target) sModeStr = "TRG";
+                    else sModeStr = "ANN";
+                    sb.Append(sModeStr);
                     sb.Append('\t');
                     int sec = msecTotal / 1000;
                     int ms = msecTotal - sec * 1000;
@@ -254,10 +265,10 @@ namespace Site
         }
 
         public void LogQuery(string hostAddr, bool isMobile, string uiLang, UiScript script, UiTones tones,
-            int resCount, int msecLookup, int msecTotal, SearchLang lang, string query)
+            int resCount, int msecLookup, int msecTotal, SearchMode smode, string query)
         {
             QueryItem itm = new QueryItem(ipResolver, hostAddr, isMobile, uiLang, script, tones,
-                resCount, msecLookup, msecTotal, lang, query);
+                resCount, msecLookup, msecTotal, smode, query);
             lock (ilist)
             {
                 ilist.Add(itm);
