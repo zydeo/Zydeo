@@ -72,6 +72,7 @@ namespace Site
             queryInfo.Lang = lr.ActualSearchLang;
             queryInfo.DTLookup = DateTime.UtcNow;
             prov = lr.EntryProvider;
+            // Add regular results
             for (int i = 0; i != lr.Results.Count; ++i)
             {
                 if (i >= 256) break;
@@ -79,9 +80,16 @@ namespace Site
                 OneResultCtrl resCtrl = new OneResultCtrl(res, lr.EntryProvider, Master.UiScript, Master.UiTones, isMobile);
                 resultsHolder.Controls.Add(resCtrl);
             }
+            // Add annotations (we never get both, so don't need to worry about the order)
+            for (int i = 0; i != lr.Annotations.Count; ++i)
+            {
+                var ann = lr.Annotations[i];
+                OneResultCtrl resCtrl = new OneResultCtrl(lr.Query, ann, lr.EntryProvider, Master.UiTones, isMobile);
+                resultsHolder.Controls.Add(resCtrl);
+            }
             txtSearch.Value = query;
             // No results
-            if (lr.Results.Count == 0)
+            if (lr.Results.Count == 0 && lr.Annotations.Count == 0)
             {
                 resultsHolder.Visible = false;
                 welcomeScreen.Visible = true;
@@ -93,10 +101,16 @@ namespace Site
             {
                 // Page title
                 string title;
-                if (lr.ActualSearchLang == SearchLang.Chinese)
-                    title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchChinese");
-                else
-                    title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchGerman");
+                // Regular lookup results
+                if (lr.Results.Count != 0)
+                {
+                    if (lr.ActualSearchLang == SearchLang.Chinese)
+                        title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchChinese");
+                    else
+                        title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchGerman");
+                }
+                // Annotation
+                else title = TextProvider.Instance.GetString(Master.UILang, "TitleSearchAnnotation");
                 title = string.Format(title, query);
                 Title = title;
                 // SOA BOX
@@ -107,8 +121,8 @@ namespace Site
                 string attrHtml = TextProvider.Instance.GetString(Master.UILang, "AnimPopupAttr");
                 attrHtml = string.Format(attrHtml, attrLink);
                 soaFooter.InnerHtml = attrHtml;
-                // Seed walkthrough
-                if (isStaticQuery) Master.SetStaticQuery(query, slang);
+                // Seed walkthrough - if query is static and we have regular results (not annotations)
+                if (isStaticQuery && lr.Results.Count != 0) Master.SetStaticQuery(query, slang);
             }
         }
 

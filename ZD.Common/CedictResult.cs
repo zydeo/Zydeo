@@ -6,6 +6,9 @@ using System.Text;
 
 namespace ZD.Common
 {
+    /// <summary>
+    /// One lookup result (entry and highlights).
+    /// </summary>
     public class CedictResult
     {
         /// <summary>

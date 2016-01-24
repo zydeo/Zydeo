@@ -10,7 +10,11 @@ namespace Site
 {
     public partial class OneResultCtrl : System.Web.UI.UserControl
     {
+        private static bool hanim = false;
+
+        private readonly string query;
         private readonly CedictResult res;
+        private readonly CedictAnnotation ann;
         private readonly ICedictEntryProvider prov;
         private readonly UiScript script;
         private readonly UiTones tones;
@@ -19,6 +23,9 @@ namespace Site
         public OneResultCtrl()
         { }
 
+        /// <summary>
+        /// Ctor: regular lookup result
+        /// </summary>
         public OneResultCtrl(CedictResult res, ICedictEntryProvider prov,
             UiScript script, UiTones tones, bool isMobile)
         {
@@ -29,12 +36,104 @@ namespace Site
             this.isMobile = isMobile;
         }
 
+        /// <summary>
+        /// Ctor: annotated Hanzi
+        /// </summary>
+        public OneResultCtrl(string query, CedictAnnotation ann, ICedictEntryProvider prov, UiTones tones, bool isMobile)
+        {
+            this.query = query;
+            this.ann = ann;
+            this.prov = prov;
+            this.tones = tones;
+            this.isMobile = isMobile;
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
         }
 
         protected override void Render(HtmlTextWriter writer)
+        {
+            if (res != null) renderResult(writer);
+            else renderAnnotation(writer);
+        }
+
+        private void renderAnnotation(HtmlTextWriter writer)
+        {
+            CedictEntry entry = prov.GetEntry(ann.EntryId);
+            string entryClass = "entry";
+            if (tones == UiTones.Pleco) entryClass += " toneColorsPleco";
+            else if (tones == UiTones.Dummitt) entryClass += " toneColorsDummitt";
+            writer.AddAttribute(HtmlTextWriterAttribute.Class, entryClass);
+            writer.RenderBeginTag(HtmlTextWriterTag.Div); // <div class="entry">
+
+            writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-ann");
+            writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-simp">
+            renderHanzi(query, entry, ann.StartInQuery, ann.LengthInQuery, writer);
+            writer.RenderEndTag(); // <span class="hw-ann">
+
+            writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-pinyin");
+            writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-pinyin">
+            bool firstSyll = true;
+            foreach (var pinyin in entry.Pinyin)
+            {
+                if (!firstSyll) writer.WriteEncodedText(" ");
+                firstSyll = false;
+                writer.WriteEncodedText(pinyin.GetDisplayString(true));
+            }
+            writer.RenderEndTag(); // <span class="hw-pinyin">
+
+            writer.AddAttribute(HtmlTextWriterAttribute.Class, "senses");
+            writer.RenderBeginTag(HtmlTextWriterTag.Div); // <div class="senses">
+            for (int i = 0; i != entry.SenseCount; ++i)
+                renderSense(writer, entry.GetSenseAt(i), i, null);
+            writer.RenderEndTag(); // <div class="senses">
+
+            writer.RenderEndTag(); // <div class="entry">
+        }
+
+        /// <summary>
+        /// Render HW's Hanzi in annotation mode
+        /// </summary>
+        private void renderHanzi(string query, CedictEntry entry, int annStart, int annLength, HtmlTextWriter writer)
+        {
+            for (int i = 0; i != query.Length; ++i)
+            {
+                char c = query[i];
+                PinyinSyllable py = null;
+                if (i >= annStart && i < annStart + annLength)
+                {
+                    int pyIx = entry.HanziPinyinMap[i - annStart];
+                    if (pyIx != -1) py = entry.Pinyin[pyIx];
+                }
+                // Class to put on hanzi
+                string cls = "";
+                // We mark up tones if needed
+                if (tones != UiTones.None && py != null)
+                {
+                    if (py.Tone == 1) cls = "tone1";
+                    else if (py.Tone == 2) cls = "tone2";
+                    else if (py.Tone == 3) cls = "tone3";
+                    else if (py.Tone == 4) cls = "tone4";
+                    // -1 for unknown, and 0 for neutral: we don't mark up anything
+                }
+                // Whatever's outside annotation is faint
+                if (i < annStart || i >= annStart + annLength) cls += " faint";
+                // Mark up character for stroke order animation
+                if (hanim) cls += " hanim";
+                // Render with enclosing span if we have a relevant class
+                if (!string.IsNullOrEmpty(cls))
+                {
+                    writer.AddAttribute("class", cls);
+                    writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                }
+                writer.WriteEncodedText(c.ToString());
+                if (!string.IsNullOrEmpty(cls)) writer.RenderEndTag();
+            }
+        }
+
+        private void renderResult(HtmlTextWriter writer)
         {
             int hanziLimit = isMobile ? 4 : 6;
             CedictEntry entry = prov.GetEntry(res.EntryId);
@@ -110,6 +209,9 @@ namespace Site
             writer.RenderEndTag(); // <div class="entry">
         }
 
+        /// <summary>
+        /// Render HW's Hanzi in normal lookup result
+        /// </summary>
         private void renderHanzi(CedictEntry entry, bool simp, bool faintIdentTrad, HtmlTextWriter writer)
         {
             string hzStr = simp ? entry.ChSimpl : entry.ChTrad;
@@ -133,7 +235,7 @@ namespace Site
                 // If we're rendering both scripts, then show faint traditional chars where same as simp
                 if (faintIdentTrad && c == entry.ChSimpl[i]) cls += " faint";
                 // Mark up character for stroke order animation
-                cls += " hanim";
+                if (hanim) cls += " hanim";
                 // Render with enclosing span if we have a relevant class
                 if (!string.IsNullOrEmpty(cls))
                 {
@@ -206,36 +308,6 @@ namespace Site
                 if (domain != string.Empty) writer.WriteEncodedText(" ");
                 renderEquiv(writer, sense.Equiv, hl, needToSplit);
                 needToSplit = false;
-                /*
-                if (needToSplit)
-                {
-                    string[] firstAndRest = splitFirstWord(equiv);
-                    bool hlStarted = false;
-                    if (hl != null && hl.RunIx == 0 && hl.HiliteStart == 0)
-                    {
-                        // sense hilite
-                        if (hl.HiliteLength == firstAndRest[0].Length)
-                            writer.AddAttribute(HtmlTextWriterAttribute.Class, "sense-hl");
-                        else
-                        {
-                            writer.AddAttribute(HtmlTextWriterAttribute.Class, "sense-hl-start");
-                            hlStarted = true;
-                        }
-                        writer.RenderBeginTag(HtmlTextWriterTag.Span);
-                    }
-                    writer.WriteEncodedText(firstAndRest[0]);
-                    if (hl != null && hl.RunIx == 0 && hl.HiliteStart == 0)
-                        writer.RenderEndTag(); // sense hilite
-                    writer.RenderEndTag(); // sense-nobr
-                    if (firstAndRest.Length > 1)
-                    {
-                        if (hl == null) writer.WriteEncodedText(firstAndRest[1]);
-                        else renderHLEquivRest(writer, hl, hlStarted, sense.Equiv, firstAndRest[0].Length);
-                    }
-                    needToSplit = false;
-                }
-                else writer.WriteEncodedText(equiv);
-                */
             }
             if (note != string.Empty)
             {

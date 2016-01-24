@@ -12,6 +12,11 @@ namespace ZD.Common
     public class CedictLookupResult
     {
         /// <summary>
+        /// The query string, repeated, and possibly normalized.
+        /// </summary>
+        public readonly string Query;
+
+        /// <summary>
         /// Entry provider for retrieving actual dictionary entries. Caller owns it (must dispose it).
         /// </summary>
         public readonly ICedictEntryProvider EntryProvider;
@@ -22,6 +27,11 @@ namespace ZD.Common
         public readonly ReadOnlyCollection<CedictResult> Results;
 
         /// <summary>
+        /// Annotation results (if input was Hanzi and yielded no results as a whole).
+        /// </summary>
+        public readonly ReadOnlyCollection<CedictAnnotation> Annotations;
+
+        /// <summary>
         /// <para>Actual search language. If search yields no results based on user's input, but there *are*</para>
         /// <para>results in the other language, engine overrides user's wish.</para>
         /// </summary>
@@ -30,12 +40,13 @@ namespace ZD.Common
         /// <summary>
         /// Ctor: intialize immutable object.
         /// </summary>
-        public CedictLookupResult(ICedictEntryProvider entryProvider,
-            ReadOnlyCollection<CedictResult> results,
-            SearchLang actualSearchLang)
+        public CedictLookupResult(ICedictEntryProvider entryProvider, string query,
+            List<CedictResult> results, List<CedictAnnotation> annotations, SearchLang actualSearchLang)
         {
+            Query = query;
             EntryProvider = entryProvider;
-            Results = results;
+            Results = new ReadOnlyCollection<CedictResult>(results);
+            Annotations = new ReadOnlyCollection<CedictAnnotation>(annotations);
             ActualSearchLang = actualSearchLang;
         }
     }

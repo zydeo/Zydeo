@@ -2,6 +2,7 @@
 TitleMain					HanDeDict @ Zydeo Chinese-German dictionary
 TitleSearchChinese			{0} - German translation - HanDeDict @ Zydeo Chinese-German dictionary
 TitleSearchGerman			{0} - Chinese translation - HanDeDict @ Zydeo Chinese-German dictionary
+TitleSearchAnnotation		{0} - Annotated German translations - HanDeDict @ Zydeo Chinese-German dictionary
 TitleAbout					About HanDeDict @ Zydeo
 TitleOptions				Search options
 TitleCookies				How HanDeDict @ Zydeo uses cookies

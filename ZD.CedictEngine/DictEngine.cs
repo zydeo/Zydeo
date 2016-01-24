@@ -92,9 +92,9 @@ namespace ZD.CedictEngine
                 HashSet<int> poss = new HashSet<int>();
                 foreach (var iix in index.IdeoIndex)
                 {
-                    foreach (int pos in iix.Value.EntriesHeadwordSimp)
+                    foreach (var iep in iix.Value.EntriesHeadwordSimp)
                     {
-                        poss.Add(pos);
+                        poss.Add(iep.EntryIdx);
                     }
                 }
                 // Collect all the different headwords
@@ -130,7 +130,7 @@ namespace ZD.CedictEngine
             foreach (var iix in index.IdeoIndex)
             {
                 if (iix.Value.EntriesHeadwordSimp.Count == 0) continue;
-                entryId = iix.Value.EntriesHeadwordSimp[0];
+                entryId = iix.Value.EntriesHeadwordSimp[0].EntryIdx;
                 break;
             }
             using (BinReader br = new BinReader(dictFileName))
@@ -338,15 +338,15 @@ namespace ZD.CedictEngine
                 
                 IdeoIndexItem iii = index.IdeoIndex[c];
                 // Count separately for simplified and traditional
-                foreach (int pos in iii.EntriesHeadwordSimp)
+                foreach (var iep in iii.EntriesHeadwordSimp)
                 {
-                    if (posToCountSimp.ContainsKey(pos)) ++posToCountSimp[pos];
-                    else posToCountSimp[pos] = 1;
+                    if (posToCountSimp.ContainsKey(iep.EntryIdx)) ++posToCountSimp[iep.EntryIdx];
+                    else posToCountSimp[iep.EntryIdx] = 1;
                 }
-                foreach (int pos in iii.EntriesHeadwordTrad)
+                foreach (var iep in iii.EntriesHeadwordTrad)
                 {
-                    if (posToCountTrad.ContainsKey(pos)) ++posToCountTrad[pos];
-                    else posToCountTrad[pos] = 1;
+                    if (posToCountTrad.ContainsKey(iep.EntryIdx)) ++posToCountTrad[iep.EntryIdx];
+                    else posToCountTrad[iep.EntryIdx] = 1;
                 }
             }
             // Get positions that contain all chars from query
@@ -522,7 +522,7 @@ namespace ZD.CedictEngine
         {
             foreach (char c in str)
             {
-                // VERY rough "definition" but if works for out purpose
+                // VERY rough "definition" but it works for out purpose
                 int cval = (int)c;
                 if (cval >= 0x2e80) return true;
             }
@@ -613,6 +613,166 @@ namespace ZD.CedictEngine
         }
 
         /// <summary>
+        /// Verifies which candidates really fit query's indicated substring.
+        /// </summary>
+        private List<CedictAnnotation> doVerifyAnns(BinReader br, string query, bool simp,
+            int start, int length, HashSet<int> cands)
+        {
+            List<CedictAnnotation> vers = new List<CedictAnnotation>();
+            SearchScript scr = simp ? SearchScript.Simplified : SearchScript.Traditional;
+            string expected = query.Substring(start, length);
+            foreach (var ix in cands)
+            {
+                br.Position = ix;
+                CedictEntry entry = new CedictEntry(br);
+                string hw = simp ? entry.ChSimpl : entry.ChTrad;
+                if (hw == expected)
+                {
+                    CedictAnnotation ann = new CedictAnnotation(ix, scr, start, length);
+                    vers.Add(ann);
+                }
+            }
+            return vers;
+        }
+
+        /// <summary>
+        /// Finds matches from a provided start position, if they go beyond last seen range-end.
+        /// </summary>
+        private int doAnnotateFrom(BinReader br, string query, bool simp,
+            int start, int farthestEnd, List<CedictAnnotation> anns)
+        {
+            char cfirst = query[start];
+            // First character not seen in any entry: we're done right here.
+            if (!index.IdeoIndex.ContainsKey(cfirst)) return -1;
+            // Occurrence list of starting character
+            List<IdeoEntryPtr> idx;
+            if (simp) idx = index.IdeoIndex[cfirst].EntriesHeadwordSimp;
+            else idx = index.IdeoIndex[cfirst].EntriesHeadwordTrad;
+            // Special treatment: very last character of query string
+            if (start == query.Length - 1 && farthestEnd == query.Length)
+            {
+                HashSet<int> candsHere = new HashSet<int>();
+                foreach (var iep in idx) if (iep.HwCharCount == 1) candsHere.Add(iep.EntryIdx);
+                var vers = doVerifyAnns(br, query, simp, start, 1, candsHere);
+                if (vers.Count == 0) return -1;
+                anns.AddRange(vers);
+                return query.Length;
+            }
+            // Candidate IDs remaining at each position (increasingly narrow intersections)
+            HashSet<int>[] cands = new HashSet<int>[query.Length - start];
+            for (int i = 0; i != cands.Length; ++i) cands[i] = new HashSet<int>();
+            // Fill in first candidate set
+            foreach (var iep in idx) cands[0].Add(iep.EntryIdx);
+            // Narrow down intersections for each subsequent position
+            for (int i = start + 1; i < query.Length; ++i)
+            {
+                char c = query[i];
+                HashSet<int> prevSet = cands[i - start - 1];
+                // If we've run out of candidates, not point in continuing
+                if (prevSet.Count == 0) break;
+                // Calculate intersection with previous set
+                HashSet<int> thisSet = cands[i - start];
+                if (index.IdeoIndex.ContainsKey(c))
+                {
+                    if (simp) idx = index.IdeoIndex[c].EntriesHeadwordSimp;
+                    else idx = index.IdeoIndex[c].EntriesHeadwordTrad;
+                    foreach (var iep in idx)
+                    {
+                        if (prevSet.Contains(iep.EntryIdx)) thisSet.Add(iep.EntryIdx);
+                    }
+                }
+            }
+            // Actually verify candidates; find truly longest matches
+            int maxIX = -1;
+            for (int i = 0; i != cands.Length; ++i)
+            {
+                if (cands[i].Count > 0) maxIX = i;
+                else break;
+            }
+            for (int i = maxIX; i >= 0; --i)
+            {
+                // Not long enough? We're done here.
+                if (start + i + 1 <= farthestEnd) return -1;
+                // Verify candidates
+                List<CedictAnnotation> vers;
+                // Special treatment: single-character candidates
+                if (i == 0)
+                {
+                    HashSet<int> candsHere = new HashSet<int>();
+                    // We know entry list is not empty, or we wouldn't be here
+                    if (simp) idx = index.IdeoIndex[cfirst].EntriesHeadwordSimp;
+                    else idx = index.IdeoIndex[cfirst].EntriesHeadwordTrad;
+                    foreach (var iep in idx) if (iep.HwCharCount == 1) candsHere.Add(iep.EntryIdx);
+                    vers = doVerifyAnns(br, query, simp, start, i + 1, candsHere);
+                }
+                // Otherwise, verify calculated intersection
+                else vers = doVerifyAnns(br, query, simp, start, i + 1, cands[i]);
+                // We have real ones: got our longest items, return.
+                if (vers.Count != 0)
+                {
+                    anns.AddRange(vers);
+                    return start + i + 1;
+                }
+            }
+            // We failed.
+            return -1;
+        }
+
+        /// <summary>
+        /// Annotates query string with shorter simp/trad headwords.
+        /// </summary>
+        private List<CedictAnnotation> doAnnotate(BinReader br, string query)
+        {
+            List<CedictAnnotation> anns = new List<CedictAnnotation>();
+            // Nothing to annotate if we don't have any Hanzi
+            if (!hasIdeo(query)) return anns;
+            // Find longest covered substrings at each position
+            int farthestEnd = 0;
+            List<CedictAnnotation> annsS = new List<CedictAnnotation>();
+            List<CedictAnnotation> annsT = new List<CedictAnnotation>();
+            for (int i = 0; i != query.Length; ++i)
+            {
+                // If previous search covered through to end of query, no point in continuing
+                if (farthestEnd == query.Length) break;
+                // Find annotations separately from simplified and traditional HWs
+                annsS.Clear();
+                annsT.Clear();
+                int nfSimp = doAnnotateFrom(br, query, true, i, farthestEnd, annsS);
+                int nfTrad = doAnnotateFrom(br, query, false, i, farthestEnd, annsT);
+                // Both go equally far, and that's far enough
+                if (nfSimp == nfTrad && nfSimp > farthestEnd)
+                {
+                    farthestEnd = nfSimp;
+                    // Merge them, we'll have the same entries popping up in both
+                    HashSet<int> idsHere = new HashSet<int>();
+                    foreach (CedictAnnotation ann in annsS)
+                    {
+                        anns.Add(ann);
+                        idsHere.Add(ann.EntryId);
+                    }
+                    foreach (CedictAnnotation ann in annsT)
+                    {
+                        if (!idsHere.Contains(ann.EntryId)) anns.Add(ann);
+                    }
+                }
+                // Traditional goes farther, and that's far enough
+                else if (nfTrad > nfSimp && nfTrad > farthestEnd)
+                {
+                    farthestEnd = nfTrad;
+                    anns.AddRange(annsT);
+                }
+                // Simplified goes farther, and that's far enough
+                else if (nfSimp > nfTrad && nfSimp > farthestEnd)
+                {
+                    farthestEnd = nfSimp;
+                    anns.AddRange(annsS);
+                }
+            }
+            // Done.
+            return anns;
+        }
+
+        /// <summary>
         /// Retrieves entries for a Chinese search expression (pinyin vs. hanzi auto-detected)
         /// </summary>
         private List<CedictResult> doChineseLookup(BinReader br, string query, SearchScript script)
@@ -669,6 +829,7 @@ namespace ZD.CedictEngine
         public CedictLookupResult Lookup(string query, SearchScript script, SearchLang lang)
         {
             List<CedictResult> res = new List<CedictResult>();
+            List<CedictAnnotation> anns = new List<CedictAnnotation>();
             // BinReader: I own it until I successfully return results to caller.
             BinReader br = new BinReader(dictFileName);
             EntryProvider ep = new EntryProvider(br);
@@ -682,28 +843,30 @@ namespace ZD.CedictEngine
                 {
                     res = doChineseLookup(br, query, script);
                     // We got fish
-                    if (res.Count > 0)
-                        return new CedictLookupResult(ep, new ReadOnlyCollection<CedictResult>(res), lang);
+                    if (res.Count > 0) return new CedictLookupResult(ep, query, res, anns, lang);
+                    // Try to annotate
+                    anns = doAnnotate(br, query);
+                    if (anns.Count > 0) return new CedictLookupResult(ep, query, res, anns, lang);
                     // OK, try opposite (target)
                     res = doTargetLookup(br, query);
                     // We got fish: override
-                    if (res.Count > 0)
-                        return new CedictLookupResult(ep, new ReadOnlyCollection<CedictResult>(res), SearchLang.Target);
+                    if (res.Count > 0) new CedictLookupResult(ep, query, res, anns, SearchLang.Target);
                 }
                 else
                 {
                     res = doTargetLookup(br, query);
                     // We got fish
-                    if (res.Count > 0)
-                        return new CedictLookupResult(ep, new ReadOnlyCollection<CedictResult>(res), lang);
+                    if (res.Count > 0) return new CedictLookupResult(ep, query, res, anns, lang);
                     // OK, try opposite (target)
                     res = doChineseLookup(br, query, script);
                     // We got fish: override
-                    if (res.Count > 0)
-                        return new CedictLookupResult(ep, new ReadOnlyCollection<CedictResult>(res), SearchLang.Chinese);
+                    if (res.Count > 0) return new CedictLookupResult(ep, query, res, anns, SearchLang.Chinese);
+                    // Try to annotate
+                    anns = doAnnotate(br, query);
+                    if (anns.Count > 0) return new CedictLookupResult(ep, query, res, anns, SearchLang.Chinese);
                 }
                 // Sorry, no results, no override
-                return new CedictLookupResult(ep, new ReadOnlyCollection<CedictResult>(res), lang);
+                return new CedictLookupResult(ep, query, res, anns, lang);
             }
             catch
             {

@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="BinReader.cs" />
     <Compile Include="BinWriter.cs" />
+    <Compile Include="CedictAnnotation.cs" />
     <Compile Include="CedictEntry.cs" />
     <Compile Include="CedictTargetHighlight.cs" />
     <Compile Include="DiagnosticException.cs" />

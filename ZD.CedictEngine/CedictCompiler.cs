@@ -356,8 +356,17 @@ namespace ZD.CedictEngine
         /// </summary>
         private void indexEntry(CedictEntry entry, int id)
         {
+            // Collect different chars in both headwords
+            HashSet<char> simpSet = new HashSet<char>();
+            foreach (char c in entry.ChSimpl) simpSet.Add(c);
+            if (simpSet.Count > byte.MaxValue) throw new Exception("Simplified headword too long; max: 255.");
+            byte simpCount = (byte)simpSet.Count;
+            HashSet<char> tradSet = new HashSet<char>();
+            foreach (char c in entry.ChTrad) tradSet.Add(c);
+            if (tradSet.Count > byte.MaxValue) throw new Exception("Traditional headword too long; max: 255.");
+            byte tradCount = (byte)tradSet.Count;
             // Index character of simplified headword
-            foreach (char c in entry.ChSimpl)
+            foreach (char c in simpSet)
             {
                 IdeoIndexItem ii;
                 if (index.IdeoIndex.ContainsKey(c)) ii = index.IdeoIndex[c];
@@ -366,13 +375,10 @@ namespace ZD.CedictEngine
                     ii = new IdeoIndexItem();
                     index.IdeoIndex[c] = ii;
                 }
-                // Avoid indexing same entry twice if a char occurs multiple times
-                if (ii.EntriesHeadwordSimp.Count == 0 ||
-                    ii.EntriesHeadwordSimp[ii.EntriesHeadwordSimp.Count - 1] != id)
-                    ii.EntriesHeadwordSimp.Add(id);
+                ii.EntriesHeadwordSimp.Add(new IdeoEntryPtr { EntryIdx = id, HwCharCount = simpCount });
             }
             // Index characters of traditional headword
-            foreach (char c in entry.ChTrad)
+            foreach (char c in tradSet)
             {
                 IdeoIndexItem ii;
                 if (index.IdeoIndex.ContainsKey(c)) ii = index.IdeoIndex[c];
@@ -381,10 +387,7 @@ namespace ZD.CedictEngine
                     ii = new IdeoIndexItem();
                     index.IdeoIndex[c] = ii;
                 }
-                // Avoid indexing same entry twice if a char occurs multiple times
-                if (ii.EntriesHeadwordTrad.Count == 0 ||
-                    ii.EntriesHeadwordTrad[ii.EntriesHeadwordTrad.Count - 1] != id)
-                    ii.EntriesHeadwordTrad.Add(id);
+                ii.EntriesHeadwordTrad.Add(new IdeoEntryPtr { EntryIdx = id, HwCharCount = tradCount });
             }
             // Index pinyin syllables
             foreach (PinyinSyllable pys in entry.Pinyin)
@@ -475,6 +478,20 @@ namespace ZD.CedictEngine
                 int id = list[i];
                 int pos = idToPos[id];
                 list[i] = pos;
+            }
+        }
+
+        /// <summary>
+        /// Replaces entry IDs with file positions in list. Called when finalizing index.
+        /// </summary>
+        private static void replaceIdsWithPositions(List<IdeoEntryPtr> list, Dictionary<int, int> idToPos)
+        {
+            for (int i = 0; i != list.Count; ++i)
+            {
+                int id = list[i].EntryIdx;
+                byte cnt = list[i].HwCharCount;
+                int pos = idToPos[id];
+                list[i] = new IdeoEntryPtr { EntryIdx = pos, HwCharCount = cnt };
             }
         }
 

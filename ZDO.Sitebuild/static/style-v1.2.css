@@ -943,6 +943,7 @@ body.mobile #soaErrorContent {
   border-top: 0;
 }
 
+.hw-ann,
 .hw-simp,
 .hw-trad,
 .hw-sep,
@@ -952,6 +953,7 @@ body.mobile #soaErrorContent {
   float: left;
 }
 
+.hw-ann,
 .hw-simp,
 .hw-trad,
 .hw-sep {
@@ -1029,6 +1031,7 @@ body.mobile #soaErrorContent {
 }
 
 .hw-trad .faint { color: #d2d2d2; }
+.hw-ann .faint { color: #d2d2d2; }
 .hw-sep.faint { color: #818181; }
 .toneColorsPleco .tone1 { color: #e30000; }
 .toneColorsPleco .tone1.faint { color: #f5c8c8; }
