@@ -108,7 +108,7 @@ namespace Site
                 attrHtml = string.Format(attrHtml, attrLink);
                 soaFooter.InnerHtml = attrHtml;
                 // Seed walkthrough
-                Master.SetStaticQuery(query, slang);
+                if (isStaticQuery) Master.SetStaticQuery(query, slang);
             }
         }
 
