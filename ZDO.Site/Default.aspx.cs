@@ -12,6 +12,7 @@ namespace Site
     {
         private ICedictEntryProvider prov = null;
         private bool isMobile = false;
+        private bool isStaticQuery = false;
 
         private class QueryInfo
         {
@@ -42,7 +43,7 @@ namespace Site
 
             resultsHolder.Visible = false;
             soaBox.Visible = false;
-            bool isStaticQuery = Request.RawUrl.StartsWith("/search/");
+            isStaticQuery = Request.RawUrl.StartsWith("/search/");
             string qlang = Request["lang"];
             string query = Request["query"];
             if (query != null) query = query.Trim();
@@ -142,15 +143,15 @@ namespace Site
             base.OnUnload(e);
             // If lookup returned a results provider, dispose it
             if (prov != null) prov.Dispose();
-            // If we had a query, log it
-            if (queryInfo != null)
+            // If we had a POST query, log it
+            if (queryInfo != null && !isStaticQuery)
             {
                 TimeSpan tsLookup = queryInfo.DTLookup.Subtract(queryInfo.DTStart);
                 TimeSpan tsTotal = DateTime.UtcNow.Subtract(queryInfo.DTStart);
-                QueryLogger.SearchMode smode;
+                QueryLogger.SearchMode smode = QueryLogger.SearchMode.Target;
                 if (queryInfo.Lang == SearchLang.Target) smode = QueryLogger.SearchMode.Target;
                 else if (queryInfo.ResCount > 0) smode = QueryLogger.SearchMode.Source;
-                else smode = QueryLogger.SearchMode.Annotate;
+                else if (queryInfo.AnnCount > 0) smode = QueryLogger.SearchMode.Annotate;
                 int cnt = smode == QueryLogger.SearchMode.Annotate ? queryInfo.AnnCount : queryInfo.ResCount;
                 QueryLogger.Instance.LogQuery(queryInfo.HostAddr, isMobile,
                     Master.UILang, Master.UiScript, Master.UiTones,
