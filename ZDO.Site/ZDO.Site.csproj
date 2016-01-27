@@ -122,7 +122,10 @@
     <Content Include="Site.Master" />
     <Content Include="PingHandler.ashx" />
     <Content Include="ApiHandler.ashx" />
+    <Content Include="js-1.2\web.config" />
+    <Content Include="lib\web.config" />
     <None Include="Properties\PublishProfiles\LocalDeploy.pubxml" />
+    <Content Include="static\web.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
