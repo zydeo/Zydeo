@@ -88,6 +88,7 @@
     <EmbeddedResource Include="Resources\noresults_en.txt" />
     <EmbeddedResource Include="Resources\noresults_fan.txt" />
     <EmbeddedResource Include="Resources\noresults_jian.txt" />
+    <Content Include="robots.txt" />
     <Content Include="StaticContentCtrl.ascx" />
     <Content Include="Statics.aspx" />
     <EmbeddedResource Include="Statics.en\about.txt" />
