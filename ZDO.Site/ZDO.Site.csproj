@@ -150,6 +150,7 @@
     <Compile Include="Logic\DiagLogger.cs" />
     <Compile Include="Logic\QueryLogger.cs" />
     <Compile Include="Logic\SearchOptions.cs" />
+    <Compile Include="Logic\SitemapGenerator.cs" />
     <Compile Include="Logic\TextProvider.cs" />
     <Compile Include="OneResultCtrl.ascx.cs">
       <DependentUpon>OneResultCtrl.ascx</DependentUpon>

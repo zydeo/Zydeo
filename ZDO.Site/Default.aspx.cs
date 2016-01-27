@@ -34,6 +34,10 @@ namespace Site
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // Only do this manually, and offline: generate sitemaps
+            //SitemapGenerator.Generate();
+
+
             var tprov = TextProvider.Instance;
 
             // Server-side inline localization
