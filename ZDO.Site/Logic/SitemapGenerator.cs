@@ -27,7 +27,7 @@ namespace Site
                 {
                     xw.WriteStartElement("sitemap");
                     xw.WriteStartElement("loc");
-                    string href = "http://handedict.zydeo/net/" + sm;
+                    string href = "http://handedict.zydeo.net/" + sm;
                     xw.WriteString(href);
                     xw.WriteEndElement();
                     xw.WriteStartElement("lastmod");
