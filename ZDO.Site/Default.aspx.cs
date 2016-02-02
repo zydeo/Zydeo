@@ -59,7 +59,7 @@ namespace Site
                 welcomeScreen.InnerHtml = tprov.GetSnippet(Master.UILang, "welcome");
                 Title = tprov.GetString(Master.UILang, "TitleMain");
                 // Seed walkthrough
-                Master.SetStaticQuery(null, SearchLang.Chinese);
+                Master.SetStaticQuery(null, SearchLang.Chinese, DateTime.UtcNow);
                 return;
             }
 
@@ -138,7 +138,7 @@ namespace Site
                 attrHtml = string.Format(attrHtml, attrLink);
                 soaFooter.InnerHtml = attrHtml;
                 // Seed walkthrough - if query is static and we have regular results (not annotations)
-                if (isStaticQuery && lr.Results.Count != 0) Master.SetStaticQuery(query, slang);
+                if (isStaticQuery && lr.Results.Count != 0) Master.SetStaticQuery(query, slang, queryInfo.DTStart);
             }
         }
 

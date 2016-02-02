@@ -58,12 +58,14 @@ namespace Site
         private class SQItem : IAuditItem
         {
             private readonly DateTime time;
+            private readonly int msec;
             private readonly string lang;
             private readonly string query;
             private readonly string userAgent;
-            public SQItem(string lang, string query, string userAgent)
+            public SQItem(string lang, string query, string userAgent, TimeSpan ts)
             {
                 this.time = DateTime.UtcNow;
+                this.msec = (int)ts.TotalMilliseconds;
                 this.lang = lang;
                 this.query = query;
                 this.userAgent = userAgent;
@@ -74,6 +76,12 @@ namespace Site
                 {
                     StringBuilder sb = new StringBuilder();
                     sb.Append(QueryLogger.FormatTime(time));
+                    sb.Append('\t');
+
+                    int sec = msec / 1000;
+                    int ms = msec - sec * 1000;
+                    sb.Append(string.Format("{0:00}.{1:000}", sec, ms));
+                    
                     sb.Append('\t');
                     sb.Append(lang);
                     sb.Append('\t');
@@ -286,10 +294,10 @@ namespace Site
             }
         }
 
-        public void LogStatic(string query, SearchLang lang, string userAgent)
+        public void LogStatic(string query, SearchLang lang, string userAgent, TimeSpan ts)
         {
             string strLang = lang == SearchLang.Chinese ? "ZHO" : "TRG";
-            SQItem itm = new SQItem(strLang, query, userAgent);
+            SQItem itm = new SQItem(strLang, query, userAgent, ts);
             lock (ilist)
             {
                 ilist.Add(itm);

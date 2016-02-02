@@ -206,9 +206,7 @@ namespace Site
         /// <summary>
         /// Infuses walkthrough links at bottom of page.
         /// </summary>
-        /// <param name="query"></param>
-        /// <param name="slang"></param>
-        public void SetStaticQuery(string query, SearchLang slang)
+        public void SetStaticQuery(string query, SearchLang slang, DateTime dtStart)
         {
             // No query: seeding walkthrough from start page
             if (query == null)
@@ -222,8 +220,6 @@ namespace Site
             // This was a static query; walk down hanzi headwords or german words
             else
             {
-                // Log that we've been crawled
-                QueryLogger.Instance.LogStatic(query, slang, Request.UserAgent);
                 // Link back and forth
                 bool isTarget = slang == SearchLang.Target;
                 string prev, next;
@@ -240,6 +236,8 @@ namespace Site
                 desc = string.Format(desc, query);
                 Page.MetaDescription = desc;
                 descrAndKeywSet = true;
+                // Log that we've been crawled
+                QueryLogger.Instance.LogStatic(query, slang, Request.UserAgent, DateTime.UtcNow.Subtract(dtStart));
             }
         }
     }
