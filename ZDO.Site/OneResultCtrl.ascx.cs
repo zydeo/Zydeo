@@ -10,7 +10,7 @@ namespace Site
 {
     public partial class OneResultCtrl : System.Web.UI.UserControl
     {
-        private static bool hanim = false;
+        private static bool hanim = true;
 
         private readonly string query;
         private readonly CedictResult res;

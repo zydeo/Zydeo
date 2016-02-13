@@ -14,4 +14,4 @@ copy Statics.en\about.txt           ..\_localization\about.html
 copy Statics.en\options.txt         ..\_localization\options.html
 copy Statics.en\cookies.txt         ..\_localization\cookies.html
 
-copy js-1.2\ui-en.js                ..\_localization\ui.json
+copy js-1.3\ui-en.js                ..\_localization\ui.json

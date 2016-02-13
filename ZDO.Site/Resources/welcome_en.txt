@@ -1,4 +1,5 @@
 ﻿<h1>HanDeDict @ Zydeo</h1>
+<p class="welcomenotice"><b>New:</b> Now with stroke order animations<br/>Just click on a Hanzi in your search results</p>
 <img id="img-welcome" src="static/zydeo-owl.svg" alt="Welcome" />
 <p>
     Enter German word, Pinyin or Hanzi to search the dictionary.

@@ -1,11 +1,12 @@
 ﻿<h1>HanDeDict @ Zydeo</h1>
+<p class="welcomenotice"><b>Neu:</b> Jetzt mit Strichfolge-Animationen<br />Einfach in den Suchergebnissen auf die Schriftzeichen klicken</p>
 <img id="img-welcome" src="static/zydeo-owl.svg" alt="Wilkommen" />
 <p>
     Um das Wörterbuch zu durchsuchen, geben Sie ein deutsches Wort, Pinyin oder Hanzi ein.
 </p><p>
-    Pinyin-Silben können ein Tonzeichen enthalten, aber die Suche funktioniert auch ohne:<br /> sowohl <i>zhongwen</i> als auch <i>zhong1wen2</i> gibt Resultate.
+    Pinyin-Silben können ein Tonzeichen enthalten, aber die Suche funktioniert auch ohne: sowohl <i>zhongwen</i> als auch <i>zhong1wen2</i> gibt Resultate.
 </p><p>
-    Pinyin-Silben können mit einem Leerzeichen getrennt sein, es ist aber nicht notwendig:<br /> sowohl <i>zhong wen</i> als auch <i>zhongwen</i> funktioniert. Dasselbe gilt für <i>xi an</i> und <i>xi'an</i>.
+    Pinyin-Silben können mit einem Leerzeichen getrennt sein, es ist aber nicht notwendig: sowohl <i>zhong wen</i> als auch <i>zhongwen</i> funktioniert. Dasselbe gilt für <i>xi an</i> und <i>xi'an</i>.
 </p><p>
     Klicken Sie auf das Pinselsymbol, um die Handschrifterkennung einzublenden.
 </p> 

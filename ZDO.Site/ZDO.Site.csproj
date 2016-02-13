@@ -61,17 +61,17 @@
   <ItemGroup>
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
-    <Content Include="js-1.2\chinesestrokes.js" />
-    <Content Include="js-1.2\common.js" />
-    <Content Include="js-1.2\lookup.js" />
-    <Content Include="js-1.2\options.js" />
-    <Content Include="js-1.2\recog.js" />
-    <Content Include="js-1.2\shortstraw.js" />
-    <Content Include="js-1.2\strokeanim.js" />
-    <Content Include="js-1.2\ui-de.js" />
-    <Content Include="js-1.2\ui-en.js" />
-    <Content Include="js-1.2\ui-jian.js" />
-    <Content Include="js-1.2\ui-fan.js" />
+    <Content Include="js-1.3\chinesestrokes.js" />
+    <Content Include="js-1.3\common.js" />
+    <Content Include="js-1.3\lookup.js" />
+    <Content Include="js-1.3\options.js" />
+    <Content Include="js-1.3\recog.js" />
+    <Content Include="js-1.3\shortstraw.js" />
+    <Content Include="js-1.3\strokeanim.js" />
+    <Content Include="js-1.3\ui-de.js" />
+    <Content Include="js-1.3\ui-en.js" />
+    <Content Include="js-1.3\ui-jian.js" />
+    <Content Include="js-1.3\ui-fan.js" />
     <Content Include="lib\jquery-2.1.4.min.js" />
     <Content Include="lib\jquery.color-2.1.2.min.js" />
     <Content Include="lib\jquery.tooltipster.min.js" />
@@ -110,7 +110,7 @@
     <Content Include="static\hhover.png" />
     <Content Include="static\nav-back.svg" />
     <Content Include="static\search.svg" />
-    <Content Include="static\style-v1.2.css" />
+    <Content Include="static\style-v1.3.css" />
     <Content Include="static\tooltipster.css" />
     <Content Include="static\zydeo-owl-sad.svg" />
     <Content Include="static\zydeo-owl.svg" />
@@ -122,7 +122,7 @@
     <Content Include="Site.Master" />
     <Content Include="PingHandler.ashx" />
     <Content Include="ApiHandler.ashx" />
-    <Content Include="js-1.2\web.config" />
+    <Content Include="js-1.3\web.config" />
     <Content Include="lib\web.config" />
     <None Include="Properties\PublishProfiles\LocalDeploy.pubxml" />
     <Content Include="static\web.config" />

@@ -57,7 +57,7 @@
             <div id="soaError"><div id="soaErrorContent"></div></div>
           </div>
           <div id="soaFooter" runat="server">
-            *Animation by <a href="https://github.com/skishore/makemeahanzi" target="_blank">makemeahanzi</a>
+            *Animation by <a href="https://skishore.github.io/makemeahanzi/" target="_blank">makemeahanzi</a>
           </div>
         </div>
        <div id="welcomeScreen" runat="server">

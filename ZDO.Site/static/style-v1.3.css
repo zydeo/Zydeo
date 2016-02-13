@@ -927,6 +927,12 @@ body.mobile #topNotice {
   font-size: 90%;
 }
 
+
+#welcomeScreen p.welcomenotice {
+  color: #e3781c;
+}
+
+
 /* ------------------------------- LOOKUP RESULTS ------------------------------- */
 
 #results {

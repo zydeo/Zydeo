@@ -13,7 +13,7 @@
   <link href='https://fonts.googleapis.com/css?family=Neuton&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
   <style>
     @import '<%=ResolveUrl("~/static/tooltipster.css") %>';
-    @import '<%=ResolveUrl("~/static/style-v1.2.css") %>';
+    @import '<%=ResolveUrl("~/static/style-v1.3.css") %>';
   </style>
 </head>
 <body id="theBody" runat="server">

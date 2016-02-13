@@ -12,4 +12,4 @@ copy ..\_localization\%TLC%\about.html        Statics.%1%\about.txt
 copy ..\_localization\%TLC%\options.html      Statics.%1%\options.txt
 copy ..\_localization\%TLC%\cookies.html      Statics.%1%\cookies.txt
 
-copy ..\_localization\%TLC%\ui.json           js-1.2\ui-%1%.js
+copy ..\_localization\%TLC%\ui.json           js-1.3\ui-%1%.js

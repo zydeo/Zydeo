@@ -54,10 +54,11 @@ namespace Site
         /// </summary>
         public virtual void SendResponse()
         {
+#if DEBUG
             Resp.AddHeader("Access-Control-Allow-Origin", "*");
             Resp.AddHeader("Access-Control-Allow-Headers", "*");
             Resp.AddHeader("Access-Control-Allow-Credentials", "true");
-
+#endif
             Resp.StatusCode = 200;
             Resp.Charset = "utf-8";
             Resp.ContentEncoding = Encoding.UTF8;
