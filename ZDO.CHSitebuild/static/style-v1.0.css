@@ -25,6 +25,10 @@ body {
   opacity: 0.9;
 }
 
+#swallowbreak {
+  display: none;
+}
+
 #bittercookie a {
   background-color: #272727;
   color: white;
@@ -45,7 +49,7 @@ body {
 
 
 #footer {
-  display: none;
+  /* display: none; */
   width: 100%;
   position: relative;
   bottom: 0;
@@ -59,14 +63,14 @@ body {
 
 #footer-inside {
   display: inline-block;
-  border-top: 1px solid #c7d9b3;
+  border-top: 1px solid #aaa;
   padding: 0.5em 2em 0 2em;
 }
 
 #footer a,
 #footer a:visited {
   text-decoration: none;
-  color: #607026;
+  color: #325E87;
 }
 
 #teaser {
@@ -111,9 +115,7 @@ body {
 #tlemail {
   display: block;
   float: left;
-  background-color: #fafafa;
   background-color: #F0F4F7;
-  border: 1px solid #5a5a5a;
   border: 0;
   color: #5a5a5a;
   font-size: 120%;
@@ -123,12 +125,17 @@ body {
   margin-right: 0.2em;
 }
 
+input[type='submit'] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
 #submit {
   display: block;
   float: left;
   background-color: #ffe4cc;
   color: #404040;
-  border: 1px solid #5a5a5a;
   border: 0;
   height: 1.7em;
   padding: 0 0.4em 0.1em 0.4em;
@@ -258,4 +265,142 @@ body {
   color: #325E87;
   text-decoration: none;
   border-bottom: 1.1pt dotted #325E87;
+}
+
+/* --------------------------- MOBILE ---------------------------- */
+
+body.mobile {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 12pt;
+}
+
+body.mobile #bittercookie {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  white-space: normal;
+  padding-left: 8pt;
+  padding-right: 8pt;
+  padding-bottom: 16pt;
+  width: 100%;
+  line-height: 120%;
+  font-size: 90%;
+}
+
+body.mobile #swallowbreak {
+  display: inline;
+}
+
+body.mobile #footer {
+  display: block;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 4em 0 1em 0;
+  padding: 0;
+  width: 100%;
+}
+
+body.mobile #footer-inside {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border-top: 0;
+  padding: 0.5em 0 0 0;
+  width: 100%;
+  font-size: 90%;
+}
+
+body.mobile #footer a,
+body.mobile #footer a:visited {
+  text-decoration: none;
+  color: #888;
+}
+
+body.mobile #teaser {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 3em 0 2em 0;
+  padding: 0;
+}
+
+body.mobile .teaser2 {
+  font-size: 90%;
+}
+
+body.mobile .teaser3 {
+  font-weight: bold;
+}
+
+body.mobile .section {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0 0.8em 0 0.8em;
+}
+
+body.mobile #tlemail {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.2em 0.2em 0.2em 0.4em;
+  height: 1.7em;
+  margin: 0 0 0.5em 0;
+}
+
+body.mobile #submit {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 0.4em 0.1em 0.4em;
+  margin: 0 0 1.5em 0;
+}
+
+body.mobile .artBlock {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+body.mobile .artBlock:hover {
+  background-color: inherit;
+}
+
+body.mobile #header {
+  height: 2.4em;
+}
+
+body.mobile #headCenter {
+  width: 100%;
+  margin: 0;
+  height: 2.4em;
+}
+
+body.mobile #headHome {
+  margin: 0;
+  padding: 0 0 0 0;
+  font-size: 160%;
+}
+
+body.mobile #headArtTitle {
+  font-size: 120%;
+}
+
+body.mobile #contCenter {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0 1.5em 0 1em;
+  font-size: 85%;
 }

@@ -78,7 +78,7 @@ function initGui() {
   }
 
   // Nudge footer to bottom of short pages
-  if (!isMobile) {
+  /* if (!isMobile) */ {
     $("#footer").css("display", "block");
     var footerBottom = $("#footer").position().top + $("#footer").outerHeight(true);
     var winHeight = $(window).height();
