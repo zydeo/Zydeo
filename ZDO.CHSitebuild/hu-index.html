@@ -7,7 +7,7 @@
   <title>CHDICT kínai-magyar szótár</title>
   <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,400italic&subset=latin,latin-ext' rel='stylesheet'
         type='text/css'>
-  <link href='https://fonts.googleapis.com/css?family=Neuton&subset=latin,latin-ext' rel='stylesheet' type='text/css'>  <link rel="stylesheet" href="static/tooltipster.css">
+  <link href='https://fonts.googleapis.com/css?family=Neuton&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="/static/style-v1.0.css">
   <script>
     !function(a){var b=/iPhone/i,c=/iPod/i,d=/iPad/i,e=/(?=.*\bAndroid\b)(?=.*\bMobile\b)/i,f=/Android/i,g=/(?=.*\bAndroid\b)(?=.*\bSD4930UR\b)/i,h=/(?=.*\bAndroid\b)(?=.*\b(?:KFOT|KFTT|KFJWI|KFJWA|KFSOWI|KFTHWI|KFTHWA|KFAPWI|KFAPWA|KFARWI|KFASWI|KFSAWI|KFSAWA)\b)/i,i=/IEMobile/i,j=/(?=.*\bWindows\b)(?=.*\bARM\b)/i,k=/BlackBerry/i,l=/BB10/i,m=/Opera Mini/i,n=/(CriOS|Chrome)(?=.*\bMobile\b)/i,o=/(?=.*\bFirefox\b)(?=.*\bMobile\b)/i,p=new RegExp("(?:Nexus 7|BNTV250|Kindle Fire|Silk|GT-P1000)","i"),q=function(a,b){return a.test(b)},r=function(a){var r=a||navigator.userAgent,s=r.split("[FBAN");return"undefined"!=typeof s[1]&&(r=s[0]),s=r.split("Twitter"),"undefined"!=typeof s[1]&&(r=s[0]),this.apple={phone:q(b,r),ipod:q(c,r),tablet:!q(b,r)&&q(d,r),device:q(b,r)||q(c,r)||q(d,r)},this.amazon={phone:q(g,r),tablet:!q(g,r)&&q(h,r),device:q(g,r)||q(h,r)},this.android={phone:q(g,r)||q(e,r),tablet:!q(g,r)&&!q(e,r)&&(q(h,r)||q(f,r)),device:q(g,r)||q(h,r)||q(e,r)||q(f,r)},this.windows={phone:q(i,r),tablet:q(j,r),device:q(i,r)||q(j,r)},this.other={blackberry:q(k,r),blackberry10:q(l,r),opera:q(m,r),firefox:q(o,r),chrome:q(n,r),device:q(k,r)||q(l,r)||q(m,r)||q(o,r)||q(n,r)},this.seven_inch=q(p,r),this.any=this.apple.device||this.android.device||this.windows.device||this.other.device||this.seven_inch,this.phone=this.apple.phone||this.android.phone||this.windows.phone,this.tablet=this.apple.tablet||this.android.tablet||this.windows.tablet,"undefined"==typeof window?this:void 0},s=function(){var a=new r;return a.Class=r,a};"undefined"!=typeof module&&module.exports&&"undefined"==typeof window?module.exports=r:"undefined"!=typeof module&&module.exports&&"undefined"!=typeof window?module.exports=s():"function"==typeof define&&define.amd?define("mobi",[],a.mobi=s()):a.mobi=s()}(this);
@@ -23,18 +23,23 @@
 </div>
 
 <div class="section">
-  <div class="sectionHead">Hírlevél</div>
+  <div class="sectionHead">Kapcsolat</div>
   <div class="sectionLead">
     Szeretnél értesülni a projekttel kapcsolatos fejleményekről?
     Iratkozz fel a hírlevélre! Havi két-három üzenetre számíthatsz.
   </div>
-  <form method="post" accept-charset="utf-8" action="https://tinyletter.com/CHDICT" target="popupwindow"
-        onsubmit="window.open('https://tinyletter.com/CHDICT', 'popupwindow', 'scrollbars=yes,width=800,height=600');return true;">
-    <input id="tlemail" name="email" value="" placeholder="Erre a címre kérem"
-           size="20" maxlength="80" type="email">
-    <input type="hidden" value="1" name="embed"/>
-    <input id="submit" value="Jöjjön!" type="submit">
-  </form>
+  <div class="sectionLead">
+    <form method="post" accept-charset="utf-8" action="https://tinyletter.com/CHDICT" target="popupwindow"
+          onsubmit="window.open('https://tinyletter.com/CHDICT', 'popupwindow', 'scrollbars=yes,width=800,height=600');return true;">
+      <input id="tlemail" name="email" value="" placeholder="Erre a címre kérem"
+             size="20" maxlength="80" type="email">
+      <input type="hidden" value="1" name="embed"/>
+      <input id="submit" value="Jöjjön!" type="submit">
+    </form>
+  </div>
+  <div class="sectionLead">
+    Emailben is elérhetsz: zydeodict [kukac] gmail - pont - com
+  </div>
 </div>
 
 <div class="section">
@@ -44,7 +49,7 @@
     Elvétve hangulatjelentések az önjelölt lexikográfus kórterméből.
     Pár hetes ritmusban készülnek, és az újakat találod felül.
   </div>
-  <a class="artBlock" href="/articles/a-vilag-legrosszabb-kinai-szotara">
+  <a class="artBlock" href="/hu/articles/a-vilag-legrosszabb-kinai-szotara">
     <div class="artTitle">A világ legrosszabb kínai szótára</div>
     <div class="artGist">Pontatlan, téves és hiányos</div>
   </a>
@@ -59,7 +64,7 @@
   Az oldal cookie-kat (sütiket) használ. A böngészés folytatásával elfogadod a sütik használatát.
   <span id="swallowbreak"><br/><br/></span>
   <a id="swallowbitterpill" href="#">Rendben</a>
-  <a id="cookierecipe" href="/cookies" target="_blank">További információk</a>
+  <a id="cookierecipe" href="/hu/cookies" target="_blank">További információk</a>
 </div>
 
 <script src="/lib/jquery-2.1.4.min.js"></script>

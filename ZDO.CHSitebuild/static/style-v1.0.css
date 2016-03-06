@@ -89,7 +89,7 @@ body {
   color: #325E87;
 }
 
-#teaser3 {
+.teaser3 {
   font-size: 120%;
   font-weight: bold;
 }
@@ -109,7 +109,18 @@ body {
 }
 
 .sectionLead {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: block;
+  float: left;
+  clear: both;
+  width: 100%;
   margin-bottom: 0.8em;
+}
+
+.sectionLead:last-child {
+  margin-bottom: 2em;
 }
 
 #tlemail {
@@ -141,10 +152,21 @@ input[type='submit'] {
   padding: 0 0.4em 0.1em 0.4em;
   font-size: 120%;
   cursor: pointer;
+  -webkit-transition: background-color 0.5s ease;
+  transition: background-color 0.5s ease;
+}
+
+#submit:hover {
+  background-color: #ffc898;
 }
 
 .artBlock {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
   display: block;
+  float: left;
+  clear: both;
   text-decoration: none;
   color: #404040;
   width: 100%;
@@ -152,10 +174,16 @@ input[type='submit'] {
   padding: 0.4em 0.4em 0.4em 0.4em;
   margin-left: -0.4em;
   margin-bottom: 0.2em;
+  -webkit-transition: background-color 0.5s ease;
+  transition: background-color 0.5s ease;
 }
 
 .artBlock:hover {
   background-color: #F0F4F7;
+}
+
+.artBlock:last-child {
+  margin-bottom: 3em;
 }
 
 .artTitle {
@@ -206,10 +234,12 @@ input[type='submit'] {
   color: #fafafa;
   text-decoration: none;
   cursor: pointer;
+  -webkit-transition: background-color 0.5s ease;
+  transition: background-color 0.5s ease;
 }
 
 #headHome a:hover {
-  background-color: #47729A;
+  background-color: #638FB8;
 }
 
 #headArtTitle {
@@ -330,10 +360,6 @@ body.mobile .teaser2 {
   font-size: 90%;
 }
 
-body.mobile .teaser3 {
-  font-weight: bold;
-}
-
 body.mobile .section {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -359,7 +385,7 @@ body.mobile #submit {
   box-sizing: border-box;
   width: 100%;
   padding: 0 0.4em 0.1em 0.4em;
-  margin: 0 0 1.5em 0;
+  margin: 0 0 0 0;
 }
 
 body.mobile .artBlock {
@@ -368,7 +394,7 @@ body.mobile .artBlock {
   box-sizing: border-box;
   width: 100%;
   padding: 0;
-  margin: 0;
+  margin: 0 0 2em 0;
 }
 
 body.mobile .artBlock:hover {
