@@ -97,6 +97,8 @@ var zdNewEntry = (function() {
   var server;
 
   function documentReady() {
+    $("#newEntrySimp").bind("compositionstart", onSimpCompStart);
+    $("#newEntrySimp").bind("compositionend", onSimpCompEnd);
     $("#newEntrySimp").bind("input", onSimpChanged);
     $("#acceptSimp").click(onSimpAccept);
     $("#editSimp").click(onSimpEdit);
@@ -244,7 +246,18 @@ var zdNewEntry = (function() {
     setActive("pinyin");
   }
 
+  var simpComposing = false;
+
+  function onSimpCompStart(evt) {
+    simpComposing = true;
+  }
+
+  function onSimpCompEnd(evt) {
+    simpComposing = false;
+  }
+
   function onSimpChanged(evt) {
+    if (simpComposing) return;
     server.processSimp($("#newEntrySimp").val(), onSimpProcessed);
   }
 
