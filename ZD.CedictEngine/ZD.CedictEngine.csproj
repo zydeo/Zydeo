@@ -54,6 +54,7 @@
     <Compile Include="PinyinIndexItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tokenizer.cs" />
+    <Compile Include="UniHanziRepo.cs" />
     <Compile Include="WordHolder.cs" />
   </ItemGroup>
   <ItemGroup>

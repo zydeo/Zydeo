@@ -53,6 +53,7 @@
     <Compile Include="CedictLookupResult.cs" />
     <Compile Include="ICedictEntryProvider.cs" />
     <Compile Include="IFontCoverage.cs" />
+    <Compile Include="IUniHanziRepo.cs" />
     <Compile Include="PinyinSyllable.cs" />
     <Compile Include="PinyinSyllable.DisplayString.cs" />
     <Compile Include="CedictSense.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="ITextProvider.cs" />
     <Compile Include="LookupOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UniHanziInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\pinyin.txt" />
