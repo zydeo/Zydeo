@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
+  <title>CHDICT doodle</title>
+  <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,400italic&subset=latin,latin-ext' rel='stylesheet'
+        type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Neuton&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="static/xstyle.css">
+  <link rel="stylesheet" href="static/xforms.css">
+  <link rel="stylesheet" href="static/xnewentry.css">
+</head>
+<body>
+<nav id="menu">
+  <div id="topMenuGroup">
+    <div class="topMenuItem">
+      <img src="static/search.svg" alt="" class="imgPositive"/>
+      <img src="static/search-w.svg" alt="" class="imgNegative"/>
+      <a href="/">Keres</a>
+    </div>
+    <div class="topMenuItem">
+      <img src="static/tool.svg" alt="" class="imgPositive"/>
+      <img src="static/tool-w.svg" alt="" class="imgNegative"/>
+      <a href="/settings">Beállít</a>
+    </div>
+    <div class="topMenuItem selected">
+      <img src="static/editing.svg" alt="" class="imgPositive"/>
+      <img src="static/editing-w.svg" alt="" class="imgNegative"/>
+      <a href="/edit">Szerkeszt</a>
+    </div>
+    <div class="topMenuItem">
+      <img src="static/book.svg" alt="" class="imgPositive"/>
+      <img src="static/book-w.svg" alt="" class="imgNegative"/>
+      <a href="/read">Olvas</a>
+    </div>
+    <div class="topMenuItem">
+      <img src="static/arrows.svg" alt="" class="imgPositive"/>
+      <img src="static/arrows-w.svg" alt="" class="imgNegative"/>
+      <a href="/download">Letölt</a>
+    </div>
+  </div>
+</nav>
+<div id="subBar">
+</div>
+
+<div id="content">
+  <div id="newEntrySpacer"></div>
+  <div id="newEntry">
+    <div class="formBlock ready">
+      <div class="formBlockLabel">Egyszerűsített</div>
+      <div class="formBlockFrame">
+        <input id="newEntrySimp" maxlength="8"/>
+        <div class="formButtonRight accept" id="acceptSimp">
+          <img src="static/sign.svg" alt=""/>
+        </div>
+        <div class="formButtonRight edit" id="editSimp">
+          <img src="static/draw.svg" alt=""/>
+        </div>
+        <div class="formNote">
+          A folytatáshoz kattints a zöld <i>Jóváhagyás</i> gombra, vagy üss Entert.
+        </div>
+        <div class="formErrors" id="errorsSimp">
+          Az automatikus ellenőrzés az alábbi problémákat találta.
+          Kérlek, korrigáld ezeket, majd kattints ismét a zöld <i>Jóváhagyás</i> gombra.
+          <ul id="errorListSimp">
+            <li>Nem egyszerűsített írásjegy: 學</li>
+            <li>Címszóban nem szerepelhet: $ # a w</li>
+            <li>Címszóban nem állhat szóköz</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="formBlock active">
+      <div class="formBlockLabel">Hagyományos</div>
+      <div class="formBlockFrame">
+        <div id="newEntryTradCtrl">
+          <div class="newEntryTradPos">
+            <span class="tradAlt">大</span>
+          </div>
+          <div class="newEntryTradPos">
+            <span class="tradAlt">學</span><span class="tradAlt">学</span>
+          </div>
+        </div>
+        <div class="formButtonRight accept" id="acceptTrad">
+          <img src="static/sign.svg" alt=""/>
+        </div>
+        <div class="formButtonRight edit" id="editTrad">
+          <img src="static/draw.svg" alt=""/>
+        </div>
+      </div>
+    </div>
+    <div class="formBlock future">
+      <div class="formBlockLabel">Pinyin</div>
+      <div class="formBlockFrame">
+        <div id="newEntryPinyinCtrl">
+          <div class="newEntryPinyinPos">
+            <span>dà</span>
+          </div>
+          <div class="newEntryPinyinPos">
+            <span>xué</span><span>shuāng</span>
+          </div>
+          <div class="newEntryPinyinPos">
+            <span>shuāng</span>
+          </div>
+          <div class="newEntryPinyinPos">
+            <span>shuāng</span>
+          </div>
+          <div class="newEntryPinyinPos">
+            <span>shuāng</span>
+          </div>
+          <div class="newEntryPinyinPos">
+            <span>shuāng</span>
+          </div>
+          <div class="newEntryPinyinPos">
+            <span>shuāng</span>
+          </div>
+        </div>
+        <div class="formButtonRight accept" id="acceptPinyin">
+          <img src="static/sign.svg" alt=""/>
+        </div>
+        <div class="formButtonRight edit" id="editPinyin">
+          <img src="static/draw.svg" alt=""/>
+        </div>
+      </div>
+    </div>
+    <div class="formBlock future">
+      <div class="formBlockLabel">Magyar</div>
+      <div class="formBlockFrame">
+        <textarea id="newEntryTrg" maxlength="1024"></textarea>
+        <div class="formButtonRight accept" id="acceptTrg">
+          <img src="static/sign.svg" alt=""/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/newentry.js"></script>
+
+</body>
+</html>

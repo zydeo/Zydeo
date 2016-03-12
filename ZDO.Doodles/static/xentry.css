@@ -1,0 +1,117 @@
+.entry {
+  padding-top: 0;
+  padding-bottom: 1em;
+  display: block;
+  float: left;
+  width: 100%;
+  clear: right;
+  border-top: 0;
+  font-size: 80%;
+}
+
+.hw-ann,
+.hw-simp,
+.hw-trad,
+.hw-sep,
+.hw-pinyin,
+.senses {
+  display: block;
+  float: left;
+}
+
+.hw-ann,
+.hw-simp,
+.hw-trad,
+.hw-sep {
+  font-size: 250%;
+}
+
+.hw-trad.break {
+  clear: both;
+}
+
+.hw-sep {
+  margin-left: 0.2em;
+  margin-right: 0.2em;
+}
+
+.hw-pinyin {
+  clear: left;
+  font-family: Ubuntu;
+  font-weight: 700;
+  font-size: 150%;
+}
+
+.senses {
+  clear: left;
+  margin-top: 0.5em;
+  white-space: nowrap;
+  line-height: 1.5em;
+  font-size: 120%;
+}
+
+.sense-ix {
+  font-size: 8pt;
+  border-radius: 8pt;
+  -moz-border-radius: 8pt;
+  -webkit-border-radius: 8pt;
+  border: 1px solid;
+  display: inline-block;
+  line-height: 8pt;
+  text-align: center;
+  width: 8pt;
+}
+
+.sense {
+  white-space: normal;
+  margin-right: 0.3em;
+}
+
+.sense-nobr {
+  white-space: nowrap;
+}
+
+.sense-meta {
+  font-style: italic;
+}
+
+.sense-hl {
+  background-color: #ffe4cc;
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+}
+
+.sense-hl-start {
+  background-color: #ffe4cc;
+  border-radius: 0.3em 0 0 0.3em;
+  -moz-border-radius: 0.3em 0 0 0.3em;
+  -webkit-border-radius: 0.3em 0 0 0.3em;
+}
+
+.sense-hl-end {
+  background-color: #ffe4cc;
+  border-radius: 0 0.3em 0.3em 0;
+  -moz-border-radius: 0 0.3em 0.3em 0;
+  -webkit-border-radius: 0 0.3em 0.3em 0;
+}
+
+.hw-trad .faint { color: #d2d2d2; }
+.hw-ann .faint { color: #d2d2d2; }
+.hw-sep.faint { color: #818181; }
+.toneColorsPleco .tone1 { color: #e30000; }
+.toneColorsPleco .tone1.faint { color: #f5c8c8; }
+.toneColorsPleco .tone2 { color: #02b31c; }
+.toneColorsPleco .tone2.faint { color: #c8ecce; }
+.toneColorsPleco .tone3 { color: #1510f0; }
+.toneColorsPleco .tone3.faint { color: #cccbf8; }
+.toneColorsPleco .tone4 { color: #8b00bf; }
+.toneColorsPleco .tone4.faint { color: #e4c8ee; }
+.toneColorsDummitt .tone1 { color: #f41d2f; }
+.toneColorsDummitt .tone1.faint { color: #f8c3ce; }
+.toneColorsDummitt .tone2 { color: #f9761b; }
+.toneColorsDummitt .tone2.faint { color: #fad2b7; }
+.toneColorsDummitt .tone3 { color: #97cd5d; }
+.toneColorsDummitt .tone3.faint { color: #dcedcb; }
+.toneColorsDummitt .tone4 { color: #589bc8; }
+.toneColorsDummitt .tone4.faint { color: #d9e5ee; }
