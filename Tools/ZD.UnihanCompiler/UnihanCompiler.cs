@@ -228,7 +228,7 @@ namespace ZD.UnihanCompiler
                 }
                 List<PyCalc> lst = new List<PyCalc>();
                 lst.AddRange(cnts.Values);
-                lst.Sort((x, y) => y.Avg.CompareTo(x.Avg));
+                lst.Sort((x, y) => y.Sum.CompareTo(x.Sum));
                 foreach (var x in lst) pinyin.Add(x.Py);
             }
 

@@ -436,18 +436,19 @@ var zdNewEntryServer = (function() {
     },
 
     verifySimp: function(simp, ready) {
-      setTimeout(function() {
-        var res = {
-          passed: true
-        };
-        if (simp == "x") {
-          res.passed = false;
-          res.errors = [];
-          res.errors.push("Ez <egy> & hiba.");
-          res.errors.push("Van masik is!");
-        }
+      // Query URL: localhost for sandboxing only
+      var url = "/ApiHandler.ashx";
+      if (window.location.protocol == "file:")
+        url = "http://localhost:8000/ApiHandler.ashx";
+      var req = $.ajax({
+        url: url,
+        type: "POST",
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        data: { action: "newentry_verifysimp", simp: simp }
+      });
+      req.done(function (res) {
         ready(res);
-      }, 200);
+      });
     },
 
     verifyHead: function(simp, trad, pinyin, ready) {

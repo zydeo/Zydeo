@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZDO.IpResolve", "ZDO.IpReso
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZD.UnihanCompiler", "Tools\ZD.UnihanCompiler\ZD.UnihanCompiler.csproj", "{C668C8FD-DF17-4511-8E41-DB564C64BEE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZDO.CHSite", "ZDO.CHSite\ZDO.CHSite.csproj", "{18A153C0-FF93-4F7F-9899-D032321D2FB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +149,12 @@ Global
 		{C668C8FD-DF17-4511-8E41-DB564C64BEE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C668C8FD-DF17-4511-8E41-DB564C64BEE4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C668C8FD-DF17-4511-8E41-DB564C64BEE4}.Release|Force32.ActiveCfg = Release|Any CPU
+		{18A153C0-FF93-4F7F-9899-D032321D2FB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18A153C0-FF93-4F7F-9899-D032321D2FB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18A153C0-FF93-4F7F-9899-D032321D2FB0}.Debug|Force32.ActiveCfg = Debug|Any CPU
+		{18A153C0-FF93-4F7F-9899-D032321D2FB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18A153C0-FF93-4F7F-9899-D032321D2FB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18A153C0-FF93-4F7F-9899-D032321D2FB0}.Release|Force32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

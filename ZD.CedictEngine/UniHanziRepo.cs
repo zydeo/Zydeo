@@ -53,10 +53,20 @@ namespace ZD.CedictEngine
                 for (int i = 0; i != chars.Length; ++i)
                 {
                     char c = chars[i];
-                    int pos = chrPoss[(int)c];
-                    if (pos == 0) continue;
-                    br.Position = pos;
-                    res[i] = new UniHanziInfo(br);
+                    // Character is an upper-case letter or a digit: itself
+                    if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z'))
+                    {
+                        UniHanziInfo uhi = new UniHanziInfo(true, new char[] { c }, new string[] { c.ToString() });
+                        res[i] = uhi;
+                    }
+                    // Get genuine Hanzi info, if present
+                    else
+                    {
+                        int pos = chrPoss[(int)c];
+                        if (pos == 0) continue;
+                        br.Position = pos;
+                        res[i] = new UniHanziInfo(br);
+                    }
                 }
             }
             return res;
