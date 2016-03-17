@@ -49,6 +49,32 @@ namespace ZD.Common
         }
 
         /// <summary>
+        /// <para>Returns a typed Pinyin syllable from its display string (with diacritics).</para>
+        /// <para>Returns null if provded string is not recognized as a Pinyin syllable.</para>
+        /// </summary>
+        public static PinyinSyllable FromDisplayString(string ds)
+        {
+            PinyinSyllable syll = null;
+            foreach (var x in toneMap)
+            {
+                string pure = null;
+                int tone = -1;
+                if (x.Value[0] == ds) { pure = x.Value[0]; tone = 0; }
+                else if (x.Value[1] == ds) { pure = x.Value[0]; tone = 1; }
+                else if (x.Value[2] == ds) { pure = x.Value[0]; tone = 2; }
+                else if (x.Value[3] == ds) { pure = x.Value[0]; tone = 3; }
+                else if (x.Value[4] == ds) { pure = x.Value[0]; tone = 4; }
+                if (tone != -1)
+                {
+                    syll = new PinyinSyllable(pure, tone);
+                    break;
+                }
+            }
+            if (ds == "r") syll = new PinyinSyllable("r", 0);
+            return syll;
+        }
+
+        /// <summary>
         /// Gets the syllable's display string.
         /// </summary>
         /// <param name="diacritics">If yes, adds diacritics for tone marks; otherwise, appends number.</param>

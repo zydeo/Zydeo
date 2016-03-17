@@ -24,14 +24,14 @@ namespace ZD.Common
         public readonly char[] TradVariants;
 
         /// <summary>
-        /// Character's pinyin readings; more frequent first. In display form: e.g., "hǔ", not "hu3".
+        /// Character's pinyin readings; more frequent first.
         /// </summary>
-        public readonly string[] Pinyin;
+        public readonly PinyinSyllable[] Pinyin;
 
         /// <summary>
         /// Ctor: init from data.
         /// </summary>
-        public UniHanziInfo(bool canBeSimp, char[] tradVariants, string[] pinyin)
+        public UniHanziInfo(bool canBeSimp, char[] tradVariants, PinyinSyllable[] pinyin)
         {
             CanBeSimp = canBeSimp;
             if (tradVariants.Length > 127) throw new ArgumentException("Maximum allowed number of traditional variants is 127.");
@@ -40,7 +40,8 @@ namespace ZD.Common
             for (int i = 0; i != TradVariants.Length; ++i) TradVariants[i] = tradVariants[i];
             if (pinyin.Length > 127) throw new ArgumentException("Maximum allowed number of Pinyin readings is 127.");
             if (pinyin.Length == 0) throw new ArgumentException("At least one Pinyin reading required.");
-            Pinyin = new string[pinyin.Length];
+            if (Array.IndexOf(pinyin, null) != -1) throw new ArgumentException("No Pinyin syllable must be null.");
+            Pinyin = new PinyinSyllable[pinyin.Length];
             for (int i = 0; i != Pinyin.Length; ++i) Pinyin[i] = pinyin[i];
         }
 
@@ -56,8 +57,8 @@ namespace ZD.Common
             TradVariants = new char[b];
             for (byte i = 0; i != b; ++i) TradVariants[i] = br.ReadChar();
             b = br.ReadByte();
-            Pinyin = new string[b];
-            for (byte i = 0; i != b; ++i) Pinyin[i] = br.ReadString();
+            Pinyin = new PinyinSyllable[b];
+            for (byte i = 0; i != b; ++i) Pinyin[i] = new PinyinSyllable(br);
         }
 
         /// <summary>
@@ -70,7 +71,47 @@ namespace ZD.Common
             bw.WriteByte((byte)TradVariants.Length);
             foreach (char c in TradVariants) bw.WriteChar(c);
             bw.WriteByte((byte)Pinyin.Length);
-            foreach (string str in Pinyin) bw.WriteString(str);
+            foreach (PinyinSyllable syll in Pinyin) syll.Serialize(bw);
         }
+    }
+
+    /// <summary>
+    /// One syllable in headword: simplified, traditional and pinyin.
+    /// </summary>
+    public class HeadwordSyll
+    {
+        /// <summary>
+        /// Simplified Hanzi.
+        /// </summary>
+        public readonly char Simp;
+        /// <summary>
+        /// Traditional Hanzi.
+        /// </summary>
+        public readonly char Trad;
+        /// <summary>
+        /// Pinyin.
+        /// </summary>
+        public readonly PinyinSyllable Pinyin;
+    }
+
+    /// <summary>
+    /// <para>Provides Unihan information about Hanzi for CHDICT's interactive entry editor.</para>
+    /// <para>Provides known headwords (from CEDICT) by simplified HW.</para>
+    /// <para>Provides CEDICT and HanDeDict entries by simplified HW.</para>
+    /// </summary>
+    public interface IHeadwordInfo
+    {
+        /// <summary>
+        /// <para>Returns information about a bunch of Hanzi.</para>
+        /// <para>Accepts A-Z, 0-9. Returns null in array for other non-ideographs, and for unknown Hanzi.</para>
+        /// </summary>
+        UniHanziInfo[] GetUnihanInfo(char[] c);
+
+        /// <summary>
+        /// Gets headwords known in CEDICT from simplified string.
+        /// </summary>
+        /// <param name="simp"></param>
+        /// <returns></returns>
+        HeadwordSyll[][] GetPossibleHeadwords(string simp);
     }
 }

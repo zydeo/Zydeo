@@ -171,6 +171,7 @@ lang	lang	lāng	láng	lǎng	làng
 lao	lao	lāo	láo	lǎo	lào
 le	le	lē	lé	lě	lè
 lei	lei	lēi	léi	lěi	lèi
+len	len	lēn	lén	lěn	lèn
 leng	leng	lēng	léng	lěng	lèng
 li	li	lī	lí	lǐ	lì
 lia	lia	liā	liá	liǎ	lià
@@ -190,7 +191,7 @@ lve	lüe	lüē	lüé	lüě	lüè
 luan	luan	luān	luán	luǎn	luàn
 lun	lun	lūn	lún	lǔn	lùn
 luo	luo	luō	luó	luǒ	luò
-m	m	m1	m2	m3	m4
+m	m	m̄	ḿ	čč	m̀
 ma	ma	mā	má	mǎ	mà
 mai	mai	māi	mái	mǎi	mài
 man	man	mān	mán	mǎn	màn
@@ -210,6 +211,7 @@ miu	miu	miū	miú	miǔ	miù
 mo	mo	mō	mó	mǒ	mò
 mou	mou	mōu	móu	mǒu	mòu
 mu	mu	mū	mú	mǔ	mù
+n	n	n̄	ń	ň	ǹ
 na	na	nā	ná	nǎ	nà
 nai	nai	nāi	nái	nǎi	nài
 nan	nan	nān	nán	nǎn	nàn
@@ -219,7 +221,9 @@ ne	ne	nē	né	ně	nè
 nei	nei	nēi	néi	něi	nèi
 nen	nen	nēn	nén	něn	nèn
 neng	neng	nēng	néng	něng	nèng
+ng	ng	n̄g	ńg	ňg	ǹg
 ni	ni	nī	ní	nǐ	nì
+nia	nia	niā	niá	niǎ	nià
 nian	nian	niān	nián	niǎn	niàn
 niang	niang	niāng	niáng	niǎng	niàng
 niao	niao	niāo	niáo	niǎo	niào
@@ -278,6 +282,7 @@ ri	ri	rī	rí	rǐ	rì
 rong	rong	rōng	róng	rǒng	ròng
 rou	rou	rōu	róu	rǒu	ròu
 ru	ru	rū	rú	rǔ	rù
+rua	rua	ruā	ruá	ruǎ	ruà
 ruan	ruan	ruān	ruán	ruǎn	ruàn
 rui	rui	ruī	ruí	ruǐ	ruì
 run	run	rūn	rún	rǔn	rùn
@@ -391,6 +396,7 @@ zhan	zhan	zhān	zhán	zhǎn	zhàn
 zhang	zhang	zhāng	zháng	zhǎng	zhàng
 zhao	zhao	zhāo	zháo	zhǎo	zhào
 zhe	zhe	zhē	zhé	zhě	zhè
+zhei	zhei	zhēi	zhéi	zhěi	zhèi
 zhen	zhen	zhēn	zhén	zhěn	zhèn
 zheng	zheng	zhēng	zhéng	zhěng	zhèng
 zhi	zhi	zhī	zhí	zhǐ	zhì

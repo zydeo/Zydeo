@@ -66,6 +66,9 @@ namespace ZD.UnihanCompiler
         private void doHanyuPinyin(char c, string str)
         {
             CharInfo ci = getOrMake(c);
+            // For lines like this: 21244.040:nài,nì,nà 80020.040:nà,nài,nì
+            // ...only care up to first space
+            str = str.Split(' ')[0];
             string[] parts = str.Split(':')[1].Split(',');
             ci.Pinyin = new string[parts.Length];
             for (int i = 0; i != parts.Length; ++i)
@@ -232,8 +235,12 @@ namespace ZD.UnihanCompiler
                 foreach (var x in lst) pinyin.Add(x.Py);
             }
 
+            // Convert to typed Pinyin syllables
+            PinyinSyllable[] sylls = new PinyinSyllable[pinyin.Count];
+            for (int i = 0; i != pinyin.Count; ++i) sylls[i] = PinyinSyllable.FromDisplayString(pinyin[i]);
+
             // Done.
-            return new UniHanziInfo(canBeSimp, tradVariants.ToArray(), pinyin.ToArray());
+            return new UniHanziInfo(canBeSimp, tradVariants.ToArray(), sylls);
         }
 
         public void WriteData(BinWriter bw)

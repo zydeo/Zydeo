@@ -44,7 +44,7 @@ namespace ZDO.CHSite
             Result res = new Result();
             char[] arr = new char[simp.Length];
             for (int i = 0; i != simp.Length; ++i) arr[i] = simp[i];
-            UniHanziInfo[] uhis = Global.UHRepo.GetInfo(arr);
+            UniHanziInfo[] uhis = Global.UHRepo.GetUnihanInfo(arr);
 
             // Has WS or punctuation
             bool hasSpaceOrPunct = false;

@@ -9,9 +9,9 @@ using ZD.Common;
 namespace ZD.CedictEngine
 {
     /// <summary>
-    /// Implements <see cref="ZD.Common.IUniHanziRepo"/>.
+    /// Implements <see cref="ZD.Common.IHeadwordInfo"/>.
     /// </summary>
-    public class UniHanziRepo : IUniHanziRepo
+    public class HeadwordInfo : IHeadwordInfo
     {
         /// <summary>
         /// Data file name; will keep opening at every query.
@@ -26,7 +26,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Ctor: init from compiled binary file.
         /// </summary>
-        public UniHanziRepo(string dataFileName)
+        public HeadwordInfo(string dataFileName)
         {
             this.dataFileName = dataFileName;
             using (BinReader br = new BinReader(dataFileName))
@@ -43,9 +43,19 @@ namespace ZD.CedictEngine
         }
 
         /// <summary>
-        /// See <see cref="ZD.Common.IUniHanziRepo.GetInfo"/>.
+        /// See <see cref="ZD.Common.IHeadwordInfo.GetPossibleHeadwords"/>.
         /// </summary>
-        public UniHanziInfo[] GetInfo(char[] chars)
+        /// <param name="simp"></param>
+        /// <returns></returns>
+        public HeadwordSyll[][] GetPossibleHeadwords(string simp)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// See <see cref="ZD.Common.IHeadwordInfo.GetUnihanInfo"/>.
+        /// </summary>
+        public UniHanziInfo[] GetUnihanInfo(char[] chars)
         {
             UniHanziInfo[] res = new UniHanziInfo[chars.Length];
             using (BinReader br = new BinReader(dataFileName))
@@ -56,7 +66,8 @@ namespace ZD.CedictEngine
                     // Character is an upper-case letter or a digit: itself
                     if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z'))
                     {
-                        UniHanziInfo uhi = new UniHanziInfo(true, new char[] { c }, new string[] { c.ToString() });
+                        PinyinSyllable syll = new PinyinSyllable(c.ToString(), -1);
+                        UniHanziInfo uhi = new UniHanziInfo(true, new char[] { c }, new PinyinSyllable[] { syll });
                         res[i] = uhi;
                     }
                     // Get genuine Hanzi info, if present

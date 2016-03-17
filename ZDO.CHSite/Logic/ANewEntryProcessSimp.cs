@@ -44,7 +44,7 @@ namespace ZDO.CHSite
             Result res = new Result();
             char[] arr = new char[simp.Length];
             for (int i = 0; i != simp.Length; ++i) arr[i] = simp[i];
-            UniHanziInfo[] uhis = Global.UHRepo.GetInfo(arr);
+            UniHanziInfo[] uhis = Global.UHRepo.GetUnihanInfo(arr);
             for (int i = 0; i != uhis.Length; ++i)
             {
                 UniHanziInfo uhi = uhis[i];
@@ -54,7 +54,7 @@ namespace ZDO.CHSite
                 if (uhi != null)
                 {
                     foreach (char c in uhi.TradVariants) trad.Add(c.ToString());
-                    foreach (string str in uhi.Pinyin) pinyin.Add(str);
+                    foreach (PinyinSyllable syll in uhi.Pinyin) pinyin.Add(syll.GetDisplayString(true));
                 }
                 // Otherwise, for the purposes of this lookup, return character itself
                 else
