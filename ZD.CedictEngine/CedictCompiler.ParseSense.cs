@@ -17,7 +17,7 @@ namespace ZD.CedictEngine
         /// <para>In input, sense comes like this, with domain/note optional:</para>
         /// <para>(domain) (domain) equiv, equiv, equiv (note) (note)</para>
         /// </summary>
-        private void trimSense(string sense, out string domain, out string equiv, out string note)
+        private static void trimSense(string sense, out string domain, out string equiv, out string note)
         {
             sense = sense.Trim();
             // Special case: sense starts with "CL:"
@@ -106,7 +106,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Regex to find 茶壺|茶壶[cha2 hu2] sequences.
         /// </summary>
-        private Regex reSTP = new Regex(@"([0-9A-B\u2e80-\ufff0]+) *\| *([0-9A-B\u2e80-\ufff0]+) *\[([^\]]+)\]");
+        private static Regex reSTP = new Regex(@"([0-9A-B\u2e80-\ufff0]+) *\| *([0-9A-B\u2e80-\ufff0]+) *\[([^\]]+)\]");
 
         /// <summary>
         /// Translates one match of the <see cref="reSTP"/> regex into a Chinese text run.
@@ -128,7 +128,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Regex to find 夂[zhi3] sequences.
         /// </summary>
-        private Regex reSP = new Regex(@"([0-9A-B\u2e80-\ufff0]+) *\[([^\]]+)\]");
+        private static Regex reSP = new Regex(@"([0-9A-B\u2e80-\ufff0]+) *\[([^\]]+)\]");
 
         /// <summary>
         /// Translates one match of the <see cref="reSP"/> regex into a Chinese text run.
@@ -150,7 +150,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Regex to find 一併|一并 sequences.
         /// </summary>
-        private Regex reST = new Regex(@"([0-9A-B\u2e80-\ufff0]+) *\| *([0-9A-B\u2e80-\ufff0]+)");
+        private static Regex reST = new Regex(@"([0-9A-B\u2e80-\ufff0]+) *\| *([0-9A-B\u2e80-\ufff0]+)");
 
         /// <summary>
         /// Translates one match of the <see cref="reST"/> regex into a Chinese text run.
@@ -168,7 +168,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Regex to find 祭祀 sequences.
         /// </summary>
-        private Regex reS = new Regex(@"([\u2e80-\ufff0]+)");
+        private static Regex reS = new Regex(@"([\u2e80-\ufff0]+)");
 
         /// <summary>
         /// Translates one match of the <see cref="reS"/> regex into a Chinese text run.
@@ -186,7 +186,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Regex to find [tou4] sequences.
         /// </summary>
-        private Regex reP = new Regex(@"\[([a-zA-Z][^\]]+)\]");
+        private static Regex reP = new Regex(@"\[([a-zA-Z][^\]]+)\]");
 
         /// <summary>
         /// Translates one match of the <see cref="reP"/> regex into a Chinese text run.
@@ -210,7 +210,7 @@ namespace ZD.CedictEngine
         /// <param name="re">The regex to use.</param>
         /// <param name="mtr">An object matching the regex, used to translate into correct Chinese run.</param>
         /// <returns>The new runs that shall replace the one whose text we parsed.</returns>
-        private List<TextRun> parseRun(string strRun, Regex re, MatchTranslator mtr)
+        private static List<TextRun> parseRun(string strRun, Regex re, MatchTranslator mtr)
         {
             List<TextRun> res = new List<TextRun>();
             // Find regex's matches in inpout
@@ -240,7 +240,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Split a list of runs into possibly more runs, by running a specific Chinese recognizer.
         /// </summary>
-        private List<TextRun> splitRuns(List<TextRun> runs, Regex re, MatchTranslator mtr)
+        private static List<TextRun> splitRuns(List<TextRun> runs, Regex re, MatchTranslator mtr)
         {
             List<TextRun> res = new List<TextRun>();
             foreach (TextRun run in runs)
@@ -258,7 +258,7 @@ namespace ZD.CedictEngine
         /// <param name="lineNum">Line number in input file (to log errors/warnings).</param>
         /// <param name="logStream">Log stream (to log errors/warnings).</param>
         /// <returns>The input's hybrid text representation, or null if we failed to parse.</returns>
-        private HybridText plainTextToHybrid(string str, int lineNum, StreamWriter logStream)
+        private static HybridText plainTextToHybrid(string str, int lineNum, StreamWriter logStream)
         {
             if (string.IsNullOrEmpty(str)) return HybridText.Empty;
 
@@ -284,7 +284,7 @@ namespace ZD.CedictEngine
                 {
                     string msg = "Line {0}: ERROR: Failed to convert sense to hybrid text: {1}";
                     msg = string.Format(msg, lineNum, str);
-                    logStream.WriteLine(msg);
+                    if (logStream != null) logStream.WriteLine(msg);
                     return null;
                 }
             }

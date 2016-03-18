@@ -200,6 +200,20 @@ namespace ZD.Common
                     this.hanziPinyinMap[i] = -1;
             }
         }
+
+        /// <summary>
+        /// Stable hash of a headword string (simplified or traditional, whatever).
+        /// </summary>
+        public static int HashHW(string headword)
+        {
+            int hash = 5381;
+            foreach (char c in headword)
+            {
+                int i = (int)c;
+                hash = ((hash << 5) + hash) + c;
+            }
+            return hash;
+        }
         
         /// <summary>
         /// Deserializes simplified and traditional headword, without reading *full* entry.

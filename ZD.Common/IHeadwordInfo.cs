@@ -91,7 +91,16 @@ namespace ZD.Common
         /// <summary>
         /// Pinyin.
         /// </summary>
-        public readonly PinyinSyllable Pinyin;
+        public readonly string Pinyin;
+        /// <summary>
+        /// Ctor: init immutable instance.
+        /// </summary>
+        public HeadwordSyll(char simp, char trad, string pinyin)
+        {
+            Simp = simp;
+            Trad = trad;
+            Pinyin = pinyin;
+        }
     }
 
     /// <summary>
@@ -110,8 +119,8 @@ namespace ZD.Common
         /// <summary>
         /// Gets headwords known in CEDICT from simplified string.
         /// </summary>
-        /// <param name="simp"></param>
-        /// <returns></returns>
+        /// <param name="simp">Simplified input to look up.</param>
+        /// <returns>First dimension: one know CEDICT headword. Second dimension: equal length as input.</returns>
         HeadwordSyll[][] GetPossibleHeadwords(string simp);
     }
 }

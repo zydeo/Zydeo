@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using ZD.Common;
+using ZD.CedictEngine;
 
 namespace ZD.UnihanCompiler
 {
@@ -243,8 +244,10 @@ namespace ZD.UnihanCompiler
             return new UniHanziInfo(canBeSimp, tradVariants.ToArray(), sylls);
         }
 
-        public void WriteData(BinWriter bw)
+        public void WriteUnihanData(BinWriter bw)
         {
+            // Start position of simplified hash array: we'll return here
+            bw.WriteInt(0);
             // Number of characters
             bw.WriteInt((int)infos.Count);
             // File pointers for each char: we'll return here
@@ -261,12 +264,136 @@ namespace ZD.UnihanCompiler
                 UniHanziInfo uhi = getInfo(x.Key, x.Value);
                 uhi.Serialize(bw);
             }
+            // Remember end of file
+            int endPos = bw.Position;
             // Go back to start of file, write file positions for each character.
             bw.Position = pos;
             foreach (var x in infos)
             {
                 bw.WriteShort((short)x.Key);
                 bw.WriteInt(x.Value.FilePos);
+            }
+            // Return to end of file
+            bw.Position = endPos;
+        }
+
+        private int cedictDropped = 0;
+        private int hddDropped = 0;
+
+        private Dictionary<int, List<int>> cedictHashPoss = new Dictionary<int, List<int>>();
+        private Dictionary<int, List<int>> hddHashPoss = new Dictionary<int, List<int>>();
+
+        public void DictLine(string line, bool cedict, BinWriter bw)
+        {
+            // Parse entry
+            CedictEntry entry = CedictCompiler.ParseEntry(line);
+            // Verify that simp, trad and pinyin are equal length
+            if (entry != null)
+                if (entry.ChSimpl.Length != entry.ChTrad.Length || entry.ChSimpl.Length != entry.PinyinCount)
+                    entry = null;
+            // Just count if failed to parse
+            if (entry == null)
+            {
+                if (cedict) ++cedictDropped;
+                else ++hddDropped;
+                return;
+            }
+            // Serialize
+            int fpos = bw.Position;
+            // First: hash chain: next entry in file with same hash. Will fill later.
+            bw.WriteInt(0);
+            // Then, entry itself
+            entry.Serialize(bw);
+            // Hash simplified and remember file position
+            int hash = CedictEntry.HashHW(entry.ChSimpl);
+            List<int> poss;
+            Dictionary<int, List<int>> hashPoss = cedict ? cedictHashPoss : hddHashPoss;
+            if (!hashPoss.ContainsKey(hash))
+            {
+                poss = new List<int>();
+                hashPoss[hash] = poss;
+            }
+            else poss = hashPoss[hash];
+            poss.Add(fpos);
+        }
+
+        private class PosPair
+        {
+            public int CedictPos = 0;
+            public int HddPos = 0;
+        }
+
+        private class HashChainStarts
+        {
+            public int Hash;
+            public int CedictPos;
+            public int HddPos;
+        }
+
+        /// <summary>
+        /// Finalize dictionary data.
+        /// </summary>
+        public void FinalizeDict(BinWriter bw)
+        {
+            // Combined items: hash > (CEDICT chain start; HDD chain start)
+            Dictionary<int, PosPair> hashChains = new Dictionary<int, PosPair>();
+            // Create hash chains in file
+            foreach (var x in cedictHashPoss)
+            {
+                PosPair pp;
+                if (!hashChains.ContainsKey(x.Key))
+                {
+                    pp = new PosPair();
+                    hashChains[x.Key] = pp;
+                }
+                else pp = hashChains[x.Key];
+                pp.CedictPos = x.Value[0];
+                for (int i = x.Value.Count - 2; i >= 0; --i)
+                {
+                    bw.Position = x.Value[i];
+                    bw.WriteInt(x.Value[i + 1]);
+                }
+            }
+            foreach (var x in hddHashPoss)
+            {
+                PosPair pp;
+                if (!hashChains.ContainsKey(x.Key))
+                {
+                    pp = new PosPair();
+                    hashChains[x.Key] = pp;
+                }
+                else pp = hashChains[x.Key];
+                pp.HddPos = x.Value[0];
+                for (int i = x.Value.Count - 2; i >= 0; --i)
+                {
+                    bw.Position = x.Value[i];
+                    bw.WriteInt(x.Value[i + 1]);
+                }
+            }
+            // Create our sorted list of hash > (pos, pos)
+            HashChainStarts[] lst = new HashChainStarts[hashChains.Count];
+            int lstPos = 0;
+            foreach (var x in hashChains)
+            {
+                lst[lstPos] = new HashChainStarts { Hash = x.Key, CedictPos = x.Value.CedictPos, HddPos = x.Value.HddPos };
+                ++lstPos;
+            }
+            Array.Sort(lst, (x, y) => x.Hash.CompareTo(y.Hash));
+            // We'll append this list to end of file
+            // First, update position at the very start of file
+            bw.MoveToEnd();
+            int filePos = bw.Position;
+            bw.Position = 0;
+            bw.WriteInt(filePos);
+            bw.MoveToEnd();
+            // Element count
+            bw.WriteInt(lst.Length);
+            // Each element
+            foreach (HashChainStarts hcs in lst)
+            {
+                bw.WriteInt(hcs.Hash);
+                bw.WriteInt(hcs.CedictPos);
+                bw.WriteInt(hcs.HddPos);
             }
         }
     }

@@ -50,7 +50,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Decomposes headword: hanzi and pinyin.
         /// </summary>
-        private Regex reHead = new Regex(@"^([^ ]+) ([^ ]+) \[([^\]]+)\]$");
+        private static Regex reHead = new Regex(@"^([^ ]+) ([^ ]+) \[([^\]]+)\]$");
 
         /// <summary>
         /// My tokenizer;
@@ -82,7 +82,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Verifies that line contains no Unicode surrogates. Needed for data hygiene if input is dirty.
         /// </summary>
-        private bool surrogateCheck(string line, StreamWriter logStream)
+        private static bool surrogateCheck(string line, StreamWriter logStream, int lineNum)
         {
             bool surrFound = false;
             foreach (char c in line)
@@ -91,16 +91,19 @@ namespace ZD.CedictEngine
                 if (val >= 0xd800 && val <= 0xdfff) { surrFound = true; break; }
             }
             if (!surrFound) return true;
-            string msg = "Line {0}: ERROR: Unicode surrogate found";
-            msg = string.Format(msg, lineNum);
-            logStream.WriteLine(msg);
+            if (logStream != null)
+            {
+                string msg = "Line {0}: ERROR: Unicode surrogate found";
+                msg = string.Format(msg, lineNum);
+                logStream.WriteLine(msg);
+            }
             return false;
         }
 
         /// <summary>
         /// Parses an entry (line) that has been separated into headword and rest.
         /// </summary>
-        private CedictEntry parseEntry(string strHead, string strBody, StreamWriter logStream)
+        private static CedictEntry parseEntry(string strHead, string strBody, StreamWriter logStream, int lineNum)
         {
             // Decompose head
             Match hm = reHead.Match(strHead);
@@ -108,7 +111,7 @@ namespace ZD.CedictEngine
             {
                 string msg = "Line {0}: ERROR: Invalid header syntax: {1}";
                 msg = string.Format(msg, lineNum, strHead);
-                logStream.WriteLine(msg);
+                if (logStream != null) logStream.WriteLine(msg);
                 return null;
             }
 
@@ -124,14 +127,14 @@ namespace ZD.CedictEngine
             {
                 string msg = "Line {0}: Warning: Weird pinyin syllable: {1}";
                 msg = string.Format(msg, lineNum, strHead);
-                logStream.WriteLine(msg);
+                if (logStream != null) logStream.WriteLine(msg);
             }
             // Trad and simp MUST have same # of chars, always
             if (hm.Groups[1].Value.Length != hm.Groups[2].Value.Length)
             {
                 string msg = "Line {0}: ERROR: Trad/simp char count mismatch: {1}";
                 msg = string.Format(msg, lineNum, strHead);
-                logStream.WriteLine(msg);
+                if (logStream != null) logStream.WriteLine(msg);
                 return null;
             }
             // Transform map so it says, for each hanzi, which pinyin syllable it corresponds to
@@ -142,7 +145,7 @@ namespace ZD.CedictEngine
             {
                 string msg = "Line {0}: Warning: Failed to match hanzi to pinyin: {1}";
                 msg = string.Format(msg, lineNum, strHead);
-                logStream.WriteLine(msg);
+                if (logStream != null) logStream.WriteLine(msg);
             }
             // Split meanings by slash
             string[] meaningsRaw = strBody.Split(new char[] { '/' });
@@ -153,14 +156,14 @@ namespace ZD.CedictEngine
             {
                 string msg = "Line {0}: Warning: Empty sense in entry: {1}";
                 msg = string.Format(msg, lineNum, strBody);
-                logStream.WriteLine(msg);
+                if (logStream != null) logStream.WriteLine(msg);
             }
             // At least one meaning!
             if (meanings.Count == 0)
             {
                 string msg = "Line {0}: ERROR: No sense: {1}";
                 msg = string.Format(msg, lineNum, strBody);
-                logStream.WriteLine(msg);
+                if (logStream != null) logStream.WriteLine(msg);
                 return null;
             }
             // Separate domain, equiv and not in each sense
@@ -174,7 +177,7 @@ namespace ZD.CedictEngine
                 {
                     string msg = "Line {0}: Warning: No equivalent in sense, only domain/notes: {1}";
                     msg = string.Format(msg, lineNum, s);
-                    logStream.WriteLine(msg);
+                    if (logStream != null) logStream.WriteLine(msg);
                 }
                 // Convert all parts of sense to hybrid text
                 HybridText hDomain = plainTextToHybrid(domain, lineNum, logStream);
@@ -222,7 +225,7 @@ namespace ZD.CedictEngine
         /// <para>identifying the corresponding pinyin syllable.</para>
         /// <para>Non-ideo chars in hanzi have no pinyin syllable.</para>
         /// </summary>
-        private short[] transformPinyinMap(string hanzi, List<int> mapIn)
+        private static short[] transformPinyinMap(string hanzi, List<int> mapIn)
         {
             if (hanzi.Length >= short.MaxValue || mapIn.Count >= short.MaxValue)
                 throw new Exception("Hanzi too long, or too many pinyin syllables.");
@@ -258,7 +261,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Normalizes array of Cedict-style pinyin syllables into our format.
         /// </summary>
-        private void normalizePinyin(string[] parts, out PinyinSyllable[] syllsArr, out List<int> pinyinMap)
+        private static void normalizePinyin(string[] parts, out PinyinSyllable[] syllsArr, out List<int> pinyinMap)
         {
             // What this function does:
             // - Separates tone mark from text (unless it's a "weird" syllable
@@ -300,6 +303,44 @@ namespace ZD.CedictEngine
         }
 
         /// <summary>
+        /// Sanitize one line; split into head and body.
+        /// </summary>
+        private static void sanitizeAndSplit(string line, out string strHead, out string strBody)
+        {
+            // Comments, empty lines, some basic normalization
+            line = line.Replace(' ', ' '); // NBSP
+            line = line.Replace('“', '"'); // Curly quote
+            line = line.Replace('”', '"'); // Curly quote
+
+            // Initial split: header vs body
+            int firstSlash = line.IndexOf('/');
+            strHead = line.Substring(0, firstSlash).Trim();
+            strBody = line.Substring(firstSlash + 1).Trim(new char[] { ' ', '/' });
+        }
+
+        /// <summary>
+        /// Parse a single entry. Return null if rejected for whatever reason.
+        /// </summary>
+        public static CedictEntry ParseEntry(string line)
+        {
+            // Empty lines
+            if (line.Trim() == "" || line.StartsWith("#")) return null;
+            // Cannot handle code points about 0xffff
+            if (!surrogateCheck(line, null, 0)) return null;
+            // Sanitization and initial split
+            string strHead, strBody;
+            sanitizeAndSplit(line, out strHead, out strBody);
+            // Parse entry. If failed > null.
+            CedictEntry entry = null;
+            try
+            {
+                entry = parseEntry(strHead, strBody, null, 0);
+            }
+            catch { }
+            return entry;
+        }
+
+        /// <summary>
         /// Processes one line of the text-based Cedict input file.
         /// </summary>
         public void ProcessLine(string line, StreamWriter logStream, StreamWriter swKept, StreamWriter swDrop)
@@ -311,28 +352,24 @@ namespace ZD.CedictEngine
 
             ++lineNum;
 
+            // Empty lines
+            if (line.Trim() == "" || line.StartsWith("#")) return;
             // Cannot handle code points about 0xffff
-            if (!surrogateCheck(origLine, logStream))
+            if (!surrogateCheck(origLine, logStream, lineNum))
             {
                 swDrop.WriteLine(origLine);
                 return;
             }
 
-            // Comments, empty lines, some basic normalization
-            line = line.Replace(' ', ' '); // NBSP
-            line = line.Replace('“', '"'); // Curly quote
-            line = line.Replace('”', '"'); // Curly quote
+            // Sanitization and initial split
+            string strHead, strBody;
+            sanitizeAndSplit(line, out strHead, out strBody);
 
-            if (line.Trim() == "" || line.StartsWith("#")) return;
-            // Initial split: header vs body
-            int firstSlash = line.IndexOf('/');
-            string strHead = line.Substring(0, firstSlash).Trim();
-            string strBody = line.Substring(firstSlash + 1).Trim(new char[] { ' ', '/' });
             // Parse entry. If failed, we be done here.
             CedictEntry entry;
             try
             {
-                entry = parseEntry(strHead, strBody, logStream);
+                entry = parseEntry(strHead, strBody, logStream, lineNum);
             }
             catch
             {
