@@ -56,7 +56,7 @@ namespace ZDO.CHSite
             // Do we have CEDICT headwords for this simplified HW?
             // If yes, put first headword's traditional and pinyin into first layer of result
             // Fill rest of the alternatives with input from additional results
-            HeadwordSyll[][] chHeads = Global.UHRepo.GetPossibleHeadwords(simp, false);
+            HeadwordSyll[][] chHeads = Global.HWInfo.GetPossibleHeadwords(simp, false);
             for (int i = 0; i != chHeads.Length; ++i)
             {
                 HeadwordSyll[] sylls = chHeads[i];
@@ -67,9 +67,7 @@ namespace ZDO.CHSite
                 }
             }
             // Unihan lookup
-            char[] arr = new char[simp.Length];
-            for (int i = 0; i != simp.Length; ++i) arr[i] = simp[i];
-            UniHanziInfo[] uhis = Global.UHRepo.GetUnihanInfo(arr);
+            UniHanziInfo[] uhis = Global.HWInfo.GetUnihanInfo(simp);
             // We had no headword: build from Unihan data, but with a twist
             // Make sure first traditional matches most common pinyin
             if (chHeads.Length == 0)
@@ -81,7 +79,7 @@ namespace ZDO.CHSite
                     // Add pinyin readings first
                     foreach (PinyinSyllable syll in uhi.Pinyin) addIfNew(res.Pinyin[i], syll.GetDisplayString(true));
                     // Look up traditional chars for this position
-                    UniHanziInfo[] tradUhis = Global.UHRepo.GetUnihanInfo(uhi.TradVariants);
+                    UniHanziInfo[] tradUhis = Global.HWInfo.GetUnihanInfo(uhi.TradVariants);
                     // Find "best" traditional character: the first one whose pinyin readings include our first pinyin
                     char firstTrad = (char)0;
                     string favoritePinyin = uhi.Pinyin[0].GetDisplayString(true);
@@ -134,7 +132,7 @@ namespace ZDO.CHSite
                 List<string> tradList = res.Trad[i];
                 if (tradList.Count == 0) continue;
                 List<string> toRem = new List<string>();
-                UniHanziInfo[] tradUhis = Global.UHRepo.GetUnihanInfo(new char[] { tradList[0][0] });
+                UniHanziInfo[] tradUhis = Global.HWInfo.GetUnihanInfo(new char[] { tradList[0][0] });
                 if (tradUhis == null || tradUhis[0] == null) continue;
                 List<string> pinyinsOfTrad = new List<string>();
                 foreach (var x in tradUhis[0].Pinyin) pinyinsOfTrad.Add(x.GetDisplayString(true));

@@ -21,10 +21,10 @@ namespace ZDO.CHSite
             get { return gaCode; }
         }
 
-        private static IHeadwordInfo uhRepo;
-        public static IHeadwordInfo UHRepo
+        private static IHeadwordInfo hwIfno;
+        public static IHeadwordInfo HWInfo
         {
-            get { return uhRepo; }
+            get { return hwIfno; }
         }
 
         void Application_Start(object sender, EventArgs e)
@@ -33,7 +33,7 @@ namespace ZDO.CHSite
             string binFilePath = HttpRuntime.AppDomainAppPath;
             binFilePath = Path.Combine(binFilePath, "_data");
             binFilePath = Path.Combine(binFilePath, "unihanzi.bin");
-            uhRepo = new HeadwordInfo(binFilePath);
+            hwIfno = new HeadwordInfo(binFilePath);
 
             // Some static config parameters
             AppSettingsReader asr = new AppSettingsReader();

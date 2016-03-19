@@ -129,5 +129,15 @@ namespace ZD.Common
         /// <param name="unihanFilter">If true, headwords are dropped where Unihan doesn't list traditional as a variant.</param>
         /// <returns>First dimension: one know CEDICT headword. Second dimension: equal length as input.</returns>
         HeadwordSyll[][] GetPossibleHeadwords(string simp, bool unihanFilter);
+
+        /// <summary>
+        /// Get all CEDICT and HanDeDict entries for provided simplified headword.
+        /// </summary>
+        void GetEntries(string simp, out CedictEntry[] ced, out CedictEntry[] hdd);
+
+        /// <summary>
+        /// Parse a line in the CEDICT format into an entry.
+        /// </summary>
+        CedictEntry ParseFromText(string line);
     }
 }

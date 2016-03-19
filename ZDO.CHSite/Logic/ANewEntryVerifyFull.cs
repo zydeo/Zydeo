@@ -14,21 +14,23 @@ namespace ZDO.CHSite
     /// <summary>
     /// 
     /// </summary>
-    [ActionName("newentry_verifyhead")]
-    public class ANewEntryVerifyHead : ApiAction
+    [ActionName("newentry_verifyfull")]
+    public class ANewEntryVerifyFull : ApiAction
     {
         /// <summary>
         /// Ctor: init. Boilerplate.
         /// </summary>
-        public ANewEntryVerifyHead(HttpContext ctxt) : base(ctxt) { }
+        public ANewEntryVerifyFull(HttpContext ctxt) : base(ctxt) { }
 
         [DataContract]
         public class Result
         {
             [DataMember(Name = "passed")]
             public bool Passed;
-            [DataMember(Name = "ref_entries_html")]
-            public string RefEntries = null;
+            [DataMember(Name = "errors")]
+            public List<string> Errors;
+            [DataMember(Name = "preview_html")]
+            public string Preview = null;
         }
 
         /// <summary>
@@ -36,48 +38,51 @@ namespace ZDO.CHSite
         /// </summary>
         public override void Process()
         {
+            // Mucho TO-DO in this action:
+            // - Escape slashes in senses
+            // - Proper checking for all sorts of stuff
+
             string simp = Req.Params["simp"];
             if (simp == null) throw new ApiException(400, "Missing 'simp' parameter.");
             string trad = Req.Params["trad"];
             if (trad == null) throw new ApiException(400, "Missing 'trad' parameter.");
             string pinyin = Req.Params["pinyin"];
             if (pinyin == null) throw new ApiException(400, "Missing 'pinyin' parameter.");
+            string trg = Req.Params["trg"];
+            if (trg == null) throw new ApiException(400, "Missing 'trg' parameter.");
 
             Result res = new Result();
             res.Passed = true;
 
-            // DBG
-            if (simp == "大家" || simp == "污染") res.Passed = false;
-
             // Prepare pinyin as list of proper syllables
             List<PinyinSyllable> pyList = new List<PinyinSyllable>();
             string[] pyRawArr = pinyin.Split(' ');
-            foreach (string pyRaw in pyRawArr) pyList.Add(PinyinSyllable.FromDisplayString(pyRaw));
-            
-            // Return all entries, CEDICT and HanDeDict, rendered as HTML
-            CedictEntry[] ced, hdd;
-            Global.HWInfo.GetEntries(simp, out ced, out hdd);
+            foreach (string pyRaw in pyRawArr)
+            {
+                PinyinSyllable ps = PinyinSyllable.FromDisplayString(pyRaw);
+                if (ps == null) ps = new PinyinSyllable(pyRaw, -1);
+                pyList.Add(ps);
+            }
+
+            // Build TRG entry in "canonical" form; parse; render
+            trg = trg.Replace("\r\n", "\n");
+            string[] senses = trg.Split('\n');
+            string can = trad + " " + simp + " [";
+            for (int i = 0; i != pyList.Count; ++i)
+            {
+                if (i != 0) can += " ";
+                can += pyList[i].GetDisplayString(false);
+            }
+            can += "] /";
+            foreach (string str in senses) can += str + "/";
+            CedictEntry entry = Global.HWInfo.ParseFromText(can);
             StringBuilder sb = new StringBuilder();
             using (HtmlTextWriter writer = new HtmlTextWriter(new StringWriter(sb)))
             {
-                writer.AddAttribute(HtmlTextWriterAttribute.Id, "newEntryRefCED");
-                writer.RenderBeginTag(HtmlTextWriterTag.Div);
-                foreach (CedictEntry entry in ced)
-                {
-                    EntryRenderer er = new EntryRenderer(entry, trad, pyList);
-                    er.Render(writer);
-                }
-                writer.RenderEndTag();
-                writer.AddAttribute(HtmlTextWriterAttribute.Id, "newEntryRefHDD");
-                writer.RenderBeginTag(HtmlTextWriterTag.Div);
-                foreach (CedictEntry entry in hdd)
-                {
-                    EntryRenderer er = new EntryRenderer(entry, trad, pyList);
-                    er.Render(writer);
-                }
-                writer.RenderEndTag();
+                EntryRenderer er = new EntryRenderer(entry, null, null);
+                er.Render(writer);
             }
-            res.RefEntries = sb.ToString();
+            res.Preview = sb.ToString();
 
             // Serialize to JSON
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Result));

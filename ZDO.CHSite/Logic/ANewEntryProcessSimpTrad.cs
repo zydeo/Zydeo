@@ -52,7 +52,7 @@ namespace ZDO.CHSite
 
             // Do we have a CEDICT headword with this simplified and traditional?
             // If yes, fill in pinyin from these
-            HeadwordSyll[][] chHeads = Global.UHRepo.GetPossibleHeadwords(simp, false);
+            HeadwordSyll[][] chHeads = Global.HWInfo.GetPossibleHeadwords(simp, false);
             for (int i = 0; i != chHeads.Length; ++i)
             {
                 HeadwordSyll[] sylls = chHeads[i];
@@ -70,8 +70,8 @@ namespace ZDO.CHSite
                 }
             }
             // At each position, add missing pinyins that match both simplified and traditional
-            UniHanziInfo[] suhis = Global.UHRepo.GetUnihanInfo(simp);
-            UniHanziInfo[] tuhis = Global.UHRepo.GetUnihanInfo(trad);
+            UniHanziInfo[] suhis = Global.HWInfo.GetUnihanInfo(simp);
+            UniHanziInfo[] tuhis = Global.HWInfo.GetUnihanInfo(trad);
             for (int i = 0; i != simp.Length; ++i)
             {
                 UniHanziInfo suhi = suhis[i];

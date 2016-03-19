@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace ZDO.CHSite
 {
-    public class DiagLogger
+    internal class DiagLogger
     {
         private static string logFileName = null;
         private static object lockObj = new object();

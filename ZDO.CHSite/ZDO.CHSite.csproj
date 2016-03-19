@@ -128,10 +128,13 @@
     </Compile>
     <Compile Include="Logic\ANewEntryProcessSimp.cs" />
     <Compile Include="Logic\ANewEntryProcessSimpTrad.cs" />
+    <Compile Include="Logic\ANewEntryVerifyFull.cs" />
     <Compile Include="Logic\ANewEntryVerifyHead.cs" />
     <Compile Include="Logic\ANewEntryVerifySimp.cs" />
     <Compile Include="Logic\ApiAction.cs" />
     <Compile Include="Logic\DiagLogger.cs" />
+    <Compile Include="Logic\EntryRenderer.cs" />
+    <Compile Include="Logic\SearchOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>

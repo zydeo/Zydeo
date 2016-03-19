@@ -239,5 +239,64 @@ namespace ZD.CedictEngine
             }
             return res;
         }
+
+        /// <summary>
+        /// See <see cref="IHeadwordInfo.GetEntries"/>.
+        /// </summary>
+        public void GetEntries(string simp, out CedictEntry[] ced, out CedictEntry[] hdd)
+        {
+            List<CedictEntry> cedList = new List<CedictEntry>();
+            List<CedictEntry> hddList = new List<CedictEntry>();
+            int hash = CedictEntry.HashHW(simp);
+            // Do we have this hash?
+            HashChainPointer hcp = new HashChainPointer(hash);
+            int pos = Array.BinarySearch(hashPtrs, hcp, new HashComp());
+            using (BinReader br = new BinReader(dataFileName))
+            {
+                // CEDICT entries
+                if (pos >= 0 && hashPtrs[pos].CedictPos != 0)
+                {
+                    int binPos = hashPtrs[pos].CedictPos;
+                    while (binPos != 0)
+                    {
+                        br.Position = binPos;
+                        // Next in chain
+                        binPos = br.ReadInt();
+                        // Entry
+                        CedictEntry entry = new CedictEntry(br);
+                        // Only keep if simplified really is identical
+                        // Could be a hash collision
+                        if (entry.ChSimpl == simp) cedList.Add(entry);
+                    }
+                }
+                // HanDeDict entries
+                if (pos >= 0 && hashPtrs[pos].HanDeDictPos != 0)
+                {
+                    int binPos = hashPtrs[pos].HanDeDictPos;
+                    while (binPos != 0)
+                    {
+                        br.Position = binPos;
+                        // Next in chain
+                        binPos = br.ReadInt();
+                        // Entry
+                        CedictEntry entry = new CedictEntry(br);
+                        // Only keep if simplified really is identical
+                        // Could be a hash collision
+                        if (entry.ChSimpl == simp) hddList.Add(entry);
+                    }
+                }
+            }
+            // Our results
+            ced = cedList.ToArray();
+            hdd = hddList.ToArray();
+        }
+
+        /// <summary>
+        /// See <see cref="IHeadwordInfo.ParseFromText"/>.
+        /// </summary>
+        public CedictEntry ParseFromText(string line)
+        {
+            return CedictCompiler.ParseEntry(line);
+        }
     }
 }

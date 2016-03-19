@@ -43,9 +43,7 @@ namespace ZDO.CHSite
             string simp = Req.Params["simp"];
             if (simp == null) throw new ApiException(400, "Missing 'simp' parameter.");
             Result res = new Result();
-            char[] arr = new char[simp.Length];
-            for (int i = 0; i != simp.Length; ++i) arr[i] = simp[i];
-            UniHanziInfo[] uhis = Global.UHRepo.GetUnihanInfo(arr);
+            UniHanziInfo[] uhis = Global.HWInfo.GetUnihanInfo(simp);
 
             // Has WS or punctuation
             bool hasSpaceOrPunct = false;
@@ -57,9 +55,9 @@ namespace ZDO.CHSite
             List<char> notSimp = new List<char>();
 
             // Check each character
-            for (int i = 0; i != arr.Length; ++i)
+            for (int i = 0; i != simp.Length; ++i)
             {
-                char c = arr[i];
+                char c = simp[i];
                 UniHanziInfo uhi = uhis[i];
 
                 // Space or punct

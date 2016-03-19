@@ -89,8 +89,8 @@ var zdNewEntry = (function () {
     '  <div class="formBlockFrame">' +
     '    <div id="newEntryRefEntries"></div>' +
     '  </div>' +
-    '</div>';
-  '<div class="formBlock future hidden" id="blockReview">' +
+    '</div>' +
+    '<div class="formBlock future hidden" id="blockReview">' +
     '  <div class="formBlockLabel">Előnézet</div>' +
     '  <div class="formBlockFrame">' +
     '    <div id="newEntryRender"></div>' +
@@ -108,6 +108,7 @@ var zdNewEntry = (function () {
     $("#newEntrySimp").bind("compositionstart", onSimpCompStart);
     $("#newEntrySimp").bind("compositionend", onSimpCompEnd);
     $("#newEntrySimp").bind("input", onSimpChanged);
+    $("#newEntrySimp").keyup(onSimpKeyUp);
     $("#acceptSimp").click(onSimpAccept);
     $("#editSimp").click(onSimpEdit);
     $("#acceptTrad").click(onTradAccept);
@@ -200,16 +201,20 @@ var zdNewEntry = (function () {
     }
   }
 
+  // Event handler: user clicked pencil to continue editing target
   function onTrgEdit(evt) {
     setActive("trg");
+    $("#blockRefs").removeClass("hidden");
   }
 
+  // Event handler: user clicked green button to accept translation
   function onTrgAccept(evt) {
     if ($("#acceptTrg").hasClass("disabled")) return;
-    server.verifyTrg($("#newEntryTrg").val(), onTrgVerified);
+    server.verifyTrg($("#newEntrySimp").val(), getTrad(), getPinyin(), $("#newEntryTrg").val(), onTrgVerified);
     $("#acceptTrg").addClass("disabled");
   }
 
+  // API callback: translation verified; we might have a preview
   function onTrgVerified(res) {
     $("#acceptTrg").removeClass("disabled");
     if (!res.passed) {
@@ -246,12 +251,14 @@ var zdNewEntry = (function () {
       $(".formErrors").removeClass("visible");
       $("#errorsPinyin").addClass("visible");
       $("#notePinyin").addClass("hidden");
+      $("#blockRefs").addClass("hidden");
     }
     else {
       $("#errorsPinyin").removeClass("visible");
       $("#notePinyin").removeClass("hidden");
       setActive("trg");
       $("#blockRefs").removeClass("hidden");
+      $("#newEntryRefEntries").html(res.ref_entries_html);
     }
   }
 
@@ -290,6 +297,14 @@ var zdNewEntry = (function () {
   // Event handler: IME composition ends in simplified field.
   function onSimpCompEnd(evt) {
     simpComposing = false;
+  }
+
+  function onSimpKeyUp(evt) {
+    if (evt.which == 13) {
+      evt.preventDefault();
+      onSimpAccept();
+      return false;
+    }
   }
 
   // Handles change of simplified field. Invokes server to retrieve data for subsequent HW fields.
@@ -409,7 +424,10 @@ var zdNewEntry = (function () {
   function getPinyin() {
     var res = "";
     var tctrl = $("#newEntryPinyinCtrl");
-    tctrl.children().each(function() {
+    var first = true;
+    tctrl.children().each(function () {
+      if (!first) res += " ";
+      first = false;
       res += $(this).children().first().text();
     });
     return res;
@@ -497,20 +515,6 @@ var zdNewEntry = (function () {
 })();
 
 var zdNewEntryServer = (function() {
-  var dummyEntry =
-    '      <div class="entry">' +
-    '        <span class="hw-simp"><span class="tone3">夫</span><span class="tone4 hanim">妇</span></span>' +
-    '        <span class="hw-sep faint">&bull;</span>' +
-    '        <span class="hw-trad"><span class="tone3">夫</span><span class="tone4 hanim">婦</span></span>' +
-    '        <span class="hw-pinyin">fū fù</span>' +
-    '        <div class="senses">' +
-    '          <span class="sense"><span class="sense-nobr"><span class="sense-ix">1</span> házaspár</span></span>' +
-    '          <span class="sense"><span class="sense-nobr"><span class="sense-ix">2</span> férj és feleség</span></span>' +
-    '          <br/>' +
-    '          <span class="sense"><i>Számlálószó:</i> 对&bull;對 [duì]</span>' +
-    '        </div>' +
-    '      </div>';
-
   return {
     processSimp: function(simp, ready) {
       // Query URL: localhost for sandboxing only
@@ -562,26 +566,31 @@ var zdNewEntryServer = (function() {
       req.done(function (data) {
         var res = {
           passed: data.passed,
-          ref_entries_html: data.ref_entries_html
+          ref_entries_html: data.ref_entries_html,
         };
         ready(res);
       });
     },
 
-    verifyTrg: function(trg, ready) {
-      setTimeout(function() {
+    verifyTrg: function(simp, trad, pinyin, trg, ready) {
+      // Query URL: localhost for sandboxing only
+      var url = "/ApiHandler.ashx";
+      if (window.location.protocol == "file:")
+        url = "http://localhost:8000/ApiHandler.ashx";
+      var req = $.ajax({
+        url: url,
+        type: "POST",
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        data: { action: "newentry_verifyfull", simp: simp, trad: trad, pinyin: pinyin, trg: trg }
+      });
+      req.done(function (data) {
         var res = {
-          passed: true,
-          preview: dummyEntry
+          passed: data.passed,
+          errors: data.errors,
+          preview: data.preview_html
         };
-        if (trg == "x") {
-          res.passed = false;
-          res.errors = [];
-          res.errors.push("Ez <egy> & hiba.");
-          res.errors.push("Van masik is!");
-        }
         ready(res);
-      }, 200);
+      });
     },
 
     processSimpTrad: function(simp, trad, ready) {
