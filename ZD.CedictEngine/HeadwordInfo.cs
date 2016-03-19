@@ -114,7 +114,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// See <see cref="ZD.Common.IHeadwordInfo.GetPossibleHeadwords"/>.
         /// </summary>
-        public HeadwordSyll[][] GetPossibleHeadwords(string simp)
+        public HeadwordSyll[][] GetPossibleHeadwords(string simp, bool unihanFilter)
         {
             int hash = CedictEntry.HashHW(simp);
             // Do we have this hash?
@@ -135,7 +135,7 @@ namespace ZD.CedictEngine
                     CedictEntry entry = new CedictEntry(br);
                     // Only keep if simplified really is identical
                     // Could be a hash collision
-                    if (entry.ChSimpl == simp) addHeadIfNew(cdHeads, entry);
+                    if (entry.ChSimpl == simp) addHeadIfNew(cdHeads, entry, unihanFilter);
                 }
             }
             if (cdHeads.Count == 0) return new HeadwordSyll[0][];
@@ -146,7 +146,7 @@ namespace ZD.CedictEngine
         /// <para>Makes an array of headword syllables from entry's data.</para>
         /// <para>Result has same length as entry's headword.</para>
         /// </summary>
-        private static void addHeadIfNew(List<HeadwordSyll[]> cdHeads, CedictEntry entry)
+        private void addHeadIfNew(List<HeadwordSyll[]> cdHeads, CedictEntry entry, bool unihanFilter)
         {
             // The new headword: with pinyin lower-cased
             HeadwordSyll[] res = new HeadwordSyll[entry.ChSimpl.Length];
@@ -156,9 +156,18 @@ namespace ZD.CedictEngine
                 res[i] = new HeadwordSyll(entry.ChSimpl[i], entry.ChTrad[i], pyLower);
             }
             // Is it already on list?
-            bool onList = false;
+            // Do traditional chars make sense?
+            UniHanziInfo[] uhis = null;
+            if (unihanFilter)
+            {
+                char[] simp = new char[entry.ChSimpl.Length];
+                for (int i = 0; i != simp.Length; ++i) simp[i] = entry.ChSimpl[i];
+                uhis = GetUnihanInfo(simp);
+            }
+            bool toSkip = false;
             foreach (HeadwordSyll[] x in cdHeads)
             {
+                // Only add if new
                 bool different = false;
                 for (int i = 0; i != res.Length; ++i)
                 {
@@ -168,12 +177,22 @@ namespace ZD.CedictEngine
                 }
                 if (!different)
                 {
-                    onList = true;
+                    toSkip = true;
                     break;
                 }
             }
-            // If not, add
-            if (!onList) cdHeads.Add(res);
+            // Drop those where traditional character is odd
+            if (unihanFilter)
+            {
+                for (int i = 0; i != res.Length; ++i)
+                {
+                    if (uhis[i] == null) continue;
+                    if (Array.IndexOf(uhis[i].TradVariants, res[i].Trad) < 0)
+                    { toSkip = true; break; }
+                }
+            }
+            // If traditionals chars are OK and HW is new, add
+            if (!toSkip) cdHeads.Add(res);
         }
 
         /// <summary>

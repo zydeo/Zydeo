@@ -41,10 +41,6 @@ namespace ZDO.CHSite
         /// </summary>
         public override void Process()
         {
-            // TO-DO:
-            // - Always note combination of Simp+Trad, and restrict Pinyin to intersection
-            // - When no dictionary entry, pick first Trad hanzi that has most common Pinyin
-
             string simp = Req.Params["simp"];
             if (simp == null) throw new ApiException(400, "Missing 'simp' parameter.");
             Result res = new Result();
@@ -59,7 +55,7 @@ namespace ZDO.CHSite
             // Do we have CEDICT headwords for this simplified HW?
             // If yes, put first headword's traditional and pinyin into first layer of result
             // Fill rest of the alternatives with input from additional results
-            HeadwordSyll[][] chHeads = Global.UHRepo.GetPossibleHeadwords(simp);
+            HeadwordSyll[][] chHeads = Global.UHRepo.GetPossibleHeadwords(simp, true);
             for (int i = 0; i != chHeads.Length; ++i)
             {
                 HeadwordSyll[] sylls = chHeads[i];

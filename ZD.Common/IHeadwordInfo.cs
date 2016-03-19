@@ -120,7 +120,8 @@ namespace ZD.Common
         /// Gets headwords known in CEDICT from simplified string.
         /// </summary>
         /// <param name="simp">Simplified input to look up.</param>
+        /// <param name="unihanFilter">If true, headwords are dropped where Unihan doesn't list traditional as a variant.</param>
         /// <returns>First dimension: one know CEDICT headword. Second dimension: equal length as input.</returns>
-        HeadwordSyll[][] GetPossibleHeadwords(string simp);
+        HeadwordSyll[][] GetPossibleHeadwords(string simp, bool unihanFilter);
     }
 }
