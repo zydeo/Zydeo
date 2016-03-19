@@ -4,6 +4,7 @@ var zdNewEntry = (function() {
     '  <div class="formBlockLabel">Egyszerűsített</div>' +
     '  <div class="formBlockFrame">' +
     '    <input id="newEntrySimp" maxlength="8" readonly/>' +
+    '    <div class="newEntryKnown">&bull;</div>' +
     '    <div class="formButtonRight accept" id="acceptSimp">' +
     '      <img src="static/sign.svg" alt=""/>' +
     '    </div>' +
@@ -26,6 +27,7 @@ var zdNewEntry = (function() {
     '    <div id="newEntryTradCtrl">' +
     '      &nbsp;' +
     '    </div>' +
+    '    <div class="newEntryKnown">&bull;</div>' +
     '    <div class="formButtonRight accept" id="acceptTrad">' +
     '      <img src="static/sign.svg" alt=""/>' +
     '    </div>' +
@@ -44,6 +46,7 @@ var zdNewEntry = (function() {
     '    <div id="newEntryPinyinCtrl">' +
     '      &nbsp;' +
     '    </div>' +
+    '    <div class="newEntryKnown">&bull;</div>' +
     '    <div class="formButtonRight accept" id="acceptPinyin">' +
     '      <img src="static/sign.svg" alt=""/>' +
     '    </div>' +
@@ -261,7 +264,7 @@ var zdNewEntry = (function() {
     server.processSimp($("#newEntrySimp").val(), onSimpProcessed);
   }
 
-  function onSimpProcessed(trad, pinyin) {
+  function onSimpProcessed(trad, pinyin, known_hw) {
     $("#newEntryTradCtrl").empty();
     for (var  i = 0; i < trad.length; ++i) {
       var tpos = $('<div class="newEntryTradPos"/>');
@@ -274,6 +277,8 @@ var zdNewEntry = (function() {
       $("#newEntryTradCtrl").append(tpos);
     }
     if (trad.length == 0) $("#newEntryTradCtrl").append('\xA0');
+    if (known_hw) $(".newEntryKnown").addClass("visible");
+    else $(".newEntryKnown").removeClass("visible");
     $(".tradAlt").unbind("click", onTradAltClicked);
     $(".tradAlt").click(onTradAltClicked);
 
@@ -431,7 +436,7 @@ var zdNewEntryServer = (function() {
         data: {action: "newentry_processsimp", simp: simp}
       });
       req.done(function(res) {
-        ready(res.trad, res.pinyin);
+        ready(res.trad, res.pinyin, res.is_known_headword);
       });
     },
 
@@ -497,3 +502,4 @@ var zdNewEntryServer = (function() {
 
 zdNewEntry.init("#newEntry");
 zdNewEntry.setServer(zdNewEntryServer);
+//zdNewEntry.setServer(zdNewEntryShim);

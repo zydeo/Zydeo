@@ -75,7 +75,6 @@
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
     <Content Include="js-1.0\common.js" />
-    <Content Include="js-1.0\newentry-shim.js" />
     <Content Include="js-1.0\newentry.js" />
     <Content Include="js-1.0\teng.js" />
     <Content Include="lib\jquery-2.1.4.min.js" />
@@ -128,6 +127,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Logic\ANewEntryProcessSimp.cs" />
+    <Compile Include="Logic\ANewEntryProcessSimpTrad.cs" />
+    <Compile Include="Logic\ANewEntryVerifyHead.cs" />
     <Compile Include="Logic\ANewEntryVerifySimp.cs" />
     <Compile Include="Logic\ApiAction.cs" />
     <Compile Include="Logic\DiagLogger.cs" />

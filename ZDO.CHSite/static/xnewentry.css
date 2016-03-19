@@ -132,3 +132,21 @@
   background-color: #f0f4f7;
   border: 2pt solid #638fb8;
 }
+
+.newEntryKnown {
+  display: none;
+  position: absolute;
+  top: -5pt;
+  left: 330pt;
+  font-size: 30pt;
+  color: #638fb8;
+  cursor: default;
+}
+
+#blockPinyin .newEntryKnown {
+  top: -11pt;
+}
+
+.newEntryKnown.visible {
+  display: block;
+}

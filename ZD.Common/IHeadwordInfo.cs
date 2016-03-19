@@ -117,6 +117,12 @@ namespace ZD.Common
         UniHanziInfo[] GetUnihanInfo(char[] c);
 
         /// <summary>
+        /// <para>Returns information about a bunch of Hanzi.</para>
+        /// <para>Accepts A-Z, 0-9. Returns null in array for other non-ideographs, and for unknown Hanzi.</para>
+        /// </summary>
+        UniHanziInfo[] GetUnihanInfo(string str);
+
+        /// <summary>
         /// Gets headwords known in CEDICT from simplified string.
         /// </summary>
         /// <param name="simp">Simplified input to look up.</param>

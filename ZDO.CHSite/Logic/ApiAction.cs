@@ -2,9 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Web;
+using System.Reflection;
 
 namespace ZDO.CHSite
 {
+    // Attribute for derived actions to indicate API name.
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ActionName : Attribute
+    {
+        string name;
+        public ActionName(string name)
+        { this.name = name; }
+        public string Name { get { return name; } }
+    }
+
     /// <summary>
     /// Base class for all API action handlers. Also serves as action handler factory.
     /// </summary>
@@ -16,11 +27,39 @@ namespace ZDO.CHSite
         public static ApiAction CreateAction(HttpContext ctxt)
         {
             string action = ctxt.Request.Params["action"];
-            if (action == "newentry_processsimp") return new ANewEntryProcessSimp(ctxt);
-            else if (action == "newentry_verifysimp") return new ANewEntryVerifySimp(ctxt);
-            else if (action == null) throw new ApiException(400, "Missing 'action' parameter.");
-            else throw new ApiException(400, "Unsupported action: " + action);
+            if (!actionMap.ContainsKey(action)) throw new ApiException(400, "Unsupported action: " + action);
+            ConstructorInfo ctor = actionMap[action].GetConstructor(new[] { typeof(HttpContext) });
+            object instance = ctor.Invoke(new object[] { ctxt });
+            return (ApiAction)instance;
+
         }
+
+        /// <summary>
+        /// Static ctor: discover, and register, all action implementors.
+        /// </summary>
+        static ApiAction()
+        {
+            Type[] types = Assembly.GetExecutingAssembly().GetExportedTypes();
+            List<Type> actions = new List<Type>();
+            foreach (Type t in types)
+                if (t.IsSubclassOf(typeof(ApiAction))) actions.Add(t);
+            foreach (Type t in actions)
+            {
+                Attribute[] attrs = Attribute.GetCustomAttributes(t);
+                foreach (Attribute attr in attrs)
+                {
+                    ActionName an = attr as ActionName;
+                    if (an == null) continue;
+                    actionMap[an.Name] = t;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Maps from action names to implementing types.
+        /// </summary>
+        private static Dictionary<string, Type> actionMap = new Dictionary<string, Type>();
+
         /// <summary>
         /// The request's HTTP context.
         /// </summary>

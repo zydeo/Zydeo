@@ -152,7 +152,11 @@ namespace ZD.CedictEngine
             HeadwordSyll[] res = new HeadwordSyll[entry.ChSimpl.Length];
             for (int i = 0; i != res.Length; ++i)
             {
-                string pyLower = entry.GetPinyinAt(i).GetDisplayString(true).ToLowerInvariant();
+                string pyLower = entry.GetPinyinAt(i).GetDisplayString(true);
+                // Do not lower-case single latin letter
+                if (pyLower.Length == 1 && pyLower[0] >= 'A' && pyLower[0] <= 'Z')
+                { /* NOP */ }
+                else pyLower = pyLower.ToLowerInvariant();
                 res[i] = new HeadwordSyll(entry.ChSimpl[i], entry.ChTrad[i], pyLower);
             }
             // Is it already on list?
@@ -193,6 +197,16 @@ namespace ZD.CedictEngine
             }
             // If traditionals chars are OK and HW is new, add
             if (!toSkip) cdHeads.Add(res);
+        }
+
+        /// <summary>
+        /// See <see cref="ZD.Common.IHeadwordInfo.GetUnihanInfo"/>.
+        /// </summary>
+        public UniHanziInfo[] GetUnihanInfo(string str)
+        {
+            char[] charr = new char[str.Length];
+            for (int i = 0; i != str.Length; ++i) charr[i] = str[i];
+            return GetUnihanInfo(charr);
         }
 
         /// <summary>

@@ -76,6 +76,11 @@
   background-color: #e0e0e0;
 }
 
+#editTrad.hidden,
+#editPinyin.hidden {
+  display: none;
+}
+
 .formButtonRight img {
   width: 24pt;
   height: 24pt;

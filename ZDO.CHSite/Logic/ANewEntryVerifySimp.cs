@@ -11,8 +11,9 @@ using ZD.Common;
 namespace ZDO.CHSite
 {
     /// <summary>
-    /// Returns information about a Hanzi (stroke order, decomposition etc.)
+    /// 
     /// </summary>
+    [ActionName("newentry_verifysimp")]
     public class ANewEntryVerifySimp : ApiAction
     {
         private static readonly string errSpacePunct = "A címszó nem tartalmazhat szóközöket vagy központozást";

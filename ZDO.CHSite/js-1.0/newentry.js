@@ -1,9 +1,11 @@
-var zdNewEntry = (function() {
+var zdNewEntry = (function () {
+  "use strict";
   var template =
     '<div class="formBlock active" id="blockSimp">' +
     '  <div class="formBlockLabel">Egyszerűsített</div>' +
     '  <div class="formBlockFrame">' +
     '    <input id="newEntrySimp" maxlength="8" readonly/>' +
+    '    <div class="newEntryKnown" title="A CEDICT-ben létező szó">&bull;</div>' +
     '    <div class="formButtonRight accept" id="acceptSimp">' +
     '      <img src="static/sign.svg" alt=""/>' +
     '    </div>' +
@@ -26,6 +28,7 @@ var zdNewEntry = (function() {
     '    <div id="newEntryTradCtrl">' +
     '      &nbsp;' +
     '    </div>' +
+    '    <div class="newEntryKnown" title="A CEDICT-ben létező szó">&bull;</div>' +
     '    <div class="formButtonRight accept" id="acceptTrad">' +
     '      <img src="static/sign.svg" alt=""/>' +
     '    </div>' +
@@ -44,6 +47,7 @@ var zdNewEntry = (function() {
     '    <div id="newEntryPinyinCtrl">' +
     '      &nbsp;' +
     '    </div>' +
+    '    <div class="newEntryKnown" title="A CEDICT-ben létező szó">&bull;</div>' +
     '    <div class="formButtonRight accept" id="acceptPinyin">' +
     '      <img src="static/sign.svg" alt=""/>' +
     '    </div>' +
@@ -51,9 +55,7 @@ var zdNewEntry = (function() {
     '      <img src="static/draw.svg" alt=""/>' +
     '    </div>' +
     '    <div class="formNote" id="notePinyin">' +
-    '      Ellenőrizd a szótagok pinyin-átiratát. Ha a szó szerepel a CEDICT-ben vagy a HanDeDict-ben,' +
-    '      akkor az ezekből ismert olvasat áll az első helyen, amúgy az egyes írásjegyek leggyakoribb olvasata.' +
-    '      Ha kész, kattints a zöld <i>Jóváhagyás</i> gombra.' +
+    '      Ellenőrizd a szótagok pinyin-átiratát. Ha kész, kattints a zöld <i>Jóváhagyás</i> gombra.' +
     '    </div>' +
     '    <div class="formErrors" id="errorsPinyin">' +
     '      Duplikátum: ilyen címszó már létezik (megegyező egyszerűsített és hagyományos írásjegyek,' +
@@ -82,7 +84,13 @@ var zdNewEntry = (function() {
     '    </div>' +
     '  </div>' +
     '</div>' +
-    '<div class="formBlock future hidden" id="blockReview">' +
+    '<div class="formBlock future hidden" id="blockRefs">' +
+    '  <div class="formBlockLabel">Referenciák</div>' +
+    '  <div class="formBlockFrame">' +
+    '    <div id="newEntryRefEntries"></div>' +
+    '  </div>' +
+    '</div>';
+  '<div class="formBlock future hidden" id="blockReview">' +
     '  <div class="formBlockLabel">Előnézet</div>' +
     '  <div class="formBlockFrame">' +
     '    <div id="newEntryRender"></div>' +
@@ -122,6 +130,7 @@ var zdNewEntry = (function() {
     $(".formBlock").removeClass("active");
     $(".formBlock").removeClass("ready");
     $(".formBlock").removeClass("future");
+    $("#blockRefs").addClass("hidden");
     $("#blockReview").addClass("hidden");
 
     $("#newEntrySimp").prop("readonly", true);
@@ -136,20 +145,26 @@ var zdNewEntry = (function() {
       $("#blockTrad").addClass("future");
       $("#blockPinyin").addClass("future");
       $("#blockTrg").addClass("future");
+      $("#blockRefs").addClass("future");
       $("#blockReview").addClass("future");
+      $("#editTrad").removeClass("hidden");
+      $("#editPinyin").removeClass("hidden");
     }
     else if (block == "trad") {
       $("#blockSimp").addClass("ready");
       $("#blockTrad").addClass("active");
       $("#blockPinyin").addClass("future");
       $("#blockTrg").addClass("future");
+      $("#blockRefs").addClass("future");
       $("#blockReview").addClass("future");
+      $("#editPinyin").removeClass("hidden");
     }
     else if (block == "pinyin") {
       $("#blockSimp").addClass("ready");
       $("#blockTrad").addClass("ready");
       $("#blockPinyin").addClass("active");
       $("#blockTrg").addClass("future");
+      $("#blockRefs").addClass("future");
       $("#blockReview").addClass("future");
     }
     else if (block == "trg") {
@@ -159,6 +174,7 @@ var zdNewEntry = (function() {
       $("#blockTrad").addClass("ready");
       $("#blockPinyin").addClass("ready");
       $("#blockTrg").addClass("active");
+      $("#blockRefs").addClass("active");
       $("#blockReview").addClass("future");
     }
     else if (block == "review") {
@@ -175,6 +191,7 @@ var zdNewEntry = (function() {
 
   function onSubmit(evt) {
     if ($("#newEntryNote").val().length < 6) {
+      $(".formErrors").removeClass("visible");
       $("#errorsReview").addClass("visible");
       $("#newEntryNote").focus();
     }
@@ -196,6 +213,7 @@ var zdNewEntry = (function() {
   function onTrgVerified(res) {
     $("#acceptTrg").removeClass("disabled");
     if (!res.passed) {
+      $(".formErrors").removeClass("visible");
       $("#errorsTrg").addClass("visible");
       $("#noteTrg").addClass("hidden");
       $("#errorListTrg").empty();
@@ -214,15 +232,18 @@ var zdNewEntry = (function() {
     }
   }
 
+  // Even handler: user accepts content of pinyin field
   function onPinyinAccept(evt) {
     if ($("#acceptPinyin").hasClass("disabled")) return;
     server.verifyHead($("#newEntrySimp").val(), getTrad(), getPinyin(), onHeadVerified);
     $("#acceptPinyin").addClass("disabled");
   }
 
+  // API callback: entire headword has been verified (is it a duplicate?).
   function onHeadVerified(res) {
     $("#acceptPinyin").removeClass("disabled");
     if (!res.passed) {
+      $(".formErrors").removeClass("visible");
       $("#errorsPinyin").addClass("visible");
       $("#notePinyin").addClass("hidden");
     }
@@ -230,38 +251,55 @@ var zdNewEntry = (function() {
       $("#errorsPinyin").removeClass("visible");
       $("#notePinyin").removeClass("hidden");
       setActive("trg");
+      $("#blockRefs").removeClass("hidden");
     }
   }
 
+  // Event handler: user clicks pencil to return to editing pinyin field.
   function onPinyinEdit(evt) {
     setActive("pinyin");
   }
 
+  // Event handler: user clicks pencil to return to editing traditional field.
   function onTradEdit(evt) {
     setActive("trad");
   }
 
+  // Event handler: traditional field is accepted by user.
   function onTradAccept(evt) {
     if ($("#acceptTrad").hasClass("disabled")) return;
-    setActive("pinyin");
+    if (isPinyinUnambiguous()) {
+      $("#editPinyin").addClass("hidden");
+      // Instead of activating target, let's get headword verified
+      onPinyinAccept();
+    }
+    else {
+      $("#editPinyin").removeClass("hidden");
+      setActive("pinyin");
+    }
   }
 
+  // Simplified field is composing (IME). Blocks API calls while field has shadow text.
   var simpComposing = false;
 
+  // Event handler: IME composition starts in simplified field.
   function onSimpCompStart(evt) {
     simpComposing = true;
   }
 
+  // Event handler: IME composition ends in simplified field.
   function onSimpCompEnd(evt) {
     simpComposing = false;
   }
 
+  // Handles change of simplified field. Invokes server to retrieve data for subsequent HW fields.
   function onSimpChanged(evt) {
     if (simpComposing) return;
     server.processSimp($("#newEntrySimp").val(), onSimpProcessed);
   }
 
-  function onSimpProcessed(trad, pinyin) {
+  // Callback when API finished processing current content of simplified field.
+  function onSimpProcessed(trad, pinyin, known_hw) {
     $("#newEntryTradCtrl").empty();
     for (var  i = 0; i < trad.length; ++i) {
       var tpos = $('<div class="newEntryTradPos"/>');
@@ -274,21 +312,28 @@ var zdNewEntry = (function() {
       $("#newEntryTradCtrl").append(tpos);
     }
     if (trad.length == 0) $("#newEntryTradCtrl").append('\xA0');
+    if (known_hw) $(".newEntryKnown").addClass("visible");
+    else $(".newEntryKnown").removeClass("visible");
     $(".tradAlt").unbind("click", onTradAltClicked);
     $(".tradAlt").click(onTradAltClicked);
 
     updatePinyin(pinyin);
   }
 
+  // Handles simplified's "accept" event. Invokes server to check input.
   function onSimpAccept(evt) {
     if ($("#acceptSimp").hasClass("disabled")) return;
     server.verifySimp($("#newEntrySimp").val(), onSimpVerified);
     $("#acceptSimp").addClass("disabled");
   }
 
+  // Callback when API finished checking simplified.
+  // We show error notice, or move on to next field.
   function onSimpVerified(res) {
     $("#acceptSimp").removeClass("disabled");
+    // Simplified is not OK - show error
     if (!res.passed) {
+      $(".formErrors").removeClass("visible");
       $("#errorsSimp").addClass("visible");
       $("#noteSimp").addClass("hidden");
       $("#errorListSimp").empty();
@@ -299,17 +344,58 @@ var zdNewEntry = (function() {
       }
       $("#newEntrySimp").focus();
     }
+    // We're good to go
     else {
       $("#errorsSimp").removeClass("visible");
       $("#noteSimp").removeClass("hidden");
-      setActive("trad");
+      // If traditional, or even pinyin, are unambiguous: skip ahead one or two steps
+      if (isTradUnambiguous()) {
+        if (isPinyinUnambiguous()) {
+          $("#editTrad").addClass("hidden");
+          $("#editPinyin").addClass("hidden");
+          // Instead of activating target, let's get headword verified
+          onPinyinAccept();
+        }
+        else {
+          $("#editPinyin").removeClass("hidden");
+          $("#editTrad").addClass("hidden");
+          setActive("pinyin");
+        }
+      }
+      else {
+        $("#editPinyin").removeClass("hidden");
+        $("#editTrad").removeClass("hidden");
+        setActive("trad");
+      }
     }
   }
 
+  // Checks if all traditional symbols are unambiguous (no user input needed).
+  function isTradUnambiguous() {
+    var unambiguous = true;
+    var tctrl = $("#newEntryTradCtrl");
+    tctrl.children().each(function () {
+      if ($(this).children().length > 1) unambiguous = false;
+    });
+    return unambiguous;
+  }
+
+  // Checks if all pinyin syllables are unambiguous (no user input needed).
+  function isPinyinUnambiguous() {
+    var unambiguous = true;
+    var tctrl = $("#newEntryPinyinCtrl");
+    tctrl.children().each(function () {
+      if ($(this).children().length > 1) unambiguous = false;
+    });
+    return unambiguous;
+  }
+
+  // Even handler: user clicked pencil to edit simplified field.
   function onSimpEdit(evt) {
     setActive("simp");
   }
 
+  // Get user's choice of traditional HW.
   function getTrad() {
     var res = "";
     var tctrl = $("#newEntryTradCtrl");
@@ -319,6 +405,7 @@ var zdNewEntry = (function() {
     return res;
   }
 
+  // Get user's choice of pinyin in HW.
   function getPinyin() {
     var res = "";
     var tctrl = $("#newEntryPinyinCtrl");
@@ -328,6 +415,7 @@ var zdNewEntry = (function() {
     return res;
   }
 
+  // Even handler: user clicked on a non-first-row traditional character to select it.
   function onTradAltClicked(evt) {
     if (!$("#blockTrad").hasClass("active")) return;
 
@@ -351,11 +439,12 @@ var zdNewEntry = (function() {
     server.processSimpTrad($("#newEntrySimp").val(), getTrad(), onSimpTradProcessed);
   }
 
+  // Update data shown in pinyin field.
   function updatePinyin(pinyin) {
     $("#newEntryPinyinCtrl").empty();
     for (var i = 0; i != pinyin.length; ++i) {
       var ppos = $('<div class="newEntryPinyinPos"/>');
-      for (j = 0; j != pinyin[i].length; ++j) {
+      for (var j = 0; j != pinyin[i].length; ++j) {
         var pspan = $('<span/>');
         if (j != 0) pspan.addClass("pyAlt");
         pspan.text(pinyin[i][j]);
@@ -368,6 +457,7 @@ var zdNewEntry = (function() {
     $(".pyAlt").click(onPyAltClicked);
   }
 
+  // Event handler: user clicked a pinyin alternative to select it.
   function onPyAltClicked(evt) {
     if (!$("#blockPinyin").hasClass("active")) return;
 
@@ -389,8 +479,11 @@ var zdNewEntry = (function() {
     $(".pyAlt").click(onPyAltClicked);
   }
 
-  function onSimpTradProcessed(pinyin) {
+  // API callback: server finished processing simplified+traditional.
+  function onSimpTradProcessed(pinyin, known_hw) {
     updatePinyin(pinyin);
+    if (known_hw) $(".newEntryKnown").addClass("visible");
+    else $(".newEntryKnown").removeClass("visible");
   }
 
   return {
@@ -430,8 +523,8 @@ var zdNewEntryServer = (function() {
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
         data: {action: "newentry_processsimp", simp: simp}
       });
-      req.done(function(res) {
-        ready(res.trad, res.pinyin);
+      req.done(function(data) {
+        ready(data.trad, data.pinyin, data.is_known_headword);
       });
     },
 
@@ -446,21 +539,33 @@ var zdNewEntryServer = (function() {
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
         data: { action: "newentry_verifysimp", simp: simp }
       });
-      req.done(function (res) {
+      req.done(function (data) {
+        var res = {
+          passed: data.passed,
+          errors: data.errors
+        };
         ready(res);
       });
     },
 
     verifyHead: function(simp, trad, pinyin, ready) {
-      setTimeout(function() {
+      // Query URL: localhost for sandboxing only
+      var url = "/ApiHandler.ashx";
+      if (window.location.protocol == "file:")
+        url = "http://localhost:8000/ApiHandler.ashx";
+      var req = $.ajax({
+        url: url,
+        type: "POST",
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        data: { action: "newentry_verifyhead", simp: simp, trad: trad, pinyin: pinyin }
+      });
+      req.done(function (data) {
         var res = {
-          passed: true
+          passed: data.passed,
+          ref_entries_html: data.ref_entries_html
         };
-        if (simp == "y") {
-          res.passed = false;
-        }
         ready(res);
-      }, 200);
+      });
     },
 
     verifyTrg: function(trg, ready) {
@@ -480,17 +585,19 @@ var zdNewEntryServer = (function() {
     },
 
     processSimpTrad: function(simp, trad, ready) {
-      setTimeout(function() {
-        var pinyin = [];
-        for (var i = 0; i < simp.length; ++i) {
-          var pyList = [];
-          pyList.push("huài");
-          pyList.push("yuè");
-          pyList.push("xiē");
-          pinyin.push(pyList);
-        }
-        ready(pinyin);
-      }, 200);
+      // Query URL: localhost for sandboxing only
+      var url = "/ApiHandler.ashx";
+      if (window.location.protocol == "file:")
+        url = "http://localhost:8000/ApiHandler.ashx";
+      var req = $.ajax({
+        url: url,
+        type: "POST",
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        data: { action: "newentry_processsimptrad", simp: simp, trad: trad }
+      });
+      req.done(function (data) {
+        ready(data.pinyin, data.is_known_headword);
+      });
     }
   }
 })();
@@ -498,3 +605,4 @@ var zdNewEntryServer = (function() {
 
 zdNewEntry.init("#newEntry");
 zdNewEntry.setServer(zdNewEntryServer);
+//zdNewEntry.setServer(zdNewEntryShim);

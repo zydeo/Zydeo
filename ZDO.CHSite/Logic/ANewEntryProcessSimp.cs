@@ -11,8 +11,9 @@ using ZD.Common;
 namespace ZDO.CHSite
 {
     /// <summary>
-    /// Returns information about a Hanzi (stroke order, decomposition etc.)
+    /// 
     /// </summary>
+    [ActionName("newentry_processsimp")]
     public class ANewEntryProcessSimp : ApiAction
     {
         /// <summary>
@@ -55,7 +56,7 @@ namespace ZDO.CHSite
             // Do we have CEDICT headwords for this simplified HW?
             // If yes, put first headword's traditional and pinyin into first layer of result
             // Fill rest of the alternatives with input from additional results
-            HeadwordSyll[][] chHeads = Global.UHRepo.GetPossibleHeadwords(simp, true);
+            HeadwordSyll[][] chHeads = Global.UHRepo.GetPossibleHeadwords(simp, false);
             for (int i = 0; i != chHeads.Length; ++i)
             {
                 HeadwordSyll[] sylls = chHeads[i];
@@ -137,8 +138,10 @@ namespace ZDO.CHSite
                 if (tradUhis == null || tradUhis[0] == null) continue;
                 List<string> pinyinsOfTrad = new List<string>();
                 foreach (var x in tradUhis[0].Pinyin) pinyinsOfTrad.Add(x.GetDisplayString(true));
-                foreach (string py in pyList)
+                // If we had a match, start from second: don't want to remove what just came from CEDICT
+                for (int j = res.IsKnownHeadword ? 1 : 0; j < pyList.Count; ++j)
                 {
+                    string py = pyList[j];
                     if (!pinyinsOfTrad.Contains(py)) toRem.Add(py);
                 }
                 if (toRem.Count == pyList.Count) continue;

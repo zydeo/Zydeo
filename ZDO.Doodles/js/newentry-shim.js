@@ -18,6 +18,7 @@ var zdNewEntryShim = (function() {
       setTimeout(function() {
         var trad = [];
         var pinyin = [];
+        var known_hw = simp == "大家";
         for (var i = 0; i < simp.length; ++i) {
           var tradList = [];
           tradList.push(simp[i]);
@@ -28,7 +29,7 @@ var zdNewEntryShim = (function() {
           pyList.push("xiē");
           pinyin.push(pyList);
         }
-        ready(trad, pinyin);
+        ready(trad, pinyin, known_hw);
       }, 200);
     },
 
