@@ -446,7 +446,7 @@ namespace ZD.CedictEngine
         {
             // Get every syllable once - we ignore repeats
             // If a syllable occurs with unspecified tone once, or if it occurs with multiple tone marks
-            // -> We only take it as once item with unspecified tone
+            // -> We only take it as one item with unspecified tone
             // Otherwise, take it as is, with tone mark
             Dictionary<string, int> syllDict = new Dictionary<string, int>();
             foreach (var syll in sylls)
@@ -553,7 +553,7 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Parses a pinyin query string into normalized syllables.
         /// </summary>
-        private static List<PinyinSyllable> doParsePinyin(string query)
+        public static List<PinyinSyllable> ParsePinyinQuery(string query)
         {
             // If query is empty string or WS only: no syllables
             query = query.Trim();
@@ -784,7 +784,7 @@ namespace ZD.CedictEngine
             else
             {
                 // Parse pinyin query string
-                List<PinyinSyllable> sylls = doParsePinyin(query);
+                List<PinyinSyllable> sylls = ParsePinyinQuery(query);
                 // Lookup
                 res = doPinyinLookupHead(br, sylls);
             }

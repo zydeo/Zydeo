@@ -116,7 +116,7 @@ namespace ZD.CedictEngine
         /// </summary>
         public HeadwordSyll[][] GetPossibleHeadwords(string simp, bool unihanFilter)
         {
-            int hash = CedictEntry.HashHW(simp);
+            int hash = CedictEntry.Hash(simp);
             // Do we have this hash?
             HashChainPointer hcp = new HashChainPointer(hash);
             int pos = Array.BinarySearch(hashPtrs, hcp, new HashComp());
@@ -247,7 +247,7 @@ namespace ZD.CedictEngine
         {
             List<CedictEntry> cedList = new List<CedictEntry>();
             List<CedictEntry> hddList = new List<CedictEntry>();
-            int hash = CedictEntry.HashHW(simp);
+            int hash = CedictEntry.Hash(simp);
             // Do we have this hash?
             HashChainPointer hcp = new HashChainPointer(hash);
             int pos = Array.BinarySearch(hashPtrs, hcp, new HashComp());
@@ -296,7 +296,7 @@ namespace ZD.CedictEngine
         /// </summary>
         public CedictEntry ParseFromText(string line)
         {
-            return CedictCompiler.ParseEntry(line);
+            return CedictCompiler.ParseEntry(line, 0, null, null);
         }
     }
 }

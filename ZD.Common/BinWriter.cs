@@ -8,12 +8,18 @@ namespace ZD.Common
 {
     public class BinWriter : IDisposable
     {
-        private FileStream stream;
+        private Stream stream;
         private BinaryWriter writer;
 
         public BinWriter(string fileName)
         {
             stream = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite);
+            writer = new BinaryWriter(stream);
+        }
+
+        public BinWriter(Stream stream)
+        {
+            this.stream = stream;
             writer = new BinaryWriter(stream);
         }
 

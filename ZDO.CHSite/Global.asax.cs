@@ -27,8 +27,20 @@ namespace ZDO.CHSite
             get { return hwIfno; }
         }
 
+        private static string workFolder;
+        public static string WorkFolder
+        {
+            get { return workFolder; }
+        }
+
         void Application_Start(object sender, EventArgs e)
         {
+            // Work folder
+            string wfpath = HttpRuntime.AppDomainAppPath;
+            wfpath = Path.Combine(wfpath, "_data");
+            wfpath = Path.Combine(wfpath, "work");
+            workFolder = wfpath;
+
             // Unihanzi repository
             string binFilePath = HttpRuntime.AppDomainAppPath;
             binFilePath = Path.Combine(binFilePath, "_data");

@@ -321,22 +321,23 @@ namespace ZD.CedictEngine
         /// <summary>
         /// Parse a single entry. Return null if rejected for whatever reason.
         /// </summary>
-        public static CedictEntry ParseEntry(string line)
+        /// <param name="line">Line to parse.</param>
+        /// <param name="lineNum">Line number in input.</param>
+        /// <param name="swLog">Stream to log warnings. Can be null.</param>
+        /// <param name="swDrop">Stream to record dropped entries (failed to parse). Can be null.</param>
+        public static CedictEntry ParseEntry(string line, int lineNum, StreamWriter swLog, StreamWriter swDrop)
         {
             // Empty lines
             if (line.Trim() == "" || line.StartsWith("#")) return null;
             // Cannot handle code points about 0xffff
-            if (!surrogateCheck(line, null, 0)) return null;
+            if (!surrogateCheck(line, swLog, lineNum)) return null;
             // Sanitization and initial split
             string strHead, strBody;
             sanitizeAndSplit(line, out strHead, out strBody);
             // Parse entry. If failed > null.
             CedictEntry entry = null;
-            try
-            {
-                entry = parseEntry(strHead, strBody, null, 0);
-            }
-            catch { }
+            try { entry = parseEntry(strHead, strBody, swLog, lineNum); }
+            catch { if (swDrop != null) swDrop.WriteLine(line); }
             return entry;
         }
 

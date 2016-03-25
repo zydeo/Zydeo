@@ -42,6 +42,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MySql.Data, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -78,6 +82,7 @@
     <Content Include="js-1.0\newentry.js" />
     <Content Include="js-1.0\teng.js" />
     <Content Include="lib\jquery-2.1.4.min.js" />
+    <EmbeddedResource Include="Logic\DB.Scripts.txt" />
     <Content Include="static\arrows-w.svg" />
     <Content Include="static\arrows.svg" />
     <Content Include="static\book-w.svg" />
@@ -103,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ApiHandler.ashx" />
+    <Compile Include="Logic\SqlDict.Importer.cs" />
     <None Include="Properties\PublishProfiles\ForUpload.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -132,9 +138,11 @@
     <Compile Include="Logic\ANewEntryVerifyHead.cs" />
     <Compile Include="Logic\ANewEntryVerifySimp.cs" />
     <Compile Include="Logic\ApiAction.cs" />
+    <Compile Include="Logic\DB.cs" />
     <Compile Include="Logic\DiagLogger.cs" />
     <Compile Include="Logic\EntryRenderer.cs" />
     <Compile Include="Logic\SearchOptions.cs" />
+    <Compile Include="Logic\SqlDict.Query.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>

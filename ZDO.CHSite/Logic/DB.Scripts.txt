@@ -1,0 +1,51 @@
+﻿# Script CreateDB
+DROP TABLE IF EXISTS binary_entries;
+CREATE TABLE binary_entries(
+	id				INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	data			BLOB
+);
+
+DROP TABLE IF EXISTS hanzi_instances;
+CREATE TABLE hanzi_instances(
+	hanzi			INT,		-- The Hanzi, as a 32-bit integer
+	simptrad		TINYINT,	-- 1 if Hanzi occurs in simplified HW; 2 for traditional; 3 for both
+	simp_count		INT,		-- Count of (different) Hanzi in simplified HW
+	trad_count		INT,		-- Count of (different) Hanzi in traditional HW
+	blob_id			INT			-- binary_entries.id
+) ENGINE=InnoDB CHARACTER SET=utf8;
+CREATE INDEX idx_hanzi_instances_hanzi ON hanzi_instances(hanzi);
+
+DROP TABLE IF EXISTS pinyin_instances;
+CREATE TABLE pinyin_instances(
+	pinyin_hash		INT,		-- Hash of syllable w/o tone. Unique for true pinyin syllables.
+	tone			INT,		-- Tone; -1 for weird ones; 0 for neutral; 1-4.
+	syll_count		INT,		-- Count of distinct pinyin syallables in headword
+	blob_id			INT			-- binary_entries.id
+) ENGINE=InnoDB CHARACTER SET=utf8;
+CREATE INDEX idx_pinyin_instances_pinyin_hash ON pinyin_instances(pinyin_hash);
+CREATE INDEX idx_pinyin_instances_pinyin_hash_tone ON pinyin_instances(pinyin_hash, tone);
+# End
+
+# Script InsPinyinInstance
+# @pinyin_hash INT
+# @tone INT
+# @syll_count INT
+# @blob_id INT
+INSERT INTO pinyin_instances (pinyin_hash, tone, syll_count, blob_id)
+VALUES (@pinyin_hash, @tone, @syll_count, @blob_id);
+# End
+
+# Script InsHanziInstance
+# @hanzi INT
+# @simptrad TINYINT
+# @simp_count INT
+# @trad_count INT
+# @blob_id INT
+INSERT INTO hanzi_instances (hanzi, simptrad, simp_count, trad_count, blob_id)
+VALUES (@hanzi, @simptrad, @simp_count, @trad_count, @blob_id);
+# End
+
+# Script InsBinaryEntry
+# @data BLOB
+INSERT INTO binary_entries (data) VALUES (@data);
+# End

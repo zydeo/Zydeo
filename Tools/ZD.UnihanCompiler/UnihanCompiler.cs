@@ -305,7 +305,7 @@ namespace ZD.UnihanCompiler
             // Then, entry itself
             entry.Serialize(bw);
             // Hash simplified and remember file position
-            int hash = CedictEntry.HashHW(entry.ChSimpl);
+            int hash = CedictEntry.Hash(entry.ChSimpl);
             List<int> poss;
             Dictionary<int, List<int>> hashPoss = cedict ? cedictHashPoss : hddHashPoss;
             if (!hashPoss.ContainsKey(hash))
