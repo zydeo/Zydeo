@@ -30,15 +30,15 @@ namespace ZDO.CHSite
             //    lookup.Lookup("yi", SearchScript.Both, SearchLang.Chinese);
             //    lookup.Lookup("zhi dao yi", SearchScript.Both, SearchLang.Chinese);
             //}
-            //using (SqlDict.Query lookup = new SqlDict.Query())
-            //{
-            //    lookup.Lookup("zhi dao", SearchScript.Both, SearchLang.Chinese);
-            //    lookup.Lookup("hai1", SearchScript.Both, SearchLang.Chinese);
-            //    lookup.Lookup("zhi", SearchScript.Both, SearchLang.Chinese);
-            //    lookup.Lookup("dao", SearchScript.Both, SearchLang.Chinese);
-            //    lookup.Lookup("yi", SearchScript.Both, SearchLang.Chinese);
-            //    lookup.Lookup("zhi dao yi", SearchScript.Both, SearchLang.Chinese);
-            //}
+            using (SqlDict.Query lookup = new SqlDict.Query())
+            {
+                lookup.Lookup("zhi dao", SearchScript.Both, SearchLang.Chinese);
+                lookup.Lookup("hai1", SearchScript.Both, SearchLang.Chinese);
+                lookup.Lookup("zhi", SearchScript.Both, SearchLang.Chinese);
+                lookup.Lookup("dao", SearchScript.Both, SearchLang.Chinese);
+                lookup.Lookup("yi", SearchScript.Both, SearchLang.Chinese);
+                lookup.Lookup("zhi dao yi", SearchScript.Both, SearchLang.Chinese);
+            }
         }
     }
 }

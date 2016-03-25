@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.IO;
 using System.Reflection;
+using System.Configuration;
 using MySql.Data.MySqlClient;
 
 using ZD.CedictEngine;
@@ -39,18 +40,18 @@ namespace ZDO.CHSite
         private static readonly string connectionString;
 
         /// <summary>
-        /// Pre-processes scripts from DB.Scripts.txt.
-        /// Builds and stores connection string from site config.
+        /// All the initialization, so it can be try-catched in static ctor
         /// </summary>
-        static DB()
+        private static void init(out string connectionString)
         {
-            // Build connection string.
+            // Build connection string. Comes from Private.config
+            AppSettingsReader asr = new AppSettingsReader();
             MySqlConnectionStringBuilder csb = new MySqlConnectionStringBuilder();
-            csb.Server = "localhost";
-            csb.Port = 3306;
-            csb.Database = "chdb";
-            csb.UserID = "chdb_user";
-            csb.Password = "pass";
+            csb.Server = asr.GetValue("dbServer", typeof(string)).ToString();
+            csb.Port = (uint)asr.GetValue("dbPort", typeof(uint));
+            csb.Database = asr.GetValue("dbDatabase", typeof(string)).ToString();
+            csb.UserID = asr.GetValue("dbUserID", typeof(string)).ToString();
+            csb.Password = asr.GetValue("dbPassword", typeof(string)).ToString();
             csb.Pooling = true;
             csb.IgnorePrepare = false;
             connectionString = csb.GetConnectionString(true);
@@ -91,6 +92,23 @@ namespace ZDO.CHSite
                         if (cmd != null) cmd.Sql += line + "\r\n";
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Pre-processes scripts from DB.Scripts.txt.
+        /// Builds and stores connection string from site config.
+        /// </summary>
+        static DB()
+        {
+            try
+            {
+                init(out connectionString);
+            }
+            catch(Exception ex)
+            {
+                DiagLogger.LogError(ex);
+                throw;
             }
         }
 
