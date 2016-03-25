@@ -7,10 +7,10 @@ var zdNewEntry = (function () {
     '    <input id="newEntrySimp" maxlength="8" readonly/>' +
     '    <div class="newEntryKnown" title="A CEDICT-ben létező szó">&bull;</div>' +
     '    <div class="formButtonRight accept" id="acceptSimp">' +
-    '      <img src="static/sign.svg" alt=""/>' +
+    '      <img src="/static/sign.svg" alt=""/>' +
     '    </div>' +
     '    <div class="formButtonRight edit" id="editSimp">' +
-    '      <img src="static/draw.svg" alt=""/>' +
+    '      <img src="/static/draw.svg" alt=""/>' +
     '    </div>' +
     '    <div class="formNote" id="noteSimp">' +
     '      A folytatáshoz kattints a zöld <i>Jóváhagyás</i> gombra, vagy üss Entert.' +
@@ -30,10 +30,10 @@ var zdNewEntry = (function () {
     '    </div>' +
     '    <div class="newEntryKnown" title="A CEDICT-ben létező szó">&bull;</div>' +
     '    <div class="formButtonRight accept" id="acceptTrad">' +
-    '      <img src="static/sign.svg" alt=""/>' +
+    '      <img src="/static/sign.svg" alt=""/>' +
     '    </div>' +
     '    <div class="formButtonRight edit" id="editTrad">' +
-    '      <img src="static/draw.svg" alt=""/>' +
+    '      <img src="/static/draw.svg" alt=""/>' +
     '    </div>' +
     '    <div class="formNote">' +
     '      Ha nem a megfelelő hagyományos írásjegy áll az első helyen, a kívánt elemre' +
@@ -49,10 +49,10 @@ var zdNewEntry = (function () {
     '    </div>' +
     '    <div class="newEntryKnown" title="A CEDICT-ben létező szó">&bull;</div>' +
     '    <div class="formButtonRight accept" id="acceptPinyin">' +
-    '      <img src="static/sign.svg" alt=""/>' +
+    '      <img src="/static/sign.svg" alt=""/>' +
     '    </div>' +
     '    <div class="formButtonRight edit" id="editPinyin">' +
-    '      <img src="static/draw.svg" alt=""/>' +
+    '      <img src="/static/draw.svg" alt=""/>' +
     '    </div>' +
     '    <div class="formNote" id="notePinyin">' +
     '      Ellenőrizd a szótagok pinyin-átiratát. Ha kész, kattints a zöld <i>Jóváhagyás</i> gombra.' +
@@ -68,10 +68,10 @@ var zdNewEntry = (function () {
     '  <div class="formBlockFrame">' +
     '    <textarea id="newEntryTrg" maxlength="1024" readonly></textarea>' +
     '    <div class="formButtonRight accept" id="acceptTrg">' +
-    '      <img src="static/sign.svg" alt=""/>' +
+    '      <img src="/static/sign.svg" alt=""/>' +
     '    </div>' +
     '    <div class="formButtonRight edit" id="editTrg">' +
-    '      <img src="static/draw.svg" alt=""/>' +
+    '      <img src="/static/draw.svg" alt=""/>' +
     '    </div>' +
     '    <div class="formNote" id="noteTrg">' +
     '      Add meg, újsorokkal elválasztva, a címszó magyar jelentéseit.' +
@@ -85,7 +85,7 @@ var zdNewEntry = (function () {
     '  </div>' +
     '</div>' +
     '<div class="formBlock future hidden" id="blockRefs">' +
-    '  <div class="formBlockLabel">Referenciák</div>' +
+    '  <div class="formBlockLabel">Források</div>' +
     '  <div class="formBlockFrame">' +
     '    <div id="newEntryRefEntries"></div>' +
     '  </div>' +

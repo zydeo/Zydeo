@@ -77,6 +77,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\WorkInProgress.en.html" />
+    <Content Include="Content\WorkInProgress.hu.html" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
     <Content Include="js-1.0\common.js" />
@@ -134,6 +136,7 @@
     <Content Include="ApiHandler.ashx" />
     <Compile Include="Logic\SqlDict.Importer.cs" />
     <None Include="Properties\PublishProfiles\ForUpload.pubxml" />
+    <Content Include="static\rubbery.svg" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -189,6 +192,7 @@
   <ItemGroup>
     <Content Include="Site.Master" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

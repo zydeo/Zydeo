@@ -7,13 +7,16 @@ using System.Web.UI.WebControls;
 
 namespace ZDO.CHSite
 {
+    /// <summary>
+    /// Redirects caller to proper language URL if requests didn't include language prefix.
+    /// </summary>
     public partial class LangRedirect : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
             string uri = Request.Params["uri"];
             if (uri == null) uri = "";
-            Response.Redirect("/hu/" + uri);
+            Response.RedirectPermanent("/hu/" + uri, true);
         }
     }
 }

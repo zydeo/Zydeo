@@ -152,10 +152,10 @@ body {
 .subMenuItem a,
 .subMenuItem span {
   display: inline-block;
-  font-family: Neuton, serif;
-  font-size: 18pt;
+  font-family: Ubuntu, sans-serif;
+  font-size: 16pt;
   text-decoration: none;
-  padding: 8pt 0 4pt 0;
+  padding: 10pt 0 4pt 0;
   margin: 0 15pt 0 0;
   border-bottom: 3pt solid #325e87;
   color: #c0c0c0;
@@ -174,7 +174,15 @@ body {
 
 #content {
   box-sizing: border-box;
-  margin: 66pt auto 0 auto;
+  margin: 70pt auto 0 auto;
+  padding-top: 0;
   padding-bottom: 400pt;
   width: 400pt;
+}
+
+#content h1 {
+  margin: 0 0 10pt 0;
+  font-family: Neuton, serif;
+  font-size: 24pt;
+  font-weight: bold;
 }

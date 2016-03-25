@@ -5,7 +5,7 @@
 <asp:Content ID="mainContent" ContentPlaceHolderID="mainContentPlaceholder" runat="server">
 
 <div id="content">
-<h1 style="margin-top: 100pt;">Static.</h1>
+<asp:Literal runat="server" ID="lit" />
 </div>
 
 </asp:Content>
