@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Web.UI.HtmlControls;
 using System.Reflection;
 using System.Text;
 
@@ -11,20 +13,11 @@ namespace ZDO.CHSite
 {
     public partial class SiteMaster : MasterPage
     {
-        private string pageName = null;
-        public string PageName { get { return pageName; } }
+        private string rawUrl = null;
+        public string RawUrl { get { return rawUrl; } }
 
-        private void determinePage(string requestPath)
-        {
-            if (requestPath == @"/Default.aspx") pageName = "search";
-            else if (requestPath == @"/Statics.aspx")
-            {
-                string page = Request.Params["page"];
-                if (page == "about") pageName = "about";
-                else if (page == "options") pageName = "options";
-                else if (page == "cookies") pageName = "cookies";
-            }
-        }
+        private string lang = null;
+        public string Lang { get { return lang; } }
 
         /// <summary>
         /// The executing assembly's version, as string.
@@ -50,15 +43,63 @@ namespace ZDO.CHSite
         }
 
         /// <summary>
-        /// Resolve the URL of a JS file, taking into account current site version.
+        /// Safely adds a CSS class to an HtmlControl.
         /// </summary>
-        /// <param name="namePure">Name of the JS file, without folder etc.</param>
-        /// <returns>The resolved URL to be included in page.</returns>
-        public string ResolveMyJS(string namePure)
+        private static void addClass(HtmlControl ctrl, string cls)
         {
-            string res = "~/js-{0}/{1}";
-            res = string.Format(res, VerStr, namePure);
-            return ResolveUrl(res);
+            string curr = ctrl.Attributes["class"];
+            string[] parts = curr.Split(' ');
+            bool alreadyThere = false;
+            string newVal = "";
+            bool first = true;
+            foreach (string old in parts)
+            {
+                if (old == "") continue;
+                if (!first) newVal += " ";
+                else first = false;
+                newVal += old;
+                if (old == cls) alreadyThere = true;
+            }
+            if (!alreadyThere)
+            {
+                if (newVal != "") newVal += " ";
+                newVal += cls;
+            }
+            ctrl.Attributes["class"] = newVal;
+        }
+
+        /// <summary>
+        /// Updates menu states to show current location.
+        /// </summary>
+        private void updateMenu()
+        {
+            // Language selector links
+            langSelHu.HRef = "/hu" + rawUrl;
+            langSelEn.HRef = "/en" + rawUrl;
+            // Selected language
+            if (lang == "en") addClass(langSelEn, "selected");
+            else if (lang == "hu") addClass(langSelHu, "selected");
+            // Selected top menu
+            if (rawUrl == "") addClass(topMenuSearch, "selected");
+            else if (rawUrl.StartsWith("/settings")) addClass(topMenuSettings, "selected");
+            else if (rawUrl.StartsWith("/edit")) addClass(topMenuEdit, "selected");
+            else if (rawUrl.StartsWith("/read")) addClass(topMenuRead, "selected");
+            else if (rawUrl.StartsWith("/download")) addClass(topMenuDownload, "selected");
+            // Selected submenu
+            if (rawUrl.StartsWith("/edit/new")) addClass(subMenuNewEntry, "selected");
+            else if (rawUrl.StartsWith("/edit/history")) addClass(subMenuHistory, "selected");
+            else if (rawUrl.StartsWith("/edit/change")) addClass(subMenuChange, "selected");
+            else if (rawUrl.StartsWith("/read/key")) addClass(subMenuReadKey, "selected");
+            else if (rawUrl.StartsWith("/read/articles")) addClass(subMenuArticles, "selected");
+            else if (rawUrl.StartsWith("/read/etc")) addClass(subMenuEtc, "selected");
+        }
+
+        /// <summary>
+        /// Resolves a raw link (infuses it with current language prefix).
+        /// </summary>
+        public string ResolveLink(string link)
+        {
+            return "/" + lang + link;
         }
 
         /// <summary>
@@ -69,16 +110,45 @@ namespace ZDO.CHSite
             return Global.GACode;
         }
 
+        /// <summary>
+        /// Adds a CSS file to be linked from HEAD.
+        /// </summary>
+        public void AddCss(string cssName)
+        {
+            string href = "/style-{0}/{1}";
+            href = string.Format(href, VerStr, cssName);
+            HtmlLink link = new HtmlLink();
+            link.Href = href;
+            link.Attributes.Add("rel", "stylesheet");
+            link.Attributes.Add("type", "text/css");
+            link.Attributes.Add("media", "all");
+            this.Page.Header.Controls.Add(link);
+        }
+
+        /// <summary>
+        /// Adds a JS file to be linked from end of BODY.
+        /// </summary>
+        public void AddJS(string jsName, bool fromLib)
+        {
+            if (fromLib)
+                litLibJS.Text += "<script src='/lib/" + jsName + "'></script>\r\n";
+            else
+                litMyJS.Text += "<script src='/js-" + VerStr + "/" + jsName + "'></script>\r\n";
+        }
+
+        /// <summary>
+        /// Initializes master page (site location, language etc.)
+        /// </summary>
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
 
-            // Which page are we showing?
-            determinePage(Request.Path);
-        }
-
-        protected void Page_Init(object sender, EventArgs e)
-        {
+            // Raw URL, without the language prefix
+            rawUrl = Request.RawUrl.Substring(3);
+            // What is our current language?
+            lang = Request.Params["lang"];
+            // Infuse menu with "selected" marks
+            updateMenu();
         }
 
         protected void master_Page_PreLoad(object sender, EventArgs e)

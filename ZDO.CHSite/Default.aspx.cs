@@ -13,6 +13,9 @@ namespace ZDO.CHSite
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            // Add CSS files
+            Master.AddCss("style.css");
+            
             //DB.CreateTables();
             //using (SqlDict.Importer importer = new SqlDict.Importer())
             //using (StreamReader sr = new StreamReader(@"D:\Development\Zydeo\ZDO.CHSite\_data\handedict_nb_sani03.u8"))
@@ -30,15 +33,15 @@ namespace ZDO.CHSite
             //    lookup.Lookup("yi", SearchScript.Both, SearchLang.Chinese);
             //    lookup.Lookup("zhi dao yi", SearchScript.Both, SearchLang.Chinese);
             //}
-            using (SqlDict.Query lookup = new SqlDict.Query())
-            {
-                lookup.Lookup("zhi dao", SearchScript.Both, SearchLang.Chinese);
-                lookup.Lookup("hai1", SearchScript.Both, SearchLang.Chinese);
-                lookup.Lookup("zhi", SearchScript.Both, SearchLang.Chinese);
-                lookup.Lookup("dao", SearchScript.Both, SearchLang.Chinese);
-                lookup.Lookup("yi", SearchScript.Both, SearchLang.Chinese);
-                lookup.Lookup("zhi dao yi", SearchScript.Both, SearchLang.Chinese);
-            }
+            //using (SqlDict.Query lookup = new SqlDict.Query())
+            //{
+            //    lookup.Lookup("zhi dao", SearchScript.Both, SearchLang.Chinese);
+            //    lookup.Lookup("hai1", SearchScript.Both, SearchLang.Chinese);
+            //    lookup.Lookup("zhi", SearchScript.Both, SearchLang.Chinese);
+            //    lookup.Lookup("dao", SearchScript.Both, SearchLang.Chinese);
+            //    lookup.Lookup("yi", SearchScript.Both, SearchLang.Chinese);
+            //    lookup.Lookup("zhi dao yi", SearchScript.Both, SearchLang.Chinese);
+            //}
         }
     }
 }
