@@ -84,21 +84,23 @@ namespace ZD.Colloc
         /// <summary>
         /// Find co-occurring words with query word.
         /// </summary>
-        public void Query(string word, int thresh, DoneDelegate done, int wleft, int wright)
+        public void Query(string word, int minFreq, int maxFreq, DoneDelegate done, int wleft, int wright)
         {
-            ThreadPool.QueueUserWorkItem(doQuery, new object[] { word, thresh, done, wleft, wright });
+            ThreadPool.QueueUserWorkItem(doQuery, new object[] { word, done, minFreq, maxFreq, wleft, wright });
         }
 
         private void doQuery(object state)
         {
             object[] args = (object[])state;
-            DoneDelegate done = (DoneDelegate)args[2];
+            DoneDelegate done = (DoneDelegate)args[1];
             string word = (string)args[0];
-            int thresh = (int)args[1];
-            if (thresh <= 0) thresh = int.MaxValue;
-            int wleft = (int)args[3];
+            int minFreq = (int)args[2];
+            if (minFreq <= 0) minFreq = int.MaxValue;
+            int maxFreq = (int)args[3];
+            if (maxFreq <= 0) maxFreq = int.MaxValue;
+            int wleft = (int)args[4];
             if (wleft <= 0) wleft = int.MaxValue;
-            int wright = (int)args[4];
+            int wright = (int)args[5];
             if (wright <= 0) wright = int.MaxValue;
 
             coCounts.Clear();
@@ -123,7 +125,8 @@ namespace ZD.Colloc
                         string str = parts[i];
                         if (str == word) continue;
                         if (!freqs.ContainsKey(str)) continue;
-                        if (freqs[str] < thresh) continue;
+                        int freq = freqs[str];
+                        if (freq < minFreq || freq > maxFreq) continue;
                         if (!coCounts.ContainsKey(str)) coCounts[str] = 1;
                         else ++coCounts[str];
                     }
@@ -133,7 +136,8 @@ namespace ZD.Colloc
                         string str = parts[i];
                         if (str == word) continue;
                         if (!freqs.ContainsKey(str)) continue;
-                        if (freqs[str] < thresh) continue;
+                        int freq = freqs[str];
+                        if (freq < minFreq || freq > maxFreq) continue;
                         if (!coCounts.ContainsKey(str)) coCounts[str] = 1;
                         else ++coCounts[str];
                     }

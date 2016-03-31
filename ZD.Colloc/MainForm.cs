@@ -49,7 +49,8 @@ namespace ZD.Colloc
         {
             btnGo.Enabled = false;
             pbar.Visible = true;
-            colloc.Query(txtQuery.Text, int.Parse(txtFreqThresh.Text), onQueryDone, int.Parse(txtLeftWin.Text), int.Parse(txtRightWin.Text));
+            colloc.Query(txtQuery.Text, int.Parse(txtMinFreq.Text), int.Parse(txtMaxFreq.Text),
+                onQueryDone, int.Parse(txtLeftWin.Text), int.Parse(txtRightWin.Text));
         }
 
         private void lnkLoadFreq_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
