@@ -1,0 +1,90 @@
+﻿#pager {
+  position: relative;
+  float: left;
+  width: 100%;
+  font-size: 13pt;
+  font-family: Ubuntu, sans-serif;
+  margin-bottom: 20pt;
+}
+
+#lblPage {
+  position: relative;
+  float: left;
+  font-weight: bold;
+  font-family: Ubuntu, sans-serif;
+}
+
+a.pageLink {
+  display: inline-block;
+  position: relative;
+  float: left;
+  text-decoration: none;
+  text-align: center;
+  color: #303030;
+  padding: 0 5pt 0 5pt;
+  border-radius: 3pt;
+  margin-left: 5pt;
+}
+
+a.pageLink:hover,
+a.pageLink.selected {
+  background-color: #d3e3f2;
+}
+
+.historyItem {
+  position: relative;
+  float: left;
+  margin-bottom: 20pt;
+}
+
+.changeHead {
+  position: relative;
+  float: left;
+  width: calc(100% + 10pt);
+  margin-left: -10pt;
+  padding-left: 10pt;
+  background-color: #f0f4f7;
+  padding-bottom: 5pt;
+  border-top: 2pt solid #d3e3f2;
+}
+
+.changeSummary {
+  position: relative;
+  float: left;
+  font-size: 12pt;
+  clear: both;
+}
+
+.changeNote {
+  position: relative;
+  float: left;
+  clear: both;
+  width: 100%;
+  text-align: right;
+  font-style: italic;
+}
+
+.changeUser {
+  font-weight: bold;
+}
+
+.changeTime {
+}
+
+.ctNew { color: blue; }
+.ctNote { color: darkorange; }
+.ctEdit { color: purple; }
+
+.lblNote {
+  font-weight: bold;
+  color: #505050;
+}
+
+.historyItem .entry {
+  position: relative;
+  float: left;
+  top: -5pt;
+  color: #606060;
+  padding: 0 0 0 0;
+  margin-top: 5pt;
+}
