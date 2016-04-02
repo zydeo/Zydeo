@@ -192,7 +192,10 @@ var zdNewEntry = (function () {
     }
   }
 
+  // Event handler: submit button clicked.
   function onSubmit(evt) {
+    if ($("#newEntrySubmit").hasClass("disabled")) return;
+    // Check if user has entered a substantial note
     if ($("#newEntryNote").val().length < 6) {
       $(".formErrors").removeClass("visible");
       $("#errorsReview").addClass("visible");
@@ -200,7 +203,16 @@ var zdNewEntry = (function () {
     }
     else {
       $("#errorsReview").removeClass("visible");
+      $("#newEntrySubmit").addClass("disabled");
+      server.submit($("#newEntrySimp").val(), getTrad(), getPinyin(),
+        $("#newEntryTrg").val(), $("#newEntryNote").val(), onSubmitReady);
     }
+  }
+
+  // API callback: submit returned, with either success or failure.
+  function onSubmitReady(success) {
+    $("#newEntrySubmit").removeClass("disabled");
+    alert(success);
   }
 
   // Event handler: user clicked pencil to continue editing target
@@ -608,6 +620,25 @@ var zdNewEntryServer = (function() {
       });
       req.done(function (data) {
         ready(data.pinyin, data.is_known_headword);
+      });
+    },
+
+    submit: function (simp, trad, pinyin, trg, note, ready) {
+      // Query URL: localhost for sandboxing only
+      var url = "/ApiHandler.ashx";
+      if (window.location.protocol == "file:")
+        url = "http://localhost:8000/ApiHandler.ashx";
+      var req = $.ajax({
+        url: url,
+        type: "POST",
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        data: { action: "newentry_submit", simp: simp, trad: trad, pinyin: pinyin, trg: trg, note: note }
+      });
+      req.done(function (data) {
+        ready(data.success);
+      });
+      req.fail(function (jqXHR, textStatus, error) {
+        ready(false);
       });
     }
   }

@@ -1,0 +1,67 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Text;
+using MySql.Data.MySqlClient;
+
+using ZD.Common;
+
+namespace ZDO.CHSite
+{
+    public partial class SqlDict
+    {
+        public class HeadAndTrg
+        {
+            public readonly string Head;
+            public readonly string Trg;
+            public HeadAndTrg(string head, string trg)
+            {
+                Head = head;
+                Trg = trg;
+            }
+        }
+
+        public static bool DoesHeadExist(string head)
+        {
+            using (MySqlConnection conn = DB.GetConn())
+            using (MySqlCommand cmd = DB.GetCmd(conn, "SelCountHead"))
+            {
+                cmd.Parameters["@hw"].Value = head;
+                Int64 count = (Int64)cmd.ExecuteScalar();
+                return count > 0;
+            }
+        }
+
+        public static CedictEntry BuildEntry(string simp, string trad, string pinyin, string trg)
+        {
+            // Prepare pinyin as list of proper syllables
+            List<PinyinSyllable> pyList = new List<PinyinSyllable>();
+            string[] pyRawArr = pinyin.Split(' ');
+            foreach (string pyRaw in pyRawArr)
+            {
+                PinyinSyllable ps = PinyinSyllable.FromDisplayString(pyRaw);
+                if (ps == null) ps = new PinyinSyllable(pyRaw, -1);
+                pyList.Add(ps);
+            }
+
+            // Build TRG entry in "canonical" form; parse; render
+            trg = trg.Replace("\r\n", "\n");
+            string[] senses = trg.Split('\n');
+            string can = trad + " " + simp + " [";
+            for (int i = 0; i != pyList.Count; ++i)
+            {
+                if (i != 0) can += " ";
+                can += pyList[i].GetDisplayString(false);
+            }
+            can += "] /";
+            foreach (string str in senses) can += str + "/";
+            return Global.HWInfo.ParseFromText(can);
+        }
+
+        public static List<HeadAndTrg> GetEntriesBySimp(string simp)
+        {
+            return null;
+        }
+    }
+}

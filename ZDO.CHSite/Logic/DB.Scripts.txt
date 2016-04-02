@@ -29,7 +29,7 @@ DROP TABLE IF EXISTS entries;
 CREATE TABLE entries(
 	id				INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	hw				VARCHAR(256),	-- trad, simp and pinyin in one (as in CEDICT format)
-	trg				VARCHAR(2048),	-- translations (as in CEDICT format)
+	trg				VARCHAR(3072),	-- translations (as in CEDICT format)
 	simp_hash		INT,			-- hash of simplified headword
 	status			TINYINT,		-- 0: neutral; 1: approved; 2: flagged
 	deleted			TINYINT,		-- 0: not deleted; 1: deleted
@@ -43,12 +43,12 @@ DROP TABLE IF EXISTS modifs;
 CREATE TABLE modifs(
 	id				INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	hw_before		VARCHAR(256),	-- changed entry's HW before change, for instant diff in history
-	trg_before		VARCHAR(2048),	-- changed entry's TRG before change, for instant diff in history
+	trg_before		VARCHAR(3072),	-- changed entry's TRG before change, for instant diff in history
 	hw_after		VARCHAR(256),	-- only filled if next change is an intervening bulk
-	trg_after		VARCHAR(2048),	-- only filled if next change is an intervening bulk
+	trg_after		VARCHAR(3072),	-- only filled if next change is an intervening bulk
 	timestamp		DATETIME,
 	user_id			INT,
-	note			VARCHAR(2048),
+	note			VARCHAR(3072),
 	chg				TINYINT,		-- 0: new; 1: delete; 2: edit; 3: note; 4: flag; 5: approve; 6: bulk import
 	entry_id		INT				-- entries.id
 ) ENGINE=InnoDB CHARACTER SET=utf8 COLLATE utf8_general_ci;
@@ -99,16 +99,18 @@ INSERT INTO entries (hw, trg, simp_hash, status, deleted, bin_id)
 VALUES (@hw, @trg, @simp_hash, @status, @deleted, @bin_id);
 # End
 
-# Script InsModif
-# @hw_before VARCHAR
-# @trg_before VARCHAR
+# Script InsDummyForBulk
+INSERT INTO entries (deleted)
+VALUES (1);
+# End
+
+# Script InsModifForBulk
 # @timestamp DATETIME
 # @user_id INT
 # @note VARCHAR
-# @chg TINYINT
-# @entry_id INT
-INSERT INTO modifs (hw_before, trg_before, timestamp, user_id, note, chg, entry_id)
-VALUES (@hw_before, @trg_before, @timestamp, @user_id, @note, @chg, @entry_id);
+# @dummy_entry_id INT
+INSERT INTO modifs (timestamp, user_id, note, chg, entry_id)
+VALUES (@timestamp, @user_id, @note, 6, @dummy_entry_id);
 # End
 
 # Script UpdLastModif
@@ -117,11 +119,32 @@ VALUES (@hw_before, @trg_before, @timestamp, @user_id, @note, @chg, @entry_id);
 UPDATE entries SET last_modif_id=@last_modif_id WHERE id=@entry_id;
 # End
 
+# Script InsBulkModif
+# @modif_id INT
+# @entry_id INT
+INSERT INTO bulk_modifs (modif_id, entry_id)
+VALUES (@modif_id, @entry_id);
+# End
+
+# Script InsModifNew
+# @timestamp DATETIME
+# @user_id INT
+# @note VARCHAR
+# @entry_id INT
+INSERT INTO modifs (timestamp, user_id, note, chg, entry_id)
+VALUES (@timestamp, @user_id, @note, 0, @entry_id);
+# End
+
+# Script SelCountHead
+# @hw VARCHAR
+SELECT COUNT(*) FROM entries WHERE hw=@hw;
+# End
+
 # https://explainextended.com/2009/10/23/mysql-order-by-limit-performance-late-row-lookups/
 # Script SelModifPage
 # @page_start INT
 # @page_len INT
-SELECT  M.timestamp, E.last_modif_id, E.hw
+SELECT  M.timestamp, E.hw, M.note, M.chg
 FROM	(
 		SELECT last_modif_id
 		FROM entries

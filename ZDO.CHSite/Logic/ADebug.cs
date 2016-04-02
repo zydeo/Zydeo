@@ -37,10 +37,12 @@ namespace ZDO.CHSite
         {
             [DataMember(Name = "when")]
             public string When;
-            [DataMember(Name = "change_id")]
-            public string ChangeId;
             [DataMember(Name = "headword")]
             public string Head;
+            [DataMember(Name = "note")]
+            public string Note;
+            [DataMember(Name = "code")]
+            public int Code;
         }
 
         [DataContract]
@@ -68,9 +70,10 @@ namespace ZDO.CHSite
             {
                 res.Items.Add(new HistoryItem
                 {
-                    When = ci.When.ToShortDateString() + " " + ci.When.ToShortTimeString(),
-                    ChangeId = ci.ChangeId.ToString(),
-                    Head = ci.Head
+                    When = ci.When.ToShortDateString() + " " + ci.When.ToLongTimeString(),
+                    Head = ci.Head,
+                    Note = ci.Note,
+                    Code = ci.ChangeCode
                 });
             }
 
@@ -128,14 +131,11 @@ namespace ZDO.CHSite
 
         private void funIndexHDD(object o)
         {
-            bool doIndex = Req.Params["index"] == "true";
-            bool doPopulate = Req.Params["populate"] == "true";
-
             indexLineCount = 0;
             string hddPath = HttpRuntime.AppDomainAppPath;
             hddPath = Path.Combine(hddPath, "_data");
             hddPath = Path.Combine(hddPath, "handesmall.u8");
-            using (SqlDict.Importer imp = new SqlDict.Importer(doIndex, doPopulate))
+            using (SqlDict.BulkBuilder imp = new SqlDict.BulkBuilder(0, "Importing stuff."))
             using (StreamReader sr = new StreamReader(hddPath))
             {
                 string line;

@@ -99,6 +99,24 @@ namespace ZD.Common
         }
 
         /// <summary>
+        /// Returns as plain text in the CEDICT format.
+        /// </summary>
+        /// <returns></returns>
+        public string GetCedict()
+        {
+            if (runs.Count == 0) return string.Empty;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i != runs.Count; ++i)
+            {
+                if (i != 0) sb.Append(' ');
+                TextRun run = runs[i];
+                if (run is TextRunZho) sb.Append((run as TextRunZho).GetCedict());
+                else sb.Append(run.GetPlainText());
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Initializes a pure plain-text instance.
         /// </summary>
         public HybridText(string plain)
@@ -219,6 +237,23 @@ namespace ZD.Common
             if (Simp == Trad)
                 return Simp + py;
             else return Simp + " • " + Trad + py;
+        }
+
+        /// <summary>
+        /// Gets text run's text in the CEDICT text format.
+        /// </summary>
+        /// <returns></returns>
+        public string GetCedict()
+        {
+            if (Simp == null) return GetPinyinInOne(false);
+
+            string py = GetPinyinInOne(false);
+            if (py == null) py = "";
+            else py = "[" + py + "]";
+
+            if (Simp == Trad)
+                return Simp + py;
+            else return Trad + "|" + Simp + py;
         }
 
         /// <summary>

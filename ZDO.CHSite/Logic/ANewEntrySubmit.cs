@@ -8,40 +8,27 @@ using System.Runtime.Serialization.Json;
 using System.IO;
 
 using ZD.Common;
+using ZD.CedictEngine;
 
 namespace ZDO.CHSite
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    [ActionName("newentry_verifyfull")]
-    public class ANewEntryVerifyFull : ApiAction
+    [ActionName("newentry_submit")]
+    public class ANewEntrySubmit : ApiAction
     {
         /// <summary>
         /// Ctor: init. Boilerplate.
         /// </summary>
-        public ANewEntryVerifyFull(HttpContext ctxt) : base(ctxt) { }
+        public ANewEntrySubmit(HttpContext ctxt) : base(ctxt) { }
 
         [DataContract]
         public class Result
         {
-            [DataMember(Name = "passed")]
-            public bool Passed;
-            [DataMember(Name = "errors")]
-            public List<string> Errors;
-            [DataMember(Name = "preview_html")]
-            public string Preview = null;
+            [DataMember(Name = "success")]
+            public bool Success;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public override void Process()
         {
-            // Mucho TO-DO in this action:
-            // - Escape slashes in senses
-            // - Proper checking for all sorts of stuff
-
             string simp = Req.Params["simp"];
             if (simp == null) throw new ApiException(400, "Missing 'simp' parameter.");
             string trad = Req.Params["trad"];
@@ -50,20 +37,27 @@ namespace ZDO.CHSite
             if (pinyin == null) throw new ApiException(400, "Missing 'pinyin' parameter.");
             string trg = Req.Params["trg"];
             if (trg == null) throw new ApiException(400, "Missing 'trg' parameter.");
+            string note = Req.Params["note"];
+            if (note == null) throw new ApiException(400, "Missing 'note' parameter.");
 
-            Result res = new Result();
-            res.Passed = true;
-
-            CedictEntry entry = SqlDict.BuildEntry(simp, trad, pinyin, trg);
-            StringBuilder sb = new StringBuilder();
-            using (HtmlTextWriter writer = new HtmlTextWriter(new StringWriter(sb)))
+            Result res = new Result { Success = true };
+            SqlDict.SimpleBuilder builder = null;
+            try
             {
-                EntryRenderer er = new EntryRenderer(entry, null, null);
-                er.Render(writer);
+                builder = new SqlDict.SimpleBuilder(0);
+                CedictEntry entry = SqlDict.BuildEntry(simp, trad, pinyin, trg);
+                builder.NewEntry(entry, note);
             }
-            res.Preview = sb.ToString();
+            catch (Exception ex)
+            {
+                DiagLogger.LogError(ex);
+                res.Success = false;
+            }
+            finally
+            {
+                if (builder != null) builder.Dispose();
+            }
 
-            // Serialize to JSON
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Result));
             MemoryStream ms = new MemoryStream();
             js.WriteObject(ms, res);

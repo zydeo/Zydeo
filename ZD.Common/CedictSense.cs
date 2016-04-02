@@ -56,6 +56,30 @@ namespace ZD.Common
         }
 
         /// <summary>
+        /// Returns this sense, without the enclosing slashes, in CEDICT format.
+        /// </summary>
+        public string GetCedict()
+        {
+            StringBuilder sb = new StringBuilder();
+            string domainCedict = Domain.GetCedict();
+            if (!string.IsNullOrEmpty(domainCedict)) sb.Append(domainCedict);
+            string equivCedict = Equiv.GetCedict();
+            if (!string.IsNullOrEmpty(equivCedict))
+            {
+                if (sb.Length != 0) sb.Append(' ');
+                sb.Append(equivCedict);
+            }
+            string noteCedict = Note.GetCedict();
+            if (!string.IsNullOrEmpty(noteCedict))
+            {
+                if (sb.Length != 0) sb.Append(' ');
+                sb.Append(noteCedict);
+            }
+            sb.Replace('/', '\\');
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Gets sense in plain text.
         /// </summary>
         public string GetPlainText()

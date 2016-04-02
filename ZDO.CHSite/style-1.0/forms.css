@@ -151,3 +151,8 @@
 .formSubmit:hover {
   background-color: #7BBA7B;
 }
+
+.formSubmit.disabled {
+  background-color: #e0e0e0;
+  color: #808080;
+}

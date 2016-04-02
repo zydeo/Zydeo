@@ -26,7 +26,7 @@ var zdNewEntry = (function () {
       $("#progressVal").append("<b>" + data.summary + "</b><br/>");
       for (var i = 0; i != data.items.length; ++i) {
         var item = data.items[i];
-        var itemHtml = "[" + item.change_id + "] " + item.when + " &nbsp; " + item.headword + "<br/>";
+        var itemHtml = "<b>" + item.code + "</b> &nbsp; " + item.headword + " &nbsp; " + item.when + " &nbsp; <i>" + item.note + "</i><br/>";
         $("#progressVal").append(itemHtml);
       }
     });
@@ -34,8 +34,6 @@ var zdNewEntry = (function () {
 
   function onIndexHDD() {
     $("#progress").css("display", "block");
-    var index = $("#chkIndex").is(":checked");
-    var populate = $("#chkPopulate").is(":checked");
     var url = "/ApiHandler.ashx";
     if (window.location.protocol == "file:")
       url = "http://localhost:8000/ApiHandler.ashx";
@@ -43,7 +41,7 @@ var zdNewEntry = (function () {
       url: url,
       type: "POST",
       contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-      data: { action: "debug", what: "index_hdd", index: index, populate: populate }
+      data: { action: "debug", what: "index_hdd" }
     });
     setTimeout(getProgressIndexHDD, 500);
   }

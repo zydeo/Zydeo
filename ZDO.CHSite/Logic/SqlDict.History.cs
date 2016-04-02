@@ -16,8 +16,9 @@ namespace ZDO.CHSite
         public class ChangeItem
         {
             public DateTime When;
-            public int ChangeId;
             public string Head;
+            public string Note;
+            public int ChangeCode;
         }
 
         public class History : IDisposable
@@ -47,8 +48,9 @@ namespace ZDO.CHSite
                         ChangeItem ci = new ChangeItem
                         {
                             When = rdr.GetDateTime(0),
-                            ChangeId = rdr.GetInt32(1),
-                            Head = rdr.GetString(2)
+                            Head = rdr.IsDBNull(1) ? "n/a" : rdr.GetString(1),
+                            Note = rdr.GetString(2),
+                            ChangeCode = rdr.GetInt32(3)
                         };
                         res.Add(ci);
                     }
