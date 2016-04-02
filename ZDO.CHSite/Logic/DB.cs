@@ -78,7 +78,10 @@ namespace ZDO.CHSite
                         MySqlDbType dbType;
                         if (parts[1] == "BLOB") dbType = MySqlDbType.Blob;
                         else if (parts[1] == "TINYINT") dbType = MySqlDbType.Byte;
-                        else dbType = MySqlDbType.Int32;
+                        else if (parts[1] == "VARCHAR") dbType = MySqlDbType.VarChar;
+                        else if (parts[1] == "DATETIME") dbType = MySqlDbType.DateTime;
+                        else if (parts[1] == "INT") dbType = MySqlDbType.Int32;
+                        else throw new Exception("Forgotten field type: " + parts[1]);
                         cmd.Params[parts[0]] = dbType;
                     }
                     else if (line.StartsWith("# End"))

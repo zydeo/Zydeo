@@ -77,13 +77,16 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Diagnostics.html" />
     <Content Include="Content\HistoryDoodle.html" />
     <Content Include="Content\WorkInProgress.en.html" />
     <Content Include="Content\WorkInProgress.hu.html" />
     <Content Include="Default.aspx" />
+    <Content Include="Diagnostics.aspx" />
     <Content Include="Global.asax" />
     <Content Include="History.aspx" />
     <Content Include="js-1.0\common.js" />
+    <Content Include="js-1.0\diagnostics.js" />
     <Content Include="js-1.0\newentry.js" />
     <Content Include="js-1.0\teng.js" />
     <Content Include="LangRedirect.aspx" />
@@ -107,6 +110,7 @@
     <Content Include="static\social.svg" />
     <Content Include="static\tool-w.svg" />
     <Content Include="static\tool.svg" />
+    <Content Include="style-1.0\diagnostics.css" />
     <Content Include="style-1.0\entry.css" />
     <Content Include="style-1.0\forms.css" />
     <Content Include="style-1.0\history.css" />
@@ -115,6 +119,13 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Diagnostics.aspx.cs">
+      <DependentUpon>Diagnostics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Diagnostics.aspx.designer.cs">
+      <DependentUpon>Diagnostics.aspx</DependentUpon>
+    </Compile>
     <Compile Include="History.aspx.cs">
       <DependentUpon>History.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -129,6 +140,7 @@
     <Compile Include="LangRedirect.aspx.designer.cs">
       <DependentUpon>LangRedirect.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Logic\ADebug.cs" />
     <Compile Include="NewEntry.aspx.cs">
       <DependentUpon>NewEntry.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -145,6 +157,7 @@
     </Compile>
     <Content Include="ApiHandler.ashx" />
     <Compile Include="Logic\SqlDict.Importer.cs" />
+    <Compile Include="Logic\SqlDict.History.cs" />
     <None Include="Properties\PublishProfiles\ForUpload.pubxml" />
     <Content Include="static\rubbery.svg" />
     <None Include="Web.Debug.config">

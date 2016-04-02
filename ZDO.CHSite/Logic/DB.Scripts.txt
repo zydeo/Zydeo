@@ -7,23 +7,61 @@ CREATE TABLE binary_entries(
 
 DROP TABLE IF EXISTS hanzi_instances;
 CREATE TABLE hanzi_instances(
-	hanzi			INT,		-- The Hanzi, as a 32-bit integer
-	simptrad		TINYINT,	-- 1 if Hanzi occurs in simplified HW; 2 for traditional; 3 for both
-	simp_count		INT,		-- Count of (different) Hanzi in simplified HW
-	trad_count		INT,		-- Count of (different) Hanzi in traditional HW
-	blob_id			INT			-- binary_entries.id
+	hanzi			INT,			-- The Hanzi, as a 32-bit integer
+	simptrad		TINYINT,		-- 1 if Hanzi occurs in simplified HW; 2 for traditional; 3 for both
+	simp_count		INT,			-- Count of (different) Hanzi in simplified HW
+	trad_count		INT,			-- Count of (different) Hanzi in traditional HW
+	blob_id			INT				-- binary_entries.id
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 CREATE INDEX idx_hanzi_instances_hanzi ON hanzi_instances(hanzi);
 
 DROP TABLE IF EXISTS pinyin_instances;
 CREATE TABLE pinyin_instances(
-	pinyin_hash		INT,		-- Hash of syllable w/o tone. Unique for true pinyin syllables.
-	tone			INT,		-- Tone; -1 for weird ones; 0 for neutral; 1-4.
-	syll_count		INT,		-- Count of distinct pinyin syallables in headword
-	blob_id			INT			-- binary_entries.id
+	pinyin_hash		INT,			-- Hash of syllable w/o tone. Unique for true pinyin syllables.
+	tone			INT,			-- Tone; -1 for weird ones; 0 for neutral; 1-4.
+	syll_count		INT,			-- Count of distinct pinyin syallables in headword
+	blob_id			INT				-- binary_entries.id
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 CREATE INDEX idx_pinyin_instances_pinyin_hash ON pinyin_instances(pinyin_hash);
 CREATE INDEX idx_pinyin_instances_pinyin_hash_tone ON pinyin_instances(pinyin_hash, tone);
+
+DROP TABLE IF EXISTS entries;
+CREATE TABLE entries(
+	id				INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	hw				VARCHAR(256),	-- trad, simp and pinyin in one (as in CEDICT format)
+	trg				VARCHAR(2048),	-- translations (as in CEDICT format)
+	simp_hash		INT,			-- hash of simplified headword
+	status			TINYINT,		-- 0: neutral; 1: approved; 2: flagged
+	deleted			TINYINT,		-- 0: not deleted; 1: deleted
+	last_modif_id	INT,			-- modifs.id; "skips over" bulk modifs!
+	bin_id			INT				-- binary_entries.id
+) ENGINE=InnoDB CHARACTER SET=utf8;
+CREATE INDEX idx_entries_simp_hash ON entries(simp_hash);
+CREATE INDEX idx_entries_last_modif_id ON entries(last_modif_id);
+
+DROP TABLE IF EXISTS modifs;
+CREATE TABLE modifs(
+	id				INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	hw_before		VARCHAR(256),	-- changed entry's HW before change, for instant diff in history
+	trg_before		VARCHAR(2048),	-- changed entry's TRG before change, for instant diff in history
+	hw_after		VARCHAR(256),	-- only filled if next change is an intervening bulk
+	trg_after		VARCHAR(2048),	-- only filled if next change is an intervening bulk
+	timestamp		DATETIME,
+	user_id			INT,
+	note			VARCHAR(2048),
+	chg				TINYINT,		-- 0: new; 1: delete; 2: edit; 3: note; 4: flag; 5: approve; 6: bulk import
+	entry_id		INT				-- entries.id
+) ENGINE=InnoDB CHARACTER SET=utf8;
+CREATE INDEX idx_modifs_user_id ON modifs(user_id);
+CREATE INDEX idx_modifs_entry_id ON modifs(entry_id);
+
+DROP TABLE IF EXISTS bulk_modifs;
+CREATE TABLE bulk_modifs(
+	modif_id		INT,			-- modifs.id
+	entry_id		INT				-- entries.id
+) ENGINE=InnoDB CHARACTER SET=utf8;
+CREATE INDEX idx_bulk_modifs_modif_id ON bulk_modifs(modif_id);
+CREATE INDEX idx_bulk_modifs_entry_id ON bulk_modifs(entry_id);
 # End
 
 # Script InsPinyinInstance
@@ -48,4 +86,49 @@ VALUES (@hanzi, @simptrad, @simp_count, @trad_count, @blob_id);
 # Script InsBinaryEntry
 # @data BLOB
 INSERT INTO binary_entries (data) VALUES (@data);
+# End
+
+# Script InsEntry
+# @hw VARCHAR
+# @trg VARCHAR
+# @simp_hash INT
+# @status TINYINT
+# @deleted TINYINT
+# @bin_id INT
+INSERT INTO entries (hw, trg, simp_hash, status, deleted, bin_id)
+VALUES (@hw, @trg, @simp_hash, @status, @deleted, @bin_id);
+# End
+
+# Script InsModif
+# @hw_before VARCHAR
+# @trg_before VARCHAR
+# @timestamp DATETIME
+# @user_id INT
+# @note VARCHAR
+# @chg TINYINT
+# @entry_id INT
+INSERT INTO modifs (hw_before, trg_before, timestamp, user_id, note, chg, entry_id)
+VALUES (@hw_before, @trg_before, @timestamp, @user_id, @note, @chg, @entry_id);
+# End
+
+# Script UpdLastModif
+# @entry_id INT
+# @last_modif_id INT
+UPDATE entries SET last_modif_id=@last_modif_id WHERE id=@entry_id;
+# End
+
+# https://explainextended.com/2009/10/23/mysql-order-by-limit-performance-late-row-lookups/
+# Script SelModifPage
+# @page_start INT
+# @page_len INT
+SELECT  M.timestamp, E.last_modif_id, E.hw
+FROM	(
+		SELECT last_modif_id
+		FROM entries
+		ORDER BY last_modif_id DESC
+		LIMIT @page_start, @page_len
+		) X
+JOIN entries E ON E.last_modif_id = X.last_modif_id
+JOIN modifs M ON M.id = E.last_modif_id
+ORDER BY E.last_modif_id DESC;
 # End

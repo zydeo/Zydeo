@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.IO;
+using System.Text;
 using MySql.Data.MySqlClient;
 
 using ZD.Common;
@@ -27,6 +28,9 @@ namespace ZDO.CHSite
             private MySqlCommand cmdInsBinaryEntry;
             private MySqlCommand cmdInsHanziInstance;
             private MySqlCommand cmdInsPinyinInstance;
+            private MySqlCommand cmdInsEntry;
+            private MySqlCommand cmdInsModif;
+            private MySqlCommand cmdUpdLastModif;
 			// ---------------
 
 			/// <summary>
@@ -63,16 +67,26 @@ namespace ZDO.CHSite
 			/// </summary>
             public int LineNum { get { return lineNum; } }
 
+            // DBG
+            private readonly bool prmIndex;
+            private readonly bool prmPopulate;
+
 			/// <summary>
 			/// Ctor: open DB connnection, create output files etc.
 			/// </summary>
-			public Importer()
+			public Importer(bool doIndex, bool doPopulate)
             {
+                this.prmIndex = doIndex;
+                this.prmPopulate = doPopulate;
+
                 conn = DB.GetConn();
                 tr = conn.BeginTransaction();
                 cmdInsBinaryEntry = DB.GetCmd(conn, "InsBinaryEntry");
                 cmdInsHanziInstance = DB.GetCmd(conn, "InsHanziInstance");
                 cmdInsPinyinInstance = DB.GetCmd(conn, "InsPinyinInstance");
+                cmdInsEntry = DB.GetCmd(conn, "InsEntry");
+                cmdInsModif = DB.GetCmd(conn, "InsModif");
+                cmdUpdLastModif = DB.GetCmd(conn, "UpdLastModif");
 
                 DateTime dt = DateTime.UtcNow;
                 string dtStr = "{0:D4}-{1:D2}-{2:D2}!{3:D2}-{4:D2}-{5:D2}.{6:D3}";
@@ -90,7 +104,7 @@ namespace ZDO.CHSite
             {
                 ++lineNum;
 				// Cycle through transactions
-				if (lineNum % 5000 == 0)
+				if (lineNum % 3000 == 0)
                 {
                     tr.Commit(); tr.Dispose(); tr = null;
                     tr = conn.BeginTransaction();
@@ -101,21 +115,98 @@ namespace ZDO.CHSite
 				// Check restrictions - can end up dropped entry
                 if (!checkRestrictions(entry)) return;
 				// TO-DO: check against duplicates
-				// Serialize, store in DB
+
+				// Serialize, store in DB, index
+                int binId = 0;
+                if (prmIndex) binId = doIndex(entry);
+                // Populate entries table
+                int entryId = 0;
+                if (prmPopulate) entryId = doPopulate(entry, binId);
+            }
+
+            private int doPopulate(CedictEntry entry, int binId)
+            {
+                StringBuilder sbHead = new StringBuilder();
+                StringBuilder sbTrg = new StringBuilder();
+                sbHead.Append(entry.ChTrad);
+                sbHead.Append(' ');
+                sbHead.Append(entry.ChSimpl);
+                sbHead.Append(" [");
+                bool first = true;
+                foreach (var py in entry.Pinyin)
+                {
+                    if (!first) sbHead.Append(' ');
+                    else first = false;
+                    sbHead.Append(py.GetDisplayString(false));
+                }
+                sbHead.Append(']');
+                string strHead = sbHead.ToString();
+                int hashSimp = CedictEntry.Hash(entry.ChSimpl);
+                foreach (var sense in entry.Senses)
+                {
+                    sbTrg.Append('/');
+                    sbTrg.Append(sense.GetPlainText());
+                }
+                sbTrg.Append('/');
+                string strTrg = sbTrg.ToString();
+                cmdInsEntry.Parameters["@hw"].Value = strHead;
+                cmdInsEntry.Parameters["@trg"].Value = strTrg;
+                cmdInsEntry.Parameters["@simp_hash"].Value = hashSimp;
+                cmdInsEntry.Parameters["@status"].Value = 0;
+                cmdInsEntry.Parameters["@deleted"].Value = 0;
+                cmdInsEntry.Parameters["@bin_id"].Value = binId;
+                cmdInsEntry.ExecuteNonQuery();
+                int entryId = (int)cmdInsEntry.LastInsertedId;
+
+                int lastModifId = doAddFiveChanges(entryId);
+
+                return entryId;
+            }
+
+            private int doAddFiveChanges(int entryId)
+            {
+                DateTime utcNow = DateTime.UtcNow;
+                cmdInsModif.Parameters["@hw_before"].Value = null;
+                cmdInsModif.Parameters["@trg_before"].Value = null;
+                cmdInsModif.Parameters["@timestamp"].Value = utcNow;
+                cmdInsModif.Parameters["@user_id"].Value = 0;
+                cmdInsModif.Parameters["@note"].Value = "Yes I wrote a note. This note belongs to this change.";
+                cmdInsModif.Parameters["@chg"].Value = 0;
+                cmdInsModif.Parameters["@entry_id"].Value = entryId;
+                cmdInsModif.ExecuteNonQuery();
+
+                cmdInsModif.Parameters["@hw_before"].Value = "你好 你好 [ni3 hao3]";
+                cmdInsModif.Parameters["@trg_before"].Value = "this was the entry's previous translation";
+                cmdInsModif.Parameters["@chg"].Value = 3;
+                for (int i = 0; i != 4; ++i)
+                {
+                    cmdInsModif.ExecuteNonQuery();
+                }
+                int modifId = (int)cmdInsModif.LastInsertedId;
+                cmdUpdLastModif.Parameters["@entry_id"].Value = entryId;
+                cmdUpdLastModif.Parameters["@last_modif_id"].Value = modifId;
+                cmdUpdLastModif.ExecuteNonQuery();
+                return modifId;
+            }
+
+            private int doIndex(CedictEntry entry)
+            {
                 MemoryStream ms = new MemoryStream();
                 BinWriter bw = new BinWriter(ms);
                 entry.Serialize(bw);
                 cmdInsBinaryEntry.Parameters["@data"].Value = ms.ToArray();
                 cmdInsBinaryEntry.ExecuteNonQuery();
-                int entryId = (int)cmdInsBinaryEntry.LastInsertedId;
-				// Index different parts of the entry
-				indexHanzi(entry, entryId);
-                indexPinyin(entry, entryId);
+                int binId = (int)cmdInsBinaryEntry.LastInsertedId;
+                // Index different parts of the entry
+                indexHanzi(entry, binId);
+                indexPinyin(entry, binId);
+                return binId;
             }
 
 			private bool checkRestrictions(CedictEntry entry)
             {
                 // TO-DO: max sizes etc.
+                if (entry.ChSimpl.Length > 16) return false;
                 return true;
             }
 
@@ -213,6 +304,9 @@ namespace ZDO.CHSite
                 if (swDropped != null) swDropped.Dispose();
                 if (swLog != null) swLog.Dispose();
 
+                if (cmdUpdLastModif != null) cmdUpdLastModif.Dispose();
+                if (cmdInsModif != null) cmdInsModif.Dispose();
+                if (cmdInsEntry != null) cmdInsEntry.Dispose();
                 if (cmdInsPinyinInstance != null) cmdInsPinyinInstance.Dispose();
                 if (cmdInsHanziInstance != null) cmdInsHanziInstance.Dispose();
                 if (cmdInsBinaryEntry != null) cmdInsBinaryEntry.Dispose();

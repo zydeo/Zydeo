@@ -1,3 +1,5 @@
+/// <reference path="/lib/jquery-2.1.4.min.js" />
+
 var zdNewEntry = (function () {
   "use strict";
   var template =
