@@ -12,7 +12,7 @@ CREATE TABLE hanzi_instances(
 	simp_count		INT,			-- Count of (different) Hanzi in simplified HW
 	trad_count		INT,			-- Count of (different) Hanzi in traditional HW
 	blob_id			INT				-- binary_entries.id
-) ENGINE=InnoDB CHARACTER SET=utf8;
+) ENGINE=InnoDB CHARACTER SET=utf8 COLLATE utf8_general_ci;
 CREATE INDEX idx_hanzi_instances_hanzi ON hanzi_instances(hanzi);
 
 DROP TABLE IF EXISTS pinyin_instances;
@@ -21,7 +21,7 @@ CREATE TABLE pinyin_instances(
 	tone			INT,			-- Tone; -1 for weird ones; 0 for neutral; 1-4.
 	syll_count		INT,			-- Count of distinct pinyin syallables in headword
 	blob_id			INT				-- binary_entries.id
-) ENGINE=InnoDB CHARACTER SET=utf8;
+) ENGINE=InnoDB CHARACTER SET=utf8 COLLATE utf8_general_ci;
 CREATE INDEX idx_pinyin_instances_pinyin_hash ON pinyin_instances(pinyin_hash);
 CREATE INDEX idx_pinyin_instances_pinyin_hash_tone ON pinyin_instances(pinyin_hash, tone);
 
@@ -35,7 +35,7 @@ CREATE TABLE entries(
 	deleted			TINYINT,		-- 0: not deleted; 1: deleted
 	last_modif_id	INT,			-- modifs.id; "skips over" bulk modifs!
 	bin_id			INT				-- binary_entries.id
-) ENGINE=InnoDB CHARACTER SET=utf8;
+) ENGINE=InnoDB CHARACTER SET=utf8 COLLATE utf8_general_ci;
 CREATE INDEX idx_entries_simp_hash ON entries(simp_hash);
 CREATE INDEX idx_entries_last_modif_id ON entries(last_modif_id);
 
@@ -51,7 +51,7 @@ CREATE TABLE modifs(
 	note			VARCHAR(2048),
 	chg				TINYINT,		-- 0: new; 1: delete; 2: edit; 3: note; 4: flag; 5: approve; 6: bulk import
 	entry_id		INT				-- entries.id
-) ENGINE=InnoDB CHARACTER SET=utf8;
+) ENGINE=InnoDB CHARACTER SET=utf8 COLLATE utf8_general_ci;
 CREATE INDEX idx_modifs_user_id ON modifs(user_id);
 CREATE INDEX idx_modifs_entry_id ON modifs(entry_id);
 

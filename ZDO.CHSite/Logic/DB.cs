@@ -54,6 +54,7 @@ namespace ZDO.CHSite
             csb.Password = asr.GetValue("dbPassword", typeof(string)).ToString();
             csb.Pooling = true;
             csb.IgnorePrepare = false;
+            csb.CharacterSet = "utf8";
             connectionString = csb.GetConnectionString(true);
 
             // Parse embedded resource with scipts.

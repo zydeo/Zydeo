@@ -134,7 +134,7 @@ namespace ZDO.CHSite
             indexLineCount = 0;
             string hddPath = HttpRuntime.AppDomainAppPath;
             hddPath = Path.Combine(hddPath, "_data");
-            hddPath = Path.Combine(hddPath, "handedict_nb_sani03.u8");
+            hddPath = Path.Combine(hddPath, "handesmall.u8");
             using (SqlDict.Importer imp = new SqlDict.Importer(doIndex, doPopulate))
             using (StreamReader sr = new StreamReader(hddPath))
             {
