@@ -185,10 +185,10 @@ namespace ZD.Colloc
             double e21 = (o21 + o11) * (o21 + o22) / dEventCount;
             double e22 = (o22 + o12) * (o22 + o21) / dEventCount;
             double ll = 2.0D * (
-                o11 * Math.Log(o11 / e11) +
-                o12 * Math.Log(o12 / e12) +
-                o21 * Math.Log(o21 / e21) +
-                o22 * Math.Log(o22 / e22));
+                o11 * (o11 == 0 ? 1D : Math.Log(o11 / e11)) +
+                o12 * (o12 == 0 ? 1D : Math.Log(o12 / e12)) +
+                o21 * (o21 == 0 ? 1D : Math.Log(o21 / e21)) +
+                o22 * (o22 == 0 ? 1D : Math.Log(o22 / e22)));
             return ll;
         }
     }
