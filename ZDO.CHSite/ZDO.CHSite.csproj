@@ -88,7 +88,6 @@
     <Content Include="js-1.0\common.js" />
     <Content Include="js-1.0\diagnostics.js" />
     <Content Include="js-1.0\newentry.js" />
-    <Content Include="js-1.0\teng.js" />
     <Content Include="LangRedirect.aspx" />
     <Content Include="lib\jquery-2.1.4.min.js" />
     <EmbeddedResource Include="Logic\DB.Scripts.txt" />
@@ -162,6 +161,7 @@
     <Compile Include="Logic\SqlDict.History.cs" />
     <None Include="Properties\PublishProfiles\ForUpload.pubxml" />
     <Content Include="static\rubbery.svg" />
+    <Content Include="static\close.svg" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

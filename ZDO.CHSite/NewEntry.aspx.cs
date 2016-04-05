@@ -17,7 +17,6 @@ namespace ZDO.CHSite
             Master.AddCss("newentry.css");
             Master.AddCss("entry.css");
             // Add JS includes
-            Master.AddJS("jquery-2.1.4.min.js", true);
             Master.AddJS("newentry.js", false);
         }
     }

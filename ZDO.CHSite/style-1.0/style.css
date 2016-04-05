@@ -172,6 +172,68 @@ body {
   color: #fafafa;
 }
 
+.alertBar {
+  position: fixed;
+  top: 16pt;
+  width: 100%;
+  z-index: 5;
+}
+
+.alert {
+  position: relative;
+  margin: 0 auto 0 auto;
+  box-shadow: 0 0 4pt #505050;
+  width: 320pt;
+  min-height: 16pt;
+  padding: 5pt 5pt 7pt 5pt;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.75s ease;
+}
+
+.alert.visible {
+  opacity: 1;
+}
+
+.alert.hidden {
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.alert.alertOK {
+  border: 1px solid #338323;
+  background-color: #f1f9eb;
+}
+
+.alert.alertFail {
+  border: 1px solid #8c2c1b;
+  background-color: #fae7e3;
+}
+
+.alertMessage {
+  margin-right: 10pt;
+}
+
+.alertTitle {
+  font-weight: bold;
+}
+
+.alert.alertFail .alertTitle {
+  color: #8c2c1b;
+}
+
+.alertClose {
+  position: absolute;
+  top: 4pt;
+  left: 313pt;
+  cursor: pointer;
+}
+
+.alertClose img {
+  width: 15pt;
+  height: 15pt;
+}
+
 #content {
   box-sizing: border-box;
   margin: 70pt auto 0 auto;

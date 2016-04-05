@@ -149,6 +149,9 @@ namespace ZDO.CHSite
             lang = Request.Params["lang"];
             // Infuse menu with "selected" marks
             updateMenu();
+
+            AddJS("jquery-2.1.4.min.js", true);
+            AddJS("common.js", false);
         }
 
         protected void master_Page_PreLoad(object sender, EventArgs e)
@@ -157,7 +160,6 @@ namespace ZDO.CHSite
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
         }
     }
 }

@@ -1,4 +1,5 @@
 /// <reference path="/lib/jquery-2.1.4.min.js" />
+/// <reference path="common.js" />
 
 var zdNewEntry = (function () {
   "use strict";
@@ -106,7 +107,7 @@ var zdNewEntry = (function () {
 
   var server;
 
-  function documentReady() {
+  $(document).ready(function () {
     $("#newEntrySimp").bind("compositionstart", onSimpCompStart);
     $("#newEntrySimp").bind("compositionend", onSimpCompEnd);
     $("#newEntrySimp").bind("input", onSimpChanged);
@@ -123,10 +124,6 @@ var zdNewEntry = (function () {
 
     $("#newEntrySimp").prop("readonly", false);
     $("#newEntrySimp").focus();
-  }
-
-  $(document).ready(function () {
-    documentReady();
   });
 
   function setActive(block) {
@@ -212,7 +209,10 @@ var zdNewEntry = (function () {
   // API callback: submit returned, with either success or failure.
   function onSubmitReady(success) {
     $("#newEntrySubmit").removeClass("disabled");
-    alert(success);
+    if (success)
+      zdCommon.showAlert("A szócikket sikeresen eltároltuk.", null, false);
+    else
+      zdCommon.showAlert("A szócikket nem sikerült eltárolni :(", null, true);
   }
 
   // Event handler: user clicked pencil to continue editing target

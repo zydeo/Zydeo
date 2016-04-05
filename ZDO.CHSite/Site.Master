@@ -78,7 +78,7 @@
         <div class="subBar">
           <div class="subMenuGroup">
             <div class="subMenuItem" runat="server" id="subMenuReadKey">
-              <a href="<%=ResolveLink("/read/key")%>">A lényeg</a>
+              <a href="<%=ResolveLink("/read/key")%>">A szótárról</a>
             </div>
             <div class="subMenuItem" runat="server" id="subMenuArticles">
               <a href="<%=ResolveLink("/read/articles")%>">Írások</a>
