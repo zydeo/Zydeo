@@ -85,6 +85,7 @@
     <Content Include="Diagnostics.aspx" />
     <Content Include="Global.asax" />
     <Content Include="History.aspx" />
+    <Content Include="HistoryItem.ascx" />
     <Content Include="js-1.0\common.js" />
     <Content Include="js-1.0\diagnostics.js" />
     <Content Include="js-1.0\newentry.js" />
@@ -131,6 +132,13 @@
     </Compile>
     <Compile Include="History.aspx.designer.cs">
       <DependentUpon>History.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryItem.ascx.cs">
+      <DependentUpon>HistoryItem.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="HistoryItem.ascx.designer.cs">
+      <DependentUpon>HistoryItem.ascx</DependentUpon>
     </Compile>
     <Compile Include="LangRedirect.aspx.cs">
       <DependentUpon>LangRedirect.aspx</DependentUpon>

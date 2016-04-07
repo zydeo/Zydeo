@@ -13,12 +13,25 @@ namespace ZDO.CHSite
 {
     public partial class SqlDict
     {
+        public enum ChangeType
+        {
+            New = 0,
+            Delete = 1,
+            Edit = 2,
+            Note = 3,
+            Flag = 4,
+            Approve = 5,
+            BulkImport = 6,
+        }
+
         public class ChangeItem
         {
             public DateTime When;
-            public string Head;
+            public string User;
+            public ChangeType ChangeType;
             public string Note;
-            public int ChangeCode;
+            public string EntryHead;
+            public string EntryBody;
         }
 
         public class History : IDisposable
@@ -27,13 +40,23 @@ namespace ZDO.CHSite
 
             // Reused commands
             private MySqlCommand cmdSelChangePage;
+            private MySqlCommand cmdGetChangeCount;
             // ---------------
 
             public History()
             {
                 conn = DB.GetConn();
                 cmdSelChangePage = DB.GetCmd(conn, "SelModifPage");
+                cmdGetChangeCount = DB.GetCmd(conn, "GetChangeCount");
+            }
 
+            /// <summary>
+            /// Gets the total number of changes (history items).
+            /// </summary>
+            public int GetChangeCount()
+            {
+                Int64 count = (Int64)cmdGetChangeCount.ExecuteScalar();
+                return (int)count;
             }
 
             public List<ChangeItem> GetChangePage(int pageStart, int pageLen)
@@ -48,9 +71,11 @@ namespace ZDO.CHSite
                         ChangeItem ci = new ChangeItem
                         {
                             When = rdr.GetDateTime(0),
-                            Head = rdr.IsDBNull(1) ? "n/a" : rdr.GetString(1),
-                            Note = rdr.GetString(2),
-                            ChangeCode = rdr.GetInt32(3)
+                            User = "valaki",
+                            EntryHead = rdr.IsDBNull(1) ? null : rdr.GetString(1),
+                            EntryBody = rdr.IsDBNull(2) ? null : rdr.GetString(2),
+                            Note = rdr.GetString(3),
+                            ChangeType = (ChangeType)rdr.GetInt32(4)
                         };
                         res.Add(ci);
                     }
@@ -60,6 +85,7 @@ namespace ZDO.CHSite
 
             public void Dispose()
             {
+                if (cmdGetChangeCount != null) cmdGetChangeCount.Dispose();
                 if (cmdSelChangePage != null) cmdSelChangePage.Dispose();
                 if (conn != null) conn.Dispose();
             }

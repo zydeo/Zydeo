@@ -115,3 +115,15 @@
 .toneColorsDummitt .tone3.faint { color: #dcedcb; }
 .toneColorsDummitt .tone4 { color: #589bc8; }
 .toneColorsDummitt .tone4.faint { color: #d9e5ee; }
+
+/* ---------------- Context-specific tweaks ---------------- */
+
+.historyItem .entry {
+  position: relative;
+  float: left;
+  top: -5pt;
+  color: #606060;
+  padding: 0 0 0 0;
+  margin-top: 5pt;
+  font-size: 8pt;
+}

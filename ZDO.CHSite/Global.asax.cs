@@ -33,6 +33,12 @@ namespace ZDO.CHSite
             get { return workFolder; }
         }
 
+        private static TimeZoneInfo timeZoneInfo;
+        public static TimeZoneInfo TimeZoneInfo
+        {
+            get { return timeZoneInfo; }
+        }
+
         void Application_Start(object sender, EventArgs e)
         {
             // Work folder
@@ -50,6 +56,8 @@ namespace ZDO.CHSite
             // Some static config parameters
             AppSettingsReader asr = new AppSettingsReader();
             gaCode = asr.GetValue("gaCode", typeof(string)).ToString();
+            string tzname = asr.GetValue("timeZone", typeof(string)).ToString();
+            timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(tzname);
         }
 
         void Application_End(object sender, EventArgs e)

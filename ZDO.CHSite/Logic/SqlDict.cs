@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Text;
+using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 
 using ZD.Common;
@@ -31,6 +32,13 @@ namespace ZDO.CHSite
                 Int64 count = (Int64)cmd.ExecuteScalar();
                 return count > 0;
             }
+        }
+
+        public static CedictEntry BuildEntry(string headword, string trg)
+        {
+            Regex re = new Regex(@"([^ ]+) ([^ ]+) \[([^\]]+)\]");
+            var m = re.Match(headword);
+            return BuildEntry(m.Groups[2].Value, m.Groups[1].Value, m.Groups[3].Value, trg);
         }
 
         public static CedictEntry BuildEntry(string simp, string trad, string pinyin, string trg)

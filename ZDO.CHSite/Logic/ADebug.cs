@@ -71,9 +71,9 @@ namespace ZDO.CHSite
                 res.Items.Add(new HistoryItem
                 {
                     When = ci.When.ToShortDateString() + " " + ci.When.ToLongTimeString(),
-                    Head = ci.Head,
+                    Head = ci.EntryHead,
                     Note = ci.Note,
-                    Code = ci.ChangeCode
+                    Code = (int)ci.ChangeType,
                 });
             }
 
@@ -135,7 +135,7 @@ namespace ZDO.CHSite
             string hddPath = HttpRuntime.AppDomainAppPath;
             hddPath = Path.Combine(hddPath, "_data");
             hddPath = Path.Combine(hddPath, "handesmall.u8");
-            using (SqlDict.BulkBuilder imp = new SqlDict.BulkBuilder(0, "Importing stuff."))
+            using (SqlDict.BulkBuilder imp = new SqlDict.BulkBuilder(0, "Importing stuff.", false))
             using (StreamReader sr = new StreamReader(hddPath))
             {
                 string line;

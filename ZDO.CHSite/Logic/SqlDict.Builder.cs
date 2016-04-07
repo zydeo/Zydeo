@@ -42,6 +42,7 @@ namespace ZDO.CHSite
             private MySqlCommand cmdInsPinyinInstance;
             private MySqlCommand cmdInsEntry;
             protected MySqlCommand cmdUpdLastModif;
+            protected MySqlCommand cmdInsModifNew;
             // ---------------
 
             /// <summary>
@@ -56,6 +57,7 @@ namespace ZDO.CHSite
                 cmdInsPinyinInstance = DB.GetCmd(conn, "InsPinyinInstance");
                 cmdInsEntry = DB.GetCmd(conn, "InsEntry");
                 cmdUpdLastModif = DB.GetCmd(conn, "UpdLastModif");
+                cmdInsModifNew = DB.GetCmd(conn, "InsModifNew");
             }
 
             /// <summary>
@@ -63,6 +65,7 @@ namespace ZDO.CHSite
             /// </summary>
             protected virtual void DoDispose()
             {
+                if (cmdInsModifNew != null) cmdInsModifNew.Dispose();
                 if (cmdUpdLastModif != null) cmdUpdLastModif.Dispose();
                 if (cmdInsEntry != null) cmdInsEntry.Dispose();
                 if (cmdInsPinyinInstance != null) cmdInsPinyinInstance.Dispose();
@@ -198,18 +201,15 @@ namespace ZDO.CHSite
         public class SimpleBuilder : Builder
         {
             // Reused commands
-            private MySqlCommand cmdInsModifNew;
             // ---------------
 
             public SimpleBuilder(int userId)
                 : base(userId)
             {
-                cmdInsModifNew = DB.GetCmd(conn, "InsModifNew");
             }
 
             protected override void DoDispose()
             {
-                if (cmdInsModifNew != null) cmdInsModifNew.Dispose();
                 // This must come at the end. Will close connection, which we need for disposing of our own stuff.
                 base.DoDispose();
             }
@@ -259,6 +259,9 @@ namespace ZDO.CHSite
             private MySqlCommand cmdInsBulkModif;
 			// ---------------
 
+            private readonly string note;
+            private readonly bool foldHistory;
+
 			/// <summary>
 			/// See <see cref="LogFileName"/>.
 			/// </summary>
@@ -300,9 +303,12 @@ namespace ZDO.CHSite
             /// <summary>
             /// Ctor: initialize bulk builder resources.
             /// </summary>
-            public BulkBuilder(int userId, string note)
+            public BulkBuilder(int userId, string note, bool foldHistory)
                 : base(userId)
             {
+                this.note = note;
+                this.foldHistory = foldHistory;
+
                 tr = conn.BeginTransaction();
 
                 cmdInsDummyForBulk = DB.GetCmd(conn, "InsDummyForBulk");
@@ -317,17 +323,21 @@ namespace ZDO.CHSite
                 swLog = new StreamWriter(logFileName);
                 swDropped = new StreamWriter(droppedFileName);
 
-                cmdInsDummyForBulk.ExecuteNonQuery();
-                int dummyId = (int)cmdInsDummyForBulk.LastInsertedId;
-                cmdInsModifForBulk.Parameters["@timestamp"].Value = dt;
-                cmdInsModifForBulk.Parameters["@user_id"].Value = userId;
-                cmdInsModifForBulk.Parameters["@note"].Value = note;
-                cmdInsModifForBulk.Parameters["@dummy_entry_id"].Value = dummyId;
-                cmdInsModifForBulk.ExecuteNonQuery();
-                modifId = (int)cmdInsModifForBulk.LastInsertedId;
-                cmdUpdLastModif.Parameters["@entry_id"].Value = dummyId;
-                cmdUpdLastModif.Parameters["@last_modif_id"].Value = modifId;
-                cmdUpdLastModif.ExecuteNonQuery();
+                // If we're folding history, insert dummy item; we'll refer to this from every entry.
+                if (foldHistory)
+                {
+                    cmdInsDummyForBulk.ExecuteNonQuery();
+                    int dummyId = (int)cmdInsDummyForBulk.LastInsertedId;
+                    cmdInsModifForBulk.Parameters["@timestamp"].Value = dt;
+                    cmdInsModifForBulk.Parameters["@user_id"].Value = userId;
+                    cmdInsModifForBulk.Parameters["@note"].Value = note;
+                    cmdInsModifForBulk.Parameters["@dummy_entry_id"].Value = dummyId;
+                    cmdInsModifForBulk.ExecuteNonQuery();
+                    modifId = (int)cmdInsModifForBulk.LastInsertedId;
+                    cmdUpdLastModif.Parameters["@entry_id"].Value = dummyId;
+                    cmdUpdLastModif.Parameters["@last_modif_id"].Value = modifId;
+                    cmdUpdLastModif.ExecuteNonQuery();
+                }
             }
 
             /// <summary>
@@ -373,10 +383,29 @@ namespace ZDO.CHSite
                 int binId = indexEntry(entry);
                 // Populate entries table
                 int entryId = storeEntry(entry.ChSimpl, head, trg, binId);
-                // Mark new entry as affected by this bulk operation
-                cmdInsBulkModif.Parameters["@modif_id"].Value = modifId;
-                cmdInsBulkModif.Parameters["@entry_id"].Value = entryId;
-                cmdInsBulkModif.ExecuteNonQuery();
+
+                // Folding history: mark new entry as affected by this bulk operation
+                if (foldHistory)
+                {
+                    cmdInsBulkModif.Parameters["@modif_id"].Value = modifId;
+                    cmdInsBulkModif.Parameters["@entry_id"].Value = entryId;
+                    cmdInsBulkModif.ExecuteNonQuery();
+                }
+                // Verbose (per-entry) history
+                else
+                {
+                    // Record change
+                    cmdInsModifNew.Parameters["@timestamp"].Value = DateTime.UtcNow;
+                    cmdInsModifNew.Parameters["@user_id"].Value = userId;
+                    cmdInsModifNew.Parameters["@note"].Value = note;
+                    cmdInsModifNew.Parameters["@entry_id"].Value = entryId;
+                    cmdInsModifNew.ExecuteNonQuery();
+                    int modifId = (int)cmdInsModifNew.LastInsertedId;
+                    // Also link from entry
+                    cmdUpdLastModif.Parameters["@entry_id"].Value = entryId;
+                    cmdUpdLastModif.Parameters["@last_modif_id"].Value = modifId;
+                    cmdUpdLastModif.ExecuteNonQuery();
+                }
             }
 
             /// <summary>

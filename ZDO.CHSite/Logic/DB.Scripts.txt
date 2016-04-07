@@ -140,11 +140,15 @@ VALUES (@timestamp, @user_id, @note, 0, @entry_id);
 SELECT COUNT(*) FROM entries WHERE hw=@hw;
 # End
 
+# Script GetChangeCount
+SELECT COUNT(*) FROM entries WHERE last_modif_id IS NOT NULL;
+# End
+
 # https://explainextended.com/2009/10/23/mysql-order-by-limit-performance-late-row-lookups/
 # Script SelModifPage
 # @page_start INT
 # @page_len INT
-SELECT  M.timestamp, E.hw, M.note, M.chg
+SELECT  M.timestamp, E.hw, E.trg, M.note, M.chg
 FROM	(
 		SELECT last_modif_id
 		FROM entries

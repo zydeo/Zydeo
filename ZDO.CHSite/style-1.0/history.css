@@ -2,28 +2,39 @@
   position: relative;
   float: left;
   width: 100%;
+  display: table-row;
   font-size: 13pt;
   font-family: Ubuntu, sans-serif;
   margin-bottom: 20pt;
 }
 
 #lblPage {
-  position: relative;
-  float: left;
+  display: table-cell;
+  vertical-align: top;
+  width: 1px;
+  padding-right: 10pt;
   font-weight: bold;
   font-family: Ubuntu, sans-serif;
 }
 
+#pageLinks {
+  display: table-cell;
+  width: 100%;
+}
+
+.pageSpacer {
+  display: inline-block;
+  margin: 0 5pt 0 5pt;
+}
+
 a.pageLink {
   display: inline-block;
-  position: relative;
-  float: left;
   text-decoration: none;
   text-align: center;
   color: #303030;
-  padding: 0 5pt 0 5pt;
+  padding: 0 7pt 0 7pt;
   border-radius: 3pt;
-  margin-left: 5pt;
+  margin-left: 0;
 }
 
 a.pageLink:hover,
@@ -34,6 +45,7 @@ a.pageLink.selected {
 .historyItem {
   position: relative;
   float: left;
+  width: 100%;
   margin-bottom: 20pt;
 }
 
@@ -60,8 +72,10 @@ a.pageLink.selected {
   float: left;
   clear: both;
   width: 100%;
+  box-sizing: border-box;
   text-align: right;
   font-style: italic;
+  padding-right: 5pt;
 }
 
 .changeUser {
@@ -78,13 +92,4 @@ a.pageLink.selected {
 .lblNote {
   font-weight: bold;
   color: #505050;
-}
-
-.historyItem .entry {
-  position: relative;
-  float: left;
-  top: -5pt;
-  color: #606060;
-  padding: 0 0 0 0;
-  margin-top: 5pt;
 }
