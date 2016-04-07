@@ -40,6 +40,9 @@ body {
   font-size: 9pt;
   color: #638fb8;
   background-color: #f0f4f7;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
   transition: all 0.5s ease;
 }
 
@@ -60,6 +63,8 @@ body {
 .topMenuItem {
   position: relative;
   float: left;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   height: 22pt;
 }
@@ -68,6 +73,8 @@ body {
   display: inline-block;
   cursor: pointer;
   padding-top: 4pt;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   height: 22pt;
 }
@@ -101,7 +108,7 @@ body {
   display: inline-block;
 }
 
-.topMenuItem>.topMenuItemLabel>a {
+.topMenuItem > .topMenuItemLabel > a {
   display: inline-block;
   position: relative;
   float: left;
@@ -113,11 +120,14 @@ body {
   text-decoration: none;
   color: #325e87;
   text-transform: uppercase;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
   transition: all 0.5s ease;
 }
 
-.topMenuItem.selected>.topMenuItemLabel>a,
-.topMenuItem:hover>.topMenuItemLabel>a {
+.topMenuItem.selected > .topMenuItemLabel > a,
+.topMenuItem:hover > .topMenuItemLabel > a {
   padding: 0 2pt 0 2pt;
   width: 80pt;
   color: #fafafa;
@@ -159,6 +169,9 @@ body {
   margin: 0 15pt 0 0;
   border-bottom: 3pt solid #325e87;
   color: #c0c0c0;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
   transition: all 0.5s ease;
 }
 
@@ -188,6 +201,9 @@ body {
   padding: 5pt 5pt 7pt 5pt;
   text-align: center;
   opacity: 0;
+  -moz-transition: opacity 0.75s ease;
+  -o-transition: opacity 0.75s ease;
+  -webkit-transition: opacity 0.75s ease;
   transition: opacity 0.75s ease;
 }
 
@@ -197,6 +213,9 @@ body {
 
 .alert.hidden {
   opacity: 0;
+  -moz-transition: opacity 2s ease;
+  -o-transition: opacity 2s ease;
+  -webkit-transition: opacity 2s ease;
   transition: opacity 2s ease;
 }
 
@@ -235,6 +254,8 @@ body {
 }
 
 #content {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   margin: 70pt auto 0 auto;
   padding-top: 0;

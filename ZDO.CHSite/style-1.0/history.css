@@ -72,6 +72,8 @@ a.pageLink.selected {
   float: left;
   clear: both;
   width: 100%;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   text-align: right;
   font-style: italic;
@@ -85,9 +87,17 @@ a.pageLink.selected {
 .changeTime {
 }
 
-.ctNew { color: blue; }
-.ctNote { color: darkorange; }
-.ctEdit { color: purple; }
+.ctNew {
+  color: blue;
+}
+
+.ctNote {
+  color: darkorange;
+}
+
+.ctEdit {
+  color: purple;
+}
 
 .lblNote {
   font-weight: bold;
