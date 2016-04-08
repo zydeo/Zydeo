@@ -23,6 +23,12 @@ namespace ZDO.CHSite
             }
         }
 
+        public static bool IsHanzi(char c)
+        {
+            return (c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DFF) ||
+                (c >= 0xF900 && c <= 0xFAFF);
+        }
+
         public static bool DoesHeadExist(string head)
         {
             using (MySqlConnection conn = DB.GetConn())

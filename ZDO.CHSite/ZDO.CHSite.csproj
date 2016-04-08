@@ -79,6 +79,8 @@
   <ItemGroup>
     <Content Include="Content\Diagnostics.html" />
     <Content Include="Content\HistoryDoodle.html" />
+    <Content Include="Content\NoResults.html" />
+    <Content Include="Content\Welcome.html" />
     <Content Include="Content\WorkInProgress.en.html" />
     <Content Include="Content\WorkInProgress.hu.html" />
     <Content Include="Default.aspx" />
@@ -88,11 +90,16 @@
     <Content Include="HistoryItem.ascx" />
     <Content Include="js-1.0\common.js" />
     <Content Include="js-1.0\diagnostics.js" />
+    <Content Include="js-1.0\lookup.js" />
     <Content Include="js-1.0\newentry.js" />
+    <Content Include="js-1.0\strokeanim.js" />
     <Content Include="LangRedirect.aspx" />
     <Content Include="lib\jquery-2.1.4.min.js" />
     <EmbeddedResource Include="Logic\DB.Scripts.txt" />
+    <Content Include="lib\jquery.color-2.1.2.min.js" />
+    <Content Include="lib\jquery.tooltipster.min.js" />
     <Content Include="NewEntry.aspx" />
+    <Content Include="OneResultCtrl.ascx" />
     <Content Include="Static.aspx" />
     <Content Include="static\arrows-w.svg" />
     <Content Include="static\arrows.svg" />
@@ -114,8 +121,10 @@
     <Content Include="style-1.0\entry.css" />
     <Content Include="style-1.0\forms.css" />
     <Content Include="style-1.0\history.css" />
+    <Content Include="style-1.0\lookup.css" />
     <Content Include="style-1.0\newentry.css" />
     <Content Include="style-1.0\style.css" />
+    <Content Include="style-1.0\tooltipster.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +166,13 @@
     <Compile Include="NewEntry.aspx.designer.cs">
       <DependentUpon>NewEntry.aspx</DependentUpon>
     </Compile>
+    <Compile Include="OneResultCtrl.ascx.cs">
+      <DependentUpon>OneResultCtrl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OneResultCtrl.ascx.designer.cs">
+      <DependentUpon>OneResultCtrl.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Static.aspx.cs">
       <DependentUpon>Static.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -170,6 +186,9 @@
     <None Include="Properties\PublishProfiles\ForUpload.pubxml" />
     <Content Include="static\rubbery.svg" />
     <Content Include="static\close.svg" />
+    <Content Include="static\searchcmd.svg" />
+    <Content Include="static\brush.svg" />
+    <Content Include="static\hamburger.svg" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

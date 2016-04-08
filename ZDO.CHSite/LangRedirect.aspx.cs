@@ -16,7 +16,17 @@ namespace ZDO.CHSite
         {
             string uri = Request.Params["uri"];
             if (uri == null) uri = "";
-            Response.RedirectPermanent("/hu/" + uri, true);
+            // If we have a language cookie, go there
+            // Otherwise, default to "hu"
+            string lang = "hu";
+            if (Request.Cookies["uilang"] != null)
+            {
+                string langFromCookie = Request.Cookies["uilang"].Value;
+                if (langFromCookie == "hu") lang = "hu";
+                else if (langFromCookie == "en") lang = "en";
+            }
+            // Redirect to fully URL with language
+            Response.RedirectPermanent("/" + lang + "/" + uri, true);
         }
     }
 }

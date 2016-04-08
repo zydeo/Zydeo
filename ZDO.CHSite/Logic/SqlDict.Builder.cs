@@ -159,16 +159,16 @@ namespace ZDO.CHSite
                 int tradCount = tradSet.Count;
                 // Extract intersection
                 HashSet<char> cmnSet = new HashSet<char>();
-                List<char> toReam = new List<char>();
+                List<char> toRem = new List<char>();
                 foreach (char c in simpSet)
                 {
                     if (tradSet.Contains(c))
                     {
                         cmnSet.Add(c);
-                        toReam.Add(c);
+                        toRem.Add(c);
                     }
                 }
-                foreach (char c in toReam) { simpSet.Remove(c); tradSet.Remove(c); }
+                foreach (char c in toRem) { simpSet.Remove(c); tradSet.Remove(c); }
                 // Index each Hanzi
                 cmdInsHanziInstance.Parameters["@simp_count"].Value = simpCount;
                 cmdInsHanziInstance.Parameters["@trad_count"].Value = tradCount;

@@ -8,12 +8,18 @@ namespace ZD.Common
 {
     public class BinReader : IDisposable
     {
-        private FileStream stream;
+        private Stream stream;
         private BinaryReader reader;
 
         public BinReader(string fileName)
         {
             stream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            reader = new BinaryReader(stream);
+        }
+
+        public BinReader(byte[] buf, int len)
+        {
+            stream = new MemoryStream(buf, 0, len);
             reader = new BinaryReader(stream);
         }
 

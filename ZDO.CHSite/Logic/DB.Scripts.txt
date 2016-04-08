@@ -159,3 +159,14 @@ JOIN entries E ON E.last_modif_id = X.last_modif_id
 JOIN modifs M ON M.id = E.last_modif_id
 ORDER BY E.last_modif_id DESC;
 # End
+
+# Script SelBinaryEntry
+# @blob_id INT
+SELECT data FROM binary_entries WHERE id=@blob_id;
+# End
+
+# Script SelHanziInstances
+# @hanzi INT
+SELECT simptrad, blob_id FROM hanzi_instances WHERE hanzi=@hanzi;
+# End
+

@@ -63,8 +63,7 @@ namespace ZDO.CHSite
                 // Space or punct
                 if (char.IsWhiteSpace(c) || char.IsPunctuation(c)) { hasSpaceOrPunct = true; continue; }
                 // Is it even a Hanzi or A-Z0-9?
-                bool isHanziOrLD = (c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DFF) ||
-                    (c >= 0xF900 && c <= 0xFAFF) || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+                bool isHanziOrLD = SqlDict.IsHanzi(c) || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
                 if (!isHanziOrLD) { notHanziOrLD.Add(c); continue; }
                 // No info?
                 if (uhi == null) { unsupportedHanzi.Add(c); continue; }

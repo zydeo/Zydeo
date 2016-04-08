@@ -6,7 +6,7 @@ var zdCommon = (function () {
   // If true, page always shows cookie warning (even if dismissed already).
   var dbgForceCookieWarning = false;
   // If true, page force-loads as mobile.
-  var dbgForceMobile = true;
+  var dbgForceMobile = false;
 
   // Determined at document ready: true if we need to show mobile variant.
   var isMobile = false;
@@ -88,6 +88,18 @@ var zdCommon = (function () {
     // Returns if current context is a mobile device.
     isMobile: function() {
       return isMobile;
+    },
+
+    // Gets language from our current URL. Defaults to "hu" if not found.
+    getLang: function() {
+      var loc = window.location;
+      var re = /[^\/]+\/\/[^\/]+\/([^\/]+)/g;
+      var m = re.exec(loc);
+      var lang = "hu";
+      if (m != null) {
+        if (m[1] == "en") lang = "en";
+      }
+      return lang;
     },
 
     // Shows an alert at the top of the page.

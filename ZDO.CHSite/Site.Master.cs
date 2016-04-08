@@ -42,6 +42,11 @@ namespace ZDO.CHSite
             }
         }
 
+        private UiScript uiScript = UiScript.Both;
+        private UiTones uiTones = UiTones.Pleco;
+        public UiScript UiScript { get { return uiScript; } }
+        public UiTones UiTones { get { return uiTones; } }
+
         /// <summary>
         /// Safely adds a CSS class to an HtmlControl.
         /// </summary>
@@ -81,6 +86,7 @@ namespace ZDO.CHSite
             else if (lang == "hu") addClass(langSelHu, "selected");
             // Selected top menu
             if (rawUrl == "") addClass(topMenuSearch, "selected");
+            else if (rawUrl.StartsWith("/search")) addClass(topMenuSearch, "selected");
             else if (rawUrl.StartsWith("/settings")) addClass(topMenuSettings, "selected");
             else if (rawUrl.StartsWith("/edit")) addClass(topMenuEdit, "selected");
             else if (rawUrl.StartsWith("/read")) addClass(topMenuRead, "selected");
@@ -146,7 +152,13 @@ namespace ZDO.CHSite
             // Raw URL, without the language prefix
             rawUrl = Request.RawUrl.Substring(3);
             // What is our current language?
+            // We always have this from URL b/c of rewrite rule
             lang = Request.Params["lang"];
+            // Set language cookie now
+            HttpCookie uilangCookie = new HttpCookie("uilang");
+            uilangCookie.Value = lang;
+            uilangCookie.Expires = DateTime.UtcNow.AddDays(365);
+            Response.Cookies.Add(uilangCookie);
             // Infuse menu with "selected" marks
             updateMenu();
 

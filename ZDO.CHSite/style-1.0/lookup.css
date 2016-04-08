@@ -1,0 +1,279 @@
+﻿#search-bar {
+  position: fixed;
+  top: 22pt;
+  left: 0;
+  background-color: #325e87;
+  width: 100%;
+  height: 40pt;
+  z-index: 1;
+}
+
+
+#search-panel {
+  margin: 4pt auto 0 auto;
+  width: 408pt;
+  height: 32pt;
+  border: 0;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+#search-panel td {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+td#cell-input {
+  background-color: white;
+}
+
+#txtSearch {
+  width: 100% ;
+  border: 0;
+  margin: 0;
+  margin-top: -2pt;
+  padding: 0 0.3em 0 0;
+  font-size: 200%;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+#txtSearch::-ms-clear {
+  width: 0;
+  height: 0;
+}
+
+input:focus {
+  outline: none;
+}
+
+#cell-menu,
+#cell-search,
+#cell-write,
+#cell-clear {
+  width: 28pt;
+}
+
+#cell-menu {
+  width: 4pt;
+}
+
+#cell-clear {
+  background-color: white;
+}
+
+#btn-menu,
+#btn-search,
+#btn-write {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  height: 32pt;
+  padding-top: 2pt;
+  border: 1px solid white;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+#btn-menu {
+  display: none;
+}
+
+#btn-search,
+#btn-write {
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+#btn-clear {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  height: 32pt;
+  padding-top: 2pt;
+  box-sizing: border-box;
+  border: 1px solid white;
+}
+
+#btn-search:hover,
+#btn-write:hover,
+#btn-write.active {
+  background-color: #d3e3f2;
+}
+
+#img-menu,
+#img-search,
+#img-write {
+  display: block;
+  margin: 0.2em 0.2em 0.2em 0.3em;
+  width: 2.2em;
+  height: 2.2em;
+}
+
+#img-clear {
+  display: block;
+  margin: 0.2em 0.2em 0.2em 0.3em;
+  width: 2.2em;
+  height: 2.2em;
+}
+
+#topNotice {
+  display: block;
+  float: left;
+  width: 100%;
+  clear: right;
+  background-color: #c7d9b3;
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  padding: 0;
+  margin-bottom: 10pt;
+  margin-top: 5pt;
+  color: #303030;
+}
+
+.tnTitle {
+  text-align: center;
+  font-size: 120%;
+  font-weight: bold;
+  margin: 5pt 0 0 0;
+}
+
+.tnMessage {
+  text-align: center;
+  font-size: 90%;
+  margin: 5pt 10pt 10pt 10pt;
+}
+
+#soaBox {
+  position: absolute;
+  width:  320px;
+  height: 375px;
+  background-color: #fafafa;
+  border: 1px solid #607026;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, .7);
+  cursor: default;
+  display: none;
+}
+
+#soaBoxTail {
+  display: block;
+  position: absolute;
+  left: -14px;
+  top: 15px;
+  width: 24px;
+  height: 24px;
+  border-color: #607026;
+  border-width: 2px;
+  border-style: none none solid solid;
+  background-color: #fafafa;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+}
+
+.soaBoxLeft #soaBoxTail {
+  left: 308px;
+  border-style: solid solid none none;
+}
+
+#soaHead {
+  position: relative;
+  float: left;
+  width: 100%;
+  background-color: #607026;
+  border-bottom: 1px solid #607026;
+  color: #fafafa;
+  font-size: 16pt;
+}
+
+#soaTitle {
+  padding-left: 5pt;
+  position: relative;
+  float: left;
+  height: 24pt;
+}
+
+#soaClose {
+  position: relative;
+  float: right;
+  width: 24pt;
+  height: 24pt;
+  background-color: #b4ca65;
+  text-align: center;
+  color: #607026;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+  z-index: 2;
+}
+
+#soaClose:hover {
+  background-color: #c7d9b3;
+}
+
+#soaGraphics {
+  position: relative;
+  z-index: 1;
+}
+
+#strokeAnimSVG {
+  margin-top: 10px;
+  margin-left: 9px;
+  width: 300px;
+  height: 300px;
+}
+
+#soaError {
+  position: absolute;
+  top: 150px;
+  width: 100%;
+  display: none;
+}
+
+#soaErrorContent {
+  background-color: #ffe4cc;
+  max-width: 240px;
+  min-height: 50px;
+  border-radius: 5pt;
+  padding: 8pt;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  vertical-align: middle;
+}
+
+#soaFooter {
+  text-align: right;
+  font-style: italic;
+  font-size: 10pt;
+  padding-right: 8pt;
+}
+
+#soaFooter a,
+#soaFooter a:hover,
+#soaFooter a:visited {
+  color: #607026;
+  text-decoration: none;
+}
+
+
+#results {
+  margin-top: 1.5em;
+  color: #303030;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 70pt auto 0 auto;
+  padding-top: 0;
+  padding-bottom: 400pt;
+  width: 400pt;
+}
+
+#results h1 {
+  margin: 0 0 10pt 0;
+  font-family: Neuton, serif;
+  font-size: 24pt;
+  font-weight: bold;
+}
