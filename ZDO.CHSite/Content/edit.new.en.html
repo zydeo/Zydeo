@@ -1,0 +1,106 @@
+﻿<!-- Title: New entry - CHDICT -->
+
+<div id="newEntry">
+  <div class="formBlock active" id="blockSimp">
+    <div class="formBlockLabel">Simplified</div>
+    <div class="formBlockFrame">
+      <input id="newEntrySimp" maxlength="8" readonly />
+      <div class="newEntryKnown" title="Word exists in CEDICT">&bull;</div>
+      <div class="formButtonRight accept" id="acceptSimp">
+        <img src="/static/sign.svg" alt="" />
+      </div>
+      <div class="formButtonRight edit" id="editSimp">
+        <img src="/static/draw.svg" alt="" />
+      </div>
+      <div class="formNote" id="noteSimp">
+        To continue, click the green <i>Confirm</i> icon, or press Enter.
+      </div>
+      <div class="formErrors" id="errorsSimp">
+        CHDICT has found a few problems. Please correct these, then
+        click the green <i>Confirm</i> icon again to proceed.
+        <ul id="errorListSimp"></ul>
+      </div>
+    </div>
+  </div>
+  <div class="formBlock future" id="blockTrad">
+    <div class="formBlockLabel">Traditional</div>
+    <div class="formBlockFrame">
+      <div id="newEntryTradCtrl">
+        &nbsp;
+      </div>
+      <div class="newEntryKnown" title="Word exists in CEDICT">&bull;</div>
+      <div class="formButtonRight accept" id="acceptTrad">
+        <img src="/static/sign.svg" alt="" />
+      </div>
+      <div class="formButtonRight edit" id="editTrad">
+        <img src="/static/draw.svg" alt="" />
+      </div>
+      <div class="formNote">
+        If the traditional character you need is not at the top, you can fix it by
+        clicking the correct item below it. When you're done, click the green
+        <i>Confirm</i> icon to continue.
+      </div>
+    </div>
+  </div>
+  <div class="formBlock future" id="blockPinyin">
+    <div class="formBlockLabel">Pinyin</div>
+    <div class="formBlockFrame">
+      <div id="newEntryPinyinCtrl">
+        &nbsp;
+      </div>
+      <div class="newEntryKnown" title="Word exists in CEDICT">&bull;</div>
+      <div class="formButtonRight accept" id="acceptPinyin">
+        <img src="/static/sign.svg" alt="" />
+      </div>
+      <div class="formButtonRight edit" id="editPinyin">
+        <img src="/static/draw.svg" alt="" />
+      </div>
+      <div class="formNote" id="notePinyin">
+        Verify the Pinyin transcription of each syllable. When done, click the green
+        <i>Confirm</i> icon to continue.
+      </div>
+      <div class="formErrors" id="errorsPinyin">
+        Duplicate: this headword already exists in the dictionary (same simplified and traditional
+        characters, with the same pronunciation).
+      </div>
+    </div>
+  </div>
+  <div class="formBlock future" id="blockTrg">
+    <div class="formBlockLabel">Hungarian</div>
+    <div class="formBlockFrame">
+      <textarea id="newEntryTrg" maxlength="1024" readonly></textarea>
+      <div class="formButtonRight accept" id="acceptTrg">
+        <img src="/static/sign.svg" alt="" />
+      </div>
+      <div class="formButtonRight edit" id="editTrg">
+        <img src="/static/draw.svg" alt="" />
+      </div>
+      <div class="formNote" id="noteTrg">
+        Enter the headword's meanings, separated by newlines.
+        When done, click the green <i>Confirm</i> icon.
+      </div>
+      <div class="formErrors" id="errorsTrg">
+        CHDICT has found a few problems. Please correct these, then
+        click the green <i>Confirm</i> icon again to proceed.
+        <ul id="errorListTrg"></ul>
+      </div>
+    </div>
+  </div>
+  <div class="formBlock future hidden" id="blockRefs">
+    <div class="formBlockLabel">Sources</div>
+    <div class="formBlockFrame">
+      <div id="newEntryRefEntries"></div>
+    </div>
+  </div>
+  <div class="formBlock future hidden" id="blockReview">
+    <div class="formBlockLabel">Preview</div>
+    <div class="formBlockFrame">
+      <div id="newEntryRender"></div>
+      <input id="newEntryNote" maxlength="128" placeholder="Megjegyzés, forrásmegjelölés" readonly />
+      <div class="formErrors" id="errorsReview">
+        Please enter a short comment or a reference.
+      </div>
+      <div class="formSubmit" id="newEntrySubmit">Save</div>
+    </div>
+  </div>
+</div>

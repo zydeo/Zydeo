@@ -23,7 +23,6 @@ namespace ZDO.CHSite
             if (what == "recreate_db")
             {
                 DB.CreateTables();
-                Json = "null";
             }
             else if (what == "index_hdd") doIndexHDD();
             else if (what == "progress_index_hdd") doProgressIndexHDD();
@@ -77,13 +76,8 @@ namespace ZDO.CHSite
                 });
             }
 
-            // Serialize to JSON
-            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(QueryPageRes));
-            MemoryStream ms = new MemoryStream();
-            js.WriteObject(ms, res);
-            ms.Position = 0;
-            StreamReader sr = new StreamReader(ms);
-            Json = sr.ReadToEnd();
+            // Tell our caller
+            Res = res;
         }
 
         #endregion
@@ -115,13 +109,9 @@ namespace ZDO.CHSite
                 progress = string.Format(progress, -indexLineCount);
             }
             IndexProgress res = new IndexProgress { Progress = progress, Done = indexLineCount < 0 };
-            // Serialize to JSON
-            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(IndexProgress));
-            MemoryStream ms = new MemoryStream();
-            js.WriteObject(ms, res);
-            ms.Position = 0;
-            StreamReader sr = new StreamReader(ms);
-            Json = sr.ReadToEnd();
+
+            // Tell our caller
+            Res = res;
         }
 
         private void doIndexHDD()

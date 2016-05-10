@@ -1,0 +1,331 @@
+﻿body {
+  margin: 0;
+  font-family: "Noto Sans", sans-serif;
+  font-size: 13pt;
+  background-color: white;
+}
+
+#thePage { display: none; }
+#thePage.visible { display: block; }
+
+#headerstick {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding-top: 0.5em;
+  z-index: 1;
+  background-color: white;
+  height: 3.5em;
+}
+
+#headerHome {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: Neuton;
+  font-size: 250%;
+  cursor: default;
+  margin: 0.5em 0 0 1em;
+  color: #638fb8;
+  color: #808080;
+  color: #e3781c;
+}
+
+#headerHome #hdrHomeLatin {
+  display: block;
+  position: relative;
+  float: left;
+  width: 0.8em;
+  word-wrap: break-word;
+  font-size: 82%;
+  font-weight: normal;
+  line-height: 0.8em;
+  text-align: center;
+}
+
+#headerHome #hdrHomeZho {
+  display: block;
+  position: relative;
+  float: left;
+  width: 1em;
+  word-wrap: break-word;
+  font-weight: normal;
+  line-height: 1em;
+}
+
+/*#headermask {
+  position: fixed;
+  top: 6.9em;
+  width: 100%;
+  background: url('whitegradient.png');
+  background-size: 100% 100%;
+  z-index: 1;
+  height: 1.5em;
+}*/
+
+#header {
+  margin: 0 auto 0 auto;
+  width: 45em;
+}
+
+.hdrAlt {
+  width: 100%;
+  position: absolute;
+  top: 0.5em;
+  overflow: hidden;
+  height: 2em;
+  font-size: 200%;
+  box-sizing: border-box;
+  padding: 0.2em 0 0 0;
+  font-family: Ubuntu;
+  transition: all 0.8s ease;
+  opacity: 0;
+  z-index: 1;
+}
+
+.hdrAlt.on {
+  opacity: 1;
+  z-index: 2;
+}
+
+#txtSearch {
+  background-color: #f0f4f7;
+  font-size: 100%;
+  border: 0;
+  width: 16em;
+  margin: 0.1em 0 0.1em 0.2em;
+}
+
+#hdrSearch div,
+#hdrSearch input,
+#hdrSearch i {
+  display: block;
+  position: relative;
+  float: left;
+}
+
+#searchBox {
+  background-color: #f0f4f7;
+  height: 1.6em;
+  box-sizing: border-box;
+  padding-right: 0.1em;
+  cursor: default;
+}
+
+#searchBox i {
+  color: #638fb8;
+  height: 1.4em;
+  margin: 0.1em 0 0 0;
+  padding: 0.15em 0.15em 0 0.15em;
+  box-sizing: border-box;
+}
+
+#searchBox i:hover {
+  background-color: #d3e3f2;
+}
+
+#toMenu {
+  display: block;
+  position: relative;
+  float: left;
+  color: #638fb8;
+  height: 1.6em;
+  box-sizing: border-box;
+  padding: 0.17em 0.4em 0.15em 0.4em;
+  font-size: 120%;
+  cursor: default;
+}
+
+#toMenu:hover {
+  color: #325e87;
+}
+
+.topMenu {
+  display: inline-block;
+  position: relative;
+  float: left;
+  padding: 0 0.3em 0 0.3em;
+  margin-right: 0.2em;
+  color: #325e87;
+  text-decoration: none;
+  cursor: default;
+  border-radius: 0.1em;
+  transition: all 0.2s ease;
+}
+
+.topMenu:hover,
+.topMenu.on {
+  background-color: #325e87;
+  color: white;
+}
+
+#hdrMenuRight {
+  position: absolute;
+  width: 3.5em;
+  left: 17.7em;
+}
+
+.langSel {
+  display: inline-block;
+  position: relative;
+  float: right;
+  color: #638fb8;
+  text-decoration: none;
+  cursor: default;
+  border-radius: 0.1em;
+  font-family: "Noto Sans";
+  font-weight: bold;
+  font-size: 50%;
+  padding: 0 0.3em 0 0.3em;
+  margin: 0.6em 0.1em 0 0;
+}
+
+.langSel:hover,
+.langSel.on {
+  color: white;
+  background-color: #638fb8;
+}
+
+.loginIcon {
+  display: inline-block;
+  position: relative;
+  float: right;
+}
+
+.loginIcon i {
+  color: #638fb8;
+  cursor: default;
+  font-size: 80%;
+  padding-top: 0.1em;
+  margin-left: 0.2em;
+}
+
+.loginIcon i:hover {
+  color: #325e87;
+}
+
+#hdrMenu {
+  margin-top: 0.15em;
+}
+
+#subHeader {
+  display: none;
+  margin: 0 auto 0 auto;
+  width: 45em;
+  margin-top: 5em;
+}
+
+#subHeader.visible {
+  display: block;
+}
+
+.subMenu {
+  display: none;
+  width: 100%;
+  font-size: 150%;
+  font-family: Ubuntu;
+  padding: 0 0 0 0.5em;
+}
+
+.subMenu span {
+  margin-right: 1em;
+}
+
+.subMenu span a,
+.subMenu span span {
+  color: #325e87;
+  cursor: pointer;
+  text-decoration: none;
+  border-bottom: 0.2em solid white;
+  padding-bottom: 0.2em;
+  transition: border 500ms ease;
+}
+
+.subMenu span a:hover { border-bottom-color: #638fb8; }
+.subMenu span.on a { border-bottom-color: #325e87; }
+
+.subMenu.visible {
+  display: block;
+}
+
+#dynPage {
+  position: relative;
+  margin: 0 auto 0 auto;
+  width: 45em;
+  margin-top: 8em;
+  padding: 0 0.8em 0 0.8em;
+  box-sizing:border-box;
+}
+
+#dynPage.nosubmenu {
+  margin-top: 4.5em;
+}
+
+.alertBar {
+  position: fixed;
+  top: 2.8em;
+  width: 100%;
+  z-index: 5;
+}
+
+.alert {
+  position: relative;
+  margin: 0 auto 0 auto;
+  box-shadow: 0 0 0.1em #505050;
+  font-size: 0.9em;
+  width: 30em;
+  min-height: 2em;
+  padding: 0.5em 0.5em 0.7em 0.5em;
+  text-align: center;
+  opacity: 0;
+  -moz-transition: opacity 0.75s ease;
+  -o-transition: opacity 0.75s ease;
+  -webkit-transition: opacity 0.75s ease;
+  transition: opacity 0.75s ease;
+}
+
+.alert.visible {
+  opacity: 1;
+}
+
+.alert.hidden {
+  opacity: 0;
+  -moz-transition: opacity 2s ease;
+  -o-transition: opacity 2s ease;
+  -webkit-transition: opacity 2s ease;
+  transition: opacity 2s ease;
+}
+
+.alert.alertOK {
+  border: 1pt solid #338323;
+  background-color: #f1f9eb;
+}
+
+.alert.alertFail {
+  border: 1pt solid #8c2c1b;
+  background-color: #fae7e3;
+}
+
+.alertMessage {
+  margin-right: 2em;
+}
+
+.alertTitle {
+  font-weight: bold;
+}
+
+.alert.alertFail .alertTitle {
+  color: #8c2c1b;
+}
+
+.alertClose {
+  position: absolute;
+  top: 0.3em;
+  left: 29em;
+  cursor: pointer;
+}
+
+.alertClose img {
+  width: 1.5em;
+  height: 1.5em;
+}

@@ -1,9 +1,14 @@
 ﻿/// <reference path="/lib/jquery-2.1.4.min.js" />
 /// <reference path="/lib/jquery.tooltipster.min.js" />
-/// <reference path="common.js" />
+/// <reference path="page.js" />
 
 var zdLookup = (function () {
+
   $(document).ready(function () {
+    zdPage.registerScript("search", init);
+  });
+
+  function init() {
     // If session storage says we've already loaded strokes, append script right now
     // This will happen from browser cache, i.e., page load doesn't suffer
     if (sessionStorage.getItem("strokesLoaded")) {
@@ -13,7 +18,7 @@ var zdLookup = (function () {
       elmStrokes.setAttribute("src", getStrokeDataUrl());
     }
     // Add tooltips in desktop version only
-    if (!zdCommon.isMobile()) {
+    if (!zdPage.isMobile()) {
       $("#img-write").tooltipster({
         content: $("<span>" + "Írásjegy-felismerés" + "</span>")
       });
@@ -31,7 +36,7 @@ var zdLookup = (function () {
     lookupEventWireup();
 
     // Do not focus input field on mobile: shows keyboard, annoying
-    if (!zdCommon.isMobile()) {
+    if (!zdPage.isMobile()) {
       $("#txtSearch").focus();
       $("#txtSearch").select();
     }
@@ -39,7 +44,7 @@ var zdLookup = (function () {
     // Debug: to work on opening screen
     //$("#resultsHolder").css("display", "none");
     //$("#welcomeScreen").css("display", "block");
-  });
+  }
 
   // TO-DO
   //function getStrokeDataUrl() {
@@ -75,7 +80,7 @@ var zdLookup = (function () {
       setRecogEnabled(false);
     }
     // Position and show panel
-    if (!zdCommon.isMobile()) {
+    if (!zdPage.isMobile()) {
       var searchPanelOfs = $("#search-panel").offset();
       var searchPanelWidth = $("#search-panel").width();
       var searchPanelHeight = $("#search-panel").height();
@@ -99,7 +104,7 @@ var zdLookup = (function () {
     clearCanvas();
     $("#btn-write").attr("class", "active");
     // Must do this explicitly: if hamburger menu is shown, got to hide it
-    if (zdCommon.isMobile()) hideShowHamburger(false);
+    if (zdPage.isMobile()) hideShowHamburger(false);
   }
 
   // Hides the handwriting recognition popup
@@ -122,7 +127,7 @@ var zdLookup = (function () {
 
   // When the search input field receives focus
   function txtSearchFocus(event) {
-    if (zdCommon.isMobile()) return;
+    if (zdPage.isMobile()) return;
     $("#txtSearch").select();
   }
 
@@ -130,8 +135,7 @@ var zdLookup = (function () {
   function submitSearch() {
     'use strict';
     var queryStr = $('#txtSearch').val().replace(" ", "+");
-    var loc = "/" + zdCommon.getLang() + "/search/" + queryStr;
-    window.location = loc;
+    zdPage.submitSearch(queryStr);
   }
 
   // Dynamically position stroke order animation popup in Desktop
@@ -194,7 +198,7 @@ var zdLookup = (function () {
     // Start the whole spiel
     $("#soaBox").css("display", "block");
     // We only position dynamically in desktop version; in mobile, it's fixed
-    if (!zdCommon.isMobile()) dynPosSOA($(this));
+    if (!zdPage.isMobile()) dynPosSOA($(this));
     else mobilePosSOA();
     // Render grid, issue AJAX query for animation data
     soaRenderBG();
@@ -219,11 +223,11 @@ var zdLookup = (function () {
       hideStrokeInput();
       closeStrokeAnim();
     });
-    // Must do explicitly for hamburger menu, b/c that stops event propagation
-    if (zdCommon.isMobile()) $('#btn-menu').click(function () {
-      hideStrokeInput();
-      closeStrokeAnim();
-    });
+    //// Must do explicitly for hamburger menu, b/c that stops event propagation
+    //if (zdPage.isMobile()) $('#btn-menu').click(function () {
+    //  hideStrokeInput();
+    //  closeStrokeAnim();
+    //});
     $('#btn-write').click(function (event) {
       event.stopPropagation();
       closeStrokeAnim();

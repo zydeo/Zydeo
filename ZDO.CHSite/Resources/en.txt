@@ -1,0 +1,14 @@
+﻿# Application menu
+TopMenuEdit						Edit
+TopMenuRead						Read
+TopMenuDownload					Download
+SMEditNew						New entry
+SMEditHistory					History
+SMEditExisting					Edit entry
+SMReadAbout						About CHDICT
+SMReadArticles					Articles
+SMReadEtc						Small print
+SMDownload						Download CHDICT
+
+# Search page
+HintSearchField					Hanzi, Pinyin or Hungarian word

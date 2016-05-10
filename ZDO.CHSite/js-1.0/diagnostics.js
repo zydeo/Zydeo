@@ -1,23 +1,25 @@
 ﻿/// <reference path="/lib/jquery-2.1.4.min.js" />
-/// <reference path="common.js" />
+/// <reference path="page.js" />
 
 var zdDiagnostics = (function () {
   "use strict";
 
   $(document).ready(function () {
-    $("#recreateDB").click(onRecreateDB);
-    $("#indexHDD").click(onIndexHDD);
-    $("#queryPage").click(onQueryPage);
-    $("#alertFail").click(onAlertFail);
-    $("#alertSucc").click(onAlertSucc);
+    zdPage.registerScript("download", function () {
+      $("#recreateDB").click(onRecreateDB);
+      $("#indexHDD").click(onIndexHDD);
+      $("#queryPage").click(onQueryPage);
+      $("#alertFail").click(onAlertFail);
+      $("#alertSucc").click(onAlertSucc);
+    });
   });
 
   function onAlertSucc() {
-    zdCommon.showAlert("Herzlichen Glückwunsch!", "Das hat diesmal ganz gut geklappt.", false);
+    zdPage.showAlert("Herzlichen Glückwunsch!", "Das hat diesmal ganz gut geklappt.", false);
   }
 
   function onAlertFail() {
-    zdCommon.showAlert("You have been pwned.", "Got anything else to say?", true);
+    zdPage.showAlert("You have been pwned.", "Got anything else to say?", true);
   }
 
   function onQueryPage() {

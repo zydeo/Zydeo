@@ -20,6 +20,7 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <TargetFrameworkProfile />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -77,30 +78,32 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Diagnostics.html" />
+    <Content Include="Content\_diagnostics.en.html" />
+    <Content Include="Content\edit.new.en.html" />
+    <Content Include="Content\edit.new.hu.html" />
     <Content Include="Content\HistoryDoodle.html" />
-    <Content Include="Content\NoResults.html" />
-    <Content Include="Content\Welcome.html" />
-    <Content Include="Content\WorkInProgress.en.html" />
-    <Content Include="Content\WorkInProgress.hu.html" />
+    <Content Include="Content\_noresults.hu.html" />
+    <Content Include="Content\_noresults.en.html" />
+    <Content Include="Content\_welcome.hu.html" />
+    <Content Include="Content\_welcome.en.html" />
+    <Content Include="Content\_work-in-progress.en.html" />
+    <Content Include="Content\_work-in-progress.hu.html" />
     <Content Include="Default.aspx" />
-    <Content Include="Diagnostics.aspx" />
     <Content Include="Global.asax" />
-    <Content Include="History.aspx" />
-    <Content Include="HistoryItem.ascx" />
     <Content Include="js-1.0\common.js" />
     <Content Include="js-1.0\diagnostics.js" />
     <Content Include="js-1.0\lookup.js" />
     <Content Include="js-1.0\newentry.js" />
+    <Content Include="js-1.0\page.js" />
     <Content Include="js-1.0\strokeanim.js" />
     <Content Include="LangRedirect.aspx" />
+    <Content Include="lib\history.min.js" />
     <Content Include="lib\jquery-2.1.4.min.js" />
     <EmbeddedResource Include="Logic\DB.Scripts.txt" />
     <Content Include="lib\jquery.color-2.1.2.min.js" />
     <Content Include="lib\jquery.tooltipster.min.js" />
-    <Content Include="NewEntry.aspx" />
-    <Content Include="OneResultCtrl.ascx" />
-    <Content Include="Static.aspx" />
+    <EmbeddedResource Include="Resources\hu.txt" />
+    <EmbeddedResource Include="Resources\en.txt" />
     <Content Include="static\arrows-w.svg" />
     <Content Include="static\arrows.svg" />
     <Content Include="static\book-w.svg" />
@@ -123,31 +126,18 @@
     <Content Include="style-1.0\history.css" />
     <Content Include="style-1.0\lookup.css" />
     <Content Include="style-1.0\newentry.css" />
+    <Content Include="style-1.0\page.css" />
     <Content Include="style-1.0\style.css" />
     <Content Include="style-1.0\tooltipster.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Diagnostics.aspx.cs">
-      <DependentUpon>Diagnostics.aspx</DependentUpon>
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Diagnostics.aspx.designer.cs">
-      <DependentUpon>Diagnostics.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="History.aspx.cs">
-      <DependentUpon>History.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="History.aspx.designer.cs">
-      <DependentUpon>History.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="HistoryItem.ascx.cs">
-      <DependentUpon>HistoryItem.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="HistoryItem.ascx.designer.cs">
-      <DependentUpon>HistoryItem.ascx</DependentUpon>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
     <Compile Include="LangRedirect.aspx.cs">
       <DependentUpon>LangRedirect.aspx</DependentUpon>
@@ -157,32 +147,13 @@
       <DependentUpon>LangRedirect.aspx</DependentUpon>
     </Compile>
     <Compile Include="Logic\ADebug.cs" />
+    <Compile Include="Logic\ADynPage.cs" />
     <Compile Include="Logic\ANewEntrySubmit.cs" />
     <Compile Include="Logic\SqlDict.cs" />
-    <Compile Include="NewEntry.aspx.cs">
-      <DependentUpon>NewEntry.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="NewEntry.aspx.designer.cs">
-      <DependentUpon>NewEntry.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="OneResultCtrl.ascx.cs">
-      <DependentUpon>OneResultCtrl.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="OneResultCtrl.ascx.designer.cs">
-      <DependentUpon>OneResultCtrl.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Static.aspx.cs">
-      <DependentUpon>Static.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Static.aspx.designer.cs">
-      <DependentUpon>Static.aspx</DependentUpon>
-    </Compile>
-    <Content Include="ApiHandler.ashx" />
+    <Content Include="Handler.ashx" />
     <Compile Include="Logic\SqlDict.Builder.cs" />
     <Compile Include="Logic\SqlDict.History.cs" />
+    <Content Include="Content\_search.hu.html" />
     <None Include="Properties\PublishProfiles\ForUpload.pubxml" />
     <Content Include="static\rubbery.svg" />
     <Content Include="static\close.svg" />
@@ -198,15 +169,8 @@
     <Content Include="_data\Private.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiHandler.ashx.cs">
-      <DependentUpon>ApiHandler.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="Default.aspx.cs">
-      <DependentUpon>Default.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Default.aspx.designer.cs">
-      <DependentUpon>Default.aspx</DependentUpon>
+    <Compile Include="Handler.ashx.cs">
+      <DependentUpon>Handler.ashx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -222,14 +186,8 @@
     <Compile Include="Logic\EntryRenderer.cs" />
     <Compile Include="Logic\SearchOptions.cs" />
     <Compile Include="Logic\SqlDict.Query.cs" />
+    <Compile Include="Logic\TextProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Site.Master.cs">
-      <DependentUpon>Site.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Site.Master.designer.cs">
-      <DependentUpon>Site.Master</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ZD.CedictEngine\ZD.CedictEngine.csproj">
@@ -240,9 +198,6 @@
       <Project>{d151811c-2cf7-4ea9-8a09-052cc5c2f695}</Project>
       <Name>ZD.Common</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Site.Master" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>

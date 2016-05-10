@@ -58,12 +58,8 @@ namespace ZDO.CHSite
                 if (builder != null) builder.Dispose();
             }
 
-            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Result));
-            MemoryStream ms = new MemoryStream();
-            js.WriteObject(ms, res);
-            ms.Position = 0;
-            StreamReader sr = new StreamReader(ms);
-            Json = sr.ReadToEnd();
+            // Tell our caller
+            Res = res;
         }
     }
 }

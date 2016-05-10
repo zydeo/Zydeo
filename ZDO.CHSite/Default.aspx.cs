@@ -1,84 +1,77 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.IO;
-
-using ZD.Common;
+using System.Reflection;
 
 namespace ZDO.CHSite
 {
     public partial class Default : System.Web.UI.Page
     {
-        private ICedictEntryProvider prov = null;
+        private string lang = null;
+        public string Lang { get { return lang; } }
 
-        protected void Page_Load(object sender, EventArgs e)
+        private string rel = null;
+        public string Rel {  get { return rel; } }
+
+        /// <summary>
+        /// The executing assembly's version, as string.
+        /// </summary>
+        private static string verStr = null;
+
+        /// <summary>
+        /// Gets the executing assembly's version, as string.
+        /// </summary>
+        public static string VerStr
         {
-            // Add CSS files
-            Master.AddCss("tooltipster.css");
-            Master.AddCss("style.css");
-            Master.AddCss("entry.css");
-            Master.AddCss("lookup.css");
-            // Add JS includes
-            Master.AddJS("jquery.tooltipster.min.js", true);
-            Master.AddJS("common.js", false);
-            Master.AddJS("lookup.js", false);
-            Master.AddJS("strokeanim.js", false);
-
-            if (string.IsNullOrEmpty(Request.Params["query"]))
+            get
             {
-                loadStatic("Welcome");
-                return;
+                if (verStr == null)
+                {
+                    string s = Assembly.GetExecutingAssembly().GetName().Version.Major.ToString();
+                    s += ".";
+                    s += Assembly.GetExecutingAssembly().GetName().Version.Minor.ToString();
+                    verStr = s;
+                }
+                return verStr;
             }
-
-            string query = Request.Params["query"].Replace('+', ' ');
-            txtSearch.Value = query;
-            CedictLookupResult lr;
-            using (SqlDict.Query q = new SqlDict.Query())
-            {
-                lr = q.Lookup(query);
-            }
-            // No results
-            if (lr.Results.Count == 0 && lr.Annotations.Count == 0)
-            {
-                loadStatic("NoResults");
-                return;
-            }
-            prov = lr.EntryProvider;
-            // Add regular results
-            for (int i = 0; i != lr.Results.Count; ++i)
-            {
-                if (i >= 256) break;
-                var res = lr.Results[i];
-                OneResultCtrl resCtrl = new OneResultCtrl(res, lr.EntryProvider,
-                    Master.UiScript, Master.UiTones, false);
-                resultsHolder.Controls.Add(resCtrl);
-            }
-            // SOA BOX
-            soaBox.Visible = true;
         }
 
-        protected override void OnUnload(EventArgs e)
+        public string EscStr(string id)
         {
-            base.OnUnload(e);
-            // If lookup returned a results provider, dispose it
-            if (prov != null) prov.Dispose();
-            // TO-DO: Log query
+            string raw = TextProvider.Instance.GetString(lang, id);
+            return Server.HtmlEncode(raw);
         }
 
-        private void loadStatic(string pageName)
+        /// <summary>
+        /// Gets the GA code to be inserted into page. Comes from config file so staging site doesn't interfere.
+        /// </summary>
+        protected string GetGACode()
         {
-            resultsHolder.Visible = false;
-            welcomeScreen.Visible = true;
-            string path = HttpRuntime.AppDomainAppPath;
-            path = Path.Combine(path, "Content");
-            path = Path.Combine(path,pageName + ".html");
-            using (StreamReader sr = new StreamReader(path))
-            {
-                this.litWelcomeScreen.Text = sr.ReadToEnd();
-            }
+            return Global.GACode;
+        }
+
+        /// <summary>
+        /// Initializes master page (site location, language etc.)
+        /// </summary>
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+            // What is our current language?
+            // We always have this from URL b/c of rewrite rule
+            lang = Request.Params["lang"];
+            // Relative path (w/o language)
+            rel = Request.RawUrl.Substring(3).TrimStart('/');
+            // Set language cookie now
+            HttpCookie uilangCookie = new HttpCookie("uilang");
+            uilangCookie.Value = lang;
+            uilangCookie.Expires = DateTime.UtcNow.AddDays(365);
+            Response.Cookies.Add(uilangCookie);
+            // Add proprietary JS files for single-page app
+            // We add all scripts for all pages
+            litJS.Text += "<script src='/js-" + VerStr + "/page.js'></script>\r\n";
+            litJS.Text += "<script src='/js-" + VerStr + "/newentry.js'></script>\r\n";
+            litJS.Text += "<script src='/js-" + VerStr + "/lookup.js'></script>\r\n";
+            // DBG
+            litJS.Text += "<script src='/js-" + VerStr + "/diagnostics.js'></script>\r\n";
         }
     }
 }

@@ -100,13 +100,8 @@ namespace ZDO.CHSite
                 }
             }
 
-            // Serialize to JSON
-            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Result));
-            MemoryStream ms = new MemoryStream();
-            js.WriteObject(ms, res);
-            ms.Position = 0;
-            StreamReader sr = new StreamReader(ms);
-            Json = sr.ReadToEnd();
+            // Tell our caller
+            Res = res;
         }
     }
 }

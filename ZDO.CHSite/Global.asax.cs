@@ -41,6 +41,9 @@ namespace ZDO.CHSite
 
         void Application_Start(object sender, EventArgs e)
         {
+            // String resources
+            TextProvider.Init();
+
             // Work folder
             string wfpath = HttpRuntime.AppDomainAppPath;
             wfpath = Path.Combine(wfpath, "_data");

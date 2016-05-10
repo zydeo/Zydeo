@@ -16,11 +16,12 @@
   position: absolute;
   left: 0;
   box-sizing: border-box;
-  width: 100pt;
-  margin: 0 0 0 -100pt;
-  padding: 0 10pt 0 0;
+  width: 9.5em;
+  margin: 0 0 0 0;
+  padding: 0 0.8em 0 0;
   text-align: right;
-  font-size: 11pt;
+  font-family: Ubuntu, sans-serif;
+  font-size: 1em;
   font-weight: bold;
 }
 
@@ -32,8 +33,8 @@
   position: relative;
   float: left;
   clear: both;
-  border-left: 3pt solid #fafafa;
-  margin: 0 0 0 -5pt;
+  border-left: 0.2em solid white;
+  margin: 0 0 0 9em;
   padding: 0 0 5pt 2pt;
   width: 100%;
 }
@@ -42,13 +43,13 @@
   display: none;
   background-color: #ffe4cc;
   padding: 0;
-  border-radius: 2pt;
+  border-radius: 0.2em;
   font-weight: bold;
   transition: background-color 0.5s ease;
   cursor: default;
-  width: 32pt;
-  height: 32pt;
-  margin-left: 3pt;
+  width: 2.45em;
+  height: 2.45em;
+  margin-left: 0.2em;
 }
 
 .formBlock.active .formButtonRight.accept {
@@ -82,9 +83,9 @@
 }
 
 .formButtonRight img {
-  width: 24pt;
-  height: 24pt;
-  margin: 4pt 0 0 4pt;
+  width: 1.8em;
+  height: 1.8em;
+  margin: 0.34em 0 0 0.34em;
 }
 
 .formNote {
@@ -93,7 +94,7 @@
   float: left;
   clear: both;
   width: 340pt;
-  font-size: 9pt;
+  font-size: 0.9em;
 }
 
 .formBlock.active .formNote {
@@ -104,7 +105,6 @@
   display: none;
 }
 
-
 .formErrors {
   display: none;
   position: relative;
@@ -113,9 +113,9 @@
   box-sizing: border-box;
   width: 344pt;
   background-color: #FAE7E3;
-  border-radius: 3pt;
-  margin: 5pt 0 5pt 0;
-  padding: 0 3pt 3pt 3pt;
+  border-radius: 0.2em;
+  margin: 0.5em 0 0.5em 0;
+  padding: 0.2em 0.5em 0.5em 0.5em;
 }
 
 .formErrors.visible {
@@ -124,7 +124,7 @@
 
 .formErrors ul {
   color: #8C2C1B;
-  margin: 3pt 0 0 0;
+  margin: 0.1em 0 0 0;
   padding: 0;
   list-style-type: circle;
 }
@@ -137,13 +137,13 @@
   display: block;
   float: right;
   clear: both;
-  font-size: 12pt;
+  font-size: 1.1em;
   font-weight: bold;
-  padding: 2pt 10pt 2pt 10pt;
+  padding: 0.1em 1em 0.1em 1em;
   background-color: #BCE3BC;
-  border-radius: 3pt;
+  border-radius: 0.2em;
   transition: background-color 0.5s ease;
-  margin: 5pt 57pt 0 0;
+  margin: 0.5em 14.6em 0 0;
   cursor: default;
   color: #507f50;
 }

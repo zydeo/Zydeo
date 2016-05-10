@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.IO;
 
 namespace ZDO.CHSite
 {
@@ -73,9 +76,9 @@ namespace ZDO.CHSite
         /// </summary>
         protected readonly HttpResponse Resp;
         /// <summary>
-        /// JSON to return to caller. Can be left null, then empty 200 response is sent.
+        /// Result to return to caller, serialized as JSON.
         /// </summary>
-        protected string Json = null;
+        protected object Res = null;
         /// <summary>
         /// Ctor: init context.
         /// </summary>
@@ -103,11 +106,19 @@ namespace ZDO.CHSite
             Resp.Charset = "utf-8";
             Resp.ContentEncoding = Encoding.UTF8;
             Resp.ContentType = "application/json";
-            if (Json != null)
+
+            DataContractJsonSerializer js = new DataContractJsonSerializer(Res.GetType());
+            MemoryStream ms = new MemoryStream();
+            js.WriteObject(ms, Res);
+            ms.Position = 0;
+            StreamReader sr = new StreamReader(ms);
+            string line;
+            while ((line = sr.ReadLine()) != null)
             {
-                Resp.Write(Json);
-                Resp.Flush();
+                Resp.Write(line);
+                Resp.Write("\r\n");
             }
+            Resp.Flush();
         }
     }
 

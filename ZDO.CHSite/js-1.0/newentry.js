@@ -3,111 +3,16 @@
 
 var zdNewEntry = (function () {
   "use strict";
-  var template =
-    '<div class="formBlock active" id="blockSimp">' +
-    '  <div class="formBlockLabel">Egyszerűsített</div>' +
-    '  <div class="formBlockFrame">' +
-    '    <input id="newEntrySimp" maxlength="8" readonly/>' +
-    '    <div class="newEntryKnown" title="A CEDICT-ben létező szó">&bull;</div>' +
-    '    <div class="formButtonRight accept" id="acceptSimp">' +
-    '      <img src="/static/sign.svg" alt=""/>' +
-    '    </div>' +
-    '    <div class="formButtonRight edit" id="editSimp">' +
-    '      <img src="/static/draw.svg" alt=""/>' +
-    '    </div>' +
-    '    <div class="formNote" id="noteSimp">' +
-    '      A folytatáshoz kattints a zöld <i>Jóváhagyás</i> gombra, vagy üss Entert.' +
-    '    </div>' +
-    '    <div class="formErrors" id="errorsSimp">' +
-    '      Az automatikus ellenőrzés az alábbi problémákat találta.' +
-    '      Kérlek, korrigáld ezeket, majd kattints ismét a zöld <i>Jóváhagyás</i> gombra.' +
-    '      <ul id="errorListSimp"></ul>' +
-    '    </div>' +
-    '  </div>' +
-    '</div>' +
-    '<div class="formBlock future" id="blockTrad">' +
-    '  <div class="formBlockLabel">Hagyományos</div>' +
-    '  <div class="formBlockFrame">' +
-    '    <div id="newEntryTradCtrl">' +
-    '      &nbsp;' +
-    '    </div>' +
-    '    <div class="newEntryKnown" title="A CEDICT-ben létező szó">&bull;</div>' +
-    '    <div class="formButtonRight accept" id="acceptTrad">' +
-    '      <img src="/static/sign.svg" alt=""/>' +
-    '    </div>' +
-    '    <div class="formButtonRight edit" id="editTrad">' +
-    '      <img src="/static/draw.svg" alt=""/>' +
-    '    </div>' +
-    '    <div class="formNote">' +
-    '      Ha nem a megfelelő hagyományos írásjegy áll az első helyen, a kívánt elemre' +
-    '      kattintva helyesbítheted. Ha kész, kattints a zöld <i>Jóváhagyás</i> gombra.' +
-    '    </div>' +
-    '  </div>' +
-    '</div>' +
-    '<div class="formBlock future" id="blockPinyin">' +
-    '  <div class="formBlockLabel">Pinyin</div>' +
-    '  <div class="formBlockFrame">' +
-    '    <div id="newEntryPinyinCtrl">' +
-    '      &nbsp;' +
-    '    </div>' +
-    '    <div class="newEntryKnown" title="A CEDICT-ben létező szó">&bull;</div>' +
-    '    <div class="formButtonRight accept" id="acceptPinyin">' +
-    '      <img src="/static/sign.svg" alt=""/>' +
-    '    </div>' +
-    '    <div class="formButtonRight edit" id="editPinyin">' +
-    '      <img src="/static/draw.svg" alt=""/>' +
-    '    </div>' +
-    '    <div class="formNote" id="notePinyin">' +
-    '      Ellenőrizd a szótagok pinyin-átiratát. Ha kész, kattints a zöld <i>Jóváhagyás</i> gombra.' +
-    '    </div>' +
-    '    <div class="formErrors" id="errorsPinyin">' +
-    '      Duplikátum: ilyen címszó már létezik (megegyező egyszerűsített és hagyományos írásjegyek,' +
-    '      azonos kiejtéssel).' +
-    '    </div>' +
-    '  </div>' +
-    '</div>' +
-    '<div class="formBlock future" id="blockTrg">' +
-    '  <div class="formBlockLabel">Magyar</div>' +
-    '  <div class="formBlockFrame">' +
-    '    <textarea id="newEntryTrg" maxlength="1024" readonly></textarea>' +
-    '    <div class="formButtonRight accept" id="acceptTrg">' +
-    '      <img src="/static/sign.svg" alt=""/>' +
-    '    </div>' +
-    '    <div class="formButtonRight edit" id="editTrg">' +
-    '      <img src="/static/draw.svg" alt=""/>' +
-    '    </div>' +
-    '    <div class="formNote" id="noteTrg">' +
-    '      Add meg, újsorokkal elválasztva, a címszó magyar jelentéseit.' +
-    '      Ha kész, kattints a zöld <i>Jóváhagyás</i> gombra.' +
-    '    </div>' +
-    '    <div class="formErrors" id="errorsTrg">' +
-    '      Az automatikus ellenőrzés az alábbi problémákat találta.' +
-    '      Kérlek, korrigáld ezeket, majd kattints ismét a zöld <i>Jóváhagyás</i> gombra.' +
-    '      <ul id="errorListTrg"></ul>' +
-    '    </div>' +
-    '  </div>' +
-    '</div>' +
-    '<div class="formBlock future hidden" id="blockRefs">' +
-    '  <div class="formBlockLabel">Források</div>' +
-    '  <div class="formBlockFrame">' +
-    '    <div id="newEntryRefEntries"></div>' +
-    '  </div>' +
-    '</div>' +
-    '<div class="formBlock future hidden" id="blockReview">' +
-    '  <div class="formBlockLabel">Előnézet</div>' +
-    '  <div class="formBlockFrame">' +
-    '    <div id="newEntryRender"></div>' +
-    '    <input id="newEntryNote" maxlength="128" placeholder="Megjegyzés, forrásmegjelölés" readonly/>' +
-    '    <div class="formErrors" id="errorsReview">' +
-    '      Kérlek, fűzz hozzá egy rövid megjegyzést vagy forrásmegjelölést.' +
-    '    </div>' +
-    '    <div class="formSubmit" id="newEntrySubmit">Eltárolom</div>' +
-    '  </div>' +
-    '</div>';
 
   var server;
 
   $(document).ready(function () {
+    zdPage.registerScript("edit/new", init);
+  });
+
+  function init() {
+    server = zdNewEntryServer;
+
     $("#newEntrySimp").bind("compositionstart", onSimpCompStart);
     $("#newEntrySimp").bind("compositionend", onSimpCompEnd);
     $("#newEntrySimp").bind("input", onSimpChanged);
@@ -124,7 +29,7 @@ var zdNewEntry = (function () {
 
     $("#newEntrySimp").prop("readonly", false);
     $("#newEntrySimp").focus();
-  });
+  }
 
   function setActive(block) {
     $(".formBlock").removeClass("active");
@@ -517,26 +422,13 @@ var zdNewEntry = (function () {
     if (known_hw) $(".newEntryKnown").addClass("visible");
     else $(".newEntryKnown").removeClass("visible");
   }
-
-  return {
-    init: function(id) {
-      $(id).html(template);
-    },
-    setServer: function(srv) {
-      server = srv;
-    }
-  }
 })();
 
 var zdNewEntryServer = (function() {
   return {
     processSimp: function(simp, ready) {
-      // Query URL: localhost for sandboxing only
-      var url = "/ApiHandler.ashx";
-      if (window.location.protocol == "file:")
-        url = "http://localhost:8000/ApiHandler.ashx";
       var req = $.ajax({
-        url: url,
+        url: "/Handler.ashx",
         type: "POST",
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
         data: {action: "newentry_processsimp", simp: simp}
@@ -547,12 +439,8 @@ var zdNewEntryServer = (function() {
     },
 
     verifySimp: function(simp, ready) {
-      // Query URL: localhost for sandboxing only
-      var url = "/ApiHandler.ashx";
-      if (window.location.protocol == "file:")
-        url = "http://localhost:8000/ApiHandler.ashx";
       var req = $.ajax({
-        url: url,
+        url: "/Handler.ashx",
         type: "POST",
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
         data: { action: "newentry_verifysimp", simp: simp }
@@ -567,12 +455,8 @@ var zdNewEntryServer = (function() {
     },
 
     verifyHead: function(simp, trad, pinyin, ready) {
-      // Query URL: localhost for sandboxing only
-      var url = "/ApiHandler.ashx";
-      if (window.location.protocol == "file:")
-        url = "http://localhost:8000/ApiHandler.ashx";
       var req = $.ajax({
-        url: url,
+        url: "/Handler.ashx",
         type: "POST",
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
         data: { action: "newentry_verifyhead", simp: simp, trad: trad, pinyin: pinyin }
@@ -587,12 +471,8 @@ var zdNewEntryServer = (function() {
     },
 
     verifyTrg: function(simp, trad, pinyin, trg, ready) {
-      // Query URL: localhost for sandboxing only
-      var url = "/ApiHandler.ashx";
-      if (window.location.protocol == "file:")
-        url = "http://localhost:8000/ApiHandler.ashx";
       var req = $.ajax({
-        url: url,
+        url: "/Handler.ashx",
         type: "POST",
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
         data: { action: "newentry_verifyfull", simp: simp, trad: trad, pinyin: pinyin, trg: trg }
@@ -608,12 +488,8 @@ var zdNewEntryServer = (function() {
     },
 
     processSimpTrad: function(simp, trad, ready) {
-      // Query URL: localhost for sandboxing only
-      var url = "/ApiHandler.ashx";
-      if (window.location.protocol == "file:")
-        url = "http://localhost:8000/ApiHandler.ashx";
       var req = $.ajax({
-        url: url,
+        url: "/Handler.ashx",
         type: "POST",
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
         data: { action: "newentry_processsimptrad", simp: simp, trad: trad }
@@ -624,12 +500,8 @@ var zdNewEntryServer = (function() {
     },
 
     submit: function (simp, trad, pinyin, trg, note, ready) {
-      // Query URL: localhost for sandboxing only
-      var url = "/ApiHandler.ashx";
-      if (window.location.protocol == "file:")
-        url = "http://localhost:8000/ApiHandler.ashx";
       var req = $.ajax({
-        url: url,
+        url: "/Handler.ashx",
         type: "POST",
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
         data: { action: "newentry_submit", simp: simp, trad: trad, pinyin: pinyin, trg: trg, note: note }
@@ -643,8 +515,3 @@ var zdNewEntryServer = (function() {
     }
   }
 })();
-
-
-zdNewEntry.init("#newEntry");
-zdNewEntry.setServer(zdNewEntryServer);
-//zdNewEntry.setServer(zdNewEntryShim);
