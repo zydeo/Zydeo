@@ -44,7 +44,7 @@
   clear: left;
   font-family: Ubuntu;
   font-weight: 700;
-  font-size: 150%;
+  font-size: 160%;
 }
 
 .senses {
@@ -52,7 +52,7 @@
   margin-top: 0.5em;
   white-space: nowrap;
   line-height: 1.5em;
-  font-size: 120%;
+  font-size: 150%;
 }
 
 .sense-ix {

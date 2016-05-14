@@ -1,6 +1,14 @@
 ﻿/// <reference path="/lib/jquery-2.1.4.min.js" />
 /// <reference path="/lib/history.min.js" />
 
+function startsWith(str, prefix) {
+  if (str.length < prefix.length)
+    return false;
+  for (var i = prefix.length - 1; (i >= 0) && (str[i] === prefix[i]) ; --i)
+    continue;
+  return i < 0;
+}
+
 var zdPage = (function () {
   "use strict";
 
@@ -35,11 +43,11 @@ var zdPage = (function () {
     var rePath = /https?:\/\/[^\/]+(.*)/i;
     var match = rePath.exec(location);
     path = match[1];
-    if (path.startsWith("/en/") || path == "/en") {
+    if (startsWith(path, "/en/") || path == "/en") {
       lang = "en";
       rel = path == "/en" ? "" : path.substring(4);
     }
-    else if (path.startsWith("/hu/") || path == "/hu") {
+    else if (startsWith(path, "/hu/") || path == "/hu") {
       lang = "hu";
       rel = path == "/hu" ? "" : path.substring(4);
     }
@@ -91,7 +99,10 @@ var zdPage = (function () {
 
     var frac = ww / w10em;
     var ptStyle;
-    if (frac < 7.2) ptStyle = "pt10";
+    if (frac < 5.4) ptStyle = "pt7";
+    else if (frac < 6.0) ptStyle = "pt8";
+    else if (frac < 6.6) ptStyle = "pt9";
+    else if (frac < 7.2) ptStyle = "pt10";
     else if (frac < 7.8) ptStyle = "pt11";
     else if (frac < 8.4) ptStyle = "pt12";
     else if (frac < 9) ptStyle = "pt13";
@@ -99,6 +110,9 @@ var zdPage = (function () {
     else ptStyle = "pt14";
     var theBody = $("#theBody");
     if (!theBody.hasClass(ptStyle)) {
+      theBody.removeClass("pt7");
+      theBody.removeClass("pt8");
+      theBody.removeClass("pt9");
       theBody.removeClass("pt10");
       theBody.removeClass("pt11");
       theBody.removeClass("pt12");
@@ -150,7 +164,7 @@ var zdPage = (function () {
     $("#dynPage").removeClass("fading");
     // Run this page's script initializer, if any
     for (var key in initScripts) {
-      if (rel.startsWith(key)) initScripts[key]();
+      if (startsWith(rel, key)) initScripts[key]();
       // Hack: call search initializer for ""
       if (rel == "" && key == "search") initScripts[key]();
     }
@@ -182,7 +196,7 @@ var zdPage = (function () {
         activeModalCloser = null;
       }
       // Trick: If we're on search page but menu is shown, link just changes display; no navigation
-      if ((rel == "" || rel.startsWith("search")) && $(this).attr("id") == "topMenuSearch") {
+      if ((rel == "" || startsWith(rel, "search")) && $(this).attr("id") == "topMenuSearch") {
         $("#hdrSearch").addClass("on");
         $("#hdrMenu").removeClass("on");
         $("#subHeader").removeClass("visible");
@@ -211,7 +225,7 @@ var zdPage = (function () {
   function updateMenuState() {
     $(".topMenu").removeClass("on");
     $(".subMenu").removeClass("visible");
-    if (rel == "" || rel.startsWith("search")) {
+    if (rel == "" || startsWith(rel, "search")) {
       $("#hdrMenu").removeClass("on");
       $("#subHeader").removeClass("visible");
       $("#dynPage").addClass("nosubmenu");
@@ -224,26 +238,26 @@ var zdPage = (function () {
       $("#subHeader").addClass("visible");
       $("#dynPage").removeClass("nosubmenu");
       $("#headermask").removeClass("nosubmenu");
-      if (rel.startsWith("edit")) {
+      if (startsWith(rel, "edit")) {
         $("#topMenuEdit").addClass("on");
         $("#subMenuEdit").addClass("visible");
       }
-      else if (rel.startsWith("read")) {
+      else if (startsWith(rel, "read")) {
         $("#topMenuRead").addClass("on");
         $("#subMenuRead").addClass("visible");
       }
-      else if (rel.startsWith("download")) {
+      else if (startsWith(rel, "download")) {
         $("#topMenuDownload").addClass("on");
         $("#subMenuDownload").addClass("visible");
       }
     }
     $(".subMenu span").removeClass("on");
-    if (rel.startsWith("edit/new")) $("#smEditNew").addClass("on");
-    else if (rel.startsWith("edit/history")) $("#smEditHistory").addClass("on");
-    else if (rel.startsWith("edit/existing")) $("#smEditExisting").addClass("on");
-    else if (rel.startsWith("read/about")) $("#smReadAbout").addClass("on");
-    else if (rel.startsWith("read/articles")) $("#smReadArticles").addClass("on");
-    else if (rel.startsWith("read/etc")) $("#smReadEtc").addClass("on");
+    if (startsWith(rel, "edit/new")) $("#smEditNew").addClass("on");
+    else if (startsWith(rel, "edit/history")) $("#smEditHistory").addClass("on");
+    else if (startsWith(rel, "edit/existing")) $("#smEditExisting").addClass("on");
+    else if (startsWith(rel, "read/about")) $("#smReadAbout").addClass("on");
+    else if (startsWith(rel, "read/articles")) $("#smReadArticles").addClass("on");
+    else if (startsWith(rel, "read/etc")) $("#smReadEtc").addClass("on");
     // Language selector
     $("#langSelHu").attr("href", "/hu/" + rel);
     $("#langSelEn").attr("href", "/en/" + rel);

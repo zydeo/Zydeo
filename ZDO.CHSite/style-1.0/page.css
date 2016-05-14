@@ -3,9 +3,13 @@
   font-family: "Noto Sans", sans-serif;
   font-size: 13pt;
   background-color: white;
+  color: #303030;
   min-width: 59em;
 }
 
+body.pt7 { font-size: 7pt; }
+body.pt8 { font-size: 8pt; }
+body.pt9{ font-size: 9pt; }
 body.pt10 { font-size: 10pt; }
 body.pt11 { font-size: 11pt; }
 body.pt12 { font-size: 12pt; }
@@ -98,7 +102,7 @@ body.pt16 { font-size: 16pt; }
   box-sizing: border-box;
   padding: 0.2em 0 0 0;
   font-family: Ubuntu;
-  transition: all 0.8s ease;
+  transition: opacity 0.8s ease;
   opacity: 0;
   z-index: 11;
 }
@@ -170,7 +174,7 @@ body.pt16 { font-size: 16pt; }
   text-decoration: none;
   cursor: default;
   border-radius: 0.1em;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .topMenu:hover,
@@ -260,6 +264,7 @@ body.pt16 { font-size: 16pt; }
   text-decoration: none;
   border-bottom: 0.2em solid white;
   padding-bottom: 0.2em;
+  transition: border 0.5s ease;
   */transition: border 500ms ease;
 }
 
@@ -314,6 +319,10 @@ body.pt16 { font-size: 16pt; }
 
 textarea:focus, input:focus {
   outline: none;
+}
+
+textarea, input {
+  color: #303030;
 }
 
 .alertBar {
