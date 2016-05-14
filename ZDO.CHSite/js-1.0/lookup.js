@@ -361,7 +361,8 @@ var zdLookup = (function () {
     var wBottom = window.pageYOffset + window.innerHeight - 10;
     if (top + boxH > wBottom) top = wBottom - boxH;
     // Then, nudge down if we're over the ceiling
-    var wTop = $("#hdrSearch").position().top + $("#hdrSearch").height() + window.pageYOffset + 20;
+    //var wTop = $("#hdrSearch").position().top + $("#hdrSearch").height() + window.pageYOffset + 20;
+    var wTop = $("#headermask").position().top + $("#headermask").height() + window.pageYOffset;
     if (top < wTop) top = wTop;
     // Position box, and tail
     $("#soaBox").offset({ left: left, top: top });

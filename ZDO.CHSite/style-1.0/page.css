@@ -3,15 +3,42 @@
   font-family: "Noto Sans", sans-serif;
   font-size: 13pt;
   background-color: white;
+  min-width: 59em;
 }
+
+body.pt10 { font-size: 10pt; }
+body.pt11 { font-size: 11pt; }
+body.pt12 { font-size: 12pt; }
+body.pt13 { font-size: 13pt; }
+body.pt14 { font-size: 14pt; }
+body.pt16 { font-size: 16pt; }
 
 #thePage { display: none; }
 #thePage.visible { display: block; }
+
+#debug {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  background: white;
+}
+
+#emMeasure {
+  font-size: 10pt;
+  border: 0;
+  padding: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin-left: -16000px;
+}
 
 #headerstick {
   position: fixed;
   top: 0;
   width: 100%;
+  min-width: 59em;
   padding-top: 0.5em;
   z-index: 11;
   background-color: white;
@@ -51,6 +78,7 @@
   word-wrap: break-word;
   font-weight: normal;
   line-height: 1em;
+  font-family: SimHei, "Microsoft Yahei", STXihei, STHeitiSC-Medium, DengXian, sans-serif;
 }
 
 #header {
@@ -246,15 +274,17 @@
   position: relative;
   margin: 0 auto 0 auto;
   width: 45em;
-  margin-top: 10.5em;
+  margin-top: 10em;
+  overflow: hidden;
+  height: auto;
   padding: 0 0.8em 0 0.8em;
   box-sizing: border-box;
   transition: none;
 }
 
-
 #dynPage.nosubmenu {
-  margin-top: 7em;
+  margin-top: 5em;
+  padding-top: 2em;
   padding-left: 0.45em;
 }
 
@@ -275,6 +305,15 @@
 
 #headermask.nosubmenu {
   top: 4.5em;
+}
+
+#bottomSpacer {
+  position: relative;
+  height: 6em;
+}
+
+textarea:focus, input:focus {
+  outline: none;
 }
 
 .alertBar {
@@ -313,12 +352,12 @@
 }
 
 .alert.alertOK {
-  border: 1pt solid #338323;
+  border: 1px solid #338323;
   background-color: #f1f9eb;
 }
 
 .alert.alertFail {
-  border: 1pt solid #8c2c1b;
+  border: 1px solid #8c2c1b;
   background-color: #fae7e3;
 }
 

@@ -1,4 +1,5 @@
 .entry {
+  position: relative;
   padding-top: 0;
   padding-bottom: 1em;
   display: block;
@@ -7,6 +8,10 @@
   clear: right;
   border-top: 0;
   font-size: 80%;
+}
+
+.hw-simp, .hw-trad {
+  font-family: SimHei, "Microsoft Yahei", STXihei, STHeitiSC-Medium, DengXian, sans-serif;
 }
 
 .hw-ann,

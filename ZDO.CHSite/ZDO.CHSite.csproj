@@ -105,23 +105,10 @@
     <Content Include="lib\jquery.tooltipster.min.js" />
     <EmbeddedResource Include="Resources\hu.txt" />
     <EmbeddedResource Include="Resources\en.txt" />
-    <Content Include="static\arrows-w.svg" />
-    <Content Include="static\arrows.svg" />
-    <Content Include="static\book-w.svg" />
-    <Content Include="static\book.svg" />
+    <Content Include="static\close.svg" />
     <Content Include="static\draw.svg" />
-    <Content Include="static\editing-w.svg" />
-    <Content Include="static\editing.svg" />
     <Content Include="static\hhover.png" />
-    <Content Include="static\keys-w.svg" />
-    <Content Include="static\keys.svg" />
-    <Content Include="static\search-w.svg" />
-    <Content Include="static\search.svg" />
     <Content Include="static\sign.svg" />
-    <Content Include="static\social-w.svg" />
-    <Content Include="static\social.svg" />
-    <Content Include="static\tool-w.svg" />
-    <Content Include="static\tool.svg" />
     <Content Include="style-1.0\diagnostics.css" />
     <Content Include="style-1.0\entry.css" />
     <Content Include="style-1.0\forms.css" />
@@ -158,10 +145,6 @@
     <Content Include="Content\_search.hu.html" />
     <None Include="Properties\PublishProfiles\ForUpload.pubxml" />
     <Content Include="static\rubbery.svg" />
-    <Content Include="static\close.svg" />
-    <Content Include="static\searchcmd.svg" />
-    <Content Include="static\brush.svg" />
-    <Content Include="static\hamburger.svg" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

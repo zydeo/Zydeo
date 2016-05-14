@@ -5,7 +5,7 @@ var zdDiagnostics = (function () {
   "use strict";
 
   $(document).ready(function () {
-    zdPage.registerScript("download", function () {
+    zdPage.registerInitScript("download", function () {
       $("#recreateDB").click(onRecreateDB);
       $("#indexHDD").click(onIndexHDD);
       $("#queryPage").click(onQueryPage);

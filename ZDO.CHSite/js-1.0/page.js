@@ -79,7 +79,35 @@ var zdPage = (function () {
         activeModalCloser = null;
       }
     });
+    // Adapt font size to window width
+    $(window).resize(onResize);
+    onResize();
   });
+
+  // Measure m width against viewport; adapt font size
+  function onResize() {
+    var ww = window.innerWidth;
+    var w10em = $("#emMeasure")[0].clientWidth;
+
+    var frac = ww / w10em;
+    var ptStyle;
+    if (frac < 7.2) ptStyle = "pt10";
+    else if (frac < 7.8) ptStyle = "pt11";
+    else if (frac < 8.4) ptStyle = "pt12";
+    else if (frac < 9) ptStyle = "pt13";
+    else if (frac > 12) ptStyle = "pt16";
+    else ptStyle = "pt14";
+    var theBody = $("#theBody");
+    if (!theBody.hasClass(ptStyle)) {
+      theBody.removeClass("pt10");
+      theBody.removeClass("pt11");
+      theBody.removeClass("pt12");
+      theBody.removeClass("pt13");
+      theBody.removeClass("pt14");
+      theBody.removeClass("pt16");
+      theBody.addClass(ptStyle);
+    }
+  }
 
   // Navigate within single-page app (invoked from link click handler)
   function dynNavigate() {
@@ -126,6 +154,8 @@ var zdPage = (function () {
       // Hack: call search initializer for ""
       if (rel == "" && key == "search") initScripts[key]();
     }
+    // Scroll to top
+    $(window).scrollTop(0);
   }
 
   function navReady(data, id) {

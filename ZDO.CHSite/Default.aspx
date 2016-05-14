@@ -29,7 +29,7 @@
   </script>
   -->
 </head>
-<body id="theBody" runat="server">
+<body id="theBody" runat="server" class="pt16">
   <div id="thePage">
     <div id="headerstick">
       <div id="headerHome"><span id="hdrHomeLatin">CHDICT</span><span id="hdrHomeZho">汉匈词典</span></div>
@@ -74,9 +74,12 @@
     </div>
     <div id="headermask">&nbsp;</div>
     <div id="dynPage" class="nosubmenu"></div>
-
+    <div id='bottomSpacer'>&nbsp;</div>
   </div>
   
+  <div id="debug"></div>
+  <div id="emMeasure">mmmmmmmmmm</div>
+
   <script src="/lib/history.min.js"></script>
   <script src="/lib/jquery-2.1.4.min.js"></script>
   <script src="/lib/jquery.color-2.1.2.min.js"></script>
