@@ -13,7 +13,7 @@
   top: 0;
   width: 100%;
   padding-top: 0.5em;
-  z-index: 1;
+  z-index: 11;
   background-color: white;
   height: 3.5em;
 }
@@ -53,19 +53,11 @@
   line-height: 1em;
 }
 
-/*#headermask {
-  position: fixed;
-  top: 6.9em;
-  width: 100%;
-  background: url('whitegradient.png');
-  background-size: 100% 100%;
-  z-index: 1;
-  height: 1.5em;
-}*/
-
 #header {
   margin: 0 auto 0 auto;
   width: 45em;
+  height: 4.6em;
+  background-color: white;
 }
 
 .hdrAlt {
@@ -80,12 +72,12 @@
   font-family: Ubuntu;
   transition: all 0.8s ease;
   opacity: 0;
-  z-index: 1;
+  z-index: 11;
 }
 
 .hdrAlt.on {
   opacity: 1;
-  z-index: 2;
+  z-index: 12;
 }
 
 #txtSearch {
@@ -212,7 +204,9 @@
   display: none;
   margin: 0 auto 0 auto;
   width: 45em;
-  margin-top: 5em;
+  padding-top: 0.4em;
+  height: 2.6em;
+  background-color: white;
 }
 
 #subHeader.visible {
@@ -238,7 +232,7 @@
   text-decoration: none;
   border-bottom: 0.2em solid white;
   padding-bottom: 0.2em;
-  transition: border 500ms ease;
+  */transition: border 500ms ease;
 }
 
 .subMenu span a:hover { border-bottom-color: #638fb8; }
@@ -252,20 +246,42 @@
   position: relative;
   margin: 0 auto 0 auto;
   width: 45em;
-  margin-top: 8em;
+  margin-top: 10.5em;
   padding: 0 0.8em 0 0.8em;
-  box-sizing:border-box;
+  box-sizing: border-box;
+  transition: none;
 }
 
+
 #dynPage.nosubmenu {
-  margin-top: 4.5em;
+  margin-top: 7em;
+  padding-left: 0.45em;
+}
+
+#dynPage.fading {
+  /* transition: opacity 1s ease; */
+  opacity: 0.2;
+}
+
+#headermask {
+  position: fixed;
+  top: 8em;
+  height: 2em;
+  width: 100%;
+  background: url('/static/whitegradient.png');
+  background-size: 100% 100%;
+  z-index: 10;
+}
+
+#headermask.nosubmenu {
+  top: 4.5em;
 }
 
 .alertBar {
   position: fixed;
   top: 2.8em;
   width: 100%;
-  z-index: 5;
+  z-index: 15;
 }
 
 .alert {

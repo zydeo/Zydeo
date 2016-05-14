@@ -1,14 +1,64 @@
 ﻿/// <reference path="/lib/jquery-2.1.4.min.js" />
+/// <reference path="/lib/jquery.color-2.1.2.min.js" />
 /// <reference path="/lib/jquery.tooltipster.min.js" />
+/// <reference path="strings-hu.js" />
 /// <reference path="page.js" />
+/// <reference path="strokeanim.js" />
 
 var zdLookup = (function () {
+  var clrSel = "#ffe4cc"; // Same as background-color of .optionItem.selected in CSS
+  var clrEmph = "#ffc898"; // Same as border-bottom of .optionHead in CSS
+
+  var optScript = "both";
+  var optTones = "pleco";
+
+  var optionsTemplate =
+    '<div id="optionsTail">&nbsp;</div>\n' +
+    '<div id="optionsHeader">\n' +
+    '  <span id="optionsTitle">{{options-title}}</span>\n' +
+    '  <span id="optionsClose">X</span>\n' +
+    '</div>\n' +
+    '<div id="searchOptions">\n' +
+    '  <div class="optionHead">{{options-script}}</div>\n' +
+    '  <div class="optionBody">\n' +
+    '    <div class="optionItem" id="optScriptSimplified">\n' +
+    '      <span class="optionLabel">{{options-simplified}}</span>\n' +
+    '      <span class="optionExampleHan">汉语</span>\n' +
+    '    </div>\n' +
+    '    <div class="optionItem" id="optScriptTraditional">\n' +
+    '      <span class="optionLabel">{{options-traditional}}</span>\n' +
+    '      <span class="optionExampleHan">漢語</span>\n' +
+    '    </div>\n' +
+    '    <div class="optionItem" id="optScriptBoth">\n' +
+    '      <span class="optionLabel">{{options-bothscripts}}</span>\n' +
+    '      <span class="optionExampleHan">汉语 • 漢語</span>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '  <div class="optionHead">{{options-tonecolors}}</div>\n' +
+    '  <div class="optionBody">\n' +
+    '    <div class="optionItem toneColorsNone" id="optToneColorsNone">\n' +
+    '      <span class="optionLabel">{{options-nocolors}}</span>\n' +
+    '      <span class="optionExampleHan"><span class="tone1">天</span><span class="tone2">人</span><span class="tone3">很</span><span class="tone4">大</span>了</span>\n' +
+    '    </div>\n' +
+    '    <div class="optionItem toneColorsPleco" id="optToneColorsPleco">\n' +
+    '      <span class="optionLabel">{{options-pleco}}</span>\n' +
+    '      <span class="optionExampleHan"><span class="tone1">天</span><span class="tone2">人</span><span class="tone3">很</span><span class="tone4">大</span>了</span>\n' +
+    '    </div>\n' +
+    '    <div class="optionItem toneColorsDummitt" id="optToneColorsDummitt">\n' +
+    '      <span class="optionLabel">{{options-dummitt}}</span>\n' +
+    '      <span class="optionExampleHan"><span class="tone1">天</span><span class="tone2">人</span><span class="tone3">很</span><span class="tone4">大</span>了</span>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '</div>\n';
+
+
+  zdPage.globalInit(globalInit);
 
   $(document).ready(function () {
-    zdPage.registerScript("search", init);
+    zdPage.registerInitScript("search", resultEventWireup);
   });
 
-  function init() {
+  function globalInit() {
     // If session storage says we've already loaded strokes, append script right now
     // This will happen from browser cache, i.e., page load doesn't suffer
     if (sessionStorage.getItem("strokesLoaded")) {
@@ -17,15 +67,16 @@ var zdLookup = (function () {
       elmStrokes.setAttribute("type", "text/javascript");
       elmStrokes.setAttribute("src", getStrokeDataUrl());
     }
-    // Add tooltips in desktop version only
-    if (!zdPage.isMobile()) {
-      $("#img-write").tooltipster({
-        content: $("<span>" + "Írásjegy-felismerés" + "</span>")
-      });
-      $("#img-search").tooltipster({
-        content: $("<span>" + "Keresés a szótárban. Kattintás helyett elég Entert ütni." + "</span>")
-      });
-    }
+    // Add tooltips
+    $("#btn-write").tooltipster({
+      content: $("<span>" + uiStrings["tooltip-btn-brush"] + "</span>")
+    });
+    $("#btn-settings").tooltipster({
+      content: $("<span>" + uiStrings["tooltip-btn-settings"] + "</span>")
+    });
+    $("#btn-search").tooltipster({
+      content: $("<span>" + uiStrings["tooltip-btn-search"] + "</span>")
+    });
 
     // TO-DO
     //initStrokes();
@@ -33,17 +84,169 @@ var zdLookup = (function () {
     // Debug: to work on strokes input
     //showStrokeInput();
 
-    lookupEventWireup();
+    $("#btn-clear").click(clearSearch);
+    $("#btn-settings").click(showSettings);
 
-    // Do not focus input field on mobile: shows keyboard, annoying
-    if (!zdPage.isMobile()) {
-      $("#txtSearch").focus();
-      $("#txtSearch").select();
-    }
+    // TO-DO
+    //$("#strokeClear").click(clearCanvas);
+    //$("#strokeUndo").click(undoStroke);
+
+    $("#btn-search").click(submitSearch);
+    $("#txtSearch").keyup(function (e) {
+      if (e.keyCode == 13) {
+        submitSearch();
+        return false;
+      }
+    });
+    $("#txtSearch").focus(txtSearchFocus);
+    $("#txtSearch").change(function () {
+      appendNotOverwrite = true;
+    });
 
     // Debug: to work on opening screen
     //$("#resultsHolder").css("display", "none");
     //$("#welcomeScreen").css("display", "block");
+  }
+
+  function resultEventWireup() {
+    $("#results").append("<div id='soaBox' class='soaBoxLeft'></div>");
+    zdStrokeAnim.init();
+    $(".hanim").click(showStrokeAnim);
+    $("#soaClose").click(hideStrokeAnim);
+    $("#soaBox").click(function (e) { e.stopPropagation(); });
+  }
+
+  // Show the search settings popup (generate from template; event wireup; position).
+  function showSettings(event) {
+    // Render HTML from template
+    var html = optionsTemplate;
+    html = html.replace("{{options-title}}", uiStrings["options-title"]);
+    html = html.replace("{{options-script}}", uiStrings["options-script"]);
+    html = html.replace("{{options-simplified}}", uiStrings["options-simplified"]);
+    html = html.replace("{{options-traditional}}", uiStrings["options-traditional"]);
+    html = html.replace("{{options-bothscripts}}", uiStrings["options-bothscripts"]);
+    html = html.replace("{{options-tonecolors}}", uiStrings["options-tonecolors"]);
+    html = html.replace("{{options-nocolors}}", uiStrings["options-nocolors"]);
+    html = html.replace("{{options-pleco}}", uiStrings["options-pleco"]);
+    html = html.replace("{{options-dummitt}}", uiStrings["options-dummitt"]);
+    $("#searchOptionsBox").html(html);
+    // Housekeeping; show search box
+    zdPage.modalShown(hideSettings);
+    var elmPopup = $("#searchOptionsBox");
+    elmPopup.addClass("visible");
+    $("#optionsClose").click(hideSettings);
+    elmPopup.click(function (evt) { evt.stopPropagation(); });
+    // Disable tooltip while settings are on screen
+    $("#btn-settings").tooltipster('disable');
+    // Stop event propagation, or we'll be closed right away
+    event.stopPropagation();
+    // Position search box to settings button
+    var elmStgs = $("#btn-settings");
+    var rectStgs = [elmStgs.offset().left, elmStgs.offset().top, elmStgs.width(), elmStgs.height()];
+    var elmTail = $("#optionsTail");
+    var rectTail = [elmTail.offset().left, elmTail.offset().top, elmTail.width(), elmTail.height()];
+    var xMidStgs = rectStgs[0] + rectStgs[2] / 2.2;
+    var xMidTail = rectTail[0] + rectTail[2] / 2;
+    elmPopup.offset({ left: elmPopup.offset().left + xMidStgs - xMidTail, top: elmPopup.offset().top });
+    // Load persisted/default values; update UI
+    loadOptions();
+    // Events
+    optionsEventWireup();
+  }
+
+  // Hides the search settings popup
+  function hideSettings() {
+    $("#searchOptionsBox").removeClass("visible");
+    zdPage.modalHidden();
+    // Re-enable tooltip
+    $("#btn-settings").tooltipster('enable');
+  }
+
+  // Load options (or inits to defaults); updates UI.
+  function loadOptions() {
+    // Check cookie for script
+    var ckScript = localStorage.getItem("uiscript");
+    if (ckScript !== null) optScript = ckScript;
+    if (optScript === "simp") $("#optScriptSimplified").addClass("selected");
+    else if (optScript === "trad") $("#optScriptTraditional").addClass("selected");
+    else if (optScript === "both") $("#optScriptBoth").addClass("selected");
+    // Check cookie for tone colors
+    var ckTones = localStorage.getItem("uitones");
+    if (ckTones !== null) optTones = ckTones;
+    if (optTones === "none") $("#optToneColorsNone").addClass("selected");
+    else if (optTones === "pleco") $("#optToneColorsPleco").addClass("selected");
+    else if (optTones === "dummitt") $("#optToneColorsDummitt").addClass("selected");
+  }
+
+  // Interactions of options UI.
+  function optionsEventWireup() {
+    // Event handlers for mouse (desktop)
+    var handlersMouse = {
+      mousedown: function (e) {
+        $(this).animate({ backgroundColor: clrEmph }, 200);
+      },
+      click: function (e) {
+        $(this).animate({ backgroundColor: clrSel }, 400);
+        selectOption(this.id);
+      },
+      mouseenter: function (e) {
+        $(this).animate({ backgroundColor: clrSel }, 400);
+      },
+      mouseleave: function (e) {
+        var clr = $(this).hasClass('selected') ? clrSel : "transparent";
+        $(this).animate({ backgroundColor: clr }, 400);
+      }
+    };
+    // Event handlers for mobile (touch)
+    var handlersTouch = {
+      click: function (e) {
+        $(this).animate({ backgroundColor: clrSel }, 400);
+        selectOption(this.id);
+      }
+    };
+    var handlers = /* isMobile ? handlersTouch : */ handlersMouse;
+    // Script option set
+    $("#optScriptSimplified").on(handlers);
+    $("#optScriptTraditional").on(handlers);
+    $("#optScriptBoth").on(handlers);
+
+    // Tone colors option set
+    $("#optToneColorsNone").on(handlers);
+    $("#optToneColorsPleco").on(handlers);
+    $("#optToneColorsDummitt").on(handlers);
+  }
+
+  // Handler: an option is selected (clicked) in the options UI.
+  function selectOption(id) {
+    function unselectOption(optId) {
+      if ($(optId).hasClass("selected")) {
+        $(optId).removeClass("selected");
+        $(optId).animate({ backgroundColor: "transparent" }, 400);
+      }
+    }
+    // Script option set
+    if (id.indexOf("optScript") === 0) {
+      unselectOption("#optScriptSimplified");
+      unselectOption("#optScriptTraditional");
+      unselectOption("#optScriptBoth");
+    }
+      // Tone colors option set
+    else if (id.indexOf("optToneColors") === 0) {
+      unselectOption("#optToneColorsNone");
+      unselectOption("#optToneColorsPleco");
+      unselectOption("#optToneColorsDummitt");
+    }
+    $("#" + id).addClass("selected");
+    // Store: Script options
+    if (id === "optScriptSimplified") localStorage.setItem("uiscript", "simp");
+    else if (id === "optScriptTraditional") localStorage.setItem("uiscript", "trad");
+    else if (id === "optScriptBoth") localStorage.setItem("uiscript", "both");
+    // Store: Tone color options
+    if (id === "optToneColorsNone") localStorage.setItem("uitones", "none");
+    else if (id === "optToneColorsPleco") localStorage.setItem("uitones", "pleco");
+    else if (id === "optToneColorsDummitt") localStorage.setItem("uitones", "dummitt");
+    // Load options again: adds "selected" to element (redundantly), and updates UI.
+    loadOptions();
   }
 
   // TO-DO
@@ -158,105 +361,41 @@ var zdLookup = (function () {
     var wBottom = window.pageYOffset + window.innerHeight - 10;
     if (top + boxH > wBottom) top = wBottom - boxH;
     // Then, nudge down if we're over the ceiling
-    var wTop = $("#search-bar").position().top + $("#search-bar").height() + window.pageYOffset + 20;
+    var wTop = $("#hdrSearch").position().top + $("#hdrSearch").height() + window.pageYOffset + 20;
     if (top < wTop) top = wTop;
     // Position box, and tail
     $("#soaBox").offset({ left: left, top: top });
     $("#soaBoxTail").css("top", (charY - top - 10) + "px");
   }
 
-  // Position and size SOA box in mobile UI
-  function mobilePosSOA() {
-    var dw = $(document).width();
-    var soaW = dw * 0.8;
-    var top = $("#search-bar").position().top + $("#search-bar").height() + window.pageYOffset + 60;
-    $("#soaBox").width(soaW);
-    $("#soaBox").offset({ left: (dw - soaW) / 2, top: top });
-    var graphW = $("#soaGraphics").innerWidth();
-    var svgW = graphW - 40;
-    $("#strokeAnimSVG").width(svgW);
-    $("#strokeAnimSVG").height(svgW);
-    var errW = svgW * 0.8;
-    $("#soaError").width(errW);
-    $("#soaError").css("margin-left", (graphW - errW) / 2);
-    $("#soaError").css("margin-top", graphW / 3);
-  }
-
   // Positions and shows the stroke animation pop-up for the clicked hanzi.
-  function hanziClicked(event) {
+  function showStrokeAnim(event) {
     // We get click event when mouse button is released after selecting a single hanzi
     // Don't want to show pop-up in this edge case
-    var sbe = getSelBoundElm();
+    var sbe = zdPage.getSelBoundElm();
     if (sbe != null && sbe.textContent == $(this).text())
       return;
     // OK, so we're actually showing. Stop propagation so we don't get auto-hidden.
     event.stopPropagation();
     // If previous show's in progress, kill it
     // Also kill stroke input, in case it's shown
-    soaKill();
-    hideStrokeInput();
+    zdStrokeAnim.kill();
     // Start the whole spiel
     $("#soaBox").css("display", "block");
     // We only position dynamically in desktop version; in mobile, it's fixed
-    if (!zdPage.isMobile()) dynPosSOA($(this));
-    else mobilePosSOA();
+    dynPosSOA($(this));
     // Render grid, issue AJAX query for animation data
-    soaRenderBG();
-    soaStartQuery($(this).text());
+    zdStrokeAnim.renderBG();
+    zdStrokeAnim.startQuery($(this).text());
+    // Notify page
+    zdPage.modalShown(hideStrokeAnim);
   }
 
   // Closes the stroke animation pop-up (if shown).
-  function closeStrokeAnim() {
-    soaKill();
+  function hideStrokeAnim() {
+    zdStrokeAnim.kill();
     $("#soaBox").css("display", "none");
-  }
-
-  function lookupEventWireup() {
-    $("#btn-clear").click(clearSearch);
-    $("#btn-write").click(function () {
-      if ($("#stroke-input").css("display") == "block") hideStrokeInput();
-      else showStrokeInput();
-    });
-    // Auto-hide stroke input when tapping away
-    // Also for stroke animation pop-up
-    $('html').click(function () {
-      hideStrokeInput();
-      closeStrokeAnim();
-    });
-    //// Must do explicitly for hamburger menu, b/c that stops event propagation
-    //if (zdPage.isMobile()) $('#btn-menu').click(function () {
-    //  hideStrokeInput();
-    //  closeStrokeAnim();
-    //});
-    $('#btn-write').click(function (event) {
-      event.stopPropagation();
-      closeStrokeAnim();
-    });
-    $('#stroke-input').click(function (event) {
-      event.stopPropagation();
-    });
-
-    // TO-DO
-    //$("#strokeClear").click(clearCanvas);
-    //$("#strokeUndo").click(undoStroke);
-
-    $("#btn-search").click(submitSearch);
-    $("#txtSearch").keyup(function (e) {
-      if (e.keyCode == 13) {
-        submitSearch();
-        return false;
-      }
-    });
-    $("#txtSearch").focus(txtSearchFocus);
-    $("#txtSearch").change(function () {
-      appendNotOverwrite = true;
-    });
-
-    $(".hanim").click(hanziClicked);
-    $("#soaClose").click(closeStrokeAnim);
-    $("#soaBox").click(function (e) {
-      e.stopPropagation();
-    });
+    zdPage.modalHidden();
   }
 })();
 

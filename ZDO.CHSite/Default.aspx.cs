@@ -67,8 +67,10 @@ namespace ZDO.CHSite
             Response.Cookies.Add(uilangCookie);
             // Add proprietary JS files for single-page app
             // We add all scripts for all pages
+            litJS.Text += "<script src='/js-" + VerStr + "/strings-" + lang + ".js'></script>\r\n";
             litJS.Text += "<script src='/js-" + VerStr + "/page.js'></script>\r\n";
             litJS.Text += "<script src='/js-" + VerStr + "/newentry.js'></script>\r\n";
+            litJS.Text += "<script src='/js-" + VerStr + "/strokeanim.js'></script>\r\n";
             litJS.Text += "<script src='/js-" + VerStr + "/lookup.js'></script>\r\n";
             // DBG
             litJS.Text += "<script src='/js-" + VerStr + "/diagnostics.js'></script>\r\n";

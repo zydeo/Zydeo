@@ -7,7 +7,7 @@ var zdNewEntry = (function () {
   var server;
 
   $(document).ready(function () {
-    zdPage.registerScript("edit/new", init);
+    zdPage.registerInitScript("edit/new", init);
   });
 
   function init() {

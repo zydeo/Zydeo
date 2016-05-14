@@ -16,6 +16,7 @@
   <link href='https://fonts.googleapis.com/css?family=Ubuntu&subset=latin,latin-ext' rel='stylesheet'
         type='text/css'>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/style-<% =VerStr %>/tooltipster.css">
   <link rel="stylesheet" href="/style-<% =VerStr %>/page.css">
   <link rel="stylesheet" href="/style-<% =VerStr %>/forms.css">
   <link rel="stylesheet" href="/style-<% =VerStr %>/entry.css">
@@ -69,6 +70,7 @@
           <span id="smDownload"><span><% =EscStr("SMDownload") %></span></span>
         </div>
       </div>
+      <div id="searchOptionsBox"></div>
     </div>
     <div id="headermask">&nbsp;</div>
     <div id="dynPage" class="nosubmenu"></div>
@@ -77,6 +79,7 @@
   
   <script src="/lib/history.min.js"></script>
   <script src="/lib/jquery-2.1.4.min.js"></script>
+  <script src="/lib/jquery.color-2.1.2.min.js"></script>
   <script src="/lib/jquery.tooltipster.min.js"></script>
   <asp:Literal ID="litJS" runat="server" />
 </body>

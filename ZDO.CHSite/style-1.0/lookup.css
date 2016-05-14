@@ -28,11 +28,11 @@
 
 #soaBox {
   position: absolute;
-  width:  320px;
-  height: 375px;
+  width: 19em;
+  height: 22em;
   background-color: #fafafa;
-  border: 1px solid #607026;
-  box-shadow: 0px 0px 6px rgba(0, 0, 0, .7);
+  border: 0.1em solid #638fb8;
+  box-shadow: 0 0 0.3em rgba(0, 0, 0, .7);
   cursor: default;
   display: none;
 }
@@ -40,12 +40,12 @@
 #soaBoxTail {
   display: block;
   position: absolute;
-  left: -14px;
-  top: 15px;
-  width: 24px;
-  height: 24px;
-  border-color: #607026;
-  border-width: 2px;
+  left: -0.9em;
+  top: 0.8em;
+  width: 1.6em;
+  height: 1.6em;
+  border-color: #638fb8;
+  border-width: 0.1em;
   border-style: none none solid solid;
   background-color: #fafafa;
   transform: rotate(45deg);
@@ -54,42 +54,43 @@
 }
 
 .soaBoxLeft #soaBoxTail {
-  left: 308px;
+  left: 18.25em;
   border-style: solid solid none none;
 }
 
 #soaHead {
+  font-family: Ubuntu;
   position: relative;
   float: left;
   width: 100%;
-  background-color: #607026;
-  border-bottom: 1px solid #607026;
+  background-color: #638fb8;
+  border-bottom: 1px solid #638fb8;
   color: #fafafa;
-  font-size: 16pt;
+  font-size: 1.4em;
 }
 
 #soaTitle {
-  padding-left: 5pt;
+  padding-left: 0.4em;
   position: relative;
   float: left;
-  height: 24pt;
+  height: 1.3em;
 }
 
 #soaClose {
   position: relative;
   float: right;
-  width: 24pt;
-  height: 24pt;
-  background-color: #b4ca65;
+  width: 1.4em;
+  height: 1.4em;
+  background-color: #d3e3f2;
   text-align: center;
-  color: #607026;
+  color: #638fb8;
   -webkit-transition: all 0.5s ease;
   transition: all 0.5s ease;
   z-index: 2;
 }
 
 #soaClose:hover {
-  background-color: #c7d9b3;
+  background-color: #f0f4f7;
 }
 
 #soaGraphics {
@@ -98,25 +99,25 @@
 }
 
 #strokeAnimSVG {
-  margin-top: 10px;
-  margin-left: 9px;
-  width: 300px;
-  height: 300px;
+  margin-top: 0.5em;
+  margin-left: 0.5em;
+  width: 18em;
+  height: 18em;
 }
 
 #soaError {
   position: absolute;
-  top: 150px;
+  top: 9em;
   width: 100%;
   display: none;
 }
 
 #soaErrorContent {
   background-color: #ffe4cc;
-  max-width: 240px;
-  min-height: 50px;
-  border-radius: 5pt;
-  padding: 8pt;
+  max-width: 13em;
+  min-height: 3em;
+  border-radius: 0.2em;
+  padding: 1em;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
@@ -126,14 +127,14 @@
 #soaFooter {
   text-align: right;
   font-style: italic;
-  font-size: 10pt;
-  padding-right: 8pt;
+  font-size: 0.8em;
+  padding-right: 0.6em;
 }
 
 #soaFooter a,
 #soaFooter a:hover,
 #soaFooter a:visited {
-  color: #607026;
+  color: #325e87;
   text-decoration: none;
 }
 
@@ -150,3 +151,124 @@
   font-size: 24pt;
   font-weight: bold;
 }
+
+
+#searchOptionsBox {
+  display: none;
+  position: fixed;
+  z-index: 3;
+  background: white;
+  top: 5.5em;
+  left: 28.5em;
+  left: 0;
+  border: 1pt solid #638fb8;
+  width: 35em;
+  box-shadow: 0 0 0.3em rgba(0, 0, 0, .7);
+}
+
+#searchOptionsBox.visible {
+  display: block;
+}
+
+#searchOptions {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 80%;
+  padding: 0 1em 0 1em;
+}
+
+#optionsTail {
+  display: block;
+  position: absolute;
+  top: -0.8em;
+  left: 26.36em;
+  width: 1.6em;
+  height: 1.6em;
+  border-color: #638fb8;
+  border-width: 0.1em;
+  border-style: none none solid solid;
+  background-color: #638fb8;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+}
+
+#optionsHeader {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #638fb8;
+  font-size: 150%;
+  font-family: Ubuntu;
+  color: white;
+  padding: 0;
+  height: 1.6em;
+}
+
+#optionsTitle {
+  display: inline-block;
+  position: absolute;
+  margin-left: 0.5em;
+  margin-top: 0.15em;
+  left: 0;
+}
+
+#optionsClose {
+  display: inline-block;
+  position: relative;
+  float: right;
+  box-sizing: border-box;
+  background-color: #d3e3f2;
+  width: 1.6em;
+  height: 1.6em;
+  padding-top: 0.15em;
+  text-align: center;
+  color: #638fb8;
+  border-bottom: 1pt solid #638fb8;
+  cursor: default;
+  transition: background-color 0.5s ease;
+}
+
+#optionsClose:hover {
+  background-color: #f0f4f7;
+}
+
+.optionHead {
+  width: 100%;
+  position: relative;
+  float: left;
+  clear: left;
+  text-align: center;
+  font-family: Ubuntu;
+  font-size: 2.5em;
+  margin-top: 0.5em;
+  border-bottom: 4pt solid #ffc898;
+}
+
+.optionBody {
+  display: table;
+  width: 100%;
+  margin-bottom: 10pt;
+}
+
+.optionItem {
+  display: table-cell;
+  text-align: center;
+  padding: 5pt 0 5pt 0;
+  font-size: 1.5em;
+  cursor: default;
+}
+
+.optionItem .optionExampleHan:before {
+  content: '\A';
+  white-space: pre;
+}
+
+.optionItem .optionExampleHan {
+  font-size: 1.5em;
+}
+
+.optionItem.selected {
+  background-color: #ffe4cc;
+}
+

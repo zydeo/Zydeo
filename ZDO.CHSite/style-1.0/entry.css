@@ -51,15 +51,16 @@
 }
 
 .sense-ix {
-  font-size: 8pt;
-  border-radius: 8pt;
-  -moz-border-radius: 8pt;
-  -webkit-border-radius: 8pt;
+  font-size: 0.7em;
+  border-radius: 1.2em;
+  -moz-border-radius: 1.2em;
+  -webkit-border-radius: 1.2em;
   border: 1px solid;
   display: inline-block;
-  line-height: 8pt;
+  line-height: 1.2em;
   text-align: center;
-  width: 8pt;
+  vertical-align: 0.1em;
+  width: 1.2em;
 }
 
 .sense {
@@ -115,6 +116,16 @@
 .toneColorsDummitt .tone3.faint { color: #dcedcb; }
 .toneColorsDummitt .tone4 { color: #589bc8; }
 .toneColorsDummitt .tone4.faint { color: #d9e5ee; }
+
+.hanim {
+  cursor: pointer;
+}
+
+.hanim:hover {
+  background-image: url('/static/hhover.png');
+  background-size: 1px 100%;
+  background-repeat: repeat-x;
+}
 
 /* ---------------- Context-specific tweaks ---------------- */
 

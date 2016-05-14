@@ -95,6 +95,7 @@
     <Content Include="js-1.0\lookup.js" />
     <Content Include="js-1.0\newentry.js" />
     <Content Include="js-1.0\page.js" />
+    <Content Include="js-1.0\strings-hu.js" />
     <Content Include="js-1.0\strokeanim.js" />
     <Content Include="LangRedirect.aspx" />
     <Content Include="lib\history.min.js" />
@@ -111,6 +112,7 @@
     <Content Include="static\draw.svg" />
     <Content Include="static\editing-w.svg" />
     <Content Include="static\editing.svg" />
+    <Content Include="static\hhover.png" />
     <Content Include="static\keys-w.svg" />
     <Content Include="static\keys.svg" />
     <Content Include="static\search-w.svg" />
