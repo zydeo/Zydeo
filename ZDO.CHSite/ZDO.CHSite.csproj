@@ -109,6 +109,7 @@
     <Content Include="static\draw.svg" />
     <Content Include="static\hhover.png" />
     <Content Include="static\sign.svg" />
+    <Content Include="static\whitegradient.png" />
     <Content Include="style-1.0\diagnostics.css" />
     <Content Include="style-1.0\entry.css" />
     <Content Include="style-1.0\forms.css" />
@@ -143,8 +144,12 @@
     <Compile Include="Logic\SqlDict.Builder.cs" />
     <Compile Include="Logic\SqlDict.History.cs" />
     <Content Include="Content\_search.hu.html" />
+    <Content Include="js-1.0\Web.config" />
+    <Content Include="lib\Web.config" />
     <None Include="Properties\PublishProfiles\ForUpload.pubxml" />
     <Content Include="static\rubbery.svg" />
+    <Content Include="static\Web.config" />
+    <Content Include="style-1.0\Web.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
