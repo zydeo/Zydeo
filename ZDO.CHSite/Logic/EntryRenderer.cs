@@ -10,18 +10,22 @@ namespace ZDO.CHSite
 {
     internal class EntryRenderer
     {
-        private static bool hanim = true;
-
+        private readonly bool hanim;
         private readonly string query;
         private readonly CedictResult res;
         private readonly CedictAnnotation ann;
         private readonly ICedictEntryProvider prov;
         private readonly UiScript script;
         private readonly UiTones tones;
-        private readonly bool isMobile;
         private readonly CedictEntry entryToRender;
         private readonly string hwTrad;
         private readonly List<PinyinSyllable> hwPinyin;
+        private readonly bool dimIdenticalTrad;
+
+        /// <summary>
+        /// Maximum number of Hanzi in HW before breaking HW into two lines
+        /// </summary>
+        public int OneLineHanziLimit = 6;
 
         /// <summary>
         /// Ctor: reference entry in new entry editor
@@ -40,33 +44,47 @@ namespace ZDO.CHSite
             }
             this.script = UiScript.Both;
             this.tones = UiTones.None;
-            this.isMobile = false;
+            this.hanim = false;
+            this.dimIdenticalTrad = false;
+        }
+
+        /// <summary>
+        /// Ctor: dictionary entry in change history.
+        /// </summary>
+        public EntryRenderer(CedictEntry entry)
+        {
+            this.entryToRender = entry;
+            this.script = UiScript.Both;
+            this.tones = UiTones.None;
+            this.hanim = false;
+            this.dimIdenticalTrad = false;
         }
 
         /// <summary>
         /// Ctor: regular lookup result
         /// </summary>
         public EntryRenderer(CedictResult res, ICedictEntryProvider prov,
-            UiScript script, UiTones tones, bool isMobile)
+            UiScript script, UiTones tones)
         {
             this.res = res;
             this.prov = prov;
             this.script = script;
             this.tones = tones;
-            this.isMobile = isMobile;
+            this.hanim = true;
+            this.dimIdenticalTrad = true;
         }
 
         /// <summary>
         /// Ctor: annotated Hanzi
         /// </summary>
         public EntryRenderer(string query, CedictAnnotation ann, ICedictEntryProvider prov,
-            UiTones tones, bool isMobile)
+            UiTones tones)
         {
             this.query = query;
             this.ann = ann;
             this.prov = prov;
             this.tones = tones;
-            this.isMobile = isMobile;
+            this.hanim = true;
         }
 
         public void Render(HtmlTextWriter writer)
@@ -151,7 +169,6 @@ namespace ZDO.CHSite
 
         private void renderResult(HtmlTextWriter writer)
         {
-            int hanziLimit = isMobile ? 4 : 6;
             CedictEntry entry = entryToRender;
             if (entry == null) entry = prov.GetEntry(res.EntryId);
 
@@ -175,8 +192,8 @@ namespace ZDO.CHSite
             }
             if (script == UiScript.Both)
             {
-                // Up to 6 hanzi: on a single line
-                if (entry.ChSimpl.Length <= hanziLimit)
+                // Up to N hanzi: on a single line
+                if (entry.ChSimpl.Length <= OneLineHanziLimit)
                 {
                     string clsSep = "hw-sep";
                     if (tones != UiTones.None) clsSep = "hw-sep faint";
@@ -196,11 +213,11 @@ namespace ZDO.CHSite
             {
                 string clsTrad = "hw-trad";
                 // Need special class so traditional floats left after line break
-                if (script == UiScript.Both && entry.ChSimpl.Length > hanziLimit)
+                if (script == UiScript.Both && entry.ChSimpl.Length > OneLineHanziLimit)
                     clsTrad = "hw-trad break";
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, clsTrad);
                 writer.RenderBeginTag(HtmlTextWriterTag.Span); // <span class="hw-trad">
-                renderHanzi(entry, false, script == UiScript.Both, writer);
+                renderHanzi(entry, false, dimIdenticalTrad && script == UiScript.Both, writer);
                 writer.RenderEndTag(); // <span class="hw-trad">
             }
             writer.AddAttribute(HtmlTextWriterAttribute.Class, "hw-pinyin");

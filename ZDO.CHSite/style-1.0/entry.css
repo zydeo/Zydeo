@@ -45,11 +45,12 @@
   font-family: Ubuntu;
   font-weight: 700;
   font-size: 160%;
+  margin-top: -0.3em;
 }
 
 .senses {
   clear: left;
-  margin-top: 0.5em;
+  margin-top: 0.3em;
   white-space: nowrap;
   line-height: 1.5em;
   font-size: 150%;
@@ -130,16 +131,4 @@
   background-image: url('/static/hhover.png');
   background-size: 1px 100%;
   background-repeat: repeat-x;
-}
-
-/* ---------------- Context-specific tweaks ---------------- */
-
-.historyItem .entry {
-  position: relative;
-  float: left;
-  top: -5pt;
-  color: #606060;
-  padding: 0 0 0 0;
-  margin-top: 5pt;
-  font-size: 8pt;
 }

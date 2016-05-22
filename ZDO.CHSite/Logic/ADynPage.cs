@@ -9,10 +9,10 @@ using System.IO;
 
 using ZD.Common;
 
-namespace ZDO.CHSite.Logic
+namespace ZDO.CHSite
 {
     [ActionName("dynpage")]
-    public class ADynPage : ApiAction
+    public partial class ADynPage : ApiAction
     {
         /// <summary>
         /// Ctor: init. Boilerplate.
@@ -94,53 +94,6 @@ namespace ZDO.CHSite.Logic
             Res = res;
         }
 
-        private void doSearch(string lang, string rel)
-        {
-            if (rel == "")
-            {
-                string fname = getFileName(lang, "_welcome");
-                feedResult(fname);
-                return;
-            }
-
-            string query = rel.Replace("search/", "");
-            query = HttpUtility.UrlDecode(query);
-            CedictLookupResult lr;
-            using (SqlDict.Query q = new SqlDict.Query())
-            {
-                lr = q.Lookup(query);
-            }
-            // No results
-            if (lr.Results.Count == 0 && lr.Annotations.Count == 0)
-            {
-                return;
-            }
-            // Render results
-
-            var prov = lr.EntryProvider;
-            StringBuilder sb = new StringBuilder();
-            using (HtmlTextWriter writer = new HtmlTextWriter(new StringWriter(sb)))
-            {
-                for (int i = 0; i != lr.Results.Count; ++i)
-                {
-                    if (i >= 256) break;
-                    var lres = lr.Results[i];
-                    EntryRenderer er = new EntryRenderer(lres, prov, UiScript.Both, UiTones.Pleco, false);
-                    er.Render(writer);
-                }
-            }
-            StringBuilder sbHtml;
-            string title, keywords, description;
-            readFile(getFileName(lang, "_search"), out sbHtml, out title, out keywords, out description);
-            sbHtml.Replace("<!-- RESULTS -->", sb.ToString());
-            Result res = new Result();
-            res.Html = sbHtml.ToString();
-            res.Title = title;
-            res.Keywords = keywords;
-            res.Description = description;
-            Res = res;
-        }
-
         public override void Process()
         {
             string lang = Req.Params["lang"];
@@ -150,6 +103,12 @@ namespace ZDO.CHSite.Logic
             if (rel == "" || rel.StartsWith("search/"))
             {
                 doSearch(lang, rel);
+                return;
+            }
+            // If request is for history, special treatment
+            if (rel.StartsWith("edit/history"))
+            {
+                doHistory(lang, rel);
                 return;
             }
             // DBG: Show diagnostics on download page
@@ -173,7 +132,7 @@ namespace ZDO.CHSite.Logic
                 return;
             }
             // Throw up in their face.
-            throw new Exception("Nah.");
+            throw new Exception("Requested dynamic page not found.");
         }
     }
 }

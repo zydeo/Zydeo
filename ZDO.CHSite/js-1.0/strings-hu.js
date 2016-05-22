@@ -16,4 +16,7 @@
   "options-nocolors": "Nincs",
   "options-pleco": "Pleco",
   "options-dummitt": "Dummitt",
+  "tooltip-history-comment": "Megjegyzés hozzáfűzése",
+  "tooltip-history-edit": "Szócikk szerkesztése",
+  "tooltip-history-flag": "Szócikk megjelölése (pontatlan, téves vagy hiányos)",
 };

@@ -81,7 +81,7 @@
     <Content Include="Content\_diagnostics.en.html" />
     <Content Include="Content\edit.new.en.html" />
     <Content Include="Content\edit.new.hu.html" />
-    <Content Include="Content\HistoryDoodle.html" />
+    <Content Include="Content\_historydoodle.en.html" />
     <Content Include="Content\_noresults.hu.html" />
     <Content Include="Content\_noresults.en.html" />
     <Content Include="Content\_welcome.hu.html" />
@@ -92,6 +92,7 @@
     <Content Include="Global.asax" />
     <Content Include="js-1.0\common.js" />
     <Content Include="js-1.0\diagnostics.js" />
+    <Content Include="js-1.0\history.js" />
     <Content Include="js-1.0\lookup.js" />
     <Content Include="js-1.0\newentry.js" />
     <Content Include="js-1.0\page.js" />
@@ -138,6 +139,8 @@
     </Compile>
     <Compile Include="Logic\ADebug.cs" />
     <Compile Include="Logic\ADynPage.cs" />
+    <Compile Include="Logic\ADynPage.History.cs" />
+    <Compile Include="Logic\ADynPage.Search.cs" />
     <Compile Include="Logic\ANewEntrySubmit.cs" />
     <Compile Include="Logic\SqlDict.cs" />
     <Content Include="Handler.ashx" />
@@ -146,6 +149,7 @@
     <Content Include="Content\_search.hu.html" />
     <Content Include="js-1.0\Web.config" />
     <Content Include="lib\Web.config" />
+    <Content Include="Content\edit.history.hu.html" />
     <None Include="Properties\PublishProfiles\ForUpload.pubxml" />
     <Content Include="static\rubbery.svg" />
     <Content Include="static\Web.config" />

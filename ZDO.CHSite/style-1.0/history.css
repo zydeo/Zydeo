@@ -3,16 +3,17 @@
   float: left;
   width: 100%;
   display: table-row;
-  font-size: 13pt;
+  font-size: 130%;
   font-family: Ubuntu, sans-serif;
-  margin-bottom: 20pt;
+  margin-bottom: 1.5em;
+  color: #303030;
 }
 
 #lblPage {
   display: table-cell;
   vertical-align: top;
   width: 1px;
-  padding-right: 10pt;
+  padding-right: 1em;
   font-weight: bold;
   font-family: Ubuntu, sans-serif;
 }
@@ -24,7 +25,7 @@
 
 .pageSpacer {
   display: inline-block;
-  margin: 0 5pt 0 5pt;
+  margin: 0 0.5em 0 0.5em;
 }
 
 a.pageLink {
@@ -32,8 +33,8 @@ a.pageLink {
   text-decoration: none;
   text-align: center;
   color: #303030;
-  padding: 0 7pt 0 7pt;
-  border-radius: 3pt;
+  padding: 0 0.5em 0 0.5em;
+  border-radius: 0.2em;
   margin-left: 0;
 }
 
@@ -42,29 +43,58 @@ a.pageLink.selected {
   background-color: #d3e3f2;
 }
 
+.historySep {
+  position: relative;
+  float: left;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0.1em;
+  padding-bottom: 0.1em;
+  border-bottom: 1px dashed #303030;
+}
+
 .historyItem {
   position: relative;
   float: left;
   width: 100%;
-  margin-bottom: 20pt;
+  padding: 0.9em 0 0.9em 0;
+}
+
+.historyItem:hover {
+  background-color: #f0f4f7;
 }
 
 .changeHead {
   position: relative;
   float: left;
-  width: calc(100% + 10pt);
-  margin-left: -10pt;
-  padding-left: 10pt;
-  background-color: #f0f4f7;
-  padding-bottom: 5pt;
-  border-top: 2pt solid #d3e3f2;
+  width: 100%;
+  min-height: 4em;
+}
+
+.changeHead i.fa {
+  display: block;
+  font-size: 300%;
+  position: absolute;
+  top: 0; left: 0.1em;
+  color: #606060;
+  cursor: default;
+}
+
+.changeHead i.ctNew {
+  color: #e3781c;
+  color: #e3a168;
 }
 
 .changeSummary {
   position: relative;
   float: left;
-  font-size: 12pt;
   clear: both;
+  width: 100%;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  margin-left: 3em;
+  font-size: 100%;
 }
 
 .changeNote {
@@ -75,13 +105,13 @@ a.pageLink.selected {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  text-align: right;
+  margin-left: 3em;
   font-style: italic;
-  padding-right: 5pt;
 }
 
 .changeUser {
   font-weight: bold;
+  color: #325e87;
 }
 
 .changeTime {
@@ -103,3 +133,49 @@ a.pageLink.selected {
   font-weight: bold;
   color: #505050;
 }
+
+.changeEntry {
+  position: relative;
+  clear: both;
+  width: calc(100% - 3em);
+  height: auto;
+  margin-left: 3em;
+}
+
+.changeEntry .entry {
+  position: relative;
+  float: left;
+  padding: 0 0 0 0;
+  font-size: 60%;
+  color: #606060;
+}
+
+.histEntryOps {
+  display: none;
+  position: absolute;
+  top: 0; left: -3em;
+  width: 3em;
+}
+
+.historyItem:hover .histEntryOps {
+  display: block;
+}
+
+.histEntryOps i {
+  position: absolute;
+  display: inline-block;
+  cursor: default;
+  color: #638fb8;
+  width: 2em;
+  height: 1.3em;
+  padding-top: 0.1em;
+  text-align: center;
+}
+
+.histEntryOps i:hover {
+  color: #e3781c;
+}
+
+.opHistComment { left: 0.5em; top: -0.1em; }
+.opHistEdit { left: 0.5em; top: 1.5em; }
+.opHistFlag { left: 0.5em; top: 3.1em; }

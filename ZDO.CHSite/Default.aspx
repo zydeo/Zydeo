@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="/style-<% =VerStr %>/forms.css">
   <link rel="stylesheet" href="/style-<% =VerStr %>/entry.css">
   <link rel="stylesheet" href="/style-<% =VerStr %>/newentry.css">
+  <link rel="stylesheet" href="/style-<% =VerStr %>/history.css">
   <link rel="stylesheet" href="/style-<% =VerStr %>/lookup.css">
   <link rel="stylesheet" href="/style-<% =VerStr %>/diagnostics.css">
   <!--
