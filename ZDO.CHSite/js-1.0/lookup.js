@@ -59,6 +59,9 @@ var zdLookup = (function () {
   });
 
   function globalInit() {
+    // Register search params provider
+    zdPage.setSearchParamsProvider(getSearchParams);
+
     // If session storage says we've already loaded strokes, append script right now
     // This will happen from browser cache, i.e., page load doesn't suffer
     if (sessionStorage.getItem("strokesLoaded")) {
@@ -108,12 +111,14 @@ var zdLookup = (function () {
     //$("#welcomeScreen").css("display", "block");
   }
 
-  function resultEventWireup() {
+  function resultEventWireup(data) {
     $("#results").append("<div id='soaBox' class='soaBoxLeft'></div>");
     zdStrokeAnim.init();
     $(".hanim").click(showStrokeAnim);
     $("#soaClose").click(hideStrokeAnim);
     $("#soaBox").click(function (e) { e.stopPropagation(); });
+    $('#txtSearch').val(data.query);
+    $('#txtSearch').focus();
   }
 
   // Show the search settings popup (generate from template; event wireup; position).
@@ -332,6 +337,11 @@ var zdLookup = (function () {
   function txtSearchFocus(event) {
     if (zdPage.isMobile()) return;
     $("#txtSearch").select();
+  }
+
+  // Returns object with search params.
+  function getSearchParams() {
+    return { searchScript: optScript, searchTones: optTones };
   }
 
   // Submits a dictionary search as simple GET URL

@@ -23,6 +23,9 @@ var zdPage = (function () {
   // Global init scripts invoked on documentReady.
   var globalInitScripts = [];
 
+  // Function that provides search parameters (submitted alongside regular AJAX page requests).
+  var searchParamsProvider = null;
+
   // Close function of currently active modal popup, or null.
   var activeModalCloser = null;
 
@@ -68,11 +71,15 @@ var zdPage = (function () {
     // Request dynamic page - async
     ++reqId;
     var id = reqId;
+    var data = { action: "dynpage", lang: lang, rel: rel };
+    // Infuse extra params (search)
+    infuseSearchParams(data);
+    // Submit request
     var req = $.ajax({
       url: "/Handler.ashx",
       type: "POST",
       contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-      data: { action: "dynpage", lang: lang, rel: rel }
+      data: data
     });
     req.done(function (data) {
       dynReady(data, id);
@@ -91,6 +98,13 @@ var zdPage = (function () {
     $(window).resize(onResize);
     onResize();
   });
+
+  // Infuses additional parameters to be submitted in search requests.
+  function infuseSearchParams(data) {
+    if (!startsWith(data.rel, "search/")) return;
+    var params = searchParamsProvider();
+    for (var fld in params) data[fld] = params[fld];
+  }
 
   // Measure m width against viewport; adapt font size
   function onResize() {
@@ -135,11 +149,15 @@ var zdPage = (function () {
     // Request dynamic page - async
     ++reqId;
     var id = reqId;
+    var data = { action: "dynpage", lang: lang, rel: rel };
+    // Infuse extra search parameters
+    infuseSearchParams(data);
+    // Submit request
     var req = $.ajax({
       url: "/Handler.ashx",
       type: "POST",
       contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-      data: { action: "dynpage", lang: lang, rel: rel }
+      data: data
     });
     req.done(function (data) {
       navReady(data, id);
@@ -155,18 +173,18 @@ var zdPage = (function () {
     // TO-DO: fail title; keywords; description
   }
 
-  // Apply dynamic content: HTML body, title, description, keywords
-  function applyDynContent(html, title, description, keywords) {
-    $(document).attr("title", title);
-    $("meta[name = 'keywords']").attr("content", keywords);
-    $("meta[name = 'description']").attr("content", description);
-    $("#dynPage").html(html);
+  // Apply dynamic content: HTML body, title, description, keywords; possible other data
+  function applyDynContent(data) {
+    $(document).attr("title", data.title);
+    $("meta[name = 'keywords']").attr("content", data.keywords);
+    $("meta[name = 'description']").attr("content", data.description);
+    $("#dynPage").html(data.html);
     $("#dynPage").removeClass("fading");
     // Run this page's script initializer, if any
     for (var key in initScripts) {
-      if (startsWith(rel, key)) initScripts[key]();
+      if (startsWith(rel, key)) initScripts[key](data);
       // Hack: call search initializer for ""
-      if (rel == "" && key == "search") initScripts[key]();
+      if (rel == "" && key == "search") initScripts[key](data);
     }
     // Scroll to top
     $(window).scrollTop(0);
@@ -177,7 +195,7 @@ var zdPage = (function () {
     if (id != reqId) return;
 
     // Show dynamic content, title etc.
-    applyDynContent(data.html, data.title, data.description, data.keywords);
+    applyDynContent(data);
   }
 
   // Dynamic data received after initial page load (not within single-page navigation)
@@ -186,7 +204,7 @@ var zdPage = (function () {
     if (id != reqId) return;
 
     // Show dynamic content, title etc.
-    applyDynContent(data.html, data.title, data.description, data.keywords);
+    applyDynContent(data);
 
     // Set up single-page navigation
     $(document).on('click', 'a.ajax', function () {
@@ -287,6 +305,11 @@ var zdPage = (function () {
     submitSearch: function(query) {
       history.pushState(null, null, "/" + lang + "/search/" + query);
       dynNavigate();
+    },
+
+    // Called by lookup.js's global initializer to name search params provider function.
+    setSearchParamsProvider: function(providerFun) {
+      searchParamsProvider = providerFun;
     },
 
     // Gets the current selection's bounding element (start), or null if page has no selection.

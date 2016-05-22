@@ -13,8 +13,16 @@ namespace ZDO.CHSite
 {
     public partial class ADynPage
     {
+        [DataContract]
+        public class SearchResult : Result
+        {
+            [DataMember(Name = "query")]
+            public string Query = "";
+        }
+
         private void doSearch(string lang, string rel)
         {
+            // No search query in URL: show welcome page.
             if (rel == "")
             {
                 string fname = getFileName(lang, "_welcome");
@@ -22,6 +30,17 @@ namespace ZDO.CHSite
                 return;
             }
 
+            // Seach's special parameters
+            string strScript = Req.Params["searchScript"];
+            string strTones = Req.Params["searchTones"];
+            UiScript uiScript = UiScript.Both;
+            if (strScript == "simp") uiScript = UiScript.Simp;
+            else if (strScript == "trad") uiScript = UiScript.Trad;
+            UiTones uiTones = UiTones.Pleco;
+            if (strTones == "dummitt") uiTones = UiTones.Dummitt;
+            else if (strTones == "none") uiTones = UiTones.None;
+
+            // Perform query
             string query = rel.Replace("search/", "");
             query = HttpUtility.UrlDecode(query);
             CedictLookupResult lr;
@@ -39,23 +58,36 @@ namespace ZDO.CHSite
             StringBuilder sb = new StringBuilder();
             using (HtmlTextWriter writer = new HtmlTextWriter(new StringWriter(sb)))
             {
-                for (int i = 0; i != lr.Results.Count; ++i)
+                int max = Math.Min(lr.Results.Count, 256);
+                for (int i = 0; i != max; ++i)
                 {
-                    if (i >= 256) break;
                     var lres = lr.Results[i];
-                    EntryRenderer er = new EntryRenderer(lres, prov, UiScript.Both, UiTones.Pleco);
+                    EntryRenderer er = new EntryRenderer(lres, prov, uiScript, uiTones);
+                    er.OneLineHanziLimit = 9;
                     er.Render(writer);
+                    if (i != max - 1)
+                    {
+                        writer.AddAttribute("class", "resultSep");
+                        writer.RenderBeginTag(HtmlTextWriterTag.Div);
+                        writer.RenderEndTag();
+                    }
                 }
             }
+            // Assemble HTML for result
             StringBuilder sbHtml;
             string title, keywords, description;
             readFile(getFileName(lang, "_search"), out sbHtml, out title, out keywords, out description);
             sbHtml.Replace("<!-- RESULTS -->", sb.ToString());
-            Result res = new Result();
+            // Special treatment of metainfo
+            title = TextProvider.Instance.GetString(lang, "TitleSearchZho");
+            title = string.Format(title, lr.Query);
+            // Build result
+            SearchResult res = new SearchResult();
             res.Html = sbHtml.ToString();
             res.Title = title;
             res.Keywords = keywords;
             res.Description = description;
+            res.Query = lr.Query;
             Res = res;
         }
     }

@@ -12,3 +12,4 @@ SMDownload						A CHDICT letöltése
 
 # Search page
 HintSearchField					Hanzi, pinyin vagy magyar szó
+TitleSearchZho					{0} magyar fordítása - CHDICT - Nyílt, bárki által szerkeszthető kínai-magyar szótár

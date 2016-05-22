@@ -1,4 +1,47 @@
-﻿#topNotice {
+﻿/* ------------------------------- WELCOME SCREEN ------------------------------- */
+
+#welcomeScreen {
+  text-align: center;
+  margin-bottom: 5em;
+  font-size: 150%;
+}
+
+#img-welcome {
+  width: 20%;
+  margin-top: -1.5em;
+  margin-bottom: -2em;
+}
+
+#welcomeScreen h1 {
+  font-family: Neuton;
+  font-size: 200%;
+  color: #325e87;
+  margin-bottom: 0.3em;
+  margin-top: 0;
+}
+
+#welcomeScreen p {
+  font-size: 70%;
+}
+
+#welcomeScreen p.welcomenotice {
+  color: #e3781c;
+}
+
+#welcomeScreen p.tagline1 {
+  font-size: 60%;
+  margin-bottom: 0;
+}
+
+#welcomeScreen p.tagline2 {
+  font-size: 80%;
+  font-weight: bold;
+  margin-top: 0;
+}
+
+/* ------------------------------- NOTICE (ANNOTATION MODE, ETC.) ------------------------------- */
+
+#topNotice {
   display: none;
   float: left;
   width: 100%;
@@ -25,6 +68,20 @@
   font-size: 90%;
   margin: 5pt 10pt 10pt 10pt;
 }
+
+/* ------------------------------- LOOKUP RESULTS ------------------------------- */
+
+.resultSep {
+  position: relative;
+  float: left;
+  clear: both;
+  margin-bottom: 0.8em;
+  padding-top: 0.3em;
+  width: 100%;
+  border-bottom: 1px dashed #303030;
+}
+
+/* ------------------------------- STROKE ORDER ANIMATION ------------------------------- */
 
 #soaBox {
   position: absolute;
@@ -152,6 +209,7 @@
   font-weight: bold;
 }
 
+/* ------------------------------- SEARCH OPTIONS POPUP ------------------------------- */
 
 #searchOptionsBox {
   display: none;

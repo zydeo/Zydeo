@@ -111,6 +111,8 @@
     <Content Include="static\hhover.png" />
     <Content Include="static\sign.svg" />
     <Content Include="static\whitegradient.png" />
+    <Content Include="static\zydeo-owl-sad.svg" />
+    <Content Include="static\zydeo-owl.svg" />
     <Content Include="style-1.0\diagnostics.css" />
     <Content Include="style-1.0\entry.css" />
     <Content Include="style-1.0\forms.css" />
