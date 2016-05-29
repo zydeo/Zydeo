@@ -2,14 +2,14 @@
   {
     "outputFileName": "style-1.0/bundle.css",
     "inputFiles": [
-      "style-1.0/tooltipster.css",
-      "style-1.0/page.css",
-      "style-1.0/forms.css",
-      "style-1.0/entry.css",
-      "style-1.0/newentry.css",
-      "style-1.0/history.css",
-      "style-1.0/lookup.css",
-      "style-1.0/diagnostics.css"
+      "style-1.0/tooltipster.min.css",
+      "style-1.0/page.min.css",
+      "style-1.0/forms.min.css",
+      "style-1.0/entry.min.css",
+      "style-1.0/newentry.min.css",
+      "style-1.0/history.min.css",
+      "style-1.0/lookup.min.css",
+      "style-1.0/diagnostics.min.css"
     ],
     "minify": {
       "enabled": false

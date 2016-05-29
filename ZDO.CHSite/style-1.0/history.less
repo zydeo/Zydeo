@@ -1,4 +1,6 @@
-﻿#pager {
+﻿@import "defines.less";
+
+#pager {
   position: relative;
   float: left;
   width: 100%;
@@ -6,8 +8,9 @@
   font-size: 130%;
   font-family: Ubuntu, sans-serif;
   margin-bottom: 1.5em;
-  color: #303030;
+  color: @clrBodyText;
 }
+
 #lblPage {
   display: table-cell;
   vertical-align: top;
@@ -16,27 +19,32 @@
   font-weight: bold;
   font-family: Ubuntu, sans-serif;
 }
+
 #pageLinks {
   display: table-cell;
   width: 100%;
 }
+
 .pageSpacer {
   display: inline-block;
   margin: 0 0.5em 0 0.5em;
 }
+
 a.pageLink {
   display: inline-block;
   text-decoration: none;
   text-align: center;
-  color: #303030;
+  color: @clrBodyText;
   padding: 0 0.5em 0 0.5em;
   border-radius: 0.2em;
   margin-left: 0;
 }
+
 a.pageLink:hover,
 a.pageLink.selected {
-  background-color: #d3e3f2;
+  background-color: @clrLight;
 }
+
 .historySep {
   position: relative;
   float: left;
@@ -44,35 +52,40 @@ a.pageLink.selected {
   box-sizing: border-box;
   margin-bottom: 0.1em;
   padding-bottom: 0.1em;
-  border-bottom: 1px dashed #303030;
+  border-bottom: 1px dashed @clrBodyText;
 }
+
 .historyItem {
   position: relative;
   float: left;
   width: 100%;
   padding: 0.9em 0 0.9em 0;
 }
+
 .historyItem:hover {
-  background-color: #f0f4f7;
+  background-color: @clrLightLight;
 }
+
 .changeHead {
   position: relative;
   float: left;
   width: 100%;
   min-height: 4em;
 }
+
 .changeHead i.fa {
   display: block;
   font-size: 300%;
   position: absolute;
-  top: 0;
-  left: 0.1em;
+  top: 0; left: 0.1em;
   color: #606060;
   cursor: default;
 }
+
 .changeHead i.ctNew {
   color: #e3a168;
 }
+
 .changeSummary {
   position: relative;
   float: left;
@@ -84,6 +97,7 @@ a.pageLink.selected {
   margin-left: 3em;
   font-size: 100%;
 }
+
 .changeNote {
   position: relative;
   float: left;
@@ -95,30 +109,40 @@ a.pageLink.selected {
   margin-left: 3em;
   font-style: italic;
 }
+
 .changeUser {
   font-weight: bold;
-  color: #325e87;
+  color: @clrStrong;
 }
+
+.changeTime {
+}
+
 .ctNew {
   color: blue;
 }
+
 .ctNote {
   color: darkorange;
 }
+
 .ctEdit {
   color: purple;
 }
+
 .lblNote {
   font-weight: bold;
   color: #505050;
 }
+
 .changeEntry {
   position: relative;
   clear: both;
-  width: calc(97%);
+  width: calc(100% - 3em);
   height: auto;
   margin-left: 3em;
 }
+
 .changeEntry .entry {
   position: relative;
   float: left;
@@ -126,38 +150,33 @@ a.pageLink.selected {
   font-size: 60%;
   color: #606060;
 }
+
 .histEntryOps {
   display: none;
   position: absolute;
-  top: 0;
-  left: -3em;
+  top: 0; left: -3em;
   width: 3em;
 }
+
 .historyItem:hover .histEntryOps {
   display: block;
 }
+
 .histEntryOps i {
   position: absolute;
   display: inline-block;
   cursor: default;
-  color: #638fb8;
+  color: @clrMedium;
   width: 2em;
   height: 1.3em;
   padding-top: 0.1em;
   text-align: center;
 }
+
 .histEntryOps i:hover {
-  color: #e3781c;
+  color: @clrStrongAccent;
 }
-.opHistComment {
-  left: 0.5em;
-  top: -0.1em;
-}
-.opHistEdit {
-  left: 0.5em;
-  top: 1.5em;
-}
-.opHistFlag {
-  left: 0.5em;
-  top: 3.1em;
-}
+
+.opHistComment { left: 0.5em; top: -0.1em; }
+.opHistEdit { left: 0.5em; top: 1.5em; }
+.opHistFlag { left: 0.5em; top: 3.1em; }

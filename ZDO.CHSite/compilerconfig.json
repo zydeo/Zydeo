@@ -1,0 +1,34 @@
+﻿[
+  {
+    "outputFile": "style-1.0/tooltipster.css",
+    "inputFile": "style-1.0/tooltipster.less"
+  },
+  {
+    "outputFile": "style-1.0/page.css",
+    "inputFile": "style-1.0/page.less"
+  },
+  {
+    "outputFile": "style-1.0/newentry.css",
+    "inputFile": "style-1.0/newentry.less"
+  },
+  {
+    "outputFile": "style-1.0/lookup.css",
+    "inputFile": "style-1.0/lookup.less"
+  },
+  {
+    "outputFile": "style-1.0/history.css",
+    "inputFile": "style-1.0/history.less"
+  },
+  {
+    "outputFile": "style-1.0/forms.css",
+    "inputFile": "style-1.0/forms.less"
+  },
+  {
+    "outputFile": "style-1.0/entry.css",
+    "inputFile": "style-1.0/entry.less"
+  },
+  {
+    "outputFile": "style-1.0/diagnostics.css",
+    "inputFile": "style-1.0/diagnostics.less"
+  }
+]

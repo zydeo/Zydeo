@@ -1,5 +1,5 @@
-/// <reference path="/lib/jquery-2.1.4.min.js" />
-/// <reference path="/lib/jquery.tooltipster.min.js" />
+/// <reference path="x-jquery-2.1.4.min.js" />
+/// <reference path="x-jquery.tooltipster.min.js" />
 /// <reference path="strings-hu.js" />
 /// <reference path="page.js" />
 

@@ -18,5 +18,5 @@
   "options-dummitt": "Dummitt",
   "tooltip-history-comment": "Megjegyzés hozzáfűzése",
   "tooltip-history-edit": "Szócikk szerkesztése",
-  "tooltip-history-flag": "Szócikk megjelölése (pontatlan, téves vagy hiányos)",
+  "tooltip-history-flag": "Szócikk megjelölése<br/>(pontatlan, téves vagy hiányos)",
 };

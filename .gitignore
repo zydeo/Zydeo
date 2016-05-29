@@ -38,6 +38,7 @@ _install/*
 _deploy/*
 _chdeploy/*
 _localization/*
+packages/*
 ZDO.Site/_data/*
 ZDO.CHSite/_data/*
 

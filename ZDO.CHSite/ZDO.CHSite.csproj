@@ -92,6 +92,10 @@
     <Content Include="Content\_work-in-progress.hu.html" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
+    <None Include="compilerconfig.json" />
+    <None Include="compilerconfig.json.defaults">
+      <DependentUpon>compilerconfig.json</DependentUpon>
+    </None>
     <None Include="js-1.0\diagnostics.js" />
     <None Include="js-1.0\history.js" />
     <None Include="js-1.0\lookup.js" />
@@ -121,14 +125,63 @@
     <Content Include="static\zydeo-owl-sad.svg" />
     <Content Include="static\zydeo-owl.svg" />
     <Content Include="style-1.0\bundle.css" />
-    <None Include="style-1.0\diagnostics.css" />
-    <None Include="style-1.0\entry.css" />
-    <None Include="style-1.0\forms.css" />
-    <None Include="style-1.0\history.css" />
-    <None Include="style-1.0\lookup.css" />
-    <None Include="style-1.0\newentry.css" />
-    <None Include="style-1.0\page.css" />
-    <None Include="style-1.0\tooltipster.css" />
+    <None Include="style-1.0\defines.less" />
+    <None Include="style-1.0\diagnostics.less" />
+    <None Include="style-1.0\entry.less" />
+    <None Include="style-1.0\forms.less" />
+    <None Include="style-1.0\history.less" />
+    <None Include="style-1.0\lookup.less" />
+    <None Include="style-1.0\newentry.less" />
+    <None Include="style-1.0\page.less" />
+    <None Include="style-1.0\tooltipster.less" />
+    <None Include="style-1.0\diagnostics.css">
+      <DependentUpon>diagnostics.less</DependentUpon>
+    </None>
+    <None Include="style-1.0\diagnostics.min.css">
+      <DependentUpon>diagnostics.css</DependentUpon>
+    </None>
+    <None Include="style-1.0\entry.css">
+      <DependentUpon>entry.less</DependentUpon>
+    </None>
+    <None Include="style-1.0\entry.min.css">
+      <DependentUpon>entry.css</DependentUpon>
+    </None>
+    <None Include="style-1.0\forms.css">
+      <DependentUpon>forms.less</DependentUpon>
+    </None>
+    <None Include="style-1.0\forms.min.css">
+      <DependentUpon>forms.css</DependentUpon>
+    </None>
+    <None Include="style-1.0\history.css">
+      <DependentUpon>history.less</DependentUpon>
+    </None>
+    <None Include="style-1.0\history.min.css">
+      <DependentUpon>history.css</DependentUpon>
+    </None>
+    <None Include="style-1.0\lookup.css">
+      <DependentUpon>lookup.less</DependentUpon>
+    </None>
+    <None Include="style-1.0\lookup.min.css">
+      <DependentUpon>lookup.css</DependentUpon>
+    </None>
+    <None Include="style-1.0\newentry.css">
+      <DependentUpon>newentry.less</DependentUpon>
+    </None>
+    <None Include="style-1.0\newentry.min.css">
+      <DependentUpon>newentry.css</DependentUpon>
+    </None>
+    <None Include="style-1.0\page.css">
+      <DependentUpon>page.less</DependentUpon>
+    </None>
+    <None Include="style-1.0\page.min.css">
+      <DependentUpon>page.css</DependentUpon>
+    </None>
+    <None Include="style-1.0\tooltipster.css">
+      <DependentUpon>tooltipster.less</DependentUpon>
+    </None>
+    <None Include="style-1.0\tooltipster.min.css">
+      <DependentUpon>tooltipster.css</DependentUpon>
+    </None>
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -235,7 +288,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\BuildBundlerMinifier.1.9.155\build\BuildBundlerMinifier.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BuildBundlerMinifier.1.9.155\build\BuildBundlerMinifier.targets'))" />
+    <Error Condition="!Exists('..\packages\BuildWebCompiler.1.11.315\build\BuildWebCompiler.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BuildWebCompiler.1.11.315\build\BuildWebCompiler.targets'))" />
   </Target>
+  <Import Project="..\packages\BuildWebCompiler.1.11.315\build\BuildWebCompiler.targets" Condition="Exists('..\packages\BuildWebCompiler.1.11.315\build\BuildWebCompiler.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

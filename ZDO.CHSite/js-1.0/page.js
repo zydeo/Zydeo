@@ -1,5 +1,5 @@
-﻿/// <reference path="/lib/jquery-2.1.4.min.js" />
-/// <reference path="/lib/history.min.js" />
+﻿/// <reference path="x-jquery-2.1.4.min.js" />
+/// <reference path="x-history.min.js" />
 
 var uiStrings = uiStringsHu;
 

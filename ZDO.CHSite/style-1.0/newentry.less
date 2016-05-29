@@ -1,23 +1,27 @@
-﻿#newEntrySimp {
+@import "defines.less";
+
+#newEntrySimp {
   display: block;
   position: relative;
   float: left;
   font-size: 1.5em;
   font-family: "Microsoft YaHei", SimHei, STXihei, STHeitiSC-Medium, DengXian, "????", sans-serif;
   width: 18em;
-  background-color: #f0f4f7;
-  border: 0.1em solid #f0f4f7;
+  background-color: @clrLightLight;
+  border: 0.1em solid @clrLightLight;
   border-radius: 0.1em;
-  color: #303030;
+  color: @clrBodyText;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   outline: none;
 }
+
 .formBlock.active #newEntrySimp {
-  background-color: #f0f4f7;
-  border: 0.1em solid #638fb8;
+  background-color: @clrLightLight;
+  border: 0.1em solid @clrMedium;
 }
+
 #newEntryTradCtrl,
 #newEntryPinyinCtrl,
 #newEntryTrg {
@@ -27,22 +31,25 @@
   font-size: 1.5em;
   font-family: "Microsoft YaHei", SimHei, STXihei, STHeitiSC-Medium, DengXian, "????", sans-serif;
   width: 18.1em;
-  background-color: #f0f4f7;
-  border: 0.1em solid #f0f4f7;
+  background-color: @clrLightLight;
+  border: 0.1em solid @clrLightLight;
   border-radius: 0.1em;
 }
+
 .formBlock.active #newEntryTradCtrl,
 .formBlock.active #newEntryPinyinCtrl,
 .formBlock.active #newEntryTrg {
-  background-color: #f0f4f7;
-  border: 0.1em solid #638fb8;
+  background-color: @clrLightLight;
+  border: 0.1em solid @clrMedium;
 }
+
 .newEntryTradPos,
 .newEntryPinyinPos {
   display: block;
   position: relative;
   float: left;
 }
+
 .newEntryTradPos span,
 .newEntryPinyinPos span {
   display: inline-block;
@@ -53,22 +60,28 @@
   border-radius: 0.1em;
   color: #808080;
 }
+
 .newEntryTradPos span:first-child,
 .newEntryPinyinPos span:first-child {
-  color: #303030;
+  color: @clrBodyText;
 }
+
 .formBlock.ready .tradAlt,
 .formBlock.ready .pyAlt {
   display: none;
 }
+
 .formBlock.active .newEntryTradPos span:hover,
 .formBlock.active .newEntryPinyinPos span:hover {
   background-color: #A8C8E5;
 }
+
 .formBlock.active .newEntryTradPos span:first-child:hover,
 .formBlock.active .newEntryPinyinPos span:first-child:hover {
   background-color: inherit;
 }
+
+
 #newEntryPinyinCtrl {
   font-size: 1em;
   font-family: "Noto Sans", sans-serif;
@@ -76,24 +89,28 @@
   padding-top: 0.4em;
   padding-bottom: 0.4em;
 }
+
 .newEntryPinyinPos {
   text-align: center;
 }
+
 .newEntryPinyinPos span {
   box-sizing: border-box;
   padding: 0 0.1em 0 0.1em;
   margin: 0 0.1em 0 0.1em;
   width: 100%;
 }
+
 #newEntryTrg {
   font-size: 0.9em;
   font-family: "Noto Sans", sans-serif;
-  color: #303030;
+  color: @clrBodyText;
   height: 9em;
   padding: 0 0.1em 0 0.1em;
   width: 30.05em;
   resize: vertical;
 }
+
 #newEntryNote {
   display: block;
   position: relative;
@@ -102,31 +119,35 @@
   font-family: "Noto Sans", sans-serif;
   width: 29.3em;
   padding: 0.4em;
-  background-color: #f0f4f7;
-  border: 0.1em solid #f0f4f7;
+  background-color: @clrLightLight;
+  border: 0.1em solid @clrLightLight;
   border-radius: 0.1em;
-  color: #303030;
+  color: @clrBodyText;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   outline: none;
 }
+
 .formBlock.active #newEntryNote {
-  background-color: #f0f4f7;
-  border: 2pt solid #638fb8;
+  background-color: @clrLightLight;
+  border: 2pt solid @clrMedium;
 }
+
 .newEntryKnown {
   display: none;
   position: absolute;
   top: -0.2em;
   left: 11.4em;
   font-size: 30pt;
-  color: #638fb8;
+  color: @clrMedium;
   cursor: default;
 }
+
 #blockPinyin .newEntryKnown {
   top: -0.2em;
 }
+
 .newEntryKnown.visible {
   display: block;
 }

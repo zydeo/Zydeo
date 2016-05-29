@@ -1,5 +1,5 @@
-/// <reference path="/lib/jquery-2.1.4.min.js" />
-/// <reference path="common.js" />
+/// <reference path="x-jquery-2.1.4.min.js" />
+/// <reference path="page.js" />
 
 var zdNewEntry = (function () {
   "use strict";

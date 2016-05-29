@@ -15,14 +15,14 @@
   <link href='https://fonts.googleapis.com/css?family=Ubuntu&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
   <% if(DebugMode) { %>
-  <link rel="stylesheet" href="/style-<% =VerStr %>/tooltipster.css">
-  <link rel="stylesheet" href="/style-<% =VerStr %>/page.css">
-  <link rel="stylesheet" href="/style-<% =VerStr %>/forms.css">
-  <link rel="stylesheet" href="/style-<% =VerStr %>/entry.css">
-  <link rel="stylesheet" href="/style-<% =VerStr %>/newentry.css">
-  <link rel="stylesheet" href="/style-<% =VerStr %>/history.css">
-  <link rel="stylesheet" href="/style-<% =VerStr %>/lookup.css">
-  <link rel="stylesheet" href="/style-<% =VerStr %>/diagnostics.css">
+  <link rel="stylesheet" href="/style-<% =VerStr %>/tooltipster.min.css">
+  <link rel="stylesheet" href="/style-<% =VerStr %>/page.min.css">
+  <link rel="stylesheet" href="/style-<% =VerStr %>/forms.min.css">
+  <link rel="stylesheet" href="/style-<% =VerStr %>/entry.min.css">
+  <link rel="stylesheet" href="/style-<% =VerStr %>/newentry.min.css">
+  <link rel="stylesheet" href="/style-<% =VerStr %>/history.min.css">
+  <link rel="stylesheet" href="/style-<% =VerStr %>/lookup.min.css">
+  <link rel="stylesheet" href="/style-<% =VerStr %>/diagnostics.min.css">
   <% } else { %>
   <link rel="stylesheet" href="/style-<% =VerStr %>/bundle.css">
   <% } %>

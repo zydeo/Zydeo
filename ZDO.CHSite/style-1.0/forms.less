@@ -1,14 +1,19 @@
-﻿.formBlock {
+@import "defines.less";
+
+.formBlock {
   display: block;
+  position: relative;
   float: left;
   width: 34em;
   box-sizing: border-box;
   position: relative;
   margin-bottom: 1pt;
 }
+
 .formBlock.hidden {
   display: none;
 }
+
 .formBlockLabel {
   position: absolute;
   left: 0;
@@ -21,18 +26,21 @@
   font-size: 1em;
   font-weight: bold;
 }
+
 .formBlock.future .formBlockLabel {
   color: #808080;
 }
+
 .formBlockFrame {
   position: relative;
   float: left;
   clear: both;
-  border-left: 0.2em solid #fff;
+  border-left: 0.2em solid @clrDefBg;
   margin: 0 0 0 9em;
   padding: 0 0 5pt 2pt;
   width: 100%;
 }
+
 .formButtonRight {
   display: none;
   background-color: #ffe4cc;
@@ -45,34 +53,43 @@
   height: 2.45em;
   margin-left: 0.2em;
 }
+
 .formBlock.active .formButtonRight.accept {
   display: inline-block;
 }
+
 .formBlock.ready .formButtonRight.edit {
   display: inline-block;
 }
+
 .formButtonRight.accept {
   background-color: #BCE3BC;
 }
+
 .formButtonRight:hover {
   background-color: #ffc898;
 }
+
 .formButtonRight.accept:hover {
   background-color: #7BBA7B;
 }
+
 .formButtonRight.disabled,
 .formButtonRight.disabled:hover {
   background-color: #e0e0e0;
 }
+
 #editTrad.hidden,
 #editPinyin.hidden {
   display: none;
 }
+
 .formButtonRight img {
   width: 1.8em;
   height: 1.8em;
   margin: 0.34em 0 0 0.34em;
 }
+
 .formNote {
   display: none;
   position: relative;
@@ -81,12 +98,15 @@
   width: 340pt;
   font-size: 0.9em;
 }
+
 .formBlock.active .formNote {
   display: block;
 }
+
 .formBlock.active .formNote.hidden {
   display: none;
 }
+
 .formErrors {
   display: none;
   position: relative;
@@ -99,18 +119,22 @@
   margin: 0.5em 0 0.5em 0;
   padding: 0.2em 0.5em 0.5em 0.5em;
 }
+
 .formErrors.visible {
   display: block;
 }
+
 .formErrors ul {
   color: #8C2C1B;
   margin: 0.1em 0 0 0;
   padding: 0;
   list-style-type: circle;
 }
+
 .formErrors ul li {
   margin-left: 15pt;
 }
+
 .formSubmit {
   display: block;
   float: right;
@@ -125,9 +149,11 @@
   cursor: default;
   color: #507f50;
 }
+
 .formSubmit:hover {
   background-color: #7BBA7B;
 }
+
 .formSubmit.disabled {
   background-color: #e0e0e0;
   color: #808080;

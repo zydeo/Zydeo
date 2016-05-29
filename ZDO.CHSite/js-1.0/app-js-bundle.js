@@ -41,11 +41,11 @@ var uiStringsHu = {
   "options-dummitt": "Dummitt",
   "tooltip-history-comment": "Megjegyzés hozzáfűzése",
   "tooltip-history-edit": "Szócikk szerkesztése",
-  "tooltip-history-flag": "Szócikk megjelölése (pontatlan, téves vagy hiányos)",
+  "tooltip-history-flag": "Szócikk megjelölése<br/>(pontatlan, téves vagy hiányos)",
 };
 
-/// <reference path="/lib/jquery-2.1.4.min.js" />
-/// <reference path="/lib/history.min.js" />
+/// <reference path="x-jquery-2.1.4.min.js" />
+/// <reference path="x-history.min.js" />
 
 var uiStrings = uiStringsHu;
 
@@ -457,8 +457,8 @@ var zdPage = (function () {
 
 })();
 
-/// <reference path="/lib/jquery-2.1.4.min.js" />
-/// <reference path="common.js" />
+/// <reference path="x-jquery-2.1.4.min.js" />
+/// <reference path="page.js" />
 
 var zdNewEntry = (function () {
   "use strict";
@@ -975,8 +975,8 @@ var zdNewEntryServer = (function() {
   }
 })();
 
-/// <reference path="/lib/jquery-2.1.4.min.js" />
-/// <reference path="/lib/jquery.tooltipster.min.js" />
+/// <reference path="x-jquery-2.1.4.min.js" />
+/// <reference path="x-jquery.tooltipster.min.js" />
 /// <reference path="strings-hu.js" />
 /// <reference path="page.js" />
 
@@ -1312,9 +1312,9 @@ var zdStrokeAnim = (function () {
 
 })();
 
-/// <reference path="/lib/jquery-2.1.4.min.js" />
-/// <reference path="/lib/jquery.color-2.1.2.min.js" />
-/// <reference path="/lib/jquery.tooltipster.min.js" />
+/// <reference path="x-jquery-2.1.4.min.js" />
+/// <reference path="x-jquery.color-2.1.2.min.js" />
+/// <reference path="x-jquery.tooltipster.min.js" />
 /// <reference path="strings-hu.js" />
 /// <reference path="page.js" />
 /// <reference path="strokeanim.js" />
@@ -1726,9 +1726,9 @@ var zdLookup = (function () {
 
 
 
-/// <reference path="/lib/jquery-2.1.4.min.js" />
-/// <reference path="/lib/jquery.color-2.1.2.min.js" />
-/// <reference path="/lib/jquery.tooltipster.min.js" />
+/// <reference path="x-jquery-2.1.4.min.js" />
+/// <reference path="x-jquery.color-2.1.2.min.js" />
+/// <reference path="x-jquery.tooltipster.min.js" />
 /// <reference path="strings-hu.js" />
 /// <reference path="page.js" />
 
@@ -1742,22 +1742,22 @@ var zdHistory = (function() {
     // Add tooltips to pliant per-entry commands
     $(".opHistComment").tooltipster({
       content: $("<span>" + uiStrings["tooltip-history-comment"] + "</span>"),
-      position: 'right'
+      position: 'left'
     });
     $(".opHistEdit").tooltipster({
       content: $("<span>" + uiStrings["tooltip-history-edit"] + "</span>"),
-      position: 'right'
+      position: 'left'
     });
     $(".opHistFlag").tooltipster({
       content: $("<span>" + uiStrings["tooltip-history-flag"] + "</span>"),
-      position: 'right'
+      position: 'left'
     });
 
   }
 
 })();
 
-/// <reference path="/lib/jquery-2.1.4.min.js" />
+/// <reference path="x-jquery-2.1.4.min.js" />
 /// <reference path="page.js" />
  
 var zdDiagnostics = (function () {

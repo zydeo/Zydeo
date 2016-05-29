@@ -1,45 +1,32 @@
-﻿body {
+﻿@import "defines.less";
+
+body {
   margin: 0;
   font-family: "Noto Sans", sans-serif;
   font-size: 13pt;
-  background-color: #fff;
-  color: #303030;
+  background-color: @clrDefBg;
+  color: @clrBodyText;
   min-width: 59em;
 }
-body.pt7 {
-  font-size: 7pt;
-}
-body.pt8 {
-  font-size: 8pt;
-}
-body.pt9 {
-  font-size: 9pt;
-}
-body.pt10 {
-  font-size: 10pt;
-}
-body.pt11 {
-  font-size: 11pt;
-}
-body.pt12 {
-  font-size: 12pt;
-}
-body.pt13 {
-  font-size: 13pt;
-}
-body.pt14 {
-  font-size: 14pt;
-}
-body.pt16 {
-  font-size: 16pt;
-}
+
+body.pt7 { font-size: 7pt; }
+body.pt8 { font-size: 8pt; }
+body.pt9{ font-size: 9pt; }
+body.pt10 { font-size: 10pt; }
+body.pt11 { font-size: 11pt; }
+body.pt12 { font-size: 12pt; }
+body.pt13 { font-size: 13pt; }
+body.pt14 { font-size: 14pt; }
+body.pt16 { font-size: 16pt; }
+
 #debug {
   position: fixed;
   top: 0;
   left: 0;
   z-index: 20;
-  background: #fff;
+  background: @clrDefBg;
 }
+
 #emMeasure {
   font-size: 10pt;
   border: 0;
@@ -49,6 +36,7 @@ body.pt16 {
   left: 0;
   margin-left: -16000px;
 }
+
 #headerstick {
   position: fixed;
   top: 0;
@@ -56,9 +44,10 @@ body.pt16 {
   min-width: 59em;
   padding-top: 0.5em;
   z-index: 11;
-  background-color: #fff;
+  background-color: @clrDefBg;
   height: 3.5em;
 }
+
 #headerHome {
   position: absolute;
   top: 0;
@@ -67,8 +56,9 @@ body.pt16 {
   font-size: 250%;
   cursor: default;
   margin: 0.5em 0 0 1em;
-  color: #e3781c;
+  color:@clrStrongAccent;
 }
+
 #headerHome #hdrHomeLatin {
   display: block;
   position: relative;
@@ -80,6 +70,7 @@ body.pt16 {
   line-height: 0.8em;
   text-align: center;
 }
+
 #headerHome #hdrHomeZho {
   display: block;
   position: relative;
@@ -90,12 +81,14 @@ body.pt16 {
   line-height: 1em;
   font-family: SimHei, "Microsoft Yahei", STXihei, STHeitiSC-Medium, DengXian, sans-serif;
 }
+
 #header {
   margin: 0 auto 0 auto;
   width: 45em;
   height: 4.6em;
-  background-color: #fff;
+  background-color: @clrDefBg;
 }
+
 .hdrAlt {
   width: 100%;
   position: absolute;
@@ -110,17 +103,20 @@ body.pt16 {
   opacity: 0;
   z-index: 11;
 }
+
 .hdrAlt.on {
   opacity: 1;
   z-index: 12;
 }
+
 #txtSearch {
-  background-color: #f0f4f7;
+  background-color: @clrLightLight;
   font-size: 100%;
   border: 0;
   width: 16em;
   margin: 0.1em 0 0.1em 0.2em;
 }
+
 #hdrSearch div,
 #hdrSearch input,
 #hdrSearch i {
@@ -128,64 +124,73 @@ body.pt16 {
   position: relative;
   float: left;
 }
+
 #searchBox {
-  background-color: #f0f4f7;
+  background-color: @clrLightLight;
   height: 1.6em;
   box-sizing: border-box;
   padding-right: 0.1em;
   cursor: default;
 }
+
 #searchBox i {
-  color: #638fb8;
+  color: @clrMedium;
   height: 1.4em;
   margin: 0.1em 0 0 0;
   padding: 0.15em 0.15em 0 0.15em;
   box-sizing: border-box;
 }
+
 #searchBox i:hover {
-  background-color: #d3e3f2;
+  background-color: @clrLight;
 }
+
 #toMenu {
   display: block;
   position: relative;
   float: left;
-  color: #638fb8;
+  color: @clrMedium;
   height: 1.6em;
   box-sizing: border-box;
   padding: 0.17em 0.4em 0.15em 0.4em;
   font-size: 120%;
   cursor: default;
 }
+
 #toMenu:hover {
-  color: #325e87;
+  color: @clrStrong;
 }
+
 .topMenu {
   display: inline-block;
   position: relative;
   float: left;
   padding: 0 0.3em 0 0.3em;
   margin-right: 0.2em;
-  color: #325e87;
+  color: @clrStrong;
   text-decoration: none;
   cursor: default;
   border-radius: 0.1em;
   transition: opacity 0.2s ease;
 }
+
 .topMenu:hover,
 .topMenu.on {
-  background-color: #325e87;
-  color: #fff;
+  background-color: @clrStrong;
+  color: @clrDefBg;
 }
+
 #hdrMenuRight {
   position: absolute;
   width: 3.5em;
   left: 17.7em;
 }
+
 .langSel {
   display: inline-block;
   position: relative;
   float: right;
-  color: #638fb8;
+  color: @clrMedium;
   text-decoration: none;
   cursor: default;
   border-radius: 0.1em;
@@ -195,40 +200,48 @@ body.pt16 {
   padding: 0 0.3em 0 0.3em;
   margin: 0.6em 0.1em 0 0;
 }
+
 .langSel:hover,
 .langSel.on {
-  color: #fff;
-  background-color: #638fb8;
+  color: @clrDefBg;
+  background-color: @clrMedium;
 }
+
 .loginIcon {
   display: inline-block;
   position: relative;
   float: right;
 }
+
 .loginIcon i {
-  color: #638fb8;
+  color: @clrMedium;
   cursor: default;
   font-size: 80%;
   padding-top: 0.1em;
   margin-left: 0.2em;
 }
+
 .loginIcon i:hover {
-  color: #325e87;
+  color: @clrStrong;
 }
+
 #hdrMenu {
   margin-top: 0.15em;
 }
+
 #subHeader {
   display: none;
   margin: 0 auto 0 auto;
   width: 45em;
   padding-top: 0.4em;
   height: 2.6em;
-  background-color: #fff;
+  background-color: @clrDefBg;
 }
+
 #subHeader.visible {
   display: block;
 }
+
 .subMenu {
   display: none;
   width: 100%;
@@ -236,27 +249,28 @@ body.pt16 {
   font-family: Ubuntu;
   padding: 0 0 0 0.5em;
 }
+
 .subMenu span {
   margin-right: 1em;
 }
+
 .subMenu span a,
 .subMenu span span {
-  color: #325e87;
+  color: @clrStrong;
   cursor: pointer;
   text-decoration: none;
-  border-bottom: 0.2em solid #fff;
+  border-bottom: 0.2em solid @clrDefBg;
   padding-bottom: 0.2em;
   transition: border 0.5s ease;
 }
-.subMenu span a:hover {
-  border-bottom-color: #638fb8;
-}
-.subMenu span.on a {
-  border-bottom-color: #325e87;
-}
+
+.subMenu span a:hover { border-bottom-color: @clrMedium; }
+.subMenu span.on a { border-bottom-color: @clrStrong; }
+
 .subMenu.visible {
   display: block;
 }
+
 #dynPage {
   position: relative;
   margin: 0 auto 0 auto;
@@ -268,15 +282,18 @@ body.pt16 {
   box-sizing: border-box;
   transition: none;
 }
+
 #dynPage.nosubmenu {
   margin-top: 5em;
   padding-top: 2em;
   padding-left: 0.45em;
 }
+
 #dynPage.fading {
   /* transition: opacity 1s ease; */
   opacity: 0.2;
 }
+
 #headermask {
   position: fixed;
   top: 8em;
@@ -286,27 +303,31 @@ body.pt16 {
   background-size: 100% 100%;
   z-index: 10;
 }
+
 #headermask.nosubmenu {
   top: 4.5em;
 }
+
 #bottomSpacer {
   position: relative;
   height: 6em;
 }
-textarea:focus,
-input:focus {
+
+textarea:focus, input:focus {
   outline: none;
 }
-textarea,
-input {
-  color: #303030;
+
+textarea, input {
+  color: @clrBodyText;
 }
+
 .alertBar {
   position: fixed;
   top: 2.8em;
   width: 100%;
   z-index: 15;
 }
+
 .alert {
   position: relative;
   margin: 0 auto 0 auto;
@@ -322,9 +343,11 @@ input {
   -webkit-transition: opacity 0.75s ease;
   transition: opacity 0.75s ease;
 }
+
 .alert.visible {
   opacity: 1;
 }
+
 .alert.hidden {
   opacity: 0;
   -moz-transition: opacity 2s ease;
@@ -332,29 +355,36 @@ input {
   -webkit-transition: opacity 2s ease;
   transition: opacity 2s ease;
 }
+
 .alert.alertOK {
   border: 1px solid #338323;
   background-color: #f1f9eb;
 }
+
 .alert.alertFail {
   border: 1px solid #8c2c1b;
   background-color: #fae7e3;
 }
+
 .alertMessage {
   margin-right: 2em;
 }
+
 .alertTitle {
   font-weight: bold;
 }
+
 .alert.alertFail .alertTitle {
   color: #8c2c1b;
 }
+
 .alertClose {
   position: absolute;
   top: 0.3em;
   left: 29em;
   cursor: pointer;
 }
+
 .alertClose img {
   width: 1.5em;
   height: 1.5em;
