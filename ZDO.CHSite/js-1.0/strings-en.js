@@ -1,6 +1,6 @@
-﻿var uiStringsHu = {
+﻿var uiStringsEn = {
   "empty-str": "",
-  "tooltip-btn-brush": "Kézírás-felismerés",
+  "tooltip-btn-brush": "Handwriting recognition",
   "tooltip-btn-settings": "Keresési beállítások",
   "tooltip-btn-search": "Keresés a CHDICT-ben (Enter)",
   "no-animation-for-char": "Ehhez az írásjegyhez sajnos nincs vonássorend-animáció.",

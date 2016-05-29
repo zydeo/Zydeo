@@ -1,0 +1,43 @@
+[
+  {
+    "outputFileName": "style-1.0/bundle.css",
+    "inputFiles": [
+      "style-1.0/tooltipster.css",
+      "style-1.0/page.css",
+      "style-1.0/forms.css",
+      "style-1.0/entry.css",
+      "style-1.0/newentry.css",
+      "style-1.0/history.css",
+      "style-1.0/lookup.css",
+      "style-1.0/diagnostics.css"
+    ],
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFileName": "js-1.0/app-js-bundle.js",
+    "inputFiles": [
+      "js-1.0/strings-en.js",
+      "js-1.0/strings-hu.js",
+      "js-1.0/page.js",
+      "js-1.0/newentry.js",
+      "js-1.0/strokeanim.js",
+      "js-1.0/lookup.js",
+      "js-1.0/history.js",
+      "js-1.0/diagnostics.js"
+    ]
+  },
+  {
+    "outputFileName": "js-1.0/app-lib-bundle.js",
+    "inputFiles": [
+      "js-1.0/x-history.min.js",
+      "js-1.0/x-jquery-2.1.4.min.js",
+      "js-1.0/x-jquery.color-2.1.2.min.js",
+      "js-1.0/x-jquery.tooltipster.min.js"
+    ],
+    "minify": {
+      "enabled": false
+    }
+  }
+]

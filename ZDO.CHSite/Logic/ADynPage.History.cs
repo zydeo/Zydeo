@@ -22,7 +22,7 @@ namespace ZDO.CHSite
             // Diagnostics/doodling
             if (rel == "edit/history/x")
             {
-                feedResult(getFileName("en", "_historydoodle"));
+                Res = makeResult(getFileName("en", "_historydoodle"));
                 return;
             }
 

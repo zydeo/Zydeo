@@ -1,6 +1,8 @@
 ﻿/// <reference path="/lib/jquery-2.1.4.min.js" />
 /// <reference path="/lib/history.min.js" />
 
+var uiStrings = uiStringsHu;
+
 function startsWith(str, prefix) {
   if (str.length < prefix.length)
     return false;
@@ -49,6 +51,7 @@ var zdPage = (function () {
     if (startsWith(path, "/en/") || path == "/en") {
       lang = "en";
       rel = path == "/en" ? "" : path.substring(4);
+      uiStrings = uiStringsEn;
     }
     else if (startsWith(path, "/hu/") || path == "/hu") {
       lang = "hu";
@@ -69,34 +72,40 @@ var zdPage = (function () {
     // Global script initializers
     for (var i = 0; i != globalInitScripts.length; ++i) globalInitScripts[i]();
     // Request dynamic page - async
-    ++reqId;
-    var id = reqId;
-    var data = { action: "dynpage", lang: lang, rel: rel };
-    // Infuse extra params (search)
-    infuseSearchParams(data);
-    // Submit request
-    var req = $.ajax({
-      url: "/Handler.ashx",
-      type: "POST",
-      contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-      data: data
-    });
-    req.done(function (data) {
-      dynReady(data, id);
-    });
-    req.fail(function (jqXHR, textStatus, error) {
-      applyFailHtml();
-    });
-    // Generic click-away handler to close active popup
-    $('html').click(function () {
-      if (activeModalCloser != null) {
-        activeModalCloser();
-        activeModalCloser = null;
-      }
-    });
+    // Skipped if we received page with content present already
+    var hasContent = $("#theBody").hasClass("has-initial-content");
+    if (!hasContent) {
+      ++reqId;
+      var id = reqId;
+      var data = { action: "dynpage", lang: lang, rel: rel };
+      // Infuse extra params (search)
+      infuseSearchParams(data);
+      // Submit request
+      var req = $.ajax({
+        url: "/Handler.ashx",
+        type: "POST",
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        data: data
+      });
+      req.done(function (data) {
+        dynReady(data, id);
+      });
+      req.fail(function (jqXHR, textStatus, error) {
+        applyFailHtml();
+      });
+      // Generic click-away handler to close active popup
+      $('html').click(function () {
+        if (activeModalCloser != null) {
+          activeModalCloser();
+          activeModalCloser = null;
+        }
+      });
+    }
     // Adapt font size to window width
     $(window).resize(onResize);
     onResize();
+    // If page has initial content, trigger dyn-content-loaded activities right now
+    if (hasContent) dynReady(null, -1);
   });
 
   // Infuses additional parameters to be submitted in search requests.
@@ -201,10 +210,11 @@ var zdPage = (function () {
   // Dynamic data received after initial page load (not within single-page navigation)
   function dynReady(data, id) {
     // An obsolete request completing too late?
-    if (id != reqId) return;
+    if (id != -1 && id != reqId) return;
 
     // Show dynamic content, title etc.
-    applyDynContent(data);
+    // Data is null if we're call directly from page load (content already present)
+    if (data != null) applyDynContent(data);
 
     // Set up single-page navigation
     $(document).on('click', 'a.ajax', function () {
@@ -230,7 +240,7 @@ var zdPage = (function () {
     });
 
     // *NOW* that we're all done, show page.
-    $("#thePage").addClass("visible");
+    $("#thePage").css("visibility", "visible");
     // Events - toggle from lookup input to menu
     $("#toMenu").click(function () {
       $("#hdrSearch").removeClass("on");

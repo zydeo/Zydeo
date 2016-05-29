@@ -21,6 +21,8 @@
     <IISExpressUseClassicPipelineMode />
     <TargetFrameworkProfile />
     <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -90,20 +92,25 @@
     <Content Include="Content\_work-in-progress.hu.html" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
-    <Content Include="js-1.0\common.js" />
-    <Content Include="js-1.0\diagnostics.js" />
-    <Content Include="js-1.0\history.js" />
-    <Content Include="js-1.0\lookup.js" />
-    <Content Include="js-1.0\newentry.js" />
-    <Content Include="js-1.0\page.js" />
-    <Content Include="js-1.0\strings-hu.js" />
-    <Content Include="js-1.0\strokeanim.js" />
+    <None Include="js-1.0\diagnostics.js" />
+    <None Include="js-1.0\history.js" />
+    <None Include="js-1.0\lookup.js" />
+    <None Include="js-1.0\newentry.js" />
+    <None Include="js-1.0\page.js" />
+    <None Include="js-1.0\strings-hu.js" />
+    <None Include="js-1.0\strokeanim.js" />
+    <None Include="js-1.0\app-js-bundle.js" />
+    <Content Include="js-1.0\app-js-bundle.min.js">
+      <DependentUpon>app-js-bundle.js</DependentUpon>
+    </Content>
+    <Content Include="js-1.0\app-lib-bundle.js" />
+    <None Include="js-1.0\strings-en.js" />
     <Content Include="LangRedirect.aspx" />
-    <Content Include="lib\history.min.js" />
-    <Content Include="lib\jquery-2.1.4.min.js" />
+    <None Include="js-1.0\x-history.min.js" />
+    <None Include="js-1.0\x-jquery-2.1.4.min.js" />
     <EmbeddedResource Include="Logic\DB.Scripts.txt" />
-    <Content Include="lib\jquery.color-2.1.2.min.js" />
-    <Content Include="lib\jquery.tooltipster.min.js" />
+    <None Include="js-1.0\x-jquery.color-2.1.2.min.js" />
+    <None Include="js-1.0\x-jquery.tooltipster.min.js" />
     <EmbeddedResource Include="Resources\hu.txt" />
     <EmbeddedResource Include="Resources\en.txt" />
     <Content Include="static\close.svg" />
@@ -113,15 +120,15 @@
     <Content Include="static\whitegradient.png" />
     <Content Include="static\zydeo-owl-sad.svg" />
     <Content Include="static\zydeo-owl.svg" />
-    <Content Include="style-1.0\diagnostics.css" />
-    <Content Include="style-1.0\entry.css" />
-    <Content Include="style-1.0\forms.css" />
-    <Content Include="style-1.0\history.css" />
-    <Content Include="style-1.0\lookup.css" />
-    <Content Include="style-1.0\newentry.css" />
-    <Content Include="style-1.0\page.css" />
-    <Content Include="style-1.0\style.css" />
-    <Content Include="style-1.0\tooltipster.css" />
+    <Content Include="style-1.0\bundle.css" />
+    <None Include="style-1.0\diagnostics.css" />
+    <None Include="style-1.0\entry.css" />
+    <None Include="style-1.0\forms.css" />
+    <None Include="style-1.0\history.css" />
+    <None Include="style-1.0\lookup.css" />
+    <None Include="style-1.0\newentry.css" />
+    <None Include="style-1.0\page.css" />
+    <None Include="style-1.0\tooltipster.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -150,8 +157,9 @@
     <Compile Include="Logic\SqlDict.History.cs" />
     <Content Include="Content\_search.hu.html" />
     <Content Include="js-1.0\Web.config" />
-    <Content Include="lib\Web.config" />
     <Content Include="Content\edit.history.hu.html" />
+    <None Include="packages.config" />
+    <None Include="bundleconfig.json" />
     <None Include="Properties\PublishProfiles\ForUpload.pubxml" />
     <Content Include="static\rubbery.svg" />
     <Content Include="static\Web.config" />
@@ -221,6 +229,13 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <Import Project="..\packages\BuildBundlerMinifier.1.9.155\build\BuildBundlerMinifier.targets" Condition="Exists('..\packages\BuildBundlerMinifier.1.9.155\build\BuildBundlerMinifier.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\BuildBundlerMinifier.1.9.155\build\BuildBundlerMinifier.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BuildBundlerMinifier.1.9.155\build\BuildBundlerMinifier.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

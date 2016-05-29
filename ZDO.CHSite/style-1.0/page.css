@@ -17,9 +17,6 @@ body.pt13 { font-size: 13pt; }
 body.pt14 { font-size: 14pt; }
 body.pt16 { font-size: 16pt; }
 
-#thePage { display: none; }
-#thePage.visible { display: block; }
-
 #debug {
   position: fixed;
   top: 0;

@@ -1,4 +1,7 @@
-﻿# Application menu
+﻿# Misc
+DefaultTitle					CHDICT - Nyílt, bárki által szerkeszthető kínai-magyar szótár
+
+# Application menu
 TopMenuEdit						Szerkeszt
 TopMenuRead						Olvas
 TopMenuDownload					Letölt

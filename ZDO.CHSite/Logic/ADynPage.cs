@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
-using System.Web.UI;
 using System.Text;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
 using System.IO;
-
-using ZD.Common;
 
 namespace ZDO.CHSite
 {
@@ -19,6 +15,9 @@ namespace ZDO.CHSite
         /// </summary>
         public ADynPage(HttpContext ctxt) : base(ctxt) { }
 
+        /// <summary>
+        /// Everything relevant for a dynamic page: HTML, title, other meta-information.
+        /// </summary>
         [DataContract]
         public class Result
         {
@@ -32,6 +31,9 @@ namespace ZDO.CHSite
             public string Description = "";
         }
 
+        /// <summary>
+        /// Assembles full absolute file name for language and relative path.
+        /// </summary>
         private static string getFileName(string lang, string rel)
         {
             // Derive file name in Content folder from request
@@ -56,7 +58,11 @@ namespace ZDO.CHSite
             return null;
         }
 
-        private void readFile(string fname, out StringBuilder sbHtml, out string title, out string keywords, out string description)
+        /// <summary>
+        /// Reads and interprets fully qualified HTML file.
+        /// </summary>
+        private static void readFile(string fname, out StringBuilder sbHtml, out string title,
+            out string keywords, out string description)
         {
             sbHtml = new StringBuilder();
             title = "";
@@ -81,7 +87,10 @@ namespace ZDO.CHSite
             }
         }
 
-        private void feedResult(string fname)
+        /// <summary>
+        /// Makes result based on fully qualified static HTML file name.
+        /// </summary>
+        private static Result makeResult(string fname)
         {
             StringBuilder sbHtml;
             string title, keywords, description;
@@ -91,9 +100,57 @@ namespace ZDO.CHSite
             res.Title = title;
             res.Keywords = keywords;
             res.Description = description;
-            Res = res;
+            return res;
         }
 
+        /// <summary>
+        /// Provides content of welcome screen.
+        /// </summary>
+        private static Result makeWelcomeResult(string lang)
+        {
+            string fname = getFileName(lang, "_welcome");
+            return makeResult(fname);
+        }
+
+        /// <summary>
+        /// Provides static page for Default.aspx code-behind, without any AJAX handler machinery.
+        /// </summary>
+        /// <param name="lang">Page language from URL.</param>
+        /// <param name="rel">Relative address from URL.</param>
+        /// <returns>HTML and metas to return, or null if this page is not to be served without callback.</returns>
+        public static Result StaticLoad(string lang, string rel)
+        {
+            // Pages we don't want to load statically (too long - callback better)
+            if (rel.StartsWith("search/") || rel.StartsWith("edit/history"))
+                return null;
+            // Welcome page gets special treatment
+            if (rel == "") return makeWelcomeResult(lang);
+            // Just get HTML
+            return getStaticResult(lang, rel);
+        }
+
+        /// <summary>
+        /// Gets static page for a language and relative URL.
+        /// </summary>
+        public static Result getStaticResult(string lang, string rel)
+        {
+            // DBG: Show diagnostics on download page
+            if (rel == "download")
+                return makeResult(getFileName("en", "_diagnostics"));
+
+            string fname = getFileName(lang, rel);
+            // If requested file exists, feed it to caller
+            if (fname != null)
+                return makeResult(fname);
+            // For "edit" menu, return WIP
+            if (rel.StartsWith("edit"))
+                return makeResult(getFileName(lang, "_work-in-progress"));
+            return null;
+        }
+
+        /// <summary>
+        /// Processes dynamic page request: result includes HTML, title, keywords, description.
+        /// </summary>
         public override void Process()
         {
             string lang = Req.Params["lang"];
@@ -101,38 +158,16 @@ namespace ZDO.CHSite
 
             // If request is for search, special treatment
             if (rel == "" || rel.StartsWith("search/"))
-            {
                 doSearch(lang, rel);
-                return;
-            }
             // If request is for history, special treatment
-            if (rel.StartsWith("edit/history"))
-            {
+            else if (rel.StartsWith("edit/history"))
                 doHistory(lang, rel);
-                return;
-            }
-            // DBG: Show diagnostics on download page
-            if (rel == "download")
+            // Static page, nothing special
+            else
             {
-                feedResult(getFileName("en", "_diagnostics"));
-                return;
+                Res = getStaticResult(lang, rel);
+                if (Res == null) throw new Exception("Requested dynamic page not found.");
             }
-
-            string fname = getFileName(lang, rel);
-            // If requested file exists, feed it to caller
-            if (fname != null)
-            {
-                feedResult(fname);
-                return;
-            }
-            // For "edit" menu, return WIP
-            if (rel.StartsWith("edit"))
-            {
-                feedResult(getFileName(lang, "_work-in-progress"));
-                return;
-            }
-            // Throw up in their face.
-            throw new Exception("Requested dynamic page not found.");
         }
     }
 }

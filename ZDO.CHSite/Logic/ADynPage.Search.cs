@@ -4,7 +4,6 @@ using System.Web;
 using System.Web.UI;
 using System.Text;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
 using System.IO;
 
 using ZD.Common;
@@ -25,8 +24,7 @@ namespace ZDO.CHSite
             // No search query in URL: show welcome page.
             if (rel == "")
             {
-                string fname = getFileName(lang, "_welcome");
-                feedResult(fname);
+                Res = makeWelcomeResult(lang);
                 return;
             }
 
