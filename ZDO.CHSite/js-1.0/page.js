@@ -11,6 +11,13 @@ function startsWith(str, prefix) {
   return i < 0;
 }
 
+function escapeHTML(s) {
+  return s.replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+}
+
 var zdPage = (function () {
   "use strict";
 
@@ -42,6 +49,26 @@ var zdPage = (function () {
     '  </div>' +
     '</div>';
 
+  var modalPopupTemplate =
+    '<div class="modalPopup" id="{{id}}">' +
+    '  <div class="modalPopupInner1">' +
+    '    <div class="modalPopupInner2">' +
+    '      <div class="modalPopupHeader">' +
+    '        <span class="modalPopupTitle">{{title}}</span>' +
+    '        <span class="modalPopupClose">X</span>' +
+    '      </div>' +
+    '      <div class="modalPopupBody">' +
+    '        {{body}}' +
+    '      </div>' +
+    '      <div class="modalPopupButtons">' +
+    '        <span class="modalPopupButton modalPopupButtonCancel">{{Cancel}}</span>' +
+    '        <span class="modalPopupButton modalPopupButtonOK">{{OK}}</span>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+
+ 
   // Parse full path, language, and relative path from URL
   function parseLocation() {
     location = window.history.location || window.location;
@@ -294,6 +321,12 @@ var zdPage = (function () {
     else if (lang == "hu") $("#langSelHu").addClass("on");
   }
 
+  // Closes a standard modal dialog (shown by us).
+  function doCloseModal(id) {
+    $("#" + id).remove();
+    zdPage.modalHidden();
+  }
+
   return {
     // Called by page-specific controller scripts to register themselves in single-page app, when page is navigated to.
     registerInitScript: function(pageRel, init) {
@@ -364,8 +397,34 @@ var zdPage = (function () {
       activeModalCloser = closeFun;
     },
 
+    // Called by code when it closes modal of its own accord.
     modalHidden: function() {
       activeModalCloser = null;
+    },
+
+    // Shows a standard modal dialog with the provided content and callbacks.
+    showModal: function (params) {
+      // Close any other popup
+      if (activeModalCloser != null) activeModalCloser();
+      activeModalCloser = null;
+      // Build popup's HTML
+      var html = modalPopupTemplate;
+      html = html.replace("{{id}}", params.id);
+      html = html.replace("{{title}}", escapeHTML(params.title));
+      html = html.replace("{{body}}", params.body);
+      html = html.replace("{{OK}}", uiStrings["dialog-ok"]);
+      html = html.replace("{{Cancel}}", uiStrings["dialog-cancel"]);
+      $("#dynPage").append(html);
+      // Wire up events
+      activeModalCloser = function () { doCloseModal(params.id); };
+      $(".modalPopupInner2").click(function (evt) { evt.stopPropagation(); });
+      $(".modalPopupClose").click(function () { doCloseModal(params.id); });
+      $(".modalPopupButtonCancel").click(function () { doCloseModal(params.id); });
+      $(".modalPopupButtonOK").click(function () {
+        if (params.confirmed()) doCloseModal(params.id);
+      });
+      // Focus requested field
+      if (params.toFocus) $(params.toFocus).focus();
     },
 
     // Shows an alert at the top of the page.

@@ -42,6 +42,12 @@ var uiStringsHu = {
   "tooltip-history-comment": "Megjegyzés hozzáfűzése",
   "tooltip-history-edit": "Szócikk szerkesztése",
   "tooltip-history-flag": "Szócikk megjelölése<br/>(pontatlan, téves vagy hiányos)",
+  "dialog-ok": "OK",
+  "dialog-cancel": "Mégse",
+  "history-commententry-title": "Megjegyzés hozzáfűzése",
+  "history-commententry-hint": "Írd ide, amit hozzáfűznél a szócikkhez...",
+  "history-commententry-successtitle": "Megjegyzés elmentve",
+  "history-commententry-successmessage": "A megjegyzésedet sikeresen elmentette a CHDICT. A szócikket a változás-történet első oldalának tetején találod.",
 };
 
 /// <reference path="x-jquery-2.1.4.min.js" />
@@ -55,6 +61,13 @@ function startsWith(str, prefix) {
   for (var i = prefix.length - 1; (i >= 0) && (str[i] === prefix[i]) ; --i)
     continue;
   return i < 0;
+}
+
+function escapeHTML(s) {
+  return s.replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
 }
 
 var zdPage = (function () {
@@ -88,6 +101,26 @@ var zdPage = (function () {
     '  </div>' +
     '</div>';
 
+  var modalPopupTemplate =
+    '<div class="modalPopup" id="{{id}}">' +
+    '  <div class="modalPopupInner1">' +
+    '    <div class="modalPopupInner2">' +
+    '      <div class="modalPopupHeader">' +
+    '        <span class="modalPopupTitle">{{title}}</span>' +
+    '        <span class="modalPopupClose">X</span>' +
+    '      </div>' +
+    '      <div class="modalPopupBody">' +
+    '        {{body}}' +
+    '      </div>' +
+    '      <div class="modalPopupButtons">' +
+    '        <span class="modalPopupButton modalPopupButtonCancel">{{Cancel}}</span>' +
+    '        <span class="modalPopupButton modalPopupButtonOK">{{OK}}</span>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+
+ 
   // Parse full path, language, and relative path from URL
   function parseLocation() {
     location = window.history.location || window.location;
@@ -340,6 +373,12 @@ var zdPage = (function () {
     else if (lang == "hu") $("#langSelHu").addClass("on");
   }
 
+  // Closes a standard modal dialog (shown by us).
+  function doCloseModal(id) {
+    $("#" + id).remove();
+    zdPage.modalHidden();
+  }
+
   return {
     // Called by page-specific controller scripts to register themselves in single-page app, when page is navigated to.
     registerInitScript: function(pageRel, init) {
@@ -410,8 +449,34 @@ var zdPage = (function () {
       activeModalCloser = closeFun;
     },
 
+    // Called by code when it closes modal of its own accord.
     modalHidden: function() {
       activeModalCloser = null;
+    },
+
+    // Shows a standard modal dialog with the provided content and callbacks.
+    showModal: function (params) {
+      // Close any other popup
+      if (activeModalCloser != null) activeModalCloser();
+      activeModalCloser = null;
+      // Build popup's HTML
+      var html = modalPopupTemplate;
+      html = html.replace("{{id}}", params.id);
+      html = html.replace("{{title}}", escapeHTML(params.title));
+      html = html.replace("{{body}}", params.body);
+      html = html.replace("{{OK}}", uiStrings["dialog-ok"]);
+      html = html.replace("{{Cancel}}", uiStrings["dialog-cancel"]);
+      $("#dynPage").append(html);
+      // Wire up events
+      activeModalCloser = function () { doCloseModal(params.id); };
+      $(".modalPopupInner2").click(function (evt) { evt.stopPropagation(); });
+      $(".modalPopupClose").click(function () { doCloseModal(params.id); });
+      $(".modalPopupButtonCancel").click(function () { doCloseModal(params.id); });
+      $(".modalPopupButtonOK").click(function () {
+        if (params.confirmed()) doCloseModal(params.id);
+      });
+      // Focus requested field
+      if (params.toFocus) $(params.toFocus).focus();
     },
 
     // Shows an alert at the top of the page.
@@ -1732,7 +1797,12 @@ var zdLookup = (function () {
 /// <reference path="strings-hu.js" />
 /// <reference path="page.js" />
 
-var zdHistory = (function() {
+var zdHistory = (function () {
+
+  var addCommentTemplate =
+    '<i class="fa fa-commenting-o" aria-hidden="true"></i>' +
+    '<textarea id="txtHistComment" placeholder="{{hint}}"></textarea>';
+
 
   $(document).ready(function () {
     zdPage.registerInitScript("edit/history", init);
@@ -1752,7 +1822,48 @@ var zdHistory = (function() {
       content: $("<span>" + uiStrings["tooltip-history-flag"] + "</span>"),
       position: 'left'
     });
+    // Event handlers for per-entry commands
+    $(".opHistComment").click(onComment);
+  }
 
+  function onComment(evt) {
+    // Find entry ID in parent with historyItem class
+    var elm = $(this);
+    while (!elm.hasClass("historyItem")) elm = elm.parent();
+    var entryId = elm.data("entryid");
+    // Prepare modal window content
+    var bodyHtml = addCommentTemplate;
+    bodyHtml = bodyHtml.replace("{{hint}}", uiStrings["history-commententry-hint"]);
+    var params = {
+      id: "dlgHistComment",
+      title: uiStrings["history-commententry-title"],
+      body: bodyHtml,
+      confirmed: function () { return onCommentConfirmed(entryId); },
+      toFocus: "#txtHistComment"
+    };
+    // Show
+    zdPage.showModal(params);
+    evt.stopPropagation();
+  }
+
+  function onCommentConfirmed(entryId) {
+    var cmt = $("#txtHistComment").val();
+    if (cmt.length == 0) {
+      return false;
+    }
+    var req = $.ajax({
+      url: "/Handler.ashx",
+      type: "POST",
+      contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+      data: { action: "history_commententry", entry_id: entryId }
+    });
+    req.done(function (data) {
+      zdPage.showAlert(uiStrings["history-commententry-successtitle"], uiStrings["history-commententry-successmessage"], false);
+    });
+    req.fail(function (jqXHR, textStatus, error) {
+      zdPage.showAlert("Csak a baj", "Elmentés nó nó.", true);
+    });
+    return true;
   }
 
 })();

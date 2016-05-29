@@ -203,6 +203,7 @@
     <Compile Include="Logic\ADynPage.cs" />
     <Compile Include="Logic\ADynPage.History.cs" />
     <Compile Include="Logic\ADynPage.Search.cs" />
+    <Compile Include="Logic\AHistCommentEntry.cs" />
     <Compile Include="Logic\ANewEntrySubmit.cs" />
     <Compile Include="Logic\SqlDict.cs" />
     <Content Include="Handler.ashx" />

@@ -321,6 +321,8 @@ textarea, input {
   color: @clrBodyText;
 }
 
+/* ======================= ALERT BAR ===================================== */
+
 .alertBar {
   position: fixed;
   top: 2.8em;
@@ -389,3 +391,105 @@ textarea, input {
   width: 1.5em;
   height: 1.5em;
 }
+
+/* ======================= GENERIC MODAL POPUP ===================================== */
+
+.modalPopup {
+  position: fixed;
+  width: 100%;
+  top: 12em;
+  left: 0;
+  z-index: 3;
+}
+
+.modalPopupInner1 {
+  position: relative;
+  float: left;
+  left: 50%;
+}
+
+.modalPopupInner2 {
+  position: relative;
+  float: left;
+  left: -50%;
+  background: @clrDefBg;
+  border: 1pt solid @clrMedium;
+  box-shadow: 0 0 0.3em rgba(0, 0, 0, .7);
+}
+
+.modalPopupHeader {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: @clrMedium;
+  font-size: 110%;
+  font-family: Ubuntu;
+  color: @clrDefBg;
+  padding: 0;
+  height: 1.6em;
+  cursor: default;
+}
+
+.modalPopupTitle {
+  display: inline-block;
+  position: absolute;
+  margin-left: 0.5em;
+  margin-top: 0.15em;
+  left: 0;
+}
+
+.modalPopupClose {
+  display: inline-block;
+  position: relative;
+  float: right;
+  box-sizing: border-box;
+  background-color: @clrLight;
+  width: 1.6em;
+  height: 1.6em;
+  padding-top: 0.15em;
+  text-align: center;
+  color: @clrMedium;
+  border-bottom: 1pt solid @clrMedium;
+  cursor: default;
+  transition: background-color 0.5s ease;
+}
+
+
+.modalPopupClose:hover {
+  background-color: @clrLightLight;
+}
+
+.modalPopupBody {
+  position: relative;
+  float: left;
+  clear: both;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6em 0.6em 0 0.6em;
+  font-size: 90%;
+}
+
+.modalPopupButtons {
+  position: relative;
+  float: left;
+  clear: both;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5em;
+}
+
+.modalPopupButton {
+  display: block;
+  position: relative;
+  float: right;
+  box-sizing: border-box;
+  margin-left: 0.5em;
+  padding: 0 0.7em 0.1em 0.7em;
+  background-color: @clrLightAccent;
+  transition: background-color 0.5s ease;
+  cursor: default;
+}
+
+.modalPopupButton:hover { background-color: @clrMediumAccent; }
+.modalPopupButtonCancel { background-color: @clrLightLight; }
+.modalPopupButtonCancel:hover { background-color: @clrLight; }

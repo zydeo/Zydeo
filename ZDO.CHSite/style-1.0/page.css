@@ -301,6 +301,7 @@ textarea,
 input {
   color: #303030;
 }
+/* ======================= ALERT BAR ===================================== */
 .alertBar {
   position: fixed;
   top: 2.8em;
@@ -358,4 +359,99 @@ input {
 .alertClose img {
   width: 1.5em;
   height: 1.5em;
+}
+/* ======================= GENERIC MODAL POPUP ===================================== */
+.modalPopup {
+  position: fixed;
+  width: 100%;
+  top: 12em;
+  left: 0;
+  z-index: 3;
+}
+.modalPopupInner1 {
+  position: relative;
+  float: left;
+  left: 50%;
+}
+.modalPopupInner2 {
+  position: relative;
+  float: left;
+  left: -50%;
+  background: #fff;
+  border: 1pt solid #638fb8;
+  box-shadow: 0 0 0.3em rgba(0, 0, 0, 0.7);
+}
+.modalPopupHeader {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #638fb8;
+  font-size: 110%;
+  font-family: Ubuntu;
+  color: #fff;
+  padding: 0;
+  height: 1.6em;
+  cursor: default;
+}
+.modalPopupTitle {
+  display: inline-block;
+  position: absolute;
+  margin-left: 0.5em;
+  margin-top: 0.15em;
+  left: 0;
+}
+.modalPopupClose {
+  display: inline-block;
+  position: relative;
+  float: right;
+  box-sizing: border-box;
+  background-color: #d3e3f2;
+  width: 1.6em;
+  height: 1.6em;
+  padding-top: 0.15em;
+  text-align: center;
+  color: #638fb8;
+  border-bottom: 1pt solid #638fb8;
+  cursor: default;
+  transition: background-color 0.5s ease;
+}
+.modalPopupClose:hover {
+  background-color: #f0f4f7;
+}
+.modalPopupBody {
+  position: relative;
+  float: left;
+  clear: both;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6em 0.6em 0 0.6em;
+  font-size: 90%;
+}
+.modalPopupButtons {
+  position: relative;
+  float: left;
+  clear: both;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5em;
+}
+.modalPopupButton {
+  display: block;
+  position: relative;
+  float: right;
+  box-sizing: border-box;
+  margin-left: 0.5em;
+  padding: 0 0.7em 0.1em 0.7em;
+  background-color: #ffe4cc;
+  transition: background-color 0.5s ease;
+  cursor: default;
+}
+.modalPopupButton:hover {
+  background-color: #ffc898;
+}
+.modalPopupButtonCancel {
+  background-color: #f0f4f7;
+}
+.modalPopupButtonCancel:hover {
+  background-color: #d3e3f2;
 }

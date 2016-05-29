@@ -19,4 +19,10 @@
   "tooltip-history-comment": "Megjegyzés hozzáfűzése",
   "tooltip-history-edit": "Szócikk szerkesztése",
   "tooltip-history-flag": "Szócikk megjelölése<br/>(pontatlan, téves vagy hiányos)",
+  "dialog-ok": "OK",
+  "dialog-cancel": "Mégse",
+  "history-commententry-title": "Megjegyzés hozzáfűzése",
+  "history-commententry-hint": "Írd ide, amit hozzáfűznél a szócikkhez...",
+  "history-commententry-successtitle": "Megjegyzés elmentve",
+  "history-commententry-successmessage": "A megjegyzésedet sikeresen elmentette a CHDICT. A szócikket a változás-történet első oldalának tetején találod.",
 };
